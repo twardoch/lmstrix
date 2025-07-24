@@ -27,7 +27,7 @@ classifiers = [
 
 dependencies = [
     "pydantic>=2.0",
-    "litellm>=1.0",
+    
     "rich>=13.0",
     "fire>=0.5",
     "toml>=0.10",
@@ -88,9 +88,7 @@ strict_equality = true
 module = "fire.*"
 ignore_missing_imports = true
 
-[[tool.mypy.overrides]]
-module = "litellm.*"
-ignore_missing_imports = true
+
 
 [[tool.mypy.overrides]]
 module = "lmstudio.*"
@@ -118,7 +116,7 @@ ignore = [
 "__init__.py" = ["F401"]
 
 [tool.ruff.isort]
-known-third-party = ["pydantic", "litellm", "rich", "fire", "loguru", "tenacity"]
+known-third-party = ["pydantic", "rich", "fire", "loguru", "tenacity"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

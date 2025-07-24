@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 
 from lmstrix.api.client import LMStudioClient
 from lmstrix.api.exceptions import ModelNotFoundError
-from lmstrix.core.models import ModelRegistry
+from lmstrix.core.models import Model, ModelRegistry
 
 
 class InferenceResult(BaseModel):
@@ -51,7 +51,7 @@ class InferenceEngine:
         self,
         model_id: str,
         prompt: str,
-        max_tokens: int = 2048,
+        max_tokens: int = -1,  # Use -1 for unlimited as per new client
         temperature: float = 0.7,
         **kwargs: Any,
     ) -> InferenceResult:
@@ -62,12 +62,17 @@ class InferenceEngine:
             raise ModelNotFoundError(model_id, available)
 
         start_time = time.time()
-
+        llm = None
         try:
+            # Use tested context limit if available, otherwise fallback to declared limit
+            context_len = model.tested_max_context or model.context_limit
+            logger.info(f"Loading model {model_id} with context length {context_len}...")
+            llm = self.client.load_model(model_id, context_len=context_len)
+
             logger.info(f"Running inference on model {model_id}")
             response = await self.client.acompletion(
-                model_id=model_id,
-                messages=[{"role": "user", "content": prompt}],
+                llm=llm,
+                prompt=prompt,
                 max_tokens=max_tokens,
                 temperature=temperature,
                 **kwargs,
@@ -93,3 +98,7 @@ class InferenceEngine:
                 inference_time=time.time() - start_time,
                 error=str(e),
             )
+        finally:
+            if llm:
+                logger.info(f"Unloading model {model_id}...")
+                llm.unload()
