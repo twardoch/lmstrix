@@ -64,21 +64,15 @@ def get_lmstrix_data_dir() -> Path:
 
 
 def get_default_models_file() -> Path:
-    """Get the path to the models registry JSON file.
+    """Get the path to the lmstrix.json registry file.
+
+    The file is stored directly in the LM Studio data directory.
 
     Returns:
-        Path to models.json file.
+        Path to the lmstrix.json file.
     """
-    # First check for existing lmsm.json in LM Studio root
     lms_path = get_lmstudio_path()
-    legacy_path = lms_path / "lmsm.json"
-
-    if legacy_path.exists():
-        logger.info(f"Using existing registry at {legacy_path}")
-        return legacy_path
-
-    # Otherwise use new location
-    return get_lmstrix_data_dir() / "models.json"
+    return lms_path / "lmstrix.json"
 
 
 def get_context_tests_dir() -> Path:
