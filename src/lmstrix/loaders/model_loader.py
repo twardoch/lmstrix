@@ -2,7 +2,6 @@
 """Model loading functionality."""
 
 from pathlib import Path
-from typing import Optional
 
 from loguru import logger
 
@@ -10,7 +9,7 @@ from lmstrix.core.models import ModelRegistry
 
 
 def load_model_registry(
-    json_path: Optional[Path] = None,
+    json_path: Path | None = None,
     verbose: bool = False,
 ) -> ModelRegistry:
     """Load models from a JSON file into a ModelRegistry.
@@ -54,7 +53,7 @@ def load_model_registry(
 
 def save_model_registry(
     registry: ModelRegistry,
-    json_path: Optional[Path] = None,
+    json_path: Path | None = None,
 ) -> Path:
     """Save a ModelRegistry to a JSON file.
 

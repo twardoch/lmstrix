@@ -2,7 +2,7 @@
 """Prompt loading functionality."""
 
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import toml
 from loguru import logger
@@ -13,7 +13,7 @@ from lmstrix.core.prompts import PromptResolver, ResolvedPrompt
 
 def load_prompts(
     toml_path: Path,
-    resolver: Optional[PromptResolver] = None,
+    resolver: PromptResolver | None = None,
     verbose: bool = False,
     **params: str,
 ) -> dict[str, ResolvedPrompt]:
@@ -46,7 +46,7 @@ def load_prompts(
 
     # Load TOML data
     try:
-        with open(toml_path, "r") as f:
+        with open(toml_path) as f:
             data = toml.load(f)
         logger.info(f"Loaded prompts from {toml_path}")
     except Exception as e:
@@ -73,7 +73,7 @@ def load_prompts(
 def load_single_prompt(
     toml_path: Path,
     prompt_name: str,
-    resolver: Optional[PromptResolver] = None,
+    resolver: PromptResolver | None = None,
     verbose: bool = False,
     **params: str,
 ) -> ResolvedPrompt:
@@ -107,7 +107,7 @@ def load_single_prompt(
 
     # Load TOML data
     try:
-        with open(toml_path, "r") as f:
+        with open(toml_path) as f:
             data = toml.load(f)
         logger.info(f"Loaded prompts from {toml_path}")
     except Exception as e:

@@ -1,162 +1,162 @@
-# TODO List for LMStrix
+# TODO List for LMStrix v1.0 MVP
 
-## Phase 5: Testing & Quality Assurance
+## PRIORITY: Replace litellm with lmstudio package
+
+### Immediate Tasks
+- [ ] Remove litellm dependency from pyproject.toml
+- [ ] Rewrite LMStudioClient to use native lmstudio package
+- [ ] Update ContextTester to use lmstudio.llm() for model loading
+- [ ] Replace litellm completion calls with model.complete()
+- [ ] Add proper model unloading with model.unload()
+- [ ] Update model discovery to use lmstudio.list_downloaded_models()
+- [ ] Test with real LM Studio instance
+
+## Phase 1: Core Functionality
+
+### Model Discovery & Registry
+
+- [x] Create system path detection for LM Studio data directory
+- [x] Implement model scanner that finds all downloaded models
+- [x] Add compatibility layer for existing lmsm.json format
+- [x] Create data directory structure in LM Studio path
+- [x] Implement model registry save/load with proper paths
+- [x] Add model metadata extraction (size, declared context, capabilities)
+- [x] Create model registry update mechanism
+- [x] Add model removal detection and cleanup
+- [ ] Update model discovery to use lmstudio.list_downloaded_models()
+- [ ] Extract real model metadata using model.get_info()
+
+### Context Validation System
+
+- [ ] Replace litellm with native lmstudio package
+- [ ] Update LMStudioClient to use lmstudio.llm() for model loading
+- [ ] Implement model loading with specific context size using config parameter
+- [ ] Update inference to use model.complete() instead of litellm
+- [ ] Add model.unload() after each test to free resources
+- [ ] Create context testing engine base class
+- [ ] Add simple prompt testing ("2+2=" -> "4")
+- [ ] Implement binary search for maximum loadable context
+- [ ] Create progressive context testing from min to max
+- [ ] Add response validation logic
+- [ ] Implement per-model logging system
+- [ ] Create log file format and structure
+- [ ] Add context test status tracking
+- [ ] Implement test resumption for interrupted tests
+- [ ] Add tested_max_context field to model registry
+- [ ] Create context test results storage
+
+### CLI Updates
+
+- [x] Update CLI to use new model discovery
+- [x] Implement `lmstrix scan` command
+- [x] Update `lmstrix list` to show context test status
+- [x] Create `lmstrix test <model_id>` command
+- [x] Add `lmstrix test --all` for batch testing
+- [x] Create `lmstrix status` to show testing progress
+- [x] Add progress bars for long operations
+- [x] Implement proper error messages
+- [x] Add CLI help documentation
+
+### Python API Updates
+
+- [ ] Update LMStrix class with context testing methods
+- [ ] Add test_context_limits method
+- [ ] Create get_tested_context_limit method
+- [ ] Add context test status query methods
+- [ ] Implement async context testing support
+- [ ] Add batch testing capabilities
+- [ ] Create context test result models
+- [ ] Add proper exception handling
+
+## Phase 2: Testing & Quality
 
 ### Unit Tests
-- [ ] Set up pytest configuration with pytest-cov
-- [ ] Create test fixtures in tests/conftest.py
-- [ ] Write tests for Model class validation
-- [ ] Write tests for ModelRegistry operations
-- [ ] Write tests for InferenceEngine async operations
-- [ ] Write tests for ContextOptimizer binary search
-- [ ] Write tests for PromptResolver two-phase resolution
-- [ ] Write tests for all data loaders
+
+- [ ] Write tests for model discovery
+- [ ] Write tests for path detection logic
+- [ ] Write tests for context binary search
+- [ ] Write tests for response validation
+- [ ] Write tests for log file handling
+- [ ] Write tests for registry updates
 - [ ] Write tests for CLI commands
-- [ ] Write tests for LMStudioClient retry logic
-- [ ] Achieve 90% test coverage
+- [ ] Write tests for error conditions
 
 ### Integration Tests
-- [ ] Set up integration test framework
-- [ ] Create Docker setup for LM Studio test instance
-- [ ] Write end-to-end inference tests
-- [ ] Write context optimization integration tests
-- [ ] Test CLI commands with real server
+
+- [ ] Create mock LM Studio server
+- [ ] Write end-to-end context testing tests
+- [ ] Test interrupted test resumption
+- [ ] Test batch model testing
+- [ ] Test error recovery scenarios
 
 ### Code Quality
-- [ ] Configure mypy with strict settings
-- [ ] Fix all type checking errors
-- [ ] Set up pre-commit hooks
-- [ ] Configure ruff with project rules
-- [ ] Add GitHub Actions for CI
 
-## Phase 6: Documentation
+- [ ] Run mypy and fix type errors
+- [ ] Run ruff and fix linting issues
+- [ ] Add missing type hints
+- [ ] Add comprehensive docstrings
+- [ ] Review error handling
+
+## Phase 3: Documentation
+
+### User Documentation
+
+- [ ] Update README.md with context testing features
+- [ ] Write context testing methodology guide
+- [ ] Create troubleshooting section
+- [ ] Add common issues and solutions
+- [ ] Write quick start guide
 
 ### API Documentation
-- [ ] Install and configure MkDocs
-- [ ] Set up Material theme
-- [ ] Write comprehensive index.md
-- [ ] Create detailed installation guide
-- [ ] Write CLI command reference
-- [ ] Document Python API with examples
-- [ ] Add architecture diagrams
-- [ ] Set up auto-generated API docs
-- [ ] Create contribution guidelines
-- [ ] Deploy docs to GitHub Pages
 
-### Examples and Tutorials
-- [ ] Create basic chat interface example
-- [ ] Create document summarizer example
-- [ ] Create code generator example
-- [ ] Create multi-model comparison example
-- [ ] Create streaming responses example
-- [ ] Create batch processing example
-- [ ] Write Jupyter notebook tutorials
-- [ ] Add example configurations
+- [ ] Document all CLI commands
+- [ ] Document Python API methods
+- [ ] Add code examples
+- [ ] Create configuration guide
+- [ ] Document log file format
 
-## Phase 7: Advanced Features
+### Examples
 
-### Streaming Support
-- [ ] Add streaming methods to LMStudioClient
-- [ ] Implement async generators for tokens
-- [ ] Update CLI for real-time output
-- [ ] Add streaming examples
-- [ ] Document streaming API
+- [ ] Create example: Test single model
+- [ ] Create example: Batch test all models
+- [ ] Create example: Query test results
+- [ ] Create example: Custom test prompts
 
-### Multi-Model Workflows
-- [ ] Design model routing interface
-- [ ] Implement capability-based routing
-- [ ] Add fallback mechanisms
-- [ ] Create ensemble prediction support
-- [ ] Write workflow examples
+## Phase 4: Package & Release
 
-### Context Management
-- [ ] Implement dynamic context adjustment
-- [ ] Add context compression algorithms
-- [ ] Create semantic chunking system
-- [ ] Implement context caching
-- [ ] Write context management guide
+### Package Preparation
 
-### Plugin System
-- [ ] Design plugin interface
-- [ ] Create plugin discovery mechanism
-- [ ] Implement plugin loader
-- [ ] Create example plugins
-- [ ] Document plugin development
+- [ ] Update pyproject.toml with all dependencies
+- [ ] Add package metadata
+- [ ] Include data files in package
+- [ ] Test package build
+- [ ] Test local installation
 
-## Phase 8: Performance
+### Pre-release Testing
 
-### Optimization
-- [ ] Implement connection pooling
-- [ ] Add response caching layer
-- [ ] Optimize data structures
-- [ ] Profile and optimize hot paths
-- [ ] Create performance benchmarks
-
-### Monitoring
-- [ ] Integrate OpenTelemetry
-- [ ] Create metrics collection
-- [ ] Build performance dashboard
-- [ ] Add resource tracking
-- [ ] Document monitoring setup
-
-## Phase 9: Package Publishing
-
-### PyPI Preparation
-- [ ] Create setup.py if needed
-- [ ] Configure package metadata
-- [ ] Write comprehensive README
-- [ ] Add all classifiers
-- [ ] Test package installation
-
-### CI/CD Setup
-- [ ] Create GitHub Actions workflow
-- [ ] Set up automated testing
-- [ ] Configure release automation
-- [ ] Add version bumping
-- [ ] Set up PyPI publishing
+- [ ] Test on fresh Python environment
+- [ ] Test on different OS platforms
+- [ ] Verify all CLI commands work
+- [ ] Test with real LM Studio instance
+- [ ] Verify data storage locations
 
 ### Release Process
-- [ ] Tag version v0.1.0
-- [ ] Create GitHub release
-- [ ] Publish to Test PyPI
-- [ ] Verify installation
+
+- [ ] Update version to 1.0.0
+- [ ] Create git tag v1.0.0
+- [ ] Build distribution packages
+- [ ] Test on Test PyPI
 - [ ] Publish to PyPI
-
-## Phase 10: Community
-
-### Documentation Site
-- [ ] Deploy documentation
-- [ ] Set up search functionality
-- [ ] Add version selector
-- [ ] Create landing page
-- [ ] Add analytics
-
-### Community Setup
-- [ ] Create issue templates
-- [ ] Set up PR templates
-- [ ] Add code of conduct
-- [ ] Create security policy
-- [ ] Set up GitHub Discussions
-
-### Outreach
-- [ ] Write announcement blog post
-- [ ] Create demo video
-- [ ] Submit to Python Weekly
-- [ ] Share on relevant forums
-- [ ] Create social media presence
-
-## Maintenance Tasks
-
-### Regular Updates
-- [ ] Update dependencies monthly
-- [ ] Run security audits
+- [ ] Create GitHub release
 - [ ] Update documentation
-- [ ] Review and merge PRs
-- [ ] Respond to issues
 
-### Quality Assurance
-- [ ] Monitor test coverage
-- [ ] Check type coverage
-- [ ] Profile performance
-- [ ] Review code quality
-- [ ] Update benchmarks
+## Critical Path Items
+
+These must be completed for MVP:
+
+1. [ ] Model discovery with proper paths
+2. [ ] Context testing engine
+3. [ ] Result logging and storage
+4. [ ] Basic CLI commands
+5. [ ] Minimal documentation
+6. [ ] Package configuration

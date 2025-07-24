@@ -3,7 +3,6 @@
 
 import json
 from pathlib import Path
-from typing import Optional, Tuple
 
 from loguru import logger
 from pydantic import BaseModel, Field
@@ -19,9 +18,7 @@ class OptimizationResult(BaseModel):
     declared_limit: int = Field(..., description="Model's declared context limit")
     optimal_context: int = Field(..., description="Optimal context size found")
     attempts: int = Field(0, description="Number of attempts made")
-    error: Optional[str] = Field(
-        None, description="Error message if optimization failed"
-    )
+    error: str | None = Field(None, description="Error message if optimization failed")
 
     @property
     def succeeded(self) -> bool:
@@ -34,8 +31,8 @@ class ContextOptimizer:
 
     def __init__(
         self,
-        client: Optional[LMStudioClient] = None,
-        cache_file: Optional[Path] = None,
+        client: LMStudioClient | None = None,
+        cache_file: Path | None = None,
         verbose: bool = False,
     ):
         """Initialize the context optimizer."""
@@ -79,8 +76,8 @@ class ContextOptimizer:
         self,
         model_id: str,
         context_size: int,
-        test_prompt: Optional[str] = None,
-    ) -> Tuple[bool, str]:
+        test_prompt: str | None = None,
+    ) -> tuple[bool, str]:
         """Test if a model can handle a specific context size."""
         if test_prompt is None:
             test_prompt = self._generate_test_prompt(context_size)
@@ -99,7 +96,7 @@ class ContextOptimizer:
     async def find_optimal_context(
         self,
         model: Model,
-        initial_size: Optional[int] = None,
+        initial_size: int | None = None,
         min_size: int = 1024,
         max_attempts: int = 20,
     ) -> OptimizationResult:
@@ -139,9 +136,7 @@ class ContextOptimizer:
         self._cache[model_id] = optimal
         self._save_cache()
 
-        logger.info(
-            f"Optimal context for {model_id}: {optimal} (from {model.context_limit})"
-        )
+        logger.info(f"Optimal context for {model_id}: {optimal} (from {model.context_limit})")
 
         return OptimizationResult(
             model_id=model_id,

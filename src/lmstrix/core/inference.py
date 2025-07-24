@@ -2,7 +2,7 @@
 """Inference engine for running models."""
 
 import time
-from typing import Any, Optional
+from typing import Any
 
 from loguru import logger
 from pydantic import BaseModel, Field
@@ -19,10 +19,8 @@ class InferenceResult(BaseModel):
     prompt: str = Field(..., description="The input prompt")
     response: str = Field(..., description="The generated response")
     tokens_used: int = Field(0, description="Total tokens used")
-    inference_time: float = Field(
-        0.0, description="Time taken for inference in seconds"
-    )
-    error: Optional[str] = Field(None, description="Error message if inference failed")
+    inference_time: float = Field(0.0, description="Time taken for inference in seconds")
+    error: str | None = Field(None, description="Error message if inference failed")
 
     @property
     def succeeded(self) -> bool:
@@ -35,8 +33,8 @@ class InferenceEngine:
 
     def __init__(
         self,
-        client: Optional[LMStudioClient] = None,
-        model_registry: Optional[ModelRegistry] = None,
+        client: LMStudioClient | None = None,
+        model_registry: ModelRegistry | None = None,
         verbose: bool = False,
     ):
         """Initialize the inference engine."""
