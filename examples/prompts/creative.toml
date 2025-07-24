@@ -1,0 +1,22 @@
+# Prompt templates for creative writing tasks
+
+[story_starter]
+name = "Story Starter"
+description = "Generate a starting paragraph for a story based on a genre and a character."
+prompt = """
+Write the opening paragraph of a {genre} story featuring a character named {character}.
+"""
+
+[poem_generator]
+name = "Poem Generator"
+description = "Generate a short poem about a given topic."
+prompt = """
+Write a four-line poem about {topic}.
+"""
+
+[dialogue_writer]
+name = "Dialogue Writer"
+description = "Write a short piece of dialogue between two characters."
+prompt = """
+Write a brief dialogue between a {character1} and a {character2} who are discussing {topic}.
+"""

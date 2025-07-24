@@ -1,0 +1,24 @@
+{
+    "questions": [
+        {
+            "id": "qa001",
+            "question": "What is the primary function of the mitochondria in a cell?",
+            "topic": "biology"
+        },
+        {
+            "id": "qa002",
+            "question": "Who wrote the novel 'Pride and Prejudice'?",
+            "topic": "literature"
+        },
+        {
+            "id": "qa003",
+            "question": "What is the difference between a list and a tuple in Python?",
+            "topic": "programming"
+        },
+        {
+            "id": "qa004",
+            "question": "What is the boiling point of water at sea level in Celsius?",
+            "topic": "physics"
+        }
+    ]
+}

@@ -1,65 +1,62 @@
 #!/bin/bash
-# model_testing.sh - Context testing focused examples for lmstrix CLI
-# This example demonstrates various ways to test model context limits
+# This script demonstrates various ways to use the `lmstrix test` command
+# for verifying the context length of models in LM Studio.
 
-echo "=== LMStrix Model Context Testing Examples ==="
-echo "This example shows different ways to test model context limits"
-echo
+# --- Introduction ---
+echo "LMStrix Model Testing Examples"
+echo "------------------------------"
+echo "This script requires LM Studio to be running."
 
-# Example 1: Test a specific model by ID
-echo "Example 1: Testing a specific model"
-echo "Command: python -m lmstrix test --model_id='llama-3.2-1b-instruct'"
-echo "This tests the context limits of a single model"
-# python -m lmstrix test --model_id="llama-3.2-1b-instruct"
-echo
+# --- Prerequisite: Scan for models ---
+echo "First, ensuring the model registry is up-to-date..."
+lmstrix scan
 
-# Example 2: Test all untested models
-echo "Example 2: Testing all untested models"
-echo "Command: python -m lmstrix test --all"
-echo "This tests all models that haven't been tested yet"
-# python -m lmstrix test --all
-echo
+# --- Example 1: Test a Specific Model by Path ---
+echo "\nExample 1: Test a specific model by its full path."
+# Find the path of the first model in the registry to use as an example.
+MODEL_PATH=$(lmstrix list --json | jq -r 'keys[0]')
 
-# Example 3: Test with verbose output
-echo "Example 3: Testing with verbose output for debugging"
-echo "Command: python -m lmstrix test --model_id='your-model-id' --verbose"
-echo "Verbose mode shows detailed progress and debug information"
-# python -m lmstrix test --model_id="llama-3.2-1b-instruct" --verbose
-echo
+if [ -z "$MODEL_PATH" ] || [ "$MODEL_PATH" == "null" ]; then
+    echo "Error: No models found. Please download a model in LM Studio and run `lmstrix scan`."
+    exit 1
+fi
 
-# Example 4: Re-test a previously failed model
-echo "Example 4: Re-testing a model that previously failed"
-echo "First, list models to see which ones failed:"
-echo "Command: python -m lmstrix list"
-# python -m lmstrix list
-echo
-echo "Then re-test the failed model:"
-echo "Command: python -m lmstrix test --model_id='failed-model-id'"
-# python -m lmstrix test --model_id="failed-model-id"
-echo
+echo "Testing model: $MODEL_PATH"
+# The `--model` flag is used to specify the model to test.
+# lmstrix test --model "$MODEL_PATH"
 
-# Example 5: Understanding test results
-echo "Example 5: Understanding test results"
-echo "After testing, use 'list' to see the results:"
-echo "Command: python -m lmstrix list"
-echo
-echo "The output shows:"
-echo "- Declared Ctx: What the model claims to support"
-echo "- Tested Ctx: The actual working context limit found"
-echo "- Status: untested, testing, completed, or failed"
-echo
+echo "(Example 1 test is commented out to prevent long run times)."
 
-# Example 6: Testing workflow for new models
-echo "Example 6: Complete testing workflow for new models"
-echo "1. Scan for new models: python -m lmstrix scan"
-echo "2. List to see new models: python -m lmstrix list"
-echo "3. Test new models: python -m lmstrix test --all"
-echo "4. Verify results: python -m lmstrix list"
-echo
+# --- Example 2: Force a Retest of a Model ---
+echo "\nExample 2: Force a retest on a model that may already have results."
+# The `--force` flag tells the tester to ignore any previous test results and run again.
 
-echo "=== Context Testing Tips ==="
-echo "- Testing can take several minutes per model"
-echo "- The tool uses binary search to efficiently find the maximum context"
-echo "- Results are saved automatically to the registry"
-echo "- Failed tests can be retried - the tool will start fresh"
-echo "- Use --verbose flag to see detailed progress during testing"
+echo "Retesting model: $MODEL_PATH"
+# lmstrix test --model "$MODEL_PATH" --force
+
+echo "(Example 2 test is commented out)."
+
+# --- Example 3: Run a Full Test on All Untested Models ---
+echo "\nExample 3: Test all models that don't have existing results."
+# Running `lmstrix test` without a specific model will start a full scan.
+# It will iterate through all models in the registry and test each one
+# that does not already have a `test_result`.
+
+echo "Starting a full test run on all untested models..."
+# lmstrix test
+
+echo "(Example 3 test is commented out)."
+
+# --- Example 4: Customizing the Test with Different Context Sizes ---
+echo "\nExample 4: Customize the test range."
+# You can specify the minimum and maximum context sizes to test.
+# This is useful if you want to narrow the search range.
+
+echo "Testing model with a custom range (1024-4096 tokens): $MODEL_PATH"
+# lmstrix test --model "$MODEL_PATH" --min-context 1024 --max-context 4096
+
+echo "(Example 4 test is commented out)."
+
+
+echo "\nModel testing examples complete."
+echo "Uncomment the 'lmstrix test ...' lines to run the commands."
