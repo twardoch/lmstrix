@@ -1,103 +1,87 @@
 # this_file: src/lmstrix/__init__.py
-"""LMStrix - A toolkit for managing and utilizing models with LM Studio.
+"""High-level API for LMStrix functionality."""
 
-This package provides a robust, user-friendly, and extensible toolkit for managing
-and running inference with models via the LM Studio local server. The core feature
-is an Adaptive Context Optimizer that automatically determines the maximum operational
-context length for any given model.
-"""
+import asyncio
+from typing import List
 
 from lmstrix.__version__ import __version__
-from lmstrix.api import CompletionResponse, LMStudioClient
-from lmstrix.core import (
-    ContextOptimizer,
-    InferenceEngine,
-    Model,
-    ModelRegistry,
-    PromptResolver,
+from lmstrix.core.context_tester import ContextTester
+from lmstrix.core.inference import InferenceEngine, InferenceResult
+from lmstrix.core.models import Model
+from lmstrix.loaders.model_loader import (
+    load_model_registry,
+    save_model_registry,
+    scan_and_update_registry,
 )
-from lmstrix.loaders import load_context, load_model_registry, load_prompts
 
 
-# High-level convenience class
 class LMStrix:
-    """High-level interface for LMStrix functionality."""
+    """Provides a high-level, simplified interface to LMStrix's core features."""
 
-    def __init__(
-        self,
-        endpoint: str = "http://localhost:1234/v1",
-        models_file: str | None = None,
-        verbose: bool = False,
-    ):
-        """Initialize LMStrix client.
+    def __init__(self, verbose: bool = False):
+        """Initializes the LMStrix API wrapper.
 
         Args:
-            endpoint: LM Studio API endpoint.
-            models_file: Path to models JSON file. If None, searches default locations.
-            verbose: Enable verbose logging.
+            verbose: Enable verbose logging throughout operations.
         """
-        self.endpoint = endpoint
         self.verbose = verbose
 
-        # Initialize components
-        self.client = LMStudioClient(endpoint=endpoint, verbose=verbose)
-        self.registry = load_model_registry(models_file, verbose=verbose)
-        self.engine = InferenceEngine(
-            client=self.client,
-            model_registry=self.registry,
-            verbose=verbose,
-        )
-        self.optimizer = ContextOptimizer(client=self.client, verbose=verbose)
-        self.prompt_resolver = PromptResolver(verbose=verbose)
+    def scan(self) -> List[Model]:
+        """Scans for LM Studio models, updates the registry, and returns all models."""
+        registry = scan_and_update_registry(verbose=self.verbose)
+        return registry.list_models()
 
-    async def list_models(self) -> list[Model]:
-        """List all available models."""
-        return self.registry.list_models()
+    def list_models(self) -> List[Model]:
+        """Lists all models currently in the registry."""
+        registry = load_model_registry(verbose=self.verbose)
+        return registry.list_models()
 
-    async def get_model(self, model_id: str) -> Model | None:
-        """Get a specific model by ID."""
-        return self.registry.get_model(model_id)
+    def test_model(self, model_id: str) -> Model:
+        """Runs the context-length test on a specific model and returns the updated model data."""
+        registry = load_model_registry(verbose=self.verbose)
+        model = registry.get_model(model_id)
+        if not model:
+            raise ValueError(f"Model '{model_id}' not found in the registry.")
+
+        tester = ContextTester()
+        updated_model = asyncio.run(tester.test_model(model))
+        
+        registry.add_model(updated_model)
+        save_model_registry(registry)
+        
+        return updated_model
 
     async def infer(
-        self,
-        model_id: str,
-        prompt: str,
-        max_tokens: int = 2048,
-        temperature: float = 0.7,
-        **kwargs,
-    ):
-        """Run inference on a model."""
-        return await self.engine.infer(
-            model_id=model_id,
-            prompt=prompt,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            **kwargs,
-        )
+        self, 
+        model_id: str, 
+        prompt: str, 
+        max_tokens: int = -1, 
+        temperature: float = 0.7
+    ) -> InferenceResult:
+        """Runs inference on a specified model.
 
-    async def optimize_context(self, model_id: str):
-        """Find optimal context size for a model."""
-        model = self.registry.get_model(model_id)
-        if not model:
-            raise ValueError(f"Model {model_id} not found")
-        return await self.optimizer.find_optimal_context(model)
+        Args:
+            model_id: The ID of the model to use.
+            prompt: The prompt to send to the model.
+            max_tokens: The maximum number of tokens to generate.
+            temperature: The sampling temperature.
+
+        Returns:
+            An InferenceResult object with the response and metadata.
+        """
+        registry = load_model_registry(verbose=self.verbose)
+        engine = InferenceEngine(model_registry=registry, verbose=self.verbose)
+        return await engine.infer(
+            model_id=model_id, 
+            prompt=prompt, 
+            max_tokens=max_tokens, 
+            temperature=temperature
+        )
 
 
 __all__ = [
     "__version__",
-    # High-level interface
     "LMStrix",
-    # Core classes
     "Model",
-    "ModelRegistry",
-    "InferenceEngine",
-    "ContextOptimizer",
-    "PromptResolver",
-    # API classes
-    "LMStudioClient",
-    "CompletionResponse",
-    # Convenience functions
-    "load_model_registry",
-    "load_prompts",
-    "load_context",
+    "InferenceResult",
 ]

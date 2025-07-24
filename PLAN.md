@@ -1,272 +1,85 @@
-# LMStrix Development Plan - v1.0 MVP
+# LMStrix Development Plan - v1.0 Pivot to Native `lmstudio`
 
-## Project Vision
+## 1. Project Pivot: From `litellm` to `lmstudio`
 
-LMStrix v1.0 will be a minimal viable product focused on solving the critical problem with LM Studio: many models falsely declare higher maximum context lengths than they can actually handle. The tool will provide automated discovery of true operational context limits and maintain a reliable model registry.
+**Vision**: LMStrix v1.0 will be a minimal viable product focused on solving the critical problem with LM Studio: many models falsely declare higher maximum context lengths than they can actually handle.
 
-## Core Problem Statement
+**Core Problem**: LM Studio models often declare context limits (e.g., 128k tokens) that fail in practice. Models may fail to load, produce gibberish, or only work correctly below a certain "real" max context.
 
-LM Studio models often declare context limits (e.g., 128k tokens) that fail in practice:
-1. Models may fail to load at declared context length
-2. Models may load but produce gibberish output
-3. Only below a certain "real" max context do models produce correct output
+**Strategic Change**: The initial v0.1.0 implementation relied on `litellm` for API interaction. Based on performance and reliability issues (see `issues/101.txt`), this plan outlines a pivot to using the native `lmstudio` Python package directly for all model interactions. This provides a more robust and direct integration with LM Studio.
 
-## Technical Approach
+## 2. Core Technical Approach: Native Integration
 
-Use the native `lmstudio` Python package for all model operations:
-- Model discovery: `lmstudio.list_downloaded_models()`
-- Model loading: `lmstudio.llm(model_id, config={"contextLength": size})`
-- Model info: `model.get_info()`
-- Inference: `model.complete(prompt)`
-- Unloading: `model.unload()`
+All core functionality will be built directly on top of the `lmstudio` Python package. This completely removes the `litellm` dependency.
 
-This avoids the limitations and issues with `litellm` and provides direct integration with LM Studio.
+- **Model Discovery**: `lmstudio.list_downloaded_models()`
+- **Model Loading/Unloading**: `lmstudio.llm()` and `llm.unload()`
+- **Model Information**: `llm.get_info()`
+- **Inference**: `llm.complete()`
+- **Configuration**: Model loading will be configured with `config={"context_length": size}`.
 
-## Current Implementation Status
+## 3. Phase 1: Refactoring and MVP Feature Implementation
 
-### Completed Components
-1. **Project Structure** ✓
-   - Modern Python package with `src/` layout
-   - Modular architecture: api/, core/, cli/, loaders/, utils/
-   - Comprehensive pyproject.toml configuration
+This phase focuses on replacing the existing `litellm`-based implementation and completing the core features for the MVP.
 
-2. **Core Models & Registry** ✓
-   - `Model` class with context testing fields
-   - `ModelRegistry` with save/load functionality
-   - `ModelScanner` for automatic discovery
-   - `ContextTestStatus` enum for tracking
+### 3.1. Foundational Refactoring
+**Goal**: Replace all `litellm` functionality with the `lmstudio` package.
 
-3. **Context Testing Framework** ✓
-   - `ContextTester` class with binary search algorithm
-   - `ContextTestResult` for logging attempts
-   - Per-model logging system
-   - Test status tracking and resumption
+- **Dependency Management**: Remove `litellm` from `pyproject.toml`.
+- **API Client**: Rewrite `src/lmstrix/api/client.py` to be a thin wrapper around the `lmstudio` package's functions.
+- **Inference Engine**: Update `src/lmstrix/core/inference.py` to use the new client and `llm.complete()`.
+- **Context Testing**: Update `src/lmstrix/core/context_tester.py` to use `lmstudio.llm()` for loading models with specific context sizes and `llm.unload()` for cleanup.
 
-4. **CLI Interface** ✓
-   - `lmstrix scan` - Discover models
-   - `lmstrix list` - Show models with test status
-   - `lmstrix test <model>` - Test specific model
-   - `lmstrix test --all` - Batch testing
-   - `lmstrix status` - Testing progress
-   - Rich formatting with progress bars
+### 3.2. Model Discovery & Registry
+**Goal**: Reliable model discovery and metadata storage.
 
-5. **Utilities** ✓
-   - Path detection for LM Studio directory
-   - Data storage in proper system locations
-   - Backward compatibility with lmsm.json
+- **Scanner**: Use `lmstudio.list_downloaded_models()` to discover all models.
+- **Metadata**: Use `llm.get_info()` to extract detailed and accurate model metadata.
+- **Registry**: Create/update a `models.json` registry file.
+- **Storage**: Store all data (`models.json`, logs) in a dedicated `lmstrix` folder within the LM Studio application data directory to avoid cluttering the project.
 
-### Pending Critical Changes
+### 3.3. Context Validation System
+**Goal**: Automatically discover the true operational context limit for each model.
 
-**PRIORITY: Replace litellm with native lmstudio package**
-- Current implementation uses litellm (inadequate for our needs)
-- Must rewrite LMStudioClient to use native lmstudio APIs
-- Update ContextTester to properly load/unload models
-- Ensure real model metadata extraction
+- **Test Procedure**:
+    1. For a given model, use a binary search algorithm between a minimum (e.g., 2048) and the model's declared maximum context length.
+    2. In each step, attempt to load the model using `lmstudio.llm(model_id, config={"context_length": current_size})`.
+    3. If loading succeeds, perform a simple "needle in a haystack" test: run inference with a prompt that requires recalling a specific piece of information. A simple "2+2=" -> "4" check is a good start.
+    4. If the test passes, this context size is considered valid. The search continues for a higher valid size.
+    5. The highest context size that both loads and passes the inference test is recorded as the `tested_max_context`.
+    6. The model is unloaded using `llm.unload()` after each test to free up system resources.
+- **Logging**: Log the entire test procedure for each model to `{model_id}_context_test.log`, recording context size, load success, and inference success/failure.
+- **Results**: Store the final `tested_max_context` and a `context_test_status` (e.g., `untested`, `passed`, `failed`) in the `models.json` registry.
 
-## Phase 1: Core Functionality Completion
+### 3.4. CLI and Python API
+**Goal**: Provide simple and effective interfaces for users.
 
-### 1.1 LM Studio Native Integration (IMMEDIATE PRIORITY)
-**Goal**: Replace litellm with native lmstudio package
+- **CLI Commands**:
+    - `lmstrix scan`: Scan for models and update the registry.
+    - `lmstrix list`: List all models, showing their declared vs. tested context limits and test status.
+    - `lmstrix test <model_id|--all>`: Run the context validation test on a specific model or all untested models.
+    - `lmstrix status`: Show a summary of testing progress.
+- **Python API**:
+    - `lmstrix.list_models()`: Returns a list of `Model` objects.
+    - `lmstrix.test_context(model_id)`: Runs the validation test for a model.
+    - `lmstrix.get_model(model_id)`: Retrieves a model with its tested metadata.
 
-**Tasks**:
-1. Remove litellm dependency from pyproject.toml
-2. Rewrite `LMStudioClient` class:
-   ```python
-   class LMStudioClient:
-       async def load_model(self, model_id: str, context_length: int):
-           return lmstudio.llm(model_id, config={"contextLength": context_length})
-       
-       async def complete(self, model, prompt: str):
-           return await model.complete(prompt)
-       
-       async def unload_model(self, model):
-           model.unload()
-   ```
+## 4. Phase 2: Testing, Documentation, and Release
 
-3. Update `ContextTester._test_at_context()`:
-   - Use actual model loading instead of simulation
-   - Properly handle load failures
-   - Test with real completions
-   - Unload models after each test
+### 4.1. Testing
+- **Unit Tests**: Cover the core logic for the binary search algorithm, response validation, and registry management.
+- **Integration Tests**: Write tests that use a mock of the `lmstudio` package to simulate end-to-end workflows without requiring a live LM Studio instance.
 
-4. Update `ModelScanner`:
-   - Use `lmstudio.list_downloaded_models()`
-   - Extract real metadata with `model.get_info()`
+### 4.2. Documentation
+- Update `README.md` to reflect the new `lmstudio`-based approach and remove mentions of `litellm`.
+- Create a clear guide on the context testing methodology.
+- Document the CLI commands and Python API.
 
-### 1.2 Context Validation System Enhancement
-**Goal**: Implement real context testing with proper model operations
+### 4.3. Release
+- Ensure `pyproject.toml` is complete and accurate.
+- Publish v1.0.0 to PyPI.
 
-**Implementation**:
-```python
-async def test_context_limits(model_id, min_ctx=32, max_ctx=None):
-    # 1. Binary search for loadable context
-    loadable_ctx = await find_max_loadable(model_id, min_ctx, max_ctx)
-    
-    # 2. Binary search for working context
-    working_ctx = await find_max_working(model_id, min_ctx, loadable_ctx)
-    
-    # 3. Log all attempts with results
-    # 4. Update registry with tested limits
-    
-async def find_max_loadable(model_id, min_ctx, max_ctx):
-    # Binary search with actual model loading
-    while left <= right:
-        mid = (left + right) // 2
-        try:
-            model = lmstudio.llm(model_id, config={"contextLength": mid})
-            model.unload()
-            best = mid
-            left = mid + 1
-        except:
-            right = mid - 1
-    return best
-    
-async def find_max_working(model_id, min_ctx, max_ctx):
-    # Binary search with inference testing
-    while left <= right:
-        mid = (left + right) // 2
-        try:
-            model = lmstudio.llm(model_id, config={"contextLength": mid})
-            response = await model.complete("2+2=")
-            model.unload()
-            if response.strip() == "4":
-                best = mid
-                left = mid + 1
-            else:
-                right = mid - 1
-        except:
-            right = mid - 1
-    return best
-```
+## 5. Out of Scope for v1.0
 
-### 1.3 Data Storage & Registry
-**Goal**: Proper system-aware data storage
-
-**Implementation**:
-- Model registry: `{lm_studio_path}/lmstrix/models.json`
-- Context test logs: `{lm_studio_path}/lmstrix/context_tests/{model_id}_context_test.log`
-- Maintain backward compatibility with existing `lmsm.json`
-- Never store data in package directory
-
-### 1.4 Python API Completion
-**Goal**: Complete the high-level API
-
-**Implementation**:
-```python
-class LMStrix:
-    async def test_context_limits(self, model_id: str, min_context: int = 32):
-        """Test and return real context limits for a model."""
-        tester = ContextTester(self.client)
-        model = self.registry.get_model(model_id)
-        if not model:
-            raise ModelNotFoundError(model_id)
-        
-        updated_model = await tester.test_model(model, min_context)
-        self.registry.update_model(model_id, updated_model)
-        
-        return {
-            "declared": model.context_limit,
-            "loadable": updated_model.loadable_max_context,
-            "working": updated_model.tested_max_context,
-            "reduction": (1 - updated_model.tested_max_context / model.context_limit) * 100
-        }
-    
-    def get_tested_context_limit(self, model_id: str) -> Optional[int]:
-        """Get the tested working context limit for a model."""
-        model = self.registry.get_model(model_id)
-        return model.tested_max_context if model else None
-```
-
-## Phase 2: Testing & Quality Assurance
-
-### 2.1 Unit Tests
-**Goal**: Test core functionality
-
-**Priority Tests**:
-- Path detection and directory creation
-- Model discovery and registry operations
-- Context binary search algorithm
-- Log file writing and parsing
-- CLI command parsing
-
-### 2.2 Integration Tests
-**Goal**: Test with real LM Studio
-
-**Tests**:
-- Real model loading/unloading
-- Actual inference with context sizes
-- Interrupted test resumption
-- Batch testing operations
-
-## Phase 3: Documentation & Release
-
-### 3.1 Essential Documentation
-**Goal**: Clear usage instructions
-
-**Deliverables**:
-- Updated README.md with real examples
-- Context testing methodology explanation
-- Troubleshooting guide for common issues
-- API reference with code examples
-
-### 3.2 Package Release
-**Goal**: v1.0.0 on PyPI
-
-**Steps**:
-1. Remove litellm, ensure lmstudio dependency
-2. Test with real LM Studio instance
-3. Update version to 1.0.0
-4. Build and test distribution
-5. Publish to PyPI
-
-## Success Criteria for v1.0
-
-1. **Functional**:
-   - Uses native lmstudio package for all operations
-   - Accurately discovers real context limits
-   - Properly loads/unloads models
-   - Saves results in system-appropriate location
-
-2. **Reliable**:
-   - Handles model loading failures gracefully
-   - Resumes interrupted tests
-   - Provides clear error messages
-   - Doesn't leave models loaded in memory
-
-3. **Usable**:
-   - Simple CLI commands work reliably
-   - Progress indication during long tests
-   - Clear reporting of context limit issues
-   - Helpful documentation
-
-## Out of Scope for v1.0
-
-- Advanced optimization algorithms beyond binary search
-- Streaming support
-- Multi-model parallel testing
-- Web interface
-- Plugin system
-- Docker/Kubernetes support
-
-## Implementation Notes
-
-### Critical Path for MVP
-1. Replace litellm with lmstudio package (BLOCKER)
-2. Implement real model loading/unloading
-3. Complete context testing with actual inference
-4. Ensure proper data persistence
-5. Test with real LM Studio instance
-6. Package and release
-
-### Error Handling
-- Graceful handling of model load failures
-- Clear error messages for connection issues
-- Automatic retry with exponential backoff
-- Save partial results on interruption
-- Proper cleanup (unload models) on errors
-
-### Performance Considerations
-- Unload models immediately after testing to free VRAM
-- Cache results to avoid retesting
-- Binary search minimizes test attempts
-- Progress indication for user feedback
+- Advanced context optimization algorithms (beyond the binary search validation).
+- Streaming support, multi-model workflows, GUI/web interface.

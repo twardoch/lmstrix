@@ -63,7 +63,7 @@ def get_lmstrix_data_dir() -> Path:
     return data_dir
 
 
-def get_models_registry_path() -> Path:
+def get_default_models_file() -> Path:
     """Get the path to the models registry JSON file.
 
     Returns:

@@ -8,265 +8,132 @@ from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
-from lmstrix import LMStrix
-from lmstrix.core import ContextTester, ModelRegistry
-from lmstrix.core.scanner import ModelScanner
+from lmstrix.core.context_tester import ContextTester
+from lmstrix.core.inference import InferenceEngine
+from lmstrix.loaders.model_loader import (
+    load_model_registry,
+    save_model_registry,
+    scan_and_update_registry,
+)
 
 console = Console()
 
 
 class LMStrixCLI:
-    """LMStrix command-line interface."""
+    """A CLI for testing and managing LM Studio models."""
 
-    def __init__(self, endpoint: str = "http://localhost:1234/v1", verbose: bool = False):
-        """Initialize the CLI.
-
-        Args:
-            endpoint: LM Studio API endpoint.
-            verbose: Enable verbose output.
-        """
-        self.endpoint = endpoint
-        self.verbose = verbose
-        self.client = LMStrix(endpoint=endpoint, verbose=verbose)
-
-    def scan(self):
-        """Scan for models in LM Studio and update registry."""
-        scanner = ModelScanner()
-        registry = ModelRegistry()
-
+    def scan(self, verbose: bool = False):
+        """Scan for LM Studio models and update the local registry."""
         with console.status("Scanning for models..."):
-            registry = scanner.update_registry(registry)
+            scan_and_update_registry(verbose=verbose)
+        console.print("[green]Model scan complete.[/green]")
+        self.list()
 
-        models = registry.list_models()
-        console.print(f"[green]Found {len(models)} models[/green]")
-
-        # Show newly added models
-        new_models = [m for m in models if m.context_test_status.value == "untested"]
-        if new_models:
-            console.print(f"[yellow]{len(new_models)} new models require context testing[/yellow]")
-
-    def list(self):
-        """List all models with their test status."""
-        registry = ModelRegistry()
+    def list(self, verbose: bool = False):
+        """List all models from the registry with their test status."""
+        registry = load_model_registry(verbose=verbose)
         models = registry.list_models()
 
         if not models:
             console.print(
-                "[yellow]No models found. Run 'lmstrix scan' to scan for models.[/yellow]"
+                "[yellow]No models found. Run 'lmstrix scan' to discover models.[/yellow]"
             )
             return
 
-        table = Table(title="Available Models")
+        table = Table(title="LM Studio Models")
         table.add_column("Model ID", style="cyan", no_wrap=True)
-        table.add_column("Size", style="magenta")
-        table.add_column("Declared", style="yellow")
-        table.add_column("Tested", style="green")
+        table.add_column("Size (GB)", style="magenta")
+        table.add_column("Declared Ctx", style="yellow")
+        table.add_column("Tested Ctx", style="green")
         table.add_column("Status", style="blue")
-        table.add_column("Features", style="dim")
 
-        for model in models:
-            # Format tested context
-            if model.tested_max_context:
-                tested = f"{model.tested_max_context:,}"
-            else:
-                tested = "-"
-
-            # Format status with color
-            status = model.context_test_status.value
-            if status == "completed":
-                status_str = "[green]✓ Tested[/green]"
-            elif status == "testing":
-                status_str = "[yellow]⟳ Testing[/yellow]"
-            elif status == "failed":
-                status_str = "[red]✗ Failed[/red]"
-            else:
-                status_str = "[dim]- Untested[/dim]"
-
-            # Features
-            features = []
-            if model.supports_tools:
-                features.append("Tools")
-            if model.supports_vision:
-                features.append("Vision")
-            features_str = ", ".join(features) if features else "-"
+        for model in sorted(models, key=lambda m: m.id):
+            tested_ctx = (
+                f"{model.tested_max_context:,}" if model.tested_max_context else "-"
+            )
+            status_map = {
+                "untested": "[dim]Untested[/dim]",
+                "testing": "[yellow]Testing...[/yellow]",
+                "completed": "[green]✓ Tested[/green]",
+                "failed": "[red]✗ Failed[/red]",
+            }
+            status = status_map.get(model.context_test_status.value, "[dim]Unknown[/dim]")
 
             table.add_row(
                 model.id,
-                f"{model.size / (1024**3):.1f}GB",
+                f"{model.size_bytes / (1024**3):.2f}" if model.size_bytes else "N/A",
                 f"{model.context_limit:,}",
-                tested,
-                status_str,
-                features_str,
+                tested_ctx,
+                status,
             )
-
         console.print(table)
 
-        # Show summary
-        tested_count = len([m for m in models if m.context_test_status.value == "completed"])
-        console.print(f"\n[dim]{tested_count}/{len(models)} models tested[/dim]")
-
-    def test(self, model_id: str = None, all: bool = False):
-        """Test context limits for models.
+    def test(self, model_id: str = None, all: bool = False, verbose: bool = False):
+        """Test the context limits for models.
 
         Args:
-            model_id: Specific model to test.
-            all: Test all untested models.
+            model_id: The specific model ID to test.
+            all: Flag to test all untested or previously failed models.
+            verbose: Enable verbose output.
         """
-        registry = ModelRegistry()
+        registry = load_model_registry(verbose=verbose)
+        models_to_test = []
 
         if all:
             models_to_test = [
-                m
-                for m in registry.list_models()
-                if m.context_test_status.value in ["untested", "failed"]
+                m for m in registry.list_models() if m.context_test_status.value != "completed"
             ]
             if not models_to_test:
-                console.print("[green]All models have been tested![/green]")
+                console.print("[green]All models have already been successfully tested.[/green]")
                 return
-            console.print(f"[yellow]Testing {len(models_to_test)} models...[/yellow]")
+            console.print(f"Testing {len(models_to_test)} models...")
         elif model_id:
             model = registry.get_model(model_id)
             if not model:
-                console.print(f"[red]Model '{model_id}' not found[/red]")
+                console.print(f"[red]Error: Model '{model_id}' not found in registry.[/red]")
                 return
-            models_to_test = [model]
+            models_to_test.append(model)
         else:
-            console.print("[red]Please specify a model ID or use --all[/red]")
+            console.print("[red]Error: You must specify a model ID or use the --all flag.[/red]")
             return
 
-        # Run tests
-        tester = ContextTester(self.client.client)
+        tester = ContextTester()
+        for model in models_to_test:
+            updated_model = asyncio.run(tester.test_model(model))
+            registry.add_model(updated_model)  # Update the model in the registry
+            save_model_registry(registry)  # Save after each test
 
-        for i, model in enumerate(models_to_test, 1):
-            console.print(f"\n[bold]Testing {model.id} ({i}/{len(models_to_test)})[/bold]")
-
-            with Progress(
-                SpinnerColumn(),
-                TextColumn("[progress.description]{task.description}"),
-                console=console,
-            ) as progress:
-                task = progress.add_task(f"Testing context limits for {model.id}...", total=None)
-
-                # Run the test
-                updated_model = asyncio.run(tester.test_model(model))
-
-                # Update registry
-                registry.update_model(model.id, updated_model)
-
-                progress.update(task, completed=True)
-
-            # Show results
             if updated_model.context_test_status.value == "completed":
                 console.print(
-                    f"[green]✓ Test completed[/green]\n"
-                    f"  Declared: {updated_model.context_limit:,}\n"
-                    f"  Loadable: {updated_model.loadable_max_context:,}\n"
-                    f"  Working: {updated_model.tested_max_context:,}"
+                    f"[green]✓ Test for {model.id} complete. Optimal context: {updated_model.tested_max_context:,}[/green]"
                 )
-
-                if updated_model.tested_max_context < updated_model.context_limit:
-                    reduction = (
-                        (updated_model.context_limit - updated_model.tested_max_context)
-                        / updated_model.context_limit
-                        * 100
-                    )
-                    console.print(
-                        f"  [yellow]⚠ Actual limit is {reduction:.0f}% lower than declared[/yellow]"
-                    )
             else:
-                console.print(f"[red]✗ Test failed: {updated_model.error_msg}[/red]")
-
-    def status(self):
-        """Show testing progress and summary."""
-        registry = ModelRegistry()
-        models = registry.list_models()
-
-        if not models:
-            console.print("[yellow]No models found. Run 'lmstrix scan' first.[/yellow]")
-            return
-
-        # Count by status
-        status_counts = {}
-        for model in models:
-            status = model.context_test_status.value
-            status_counts[status] = status_counts.get(status, 0) + 1
-
-        # Show summary
-        console.print("[bold]Context Testing Status[/bold]\n")
-
-        total = len(models)
-        for status, count in sorted(status_counts.items()):
-            percentage = count / total * 100
-
-            if status == "completed":
-                console.print(f"[green]✓ Tested: {count} ({percentage:.0f}%)[/green]")
-            elif status == "testing":
-                console.print(f"[yellow]⟳ Testing: {count} ({percentage:.0f}%)[/yellow]")
-            elif status == "failed":
-                console.print(f"[red]✗ Failed: {count} ({percentage:.0f}%)[/red]")
-            else:
-                console.print(f"[dim]- Untested: {count} ({percentage:.0f}%)[/dim]")
-
-        # Show models with significant discrepancies
-        tested_models = [m for m in models if m.tested_max_context]
-        if tested_models:
-            console.print("\n[bold]Models with Context Limit Issues:[/bold]")
-
-            issues = []
-            for model in tested_models:
-                if model.tested_max_context < model.context_limit * 0.8:  # >20% reduction
-                    reduction = (
-                        (model.context_limit - model.tested_max_context) / model.context_limit * 100
-                    )
-                    issues.append((model, reduction))
-
-            if issues:
-                issues.sort(key=lambda x: x[1], reverse=True)
-                for model, reduction in issues[:10]:  # Top 10
-                    console.print(
-                        f"  {model.id}: "
-                        f"{model.context_limit:,} → {model.tested_max_context:,} "
-                        f"[red](-{reduction:.0f}%)[/red]"
-                    )
-            else:
-                console.print("[green]All tested models work at declared limits![/green]")
-
-    def models(self, action: str = "list", model_id: str = None):
-        """Legacy models command - redirects to new commands."""
-        if action == "list":
-            self.list()
-        elif action == "scan":
-            self.scan()
-        else:
-            console.print(f"[yellow]Unknown action: {action}[/yellow]")
+                console.print(f"[red]✗ Test for {model.id} failed. Check logs for details.[/red]")
 
     def infer(
         self,
         prompt: str,
-        model: str = None,
-        max_tokens: int = 2048,
+        model_id: str,
+        max_tokens: int = -1,
         temperature: float = 0.7,
+        verbose: bool = False,
     ):
-        """Run inference on a model.
+        """Run inference on a specified model.
 
         Args:
-            prompt: The prompt text.
-            model: Model ID to use (if not specified, uses first available).
-            max_tokens: Maximum tokens to generate.
-            temperature: Sampling temperature.
+            prompt: The text prompt to send to the model.
+            model_id: The ID of the model to use for inference.
+            max_tokens: Maximum tokens to generate (-1 for unlimited).
+            temperature: The sampling temperature.
+            verbose: Enable verbose output.
         """
-        if not model:
-            models = asyncio.run(self.client.list_models())
-            if not models:
-                console.print("[red]No models available[/red]")
-                return
-            model = models[0].id
-            console.print(f"[dim]Using model: {model}[/dim]")
+        registry = load_model_registry(verbose=verbose)
+        engine = InferenceEngine(model_registry=registry, verbose=verbose)
 
-        with console.status(f"Running inference on {model}..."):
+        with console.status(f"Running inference on {model_id}..."):
             result = asyncio.run(
-                self.client.infer(
-                    model_id=model,
+                engine.infer(
+                    model_id=model_id,
                     prompt=prompt,
                     max_tokens=max_tokens,
                     temperature=temperature,
@@ -274,21 +141,13 @@ class LMStrixCLI:
             )
 
         if result.succeeded:
-            console.print("\n[green]Response:[/green]")
+            console.print("\n[green]Model Response:[/green]")
             console.print(result.response)
             console.print(
                 f"\n[dim]Tokens: {result.tokens_used}, Time: {result.inference_time:.2f}s[/dim]"
             )
         else:
             console.print(f"[red]Inference failed: {result.error}[/red]")
-
-    def optimize(self, model: str, all: bool = False):
-        """Legacy optimize command - redirects to test."""
-        console.print(
-            "[yellow]Note: 'optimize' command is deprecated. Use 'test' instead.[/yellow]"
-        )
-        self.test(model_id=model, all=all)
-
 
 def main():
     """Main entry point for the CLI."""
