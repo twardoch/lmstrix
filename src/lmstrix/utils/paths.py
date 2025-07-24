@@ -41,7 +41,7 @@ def get_lmstudio_path() -> Path:
 
     raise RuntimeError(
         "Could not find LM Studio installation. "
-        "Please ensure LM Studio is installed and has been run at least once."
+        "Please ensure LM Studio is installed and has been run at least once.",
     )
 
 

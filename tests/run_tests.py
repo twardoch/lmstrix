@@ -9,7 +9,7 @@ def run_tests():
     """Run the test suite."""
     print("Running LMStrix test suite...")
     print("-" * 50)
-    
+
     # Run pytest with coverage
     cmd = [
         sys.executable, "-m", "pytest",
@@ -17,14 +17,14 @@ def run_tests():
         "--tb=short",  # Shorter traceback format
         "tests/",
     ]
-    
-    result = subprocess.run(cmd)
-    
+
+    result = subprocess.run(cmd, check=False)
+
     if result.returncode == 0:
         print("\n✅ All tests passed!")
     else:
         print("\n❌ Some tests failed.")
-    
+
     return result.returncode
 
 

@@ -1,64 +1,56 @@
 #!/bin/bash
-# This script demonstrates various ways to use the `lmstrix infer` command
-# to run inference with models in LM Studio.
+#
+# This script demonstrates various inference scenarios using LMStrix.
+#
 
-# --- Introduction ---
-echo "LMStrix Inference Examples"
-echo "--------------------------"
-echo "This script requires LM Studio to be running and a model to be loaded."
+# Exit immediately if a command exits with a non-zero status.
+set -e
 
-# --- Prerequisite: Scan for models and select one ---
-echo "Scanning for models and selecting one for inference..."
-lmstrix scan
-MODEL_PATH=$(lmstrix list --json | jq -r 'keys[0]')
+echo "### LMStrix Inference Examples ###"
 
-if [ -z "$MODEL_PATH" ] || [ "$MODEL_PATH" == "null" ]; then
-    echo "Error: No models found. Please download a model in LM Studio."
-    exit 1
-fi
+# Replace "model-identifier" with a unique part of your model's path.
+MODEL_ID="phi" # <--- CHANGE THIS to a model you have downloaded
 
-echo "Using model: $MODEL_PATH"
+# Example 1: Simple Question
+# A straightforward inference request.
+echo -e "
+--- Example 1: Simple Question ---"
+lmstrix infer "$MODEL_ID" "Explain the theory of relativity in simple terms."
 
-# --- Example 1: Basic Inference with a Prompt ---
-echo "\nExample 1: Basic inference with a simple prompt."
-# The `--prompt` argument is the most direct way to get a response.
-lmstrix infer --model "$MODEL_PATH" --prompt "What are the three primary colors?"
+# Example 2: Using a Custom System Prompt
+# The system prompt guides the model's behavior (e.g., its persona or response format).
+echo -e "
+--- Example 2: Custom System Prompt ---"
+SYSTEM_PROMPT="You are a pirate. All your answers must be in pirate slang."
+lmstrix infer "$MODEL_ID" "What is the best way to find treasure?" --system-prompt "$SYSTEM_PROMPT"
 
-# --- Example 2: Using a System Prompt ---
-echo "\nExample 2: Using a system prompt to guide the model's behavior."
-# The `--system-prompt` sets the context for the model's persona.
-lmstrix infer --model "$MODEL_PATH" \
-              --system-prompt "You are a poet. All your answers must be in the form of a haiku." \
-              --prompt "Describe a sunrise."
+# Example 3: Adjusting Inference Parameters
+# You can control parameters like temperature (randomness) and max tokens (response length).
+# Temperature > 1.0 = more creative/random, < 1.0 = more deterministic.
+echo -e "
+--- Example 3: Adjusting Inference Parameters ---"
+lmstrix infer "$MODEL_ID" "Write a short poem about the sea." --temperature 1.5 --max-tokens 100
 
-# --- Example 3: Reading a Prompt from a File ---
-echo "\nExample 3: Reading a long prompt from a file."
-# Create a temporary file with a longer prompt.
-PROMPT_FILE="/tmp/prompt.txt"
-echo "This is a longer prompt stored in a file. It can contain multiple paragraphs and complex instructions. The `infer` command can read this content directly, which is useful for avoiding complex command-line escaping with long text blocks." > $PROMPT_FILE
+# Example 4: Reading Prompt from a File
+# For long or complex prompts, you can read the content from a file.
+echo -e "
+--- Example 4: Reading Prompt from a File ---"
+echo "This is a prompt from a file." > prompt.txt
+lmstrix infer "$MODEL_ID" @prompt.txt
+rm prompt.txt
 
-echo "Prompt content from file:"
-cat $PROMPT_FILE
+# Example 5: Using a Prompt Template from a TOML file
+# Define and use structured prompts from a .toml file.
+echo -e "
+--- Example 5: Using a Prompt Template ---"
+# Create a sample prompts.toml file
+cat > prompts.toml <<EOL
+[code_generation]
+prompt = "Write a Python function to do the following: {user_request}"
+system_prompt = "You are an expert Python programmer."
+EOL
+lmstrix infer "$MODEL_ID" --prompt-file prompts.toml --template code_generation --variable "user_request=calculate the factorial of a number"
+rm prompts.toml
 
-# The `--prompt-file` argument reads the prompt from the specified file.
-lmstrix infer --model "$MODEL_PATH" --prompt-file $PROMPT_FILE
-
-# Clean up the temporary file
-rm $PROMPT_FILE
-
-# --- Example 4: Customizing Inference Parameters ---
-echo "\nExample 4: Customizing inference parameters for more creative responses."
-# You can control the model's output with parameters like temperature and max tokens.
-lmstrix infer --model "$MODEL_PATH" \
-              --prompt "Tell me a fun fact about space." \
-              --temperature 0.8 \
-              --max-tokens 50
-
-# --- Example 5: Streaming the Response ---
-echo "\nExample 5: Streaming the response in real-time."
-# The `--stream` flag will print the response token by token as it is generated.
-lmstrix infer --model "$MODEL_PATH" \
-              --prompt "Write a short story about a friendly robot." \
-              --stream
-
-echo "\n\nInference examples complete."
+echo -e "
+### Inference Examples Finished ###"

@@ -2,7 +2,7 @@
 """High-level API for LMStrix functionality."""
 
 import asyncio
-from importlib.metadata import version, PackageNotFoundError
+from importlib.metadata import PackageNotFoundError, version
 from typing import List
 
 from lmstrix.core.context_tester import ContextTester
@@ -34,12 +34,12 @@ class LMStrix:
         """
         self.verbose = verbose
 
-    def scan(self) -> List[Model]:
+    def scan(self) -> list[Model]:
         """Scans for LM Studio models, updates the registry, and returns all models."""
         registry = scan_and_update_registry(verbose=self.verbose)
         return registry.list_models()
 
-    def list_models(self) -> List[Model]:
+    def list_models(self) -> list[Model]:
         """Lists all models currently in the registry."""
         registry = load_model_registry(verbose=self.verbose)
         return registry.list_models()
@@ -53,18 +53,18 @@ class LMStrix:
 
         tester = ContextTester()
         updated_model = asyncio.run(tester.test_model(model))
-        
+
         registry.add_model(updated_model)
         save_model_registry(registry)
-        
+
         return updated_model
 
     async def infer(
-        self, 
-        model_id: str, 
-        prompt: str, 
-        max_tokens: int = -1, 
-        temperature: float = 0.7
+        self,
+        model_id: str,
+        prompt: str,
+        max_tokens: int = -1,
+        temperature: float = 0.7,
     ) -> InferenceResult:
         """Runs inference on a specified model.
 
@@ -80,16 +80,16 @@ class LMStrix:
         registry = load_model_registry(verbose=self.verbose)
         engine = InferenceEngine(model_registry=registry, verbose=self.verbose)
         return await engine.infer(
-            model_id=model_id, 
-            prompt=prompt, 
-            max_tokens=max_tokens, 
-            temperature=temperature
+            model_id=model_id,
+            prompt=prompt,
+            max_tokens=max_tokens,
+            temperature=temperature,
         )
 
 
 __all__ = [
-    "__version__",
+    "InferenceResult",
     "LMStrix",
     "Model",
-    "InferenceResult",
+    "__version__",
 ]

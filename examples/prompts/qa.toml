@@ -1,22 +1,15 @@
-# Prompt templates for question-answering tasks
+# examples/prompts/qa.toml
 
-[open_domain_qa]
-name = "Open Domain Question Answering"
-description = "Answer a question based on general knowledge."
-prompt = """
-Question: {question}
-Answer:
-"""
+[simple_question]
+prompt = "Answer the following question: {question}"
+system_prompt = "You are a helpful and factual question-answering AI."
+description = "Answers a direct question."
 
-[closed_domain_qa]
-name = "Closed Domain Question Answering"
-description = "Answer a question based on a provided context."
-prompt = """
-Read the following context and answer the question.
+[contextual_question]
+prompt = "Based on the text below, answer the question.
 
-Context: {context}
+Text: {context}
 
-Question: {question}
-
-Answer:
-"""
+Question: {question}"
+system_prompt = "You are an AI assistant that answers questions based *only* on the provided context."
+description = "Answers a question based on a provided context."

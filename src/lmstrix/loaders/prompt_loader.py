@@ -127,7 +127,7 @@ def load_single_prompt(
     logger.info(f"Resolved prompt '{prompt_name}'")
     if resolved.placeholders_unresolved:
         logger.warning(
-            f"Unresolved placeholders in '{prompt_name}': {resolved.placeholders_unresolved}"
+            f"Unresolved placeholders in '{prompt_name}': {resolved.placeholders_unresolved}",
         )
 
     return resolved

@@ -1,77 +1,66 @@
-"""
-This script demonstrates advanced context testing scenarios with LMStrix.
-It covers how to:
+# examples/python/advanced_testing.py
+from lmstrix.api.client import LmsClient
+from lmstrix.core.context_tester import TestPattern
 
-1.  **Initiate a Full Scan**: Run a comprehensive context length test on all models that
-    haven't been tested yet. This is useful for initial setup or after downloading
-    several new models.
-2.  **Test a Specific Model**: Target a single model for context testing. This is useful
-    when you want to re-test a model or test a newly downloaded one without running
-    a full scan.
-3.  **Force a Retest**: Re-run the context test on a model that already has existing
-    test results. This can be useful if you suspect the previous results were inaccurate
-    or if you've made changes to your system that might affect performance.
-"""
+def main():
+    """Demonstrates advanced context testing with the LMStrix Python API."""
+    print("### LMStrix Python API: Advanced Testing ###")
 
-import asyncio
-from lmstrix.core.models import ModelRegistry
-from lmstrix.core.context_tester import ContextTester
-from lmstrix.loaders.model_loader import scan_and_update_registry
+    client = LmsClient()
+    client.scan_models()
 
-async def advanced_testing_example():
-    """
-    A function to demonstrate advanced context testing scenarios.
-    """
-    print("Starting advanced context testing example...")
-
-    # First, ensure the model registry is up-to-date
-    await scan_and_update_registry()
-    registry = ModelRegistry.load()
-    if not registry.models:
-        print("No models found. Please download models in LM Studio first.")
+    if not client.models:
+        print("No models found. Please download a model in LM Studio to test.")
         return
 
-    tester = ContextTester()
+    # Select the first model for testing.
+    # In a real application, you would select a specific model.
+    model_id = list(client.models.keys())[0]
+    model = client.get_model(model_id)
+    print(f"
+--- Preparing to test model: {model.path} ---")
 
-    # --- Example 1: Run a full scan on all untested models ---
-    print("\n--- Example 1: Full Scan on Untested Models ---")
-    print("This will test all models that do not have a test result.")
-    # Note: This can take a long time depending on the number of models.
-    # await tester.test_all_models()
-    print("Full scan example complete (commented out by default to prevent long runs).")
+    # 1. Run a standard binary search test
+    # This is the most efficient test for finding the max context.
+    print("
+--- Running binary search test (max_context=4096) ---")
+    try:
+        result = model.test_context(
+            max_context=4096,
+            pattern=TestPattern.BINARY
+        )
+        print(f"Binary search complete. Max working context: {result} tokens.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
-    # --- Example 2: Test a specific model by name ---
-    print("\n--- Example 2: Test a Specific Model ---")
-    # Find a model to test. Let's pick the first one that hasn't been tested.
-    untested_model = next((m for m in registry.models.values() if not m.test_result), None)
+    # 2. Run a linear ramp-up test
+    # This is slower but useful for debugging. It tests at each step.
+    print("
+--- Running linear ramp-up test (1024 to 3072, step 1024) ---")
+    try:
+        result = model.test_context(
+            start_context=1024,
+            max_context=3072,
+            step=1024,
+            pattern=TestPattern.LINEAR,
+            force=True  # Force re-test, ignoring previous results
+        )
+        print(f"Linear test complete. Max working context: {result} tokens.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
-    if untested_model:
-        print(f"Found an untested model: {untested_model.name}")
-        print("Starting test...")
-        # await tester.test_model(untested_model.path)
-        print(f"Test for {untested_model.name} complete (commented out).")
-    else:
-        print("No untested models found for this example.")
+    # 3. Save the results
+    # Test results are automatically saved to the registry.
+    # We can explicitly save the registry to disk.
+    print("
+--- Saving updated model registry ---")
+    client.save_registry()
+    print("Registry saved to lmstrix.json")
 
-    # --- Example 3: Force a retest on an already tested model ---
-    print("\n--- Example 3: Force a Retest ---")
-    # Find a model that has already been tested.
-    tested_model = next((m for m in registry.models.values() if m.test_result), None)
-
-    if tested_model:
-        print(f"Found a tested model to re-test: {tested_model.name}")
-        print(f"Previous max context: {tested_model.test_result.max_context_length}")
-        print("Forcing a retest...")
-        # await tester.test_model(tested_model.path, force_retest=True)
-        print(f"Retest for {tested_model.name} complete (commented out).")
-    else:
-        print("No tested models found to demonstrate a forced retest.")
-
-    print("\nAdvanced testing example finished.")
-    print("Note: The actual test calls are commented out to prevent accidental long-running tests.")
-    print("Uncomment the `await tester.test...` lines to run them.")
+    # You can now inspect the lmstrix.json file to see the stored test results.
+    print(f"
+Model '{model_id}' now has test data:")
+    print(client.models[model_id].model_dump_json(indent=2))
 
 if __name__ == "__main__":
-    # Requires LM Studio to be running.
-    # Run with `python -m examples.python.advanced_testing`
-    asyncio.run(advanced_testing_example())
+    main()

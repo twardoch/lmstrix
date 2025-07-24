@@ -1,22 +1,16 @@
-# Prompt templates for code generation tasks
+# examples/prompts/coding.toml
 
 [python_function]
-name = "Python Function Generator"
-description = "Generate a Python function based on a description."
-prompt = """
-Write a Python function that does the following: {description}
-"""
+prompt = "Write a Python function that does the following: {request}. Include a docstring and type hints."
+system_prompt = "You are an expert Python programmer who writes clean, efficient, and well-documented code."
+description = "Generates a Python function based on a request."
 
-[sql_query]
-name = "SQL Query Generator"
-description = "Generate a SQL query from a natural language description."
-prompt = """
-Generate a SQL query that {description}.
-"""
+[explain_code]
+prompt = "Explain what this code does in simple terms. Identify potential bugs if any.
 
-[regex_generator]
-name = "Regex Generator"
-description = "Generate a regular expression for a given pattern."
-prompt = """
-Create a regular expression that matches the following pattern: {pattern_description}
-"""
+Code:
+```
+{code_snippet}
+```"
+system_prompt = "You are a senior software engineer who is excellent at code reviews and explaining complex concepts."
+description = "Explains a snippet of code."

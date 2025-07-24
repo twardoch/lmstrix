@@ -1,34 +1,15 @@
-# Prompt templates for analysis tasks
+# examples/prompts/analysis.toml
+
+[summarize_text]
+prompt = "Summarize the key points of the following text in three bullet points:
+
+{text}"
+system_prompt = "You are a helpful assistant that specializes in text summarization."
+description = "Summarizes a long piece of text."
 
 [sentiment_analysis]
-name = "Sentiment Analysis"
-description = "Analyze the sentiment of a given text."
-prompt = """
-Analyze the sentiment of the following text and classify it as positive, negative, or neutral. Provide a brief explanation for your classification.
+prompt = "Analyze the sentiment of the following review. Respond with 'Positive', 'Negative', or 'Neutral'.
 
-Text: {text}
-
-Sentiment:
-"""
-
-[summarization]
-name = "Text Summarization"
-description = "Summarize a long piece of text."
-prompt = """
-Summarize the following text into a few key points.
-
-Text: {text}
-
-Summary:
-"""
-
-[keyword_extraction]
-name = "Keyword Extraction"
-description = "Extract the main keywords from a text."
-prompt = """
-Extract the most important keywords from the following text.
-
-Text: {text}
-
-Keywords:
-"""
+Review: "{review_text}""
+system_prompt = "You are a sentiment analysis AI."
+description = "Analyzes the sentiment of a given text."

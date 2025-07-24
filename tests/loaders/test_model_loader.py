@@ -11,11 +11,12 @@ Key behaviors tested:
 - Preserving existing test results for models that are re-scanned.
 """
 
-import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import patch
 
-from lmstrix.loaders.model_loader import scan_and_update_registry
+import pytest
+
 from lmstrix.core.models import LmsModel, ModelRegistry, TestResult
+from lmstrix.loaders.model_loader import scan_and_update_registry
 
 # --- Mock Data ---
 
@@ -24,7 +25,7 @@ EXISTING_MODEL_PATH = "/models/existing-model.gguf"
 EXISTING_MODEL = LmsModel(
     name="existing-model",
     path=EXISTING_MODEL_PATH,
-    test_result=TestResult(max_context_length=2048, status="passed")
+    test_result=TestResult(max_context_length=2048, status="passed"),
 )
 
 # Represents a new model found in the LM Studio directory
@@ -33,7 +34,7 @@ NEW_MODEL_REMOTE_DICT = {
     "path": NEW_MODEL_PATH,
     "name": "new-model",
     "size_bytes": 123456789,
-    "architecture": "llama"
+    "architecture": "llama",
 }
 
 # Represents a model that was once in the registry but is now deleted
@@ -53,7 +54,7 @@ def mock_populated_registry():
     registry = ModelRegistry()
     registry.models = {
         EXISTING_MODEL_PATH: EXISTING_MODEL,
-        DELETED_MODEL_PATH: DELETED_MODEL
+        DELETED_MODEL_PATH: DELETED_MODEL,
     }
     return registry
 
@@ -94,7 +95,7 @@ async def test_scan_updates_and_preserves_data(mock_save, mock_load, mock_list_m
     mock_load.return_value = mock_populated_registry
     mock_list_models.return_value = [
         {"path": EXISTING_MODEL_PATH, "name": "updated-name"}, # Name change
-        NEW_MODEL_REMOTE_DICT
+        NEW_MODEL_REMOTE_DICT,
     ]
 
     # --- Run Test ---

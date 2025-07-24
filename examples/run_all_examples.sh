@@ -1,38 +1,66 @@
 #!/bin/bash
-# This script executes all the example scripts in the `cli` and `python` directories.
-# It is designed to be run from the root of the project.
+#
+# This script runs all the examples in the `cli` and `python` directories.
+# It's a way to functionally test that all example code is working as expected.
+#
+# NOTE: This script assumes you have a model downloaded in LM Studio
+# and that the identifier 'phi' will match it. If not, please edit the
+# example files to use an identifier for a model you have.
+#
 
-set -e # Exit immediately if a command exits with a non-zero status.
+set -e # Exit on any error
 
-echo "Running all examples..."
+echo "===== Running All LMStrix Examples ====="
 
-# --- Run CLI Examples ---
-echo "\n--- Running CLI Examples ---"
+# --- Running CLI Examples ---
+echo -e "
 
-# Note: The CLI examples themselves have their main commands commented out
-# to avoid long run times. This script will execute them, but they will
-# mostly print information rather than perform the actual tests or inferences.
+--- Testing CLI Examples ---"
+echo "NOTE: The CLI scripts have a placeholder model identifier ('phi')."
+echo "Please edit them if you don't have a model matching that ID."
 
-chmod +x examples/cli/*.sh
+echo -e "
+>>> Running basic_workflow.sh"
+bash "$(dirname "$0")/cli/basic_workflow.sh"
 
-for script in examples/cli/*.sh; do
-    echo "\nExecuting $script..."
-    bash "$script"
-    echo "Finished $script."
-done
+echo -e "
+>>> Running model_testing.sh"
+bash "$(dirname "$0")/cli/model_testing.sh"
 
-# --- Run Python Examples ---
-echo "\n--- Running Python Examples ---"
+echo -e "
+>>> Running inference_examples.sh"
+bash "$(dirname "$0")/cli/inference_examples.sh"
 
-# Similarly, the Python examples have their core logic commented out.
-# This will run the scripts, but they will not perform the long-running tasks.
+echo -e "
+--- CLI Examples Complete ---"
 
-for script in examples/python/*.py; do
-    echo "\nExecuting $script..."
-    # Use python -m to run the module from the project root
-    module_name=$(basename -s .py "$script")
-    python -m "examples.python.$module_name"
-    echo "Finished $script."
-done
 
-echo "\nAll examples have been executed."
+# --- Running Python Examples ---
+echo -e "
+
+--- Testing Python Examples ---"
+echo "NOTE: The Python scripts will use the first model they find."
+
+echo -e "
+>>> Running basic_usage.py"
+python3 "$(dirname "$0")/python/basic_usage.py"
+
+echo -e "
+>>> Running advanced_testing.py"
+python3 "$(dirname "$0")/python/advanced_testing.py"
+
+echo -e "
+>>> Running custom_inference.py"
+python3 "$(dirname "$0")/python/custom_inference.py"
+
+echo -e "
+>>> Running batch_processing.py"
+python3 "$(dirname "$0")/python/batch_processing.py"
+
+echo -e "
+--- Python Examples Complete ---"
+
+
+echo -e "
+
+===== All Examples Finished Successfully ====="

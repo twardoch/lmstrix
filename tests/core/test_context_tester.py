@@ -12,11 +12,12 @@ Key scenarios tested:
 - A model that works perfectly at all tested context sizes.
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+
 from lmstrix.core.context_tester import ContextTester
-from lmstrix.core.models import LmsModel, ModelRegistry, TestResult
+from lmstrix.core.models import LmsModel, ModelRegistry
 
 # A mock model path for testing purposes
 MOCK_MODEL_PATH = "/fake/path/to/model.gguf"
@@ -50,9 +51,8 @@ async def test_binary_search_logic_success(mock_save, mock_load, mock_client_con
         context_length = len(prompt)
         if context_length <= 4096:
             return {"choices": [{"message": {"content": "success"}}]}
-        else:
-            # Simulate an inference failure for larger contexts
-            raise ValueError("Inference failed due to context size")
+        # Simulate an inference failure for larger contexts
+        raise ValueError("Inference failed due to context size")
 
     mock_lmstudio_client.predict.side_effect = predict_side_effect
     mock_client_constructor.return_value = mock_lmstudio_client

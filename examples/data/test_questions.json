@@ -1,24 +1,20 @@
-{
-    "questions": [
-        {
-            "id": "qa001",
-            "question": "What is the primary function of the mitochondria in a cell?",
-            "topic": "biology"
-        },
-        {
-            "id": "qa002",
-            "question": "Who wrote the novel 'Pride and Prejudice'?",
-            "topic": "literature"
-        },
-        {
-            "id": "qa003",
-            "question": "What is the difference between a list and a tuple in Python?",
-            "topic": "programming"
-        },
-        {
-            "id": "qa004",
-            "question": "What is the boiling point of water at sea level in Celsius?",
-            "topic": "physics"
-        }
-    ]
-}
+[
+  {
+    "id": "qa_1",
+    "question": "What is the primary purpose of the sample_context.txt file?",
+    "context_source": "sample_context.txt"
+  },
+  {
+    "id": "qa_2",
+    "question": "According to the context, why is text repetition important for testing?",
+    "context_source": "sample_context.txt"
+  },
+  {
+    "id": "general_1",
+    "question": "What is the speed of light?"
+  },
+  {
+    "id": "general_2",
+    "question": "Who wrote the novel 'Pride and Prejudice'?"
+  }
+]

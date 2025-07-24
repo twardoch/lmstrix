@@ -21,7 +21,7 @@ class ModelScanner:
         """Get size of model file(s)."""
         if model_path.is_file():
             return model_path.stat().st_size
-        elif model_path.is_dir():
+        if model_path.is_dir():
             # For directories (like MLX models), sum all files
             total = 0
             for file in model_path.rglob("*"):

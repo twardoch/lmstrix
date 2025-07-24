@@ -22,10 +22,10 @@ class ResolvedPrompt(BaseModel):
     tokens: int = Field(0, description="Estimated token count")
     placeholders_found: list[str] = Field(default_factory=list, description="Placeholders found")
     placeholders_resolved: list[str] = Field(
-        default_factory=list, description="Placeholders resolved"
+        default_factory=list, description="Placeholders resolved",
     )
     placeholders_unresolved: list[str] = Field(
-        default_factory=list, description="Unresolved placeholders"
+        default_factory=list, description="Unresolved placeholders",
     )
 
 
@@ -188,7 +188,7 @@ class PromptResolver:
         else:
             logger.warning(
                 f"Reached maximum internal passes ({self.MAX_INTERNAL_PASSES}). "
-                "Possible circular placeholder references?"
+                "Possible circular placeholder references?",
             )
 
         # Phase 2: External resolution

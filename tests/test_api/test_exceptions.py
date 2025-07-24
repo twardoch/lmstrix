@@ -1,6 +1,5 @@
 """Tests for API exceptions."""
 
-import pytest
 
 from lmstrix.api.exceptions import (
     APIConnectionError,
@@ -31,7 +30,7 @@ class TestAPIExceptions:
         model_id = "test-model-123"
         reason = "Insufficient memory"
         error = ModelLoadError(model_id, reason)
-        
+
         assert isinstance(error, APIError)
         assert model_id in str(error)
         assert reason in str(error)
@@ -41,7 +40,7 @@ class TestAPIExceptions:
         model_id = "test-model-456"
         reason = "Context too long"
         error = InferenceError(model_id, reason)
-        
+
         assert isinstance(error, APIError)
         assert model_id in str(error)
         assert reason in str(error)
@@ -53,7 +52,7 @@ class TestAPIExceptions:
             ModelLoadError("model", "reason"),
             InferenceError("model", "reason"),
         ]
-        
+
         for exc in exceptions:
             assert isinstance(exc, APIError)
             assert isinstance(exc, Exception)

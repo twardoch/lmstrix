@@ -1,101 +1,85 @@
+# examples/python/custom_inference.py
+from lmstrix.api.client import LmsClient
 
-This script demonstrates advanced inference workflows using the LMStrix library.
-It covers scenarios where you might want to customize the inference process, such as:
+def main():
+    """Demonstrates custom inference workflows with the LMStrix Python API."""
+    print("### LMStrix Python API: Custom Inference ###")
 
-1.  **Using a System Prompt**: How to set a system-level instruction that guides the model's behavior
-    across multiple interactions.
-2.  **Streaming Responses**: How to process the model's response as it's being generated, which is useful
-    for real-time applications like chatbots.
-3.  **Custom Inference Parameters**: How to override default inference parameters like temperature,
-    max tokens, and stop sequences to fine-tune the model's output.
+    client = LmsClient()
+    client.scan_models()
 
-import asyncio
-from lmstrix.core.models import ModelRegistry
-from lmstrix.core.inference import InferenceManager
-from lmstrix.loaders.model_loader import scan_and_update_registry
-
-async def custom_inference_example():
-    """
-    A function to demonstrate custom inference workflows.
-    """
-    print("Starting custom inference example...")
-
-    # Ensure models are scanned and available
-    await scan_and_update_registry()
-    registry = ModelRegistry.load()
-    if not registry.models:
-        print("No models found. Please run a scan after downloading models in LM Studio.")
+    if not client.models:
+        print("No models found. Please download a model in LM Studio.")
         return
 
-    # Select the first model for this example
-    model = list(registry.models.values())[0]
-    print(f"Using model: {model.name}")
+    model_id = list(client.models.keys())[0]
+    model = client.get_model(model_id)
+    print(f"
+--- Using model: {model.path} ---")
 
-    inference_manager = InferenceManager()
+    # 1. Custom system prompt
+    # Guide the model's behavior, personality, or output format.
+    print("
+--- 1. Inference with a custom system prompt ---")
+    prompt = "Generate a list of three creative names for a new coffee shop."
+    system_prompt = "You are a branding expert. You provide concise, creative, and memorable names."
+    print(f"Prompt: {prompt}")
+    print(f"System Prompt: {system_prompt}")
 
     try:
-        # Load the model into LM Studio
-        await inference_manager.load_model(model.path)
-
-        # --- Example 1: Using a System Prompt ---
-        print("\n--- Example 1: Using a System Prompt ---")
-        system_prompt = "You are a helpful assistant that always responds in pirate-speak."
-        user_prompt = "What is the weather like today?"
-        print(f"System Prompt: {system_prompt}")
-        print(f"User Prompt: {user_prompt}")
-
-        response = await inference_manager.run_inference(
-            prompt=user_prompt,
-            system_prompt=system_prompt
-        )
-        if response and response.get("choices"):
-            content = response["choices"][0]["message"]["content"]
-            print(f"Model Response: {content.strip()}")
-        else:
-            print("Inference failed.")
-
-        # --- Example 2: Streaming Responses ---
-        print("\n--- Example 2: Streaming Responses ---")
-        prompt = "Tell me a short story about a space explorer."
-        print(f"Streaming prompt: '{prompt}'")
-        print("Model Response (streaming):", end="", flush=True)
-
-        full_response = ""
-        async for chunk in inference_manager.stream_inference(prompt):
-            if chunk and chunk.get("choices"):
-                content_delta = chunk["choices"][0].get("delta", {}).get("content", "")
-                if content_delta:
-                    print(content_delta, end="", flush=True)
-                    full_response += content_delta
-        print("\n--- End of Stream ---")
-
-        # --- Example 3: Custom Inference Parameters ---
-        print("\n--- Example 3: Custom Inference Parameters ---")
-        prompt = "Write a single, creative, one-sentence horror story."
-        print(f"Custom params prompt: '{prompt}'")
-
-        response = await inference_manager.run_inference(
-            prompt=prompt,
-            temperature=0.9,  # Higher temperature for more creativity
-            max_tokens=50,    # Limit the response length
-            stop=[".", "!"]     # Stop generation at the end of a sentence
-        )
-        if response and response.get("choices"):
-            content = response["choices"][0]["message"]["content"]
-            print(f"Model Response (creative): {content.strip()}")
-        else:
-            print("Inference failed.")
-
+        response_stream = model.infer(prompt, system_prompt=system_prompt)
+        print("Response:")
+        for chunk in response_stream:
+            print(chunk, end="", flush=True)
+        print("
+")
     except Exception as e:
-        print(f"An error occurred: {e}")
-    finally:
-        # Unload the model
-        await inference_manager.unload_model()
-        print("\nModel unloaded.")
+        print(f"
+An error occurred: {e}
+")
 
-    print("\nCustom inference example finished.")
+    # 2. Adjusting inference parameters
+    # Control creativity (temperature) and response length (max_tokens).
+    print("
+--- 2. Adjusting temperature and max_tokens ---")
+    prompt = "Write a single sentence that is surprising and philosophical."
+    print(f"Prompt: {prompt}")
+    print("Settings: temperature=1.8 (highly creative), max_tokens=50")
+
+    try:
+        response_stream = model.infer(prompt, temperature=1.8, max_tokens=50)
+        print("Response:")
+        for chunk in response_stream:
+            print(chunk, end="", flush=True)
+        print("
+")
+    except Exception as e:
+        print(f"
+An error occurred: {e}
+")
+
+    # 3. Structured output (JSON)
+    # Instructing the model to return JSON. This works best with capable models.
+    print("
+--- 3. Requesting structured JSON output ---")
+    prompt = "Return a JSON object with two keys: 'city' and 'population', for the capital of Japan."
+    system_prompt = "You are a helpful assistant that only returns valid, raw JSON objects."
+    print(f"Prompt: {prompt}")
+
+    try:
+        response_stream = model.infer(prompt, system_prompt=system_prompt)
+        print("Response:")
+        full_response = "".join(response_stream)
+        print(full_response)
+        # You can now parse the JSON string
+        # import json
+        # data = json.loads(full_response)
+        # print(f"
+Parsed city: {data.get('city')}")
+    except Exception as e:
+        print(f"
+An error occurred: {e}
+")
 
 if __name__ == "__main__":
-    # Requires LM Studio to be running.
-    # Run with `python -m examples.python.custom_inference`
-    asyncio.run(custom_inference_example())
+    main()
