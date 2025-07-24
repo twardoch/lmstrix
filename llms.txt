@@ -8,6 +8,922 @@ Project Structure:
 ├── 📁 ref
 ├── 📁 results
 ├── 📁 src
+│   ├── 📁 lmstrix
+│   │   ├── 📁 api
+│   │   │   ├── 📄 __init__.py
+│   │   │   ├── 📄 client.py
+│   │   │   └── 📄 exceptions.py
+│   │   ├── 📁 cli
+│   │   │   ├── 📄 __init__.py
+│   │   │   └── 📄 main.py
+│   │   ├── 📁 core
+│   │   │   ├── 📄 __init__.py
+│   │   │   ├── 📄 context.py
+│   │   │   ├── 📄 context_tester.py
+│   │   │   ├── 📄 inference.py
+│   │   │   ├── 📄 models.py
+│   │   │   ├── 📄 prompts.py
+│   │   │   └── 📄 scanner.py
+│   │   ├── 📁 loaders
+│   │   │   ├── 📄 __init__.py
+│   │   │   ├── 📄 context_loader.py
+│   │   │   ├── 📄 model_loader.py
+│   │   │   └── 📄 prompt_loader.py
+│   │   ├── 📁 utils
+│   │   │   ├── 📄 __init__.py
+│   │   │   └── 📄 paths.py
+│   │   ├── 📄 __init__.py
+│   │   └── 📄 __version__.py
+│   └── 📁 lmstrix.egg-info
+├── 📄 .gitignore
+├── 📄 CHANGELOG.md
+├── 📄 LICENSE
+├── 📄 llms.txt
+├── 📄 PLAN.md
+├── 📄 pyproject.toml
+├── 📄 README.md
+├── 📄 TODO.md
+└── 📄 WORK.md
+
+
+<documents>
+<document index="1">
+<source>.gitignore</source>
+<document_content>
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[codz]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py.cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+#   For a library or package, you might want to ignore these files since the code is
+#   intended to run in multiple environments; otherwise, check them in:
+# .python-version
+
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
+# UV
+#   Similar to Pipfile.lock, it is generally recommended to include uv.lock in version control.
+#   This is especially recommended for binary packages to ensure reproducibility, and is more
+#   commonly ignored for libraries.
+#uv.lock
+
+# poetry
+#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
+#   This is especially recommended for binary packages to ensure reproducibility, and is more
+#   commonly ignored for libraries.
+#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
+#poetry.lock
+#poetry.toml
+
+# pdm
+#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
+#   pdm recommends including project-wide configuration in pdm.toml, but excluding .pdm-python.
+#   https://pdm-project.org/en/latest/usage/project/#working-with-version-control
+#pdm.lock
+#pdm.toml
+.pdm-python
+.pdm-build/
+
+# pixi
+#   Similar to Pipfile.lock, it is generally recommended to include pixi.lock in version control.
+#pixi.lock
+#   Pixi creates a virtual environment in the .pixi directory, just like venv module creates one
+#   in the .venv directory. It is recommended not to include this directory in version control.
+.pixi
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.envrc
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# PyCharm
+#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
+#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
+#  and can be added to the global gitignore or merged into this file.  For a more nuclear
+#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
+#.idea/
+
+# Abstra
+# Abstra is an AI-powered process automation framework.
+# Ignore directories containing user credentials, local state, and settings.
+# Learn more at https://abstra.io/docs
+.abstra/
+
+# Visual Studio Code
+#  Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore 
+#  that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
+#  and can be added to the global gitignore or merged into this file. However, if you prefer, 
+#  you could uncomment the following to ignore the entire vscode folder
+# .vscode/
+
+# Ruff stuff:
+.ruff_cache/
+
+# PyPI configuration file
+.pypirc
+
+# Cursor
+#  Cursor is an AI-powered code editor. `.cursorignore` specifies files/directories to
+#  exclude from AI features like autocomplete and code analysis. Recommended for sensitive data
+#  refer to https://docs.cursor.com/context/ignore-files
+.cursorignore
+.cursorindexingignore
+
+# Marimo
+marimo/_static/
+marimo/_lsp/
+__marimo__/
+
+</document_content>
+</document>
+
+<document index="2">
+<source>CHANGELOG.md</source>
+<document_content>
+# Changelog
+
+All notable changes to the LMStrix project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.0] - 2025-07-24
+
+### Added
+
+#### Project Structure
+- Created modern Python package structure with `src/` layout
+- Established modular architecture with clear separation of concerns
+- Set up proper package metadata in `pyproject.toml`
+- Added MIT License
+- Created comprehensive `.gitignore` for Python projects
+
+#### Core Components
+- **Model Management** (`core/models.py`)
+  - Implemented `Model` Pydantic class with validation
+  - Created `ModelRegistry` for managing LM Studio models
+  - Added backward compatibility with existing `lmsm.json` format
+  - Implemented model ID sanitization for safe file operations
+
+- **Inference Engine** (`core/inference.py`)
+  - Built async `InferenceEngine` class
+  - Integrated with LM Studio API via litellm
+  - Added configurable temperature and max_tokens
+  - Implemented proper error handling and result formatting
+
+- **Context Optimizer** (`core/context.py`)
+  - Developed binary search algorithm for optimal context discovery
+  - Created `OptimizationResult` model for tracking results
+  - Implemented caching mechanism to avoid redundant optimizations
+  - Added configurable min/max bounds and retry logic
+
+- **Prompt Resolution** (`core/prompts.py`)
+  - Built two-phase placeholder resolution system
+  - Created `PromptTemplate` class with validation
+  - Implemented nested placeholder support
+  - Added comprehensive error messages for missing placeholders
+
+#### API Client
+- **LM Studio Client** (`api/client.py`)
+  - Wrapped litellm for LM Studio integration
+  - Implemented retry logic with exponential backoff
+  - Suppressed litellm verbose output
+  - Added proper async/await support
+  - Created unified completion interface
+
+- **Exception Hierarchy** (`api/exceptions.py`)
+  - Designed comprehensive exception classes
+  - Added specific errors for API, validation, and model issues
+  - Implemented helpful error messages
+
+#### Data Loaders
+- **Model Loader** (`loaders/model_loader.py`)
+  - Created functions to load/save model registries
+  - Added automatic discovery of model files
+  - Implemented verbose logging support
+
+- **Prompt Loader** (`loaders/prompt_loader.py`)
+  - Built TOML-based prompt management
+  - Added support for categories and descriptions
+  - Implemented single and bulk prompt loading
+
+- **Context Loader** (`loaders/context_loader.py`)
+  - Created flexible context loading from files
+  - Added token estimation using tiktoken
+  - Implemented size-limited loading
+  - Built support for multiple context files
+
+#### Command Line Interface
+- **CLI Framework** (`cli/main.py`)
+  - Implemented Fire-based command structure
+  - Added Rich formatting for beautiful output
+  - Created commands: `models list`, `models scan`, `infer`, `optimize`
+  - Integrated progress bars and status indicators
+
+#### Public API
+- **High-Level Interface** (`__init__.py`)
+  - Created `LMStrix` class for simplified usage
+  - Exposed key components in public API
+  - Added comprehensive docstrings
+  - Implemented convenience methods
+
+### Technical Implementation Details
+
+#### Code Quality
+- Full type hints throughout the codebase
+- Comprehensive docstrings following Google style
+- Structured imports with proper `__all__` exports
+- Consistent error handling patterns
+
+#### Architecture Decisions
+- Async-first design for better performance
+- Dependency injection for testability
+- Pydantic models for data validation
+- Modular design with clear boundaries
+
+#### Integration Features
+- Seamless LM Studio server integration
+- Environment variable configuration support
+- Flexible file path resolution
+- Backward compatibility with existing tools
+
+### Fixed
+- Resolved import issues after file reorganization
+- Fixed Pydantic model validation errors
+- Corrected async/await usage patterns
+- Addressed path resolution for cross-platform compatibility
+
+### Security
+- No hardcoded credentials or API keys
+- Safe file path handling
+- Input validation on all user data
+- Secure model ID sanitization
+
+## [1.0.0] - 2025-07-24
+
+### Changed
+
+#### Major Refactoring: litellm to lmstudio Native Integration
+- **Dependency Pivot**: Completely removed `litellm` dependency and replaced with native `lmstudio` package
+- **API Client** (`api/client.py`): 
+  - Rewritten to directly use `lmstudio.list_downloaded_models()`
+  - Now uses `lmstudio.llm()` for model loading
+  - Implements `llm.complete()` for all model interactions
+- **Context Tester** (`core/context_tester.py`):
+  - Completely rewritten to use native lmstudio client
+  - Implements binary search to find maximum effective context window
+  - Efficiently loads, tests, and unloads models during testing
+- **Inference Engine** (`core/inference.py`):
+  - Updated to use native client
+  - Ensures models are loaded with tested context length before inference
+- **Model Discovery** (`loaders/model_loader.py`):
+  - Now uses lmstudio to discover models
+  - Ensures local registry is always in sync with LM Studio's downloaded models
+
+### Updated
+- **CLI** (`cli/main.py`): All commands (scan, list, test, infer) updated to use refactored core logic
+- **Public API** (`__init__.py`): Simplified to provide clean interface to lmstudio-native functionality
+- **Development Plan** (`PLAN.md`): Rewritten to reflect new technical direction
+
+### Technical Improvements
+- Direct integration with LM Studio for better reliability and performance
+- More efficient model loading and unloading
+- Better alignment with project's core goal of testing true context limits
+
+## [Unreleased]
+
+### Planned
+- Unit tests for all core modules
+- Integration tests for API client
+- Documentation generation with MkDocs
+- GitHub Actions CI/CD pipeline
+- PyPI package publishing setup
+- Performance benchmarks
+- Additional model optimization strategies
+</document_content>
+</document>
+
+<document index="3">
+<source>LICENSE</source>
+<document_content>
+MIT License
+
+Copyright (c) 2025 Adam Twardoch
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+</document_content>
+</document>
+
+<document index="4">
+<source>PLAN.md</source>
+<document_content>
+# LMStrix Development Plan - v1.0 Pivot to Native `lmstudio`
+
+## 1. Project Pivot: From `litellm` to `lmstudio`
+
+**Vision**: LMStrix v1.0 will be a minimal viable product focused on solving the critical problem with LM Studio: many models falsely declare higher maximum context lengths than they can actually handle.
+
+**Core Problem**: LM Studio models often declare context limits (e.g., 128k tokens) that fail in practice. Models may fail to load, produce gibberish, or only work correctly below a certain "real" max context.
+
+**Strategic Change**: The initial v0.1.0 implementation relied on `litellm` for API interaction. Based on performance and reliability issues (see `issues/101.txt`), this plan outlines a pivot to using the native `lmstudio` Python package directly for all model interactions. This provides a more robust and direct integration with LM Studio.
+
+## 2. Core Technical Approach: Native Integration
+
+All core functionality will be built directly on top of the `lmstudio` Python package. This completely removes the `litellm` dependency.
+
+- **Model Discovery**: `lmstudio.list_downloaded_models()`
+- **Model Loading/Unloading**: `lmstudio.llm()` and `llm.unload()`
+- **Model Information**: `llm.get_info()`
+- **Inference**: `llm.complete()`
+- **Configuration**: Model loading will be configured with `config={"context_length": size}`.
+
+## 3. Phase 1: Refactoring and MVP Feature Implementation
+
+This phase focuses on replacing the existing `litellm`-based implementation and completing the core features for the MVP.
+
+### 3.1. Foundational Refactoring
+**Goal**: Replace all `litellm` functionality with the `lmstudio` package.
+
+- **Dependency Management**: Remove `litellm` from `pyproject.toml`.
+- **API Client**: Rewrite `src/lmstrix/api/client.py` to be a thin wrapper around the `lmstudio` package's functions.
+- **Inference Engine**: Update `src/lmstrix/core/inference.py` to use the new client and `llm.complete()`.
+- **Context Testing**: Update `src/lmstrix/core/context_tester.py` to use `lmstudio.llm()` for loading models with specific context sizes and `llm.unload()` for cleanup.
+
+### 3.2. Model Discovery & Registry
+**Goal**: Reliable model discovery and metadata storage.
+
+- **Scanner**: Use `lmstudio.list_downloaded_models()` to discover all models.
+- **Metadata**: Use `llm.get_info()` to extract detailed and accurate model metadata.
+- **Registry**: Create/update a `models.json` registry file.
+- **Storage**: Store all data (`models.json`, logs) in a dedicated `lmstrix` folder within the LM Studio application data directory to avoid cluttering the project.
+
+### 3.3. Context Validation System
+**Goal**: Automatically discover the true operational context limit for each model.
+
+- **Test Procedure**:
+    1. For a given model, use a binary search algorithm between a minimum (e.g., 2048) and the model's declared maximum context length.
+    2. In each step, attempt to load the model using `lmstudio.llm(model_id, config={"context_length": current_size})`.
+    3. If loading succeeds, perform a simple "needle in a haystack" test: run inference with a prompt that requires recalling a specific piece of information. A simple "2+2=" -> "4" check is a good start.
+    4. If the test passes, this context size is considered valid. The search continues for a higher valid size.
+    5. The highest context size that both loads and passes the inference test is recorded as the `tested_max_context`.
+    6. The model is unloaded using `llm.unload()` after each test to free up system resources.
+- **Logging**: Log the entire test procedure for each model to `{model_id}_context_test.log`, recording context size, load success, and inference success/failure.
+- **Results**: Store the final `tested_max_context` and a `context_test_status` (e.g., `untested`, `passed`, `failed`) in the `models.json` registry.
+
+### 3.4. CLI and Python API
+**Goal**: Provide simple and effective interfaces for users.
+
+- **CLI Commands**:
+    - `lmstrix scan`: Scan for models and update the registry.
+    - `lmstrix list`: List all models, showing their declared vs. tested context limits and test status.
+    - `lmstrix test <model_id|--all>`: Run the context validation test on a specific model or all untested models.
+    - `lmstrix status`: Show a summary of testing progress.
+- **Python API**:
+    - `lmstrix.list_models()`: Returns a list of `Model` objects.
+    - `lmstrix.test_context(model_id)`: Runs the validation test for a model.
+    - `lmstrix.get_model(model_id)`: Retrieves a model with its tested metadata.
+
+## 4. Phase 2: Testing, Documentation, and Release
+
+### 4.1. Testing
+- **Unit Tests**: Cover the core logic for the binary search algorithm, response validation, and registry management.
+- **Integration Tests**: Write tests that use a mock of the `lmstudio` package to simulate end-to-end workflows without requiring a live LM Studio instance.
+
+### 4.2. Documentation
+- Update `README.md` to reflect the new `lmstudio`-based approach and remove mentions of `litellm`.
+- Create a clear guide on the context testing methodology.
+- Document the CLI commands and Python API.
+
+### 4.3. Release
+- Ensure `pyproject.toml` is complete and accurate.
+- Publish v1.0.0 to PyPI.
+
+## 5. Out of Scope for v1.0
+
+- Advanced context optimization algorithms (beyond the binary search validation).
+- Streaming support, multi-model workflows, GUI/web interface.
+
+</document_content>
+</document>
+
+<document index="5">
+<source>README.md</source>
+<document_content>
+# LMStrix
+
+A professional, installable PyPI package for managing and utilizing models with LM Studio.
+
+## Overview
+
+LMStrix is a robust toolkit that provides seamless integration with LM Studio's local server, enabling efficient model management and inference. The standout feature is the **Adaptive Context Optimizer**, which automatically determines the maximum operational context length for any given model, eliminating the need for manual tuning.
+
+## Key Features
+
+- **Model Management**: Easily discover, list, and manage LM Studio models
+- **Adaptive Context Optimization**: Automatically find the optimal context window for each model using binary search
+- **Flexible Inference Engine**: Run inference with customizable prompts and context management
+- **Two-Phase Prompt Resolution**: Advanced templating system with placeholder resolution
+- **Rich CLI**: Beautiful command-line interface with formatted tables and progress indicators
+- **Async-First Design**: Built on modern async/await patterns for optimal performance
+- **Robust Error Handling**: Comprehensive exception hierarchy and retry logic
+
+## Installation
+
+```bash
+pip install lmstrix
+```
+
+## Quick Start
+
+### Command Line Interface
+
+```bash
+# List available models
+lmstrix models list
+
+# Scan for new models
+lmstrix models scan
+
+# Run inference
+lmstrix infer --model "llama-3.1" --prompt "greeting"
+
+# Optimize a model's context window
+lmstrix optimize llama-3.1
+```
+
+### Python API
+
+```python
+from lmstrix import LMStrix
+
+# Initialize client
+client = LMStrix()
+
+# List models
+models = await client.list_models()
+for model in models:
+    print(f"{model.id}: {model.context_limit} tokens")
+
+# Run inference
+result = await client.infer(
+    model_id="llama-3.1",
+    prompt_template="Summarize this text: {text}",
+    context={"text": "Your long document here..."}
+)
+print(result.content)
+
+# Optimize context window
+optimization = await client.optimize_context("llama-3.1")
+print(f"Optimal context: {optimization.optimal_size} tokens")
+```
+
+## Architecture
+
+LMStrix is organized into modular components:
+
+- **`api/`**: LM Studio API client with retry logic
+- **`core/`**: Core business logic (models, inference, optimization)
+- **`loaders/`**: Data loaders for models, prompts, and contexts
+- **`cli/`**: Command-line interface using Fire and Rich
+- **`utils/`**: Shared utilities
+
+## Dependencies
+
+- `pydantic`: Data validation and settings management
+- `litellm`: Unified LLM API interface
+- `rich`: Terminal formatting and progress bars
+- `fire`: CLI framework
+- `tenacity`: Retry logic
+- `loguru`: Advanced logging
+- `tiktoken`: Token counting
+
+## Development
+
+```bash
+# Install in development mode
+pip install -e .
+
+# Run tests
+python -m pytest
+
+# Format code
+python -m ruff format src/
+
+# Check linting
+python -m ruff check src/
+```
+
+## License
+
+MIT License - see LICENSE file for details.
+
+## Contributing
+
+Contributions are welcome! Please read our contributing guidelines and submit pull requests to our repository.
+
+## Support
+
+For issues, feature requests, or questions, please file an issue on our GitHub repository.
+</document_content>
+</document>
+
+<document index="6">
+<source>TODO.md</source>
+<document_content>
+# TODO List for LMStrix v1.0 MVP
+
+## PRIORITY: Replace litellm with lmstudio package
+
+### Immediate Tasks
+- [ ] Remove litellm dependency from pyproject.toml
+- [ ] Rewrite LMStudioClient to use native lmstudio package
+- [ ] Update ContextTester to use lmstudio.llm() for model loading
+- [ ] Replace litellm completion calls with model.complete()
+- [ ] Add proper model unloading with model.unload()
+- [ ] Update model discovery to use lmstudio.list_downloaded_models()
+- [ ] Test with real LM Studio instance
+
+## Phase 1: Core Functionality
+
+### Model Discovery & Registry
+
+- [x] Create system path detection for LM Studio data directory
+- [x] Implement model scanner that finds all downloaded models
+- [x] Add compatibility layer for existing lmsm.json format
+- [x] Create data directory structure in LM Studio path
+- [x] Implement model registry save/load with proper paths
+- [x] Add model metadata extraction (size, declared context, capabilities)
+- [x] Create model registry update mechanism
+- [x] Add model removal detection and cleanup
+- [ ] Update model discovery to use lmstudio.list_downloaded_models()
+- [ ] Extract real model metadata using model.get_info()
+
+### Context Validation System
+
+- [ ] Replace litellm with native lmstudio package
+- [ ] Update LMStudioClient to use lmstudio.llm() for model loading
+- [ ] Implement model loading with specific context size using config parameter
+- [ ] Update inference to use model.complete() instead of litellm
+- [ ] Add model.unload() after each test to free resources
+- [ ] Create context testing engine base class
+- [ ] Add simple prompt testing ("2+2=" -> "4")
+- [ ] Implement binary search for maximum loadable context
+- [ ] Create progressive context testing from min to max
+- [ ] Add response validation logic
+- [ ] Implement per-model logging system
+- [ ] Create log file format and structure
+- [ ] Add context test status tracking
+- [ ] Implement test resumption for interrupted tests
+- [ ] Add tested_max_context field to model registry
+- [ ] Create context test results storage
+
+### CLI Updates
+
+- [x] Update CLI to use new model discovery
+- [x] Implement `lmstrix scan` command
+- [x] Update `lmstrix list` to show context test status
+- [x] Create `lmstrix test <model_id>` command
+- [x] Add `lmstrix test --all` for batch testing
+- [x] Create `lmstrix status` to show testing progress
+- [x] Add progress bars for long operations
+- [x] Implement proper error messages
+- [x] Add CLI help documentation
+
+### Python API Updates
+
+- [ ] Update LMStrix class with context testing methods
+- [ ] Add test_context_limits method
+- [ ] Create get_tested_context_limit method
+- [ ] Add context test status query methods
+- [ ] Implement async context testing support
+- [ ] Add batch testing capabilities
+- [ ] Create context test result models
+- [ ] Add proper exception handling
+
+## Phase 2: Testing & Quality
+
+### Unit Tests
+
+- [ ] Write tests for model discovery
+- [ ] Write tests for path detection logic
+- [ ] Write tests for context binary search
+- [ ] Write tests for response validation
+- [ ] Write tests for log file handling
+- [ ] Write tests for registry updates
+- [ ] Write tests for CLI commands
+- [ ] Write tests for error conditions
+
+### Integration Tests
+
+- [ ] Create mock LM Studio server
+- [ ] Write end-to-end context testing tests
+- [ ] Test interrupted test resumption
+- [ ] Test batch model testing
+- [ ] Test error recovery scenarios
+
+### Code Quality
+
+- [ ] Run mypy and fix type errors
+- [ ] Run ruff and fix linting issues
+- [ ] Add missing type hints
+- [ ] Add comprehensive docstrings
+- [ ] Review error handling
+
+## Phase 3: Documentation
+
+### User Documentation
+
+- [ ] Update README.md with context testing features
+- [ ] Write context testing methodology guide
+- [ ] Create troubleshooting section
+- [ ] Add common issues and solutions
+- [ ] Write quick start guide
+
+### API Documentation
+
+- [ ] Document all CLI commands
+- [ ] Document Python API methods
+- [ ] Add code examples
+- [ ] Create configuration guide
+- [ ] Document log file format
+
+### Examples
+
+- [ ] Create example: Test single model
+- [ ] Create example: Batch test all models
+- [ ] Create example: Query test results
+- [ ] Create example: Custom test prompts
+
+## Phase 4: Package & Release
+
+### Package Preparation
+
+- [ ] Update pyproject.toml with all dependencies
+- [ ] Add package metadata
+- [ ] Include data files in package
+- [ ] Test package build
+- [ ] Test local installation
+
+### Pre-release Testing
+
+- [ ] Test on fresh Python environment
+- [ ] Test on different OS platforms
+- [ ] Verify all CLI commands work
+- [ ] Test with real LM Studio instance
+- [ ] Verify data storage locations
+
+### Release Process
+
+- [ ] Update version to 1.0.0
+- [ ] Create git tag v1.0.0
+- [ ] Build distribution packages
+- [ ] Test on Test PyPI
+- [ ] Publish to PyPI
+- [ ] Create GitHub release
+- [ ] Update documentation
+
+## Critical Path Items
+
+These must be completed for MVP:
+
+1. [ ] Model discovery with proper paths
+2. [ ] Context testing engine
+3. [ ] Result logging and storage
+4. [ ] Basic CLI commands
+5. [ ] Minimal documentation
+6. [ ] Package configuration
+</document_content>
+</document>
+
+<document index="7">
+<source>WORK.md</source>
+<document_content>
+# Work Progress
+
+## Completed: MVP Core Functionality
+
+### Summary of Work Completed (2025-07-24)
+
+Successfully implemented the core functionality for LMStrix v1.0 MVP focused on solving the critical problem with LM Studio models falsely declaring higher context limits than they can handle.
+
+### Completed Items
+
+1. **System Path Detection** ✓
+   - Implemented LM Studio data directory detection
+   - Created lmstrix data directory structure  
+   - Updated model registry to use proper paths
+
+2. **Context Testing Engine** ✓
+   - Created ContextTester class with binary search algorithm
+   - Implemented simulated model loading with context size
+   - Added binary search for max loadable context
+   - Implemented simple prompt testing ("2+2=")
+   - Created per-model logging system
+
+3. **Model Management** ✓
+   - Updated Model class with context testing fields
+   - Added ContextTestStatus enum
+   - Refactored ModelRegistry with save/load functionality
+   - Created ModelScanner for automatic discovery
+
+4. **CLI Interface** ✓
+   - `lmstrix scan` - Scan for models
+   - `lmstrix list` - List models with test status
+   - `lmstrix test <model>` - Test specific model
+   - `lmstrix test --all` - Test all untested models  
+   - `lmstrix status` - Show testing progress
+   - Added rich formatting and progress indicators
+
+5. **Package Configuration** ✓
+   - Created comprehensive pyproject.toml
+   - Fixed all linting issues
+   - Formatted code with ruff
+
+### Architecture Implemented
+
+- Data stored in LM Studio directory: `{lmstudio_path}/lmstrix/`
+- Model registry: `{lmstudio_path}/lmsm.json` or `{lmstudio_path}/lmstrix/models.json`
+- Test logs: `{lmstudio_path}/lmstrix/context_tests/{model_id}_context_test.log`
+- Backward compatible with existing lmsm.json format
+
+### Ready for Testing
+
+The MVP is now ready for:
+1. Local installation: `pip install -e .`
+2. Model scanning: `lmstrix scan`
+3. Context testing: `lmstrix test --all`
+
+### Next Priority Tasks
+
+1. Write unit tests for core functionality
+2. Test with real LM Studio instance
+3. Package and publish to PyPI
+4. Create user documentation
+</document_content>
+</document>
+
+<document index="8">
+<source>issues/101.txt</source>
+<document_content>
+Shouldn't the code use @ref/llmstudio.txt for much more? We don't want to use inferencing by `litellm`, it's shit. We want to use to use the `lmstudio` package for loading models and also for completion/inferencing.
+
+</document_content>
+</document>
+
+<document index="9">
+<source>llms.txt</source>
+<document_content>
+Project Structure:
+📁 lmstrix
+├── 📁 issues
+│   └── 📄 101.txt
+├── 📁 obsolete
+│   ├── 📄 lmsm.json
+│   └── 📄 lmsm.py
+├── 📁 ref
+├── 📁 results
+├── 📁 src
 │   └── 📁 lmstrix
 │       ├── 📁 api
 │       │   ├── 📄 
@@ -3510,6 +4426,1119 @@ def get_lmstrix_data_dir(()) -> Path:
     """Get the LMStrix data directory within LM Studio."""
 
 def get_models_registry_path(()) -> Path:
+    """Get the path to the models registry JSON file."""
+
+def get_context_tests_dir(()) -> Path:
+    """Get the directory for context test logs."""
+
+def get_context_test_log_path((model_id: str)) -> Path:
+    """Get the path for a specific model's context test log."""
+
+
+</documents>
+</document_content>
+</document>
+
+<document index="10">
+<source>obsolete/lmsm.json</source>
+<document_content>
+{
+  "path": "/Users/shared/lmstudio",
+  "llms": {
+    "amoral-qwen3-14b-i1": {
+      "id": "amoral-qwen3-14b-i1",
+... (file content truncated to first 5 lines)
+</document_content>
+</document>
+
+# File: /Users/Shared/lmstudio/lmstrix/obsolete/lmsm.py
+# Language: python
+
+import json
+from pathlib import Path
+from typing import Any
+import fire
+import lmstudio as lms
+from pydantic import BaseModel, Field
+from rich import box
+from rich.console import Console
+from rich.live import Live
+from rich.table import Table
+
+class LmsMInfo(B, a, s, e, M, o, d, e, l):
+    def to_table_row((self, base_path: Path)) -> list[str]:
+    def to_dict((self)) -> dict[str, Any]:
+
+class LmsM(B, a, s, e, M, o, d, e, l):
+    def save((self)) -> None:
+    def update_model((self, model_key: str, model_info: LmsMInfo)) -> None:
+        """Update a model in the cache and save"""
+    def remove_model((self, model_key: str)) -> None:
+        """Remove a model from the cache and save"""
+    def clear_models((self)) -> None:
+        """Clear all models from the cache and save"""
+    def create_table((self)) -> Table:
+    def create_error_table((self, title: str)) -> Table:
+    def update_from_lmstudio((
+        self, all_rescan: bool = False, failed_rescan: bool = False
+    )) -> None:
+
+class LmsmCLI:
+    """LMStudio Model Manager CLI"""
+    def __init__((self)):
+    def list((self, all_rescan: bool = False, failed_rescan: bool = False)):
+        """List all models in LMStudio"""
+
+def to_table_row((self, base_path: Path)) -> list[str]:
+
+def to_dict((self)) -> dict[str, Any]:
+
+def from_dict((cls, data: dict[str, Any])) -> "LmsMInfo":
+
+def load_or_create((cls, lms_path: Path)) -> "LmsM":
+
+def save((self)) -> None:
+
+def update_model((self, model_key: str, model_info: LmsMInfo)) -> None:
+    """Update a model in the cache and save"""
+
+def remove_model((self, model_key: str)) -> None:
+    """Remove a model from the cache and save"""
+
+def clear_models((self)) -> None:
+    """Clear all models from the cache and save"""
+
+def create_table((self)) -> Table:
+
+def create_error_table((self, title: str)) -> Table:
+
+def update_from_lmstudio((
+        self, all_rescan: bool = False, failed_rescan: bool = False
+    )) -> None:
+
+def render_table(()) -> Table:
+
+def __init__((self)):
+
+def list((self, all_rescan: bool = False, failed_rescan: bool = False)):
+    """List all models in LMStudio"""
+
+
+<document index="11">
+<source>pyproject.toml</source>
+<document_content>
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lmstrix"
+version = "1.0.0"
+description = "A toolkit for managing and testing LM Studio models with automatic context limit discovery"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "LMStrix Contributors"},
+]
+keywords = ["llm", "lmstudio", "context", "optimization", "testing"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "pydantic>=2.0",
+    
+    "rich>=13.0",
+    "fire>=0.5",
+    "toml>=0.10",
+    "tenacity>=8.0",
+    "loguru>=0.7",
+    "httpx>=0.24",
+    "tiktoken>=0.5",
+    "lmstudio>=0.1",  # For actual LM Studio integration
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "pytest-cov>=4.0",
+    "pytest-mock>=3.0",
+    "mypy>=1.0",
+    "ruff>=0.1",
+    "black>=23.0",
+]
+
+docs = [
+    "mkdocs>=1.5",
+    "mkdocs-material>=9.0",
+    "mkdocstrings[python]>=0.22",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/yourusername/lmstrix"
+"Bug Tracker" = "https://github.com/yourusername/lmstrix/issues"
+"Documentation" = "https://lmstrix.readthedocs.io"
+
+[project.scripts]
+lmstrix = "lmstrix.cli.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+lmstrix = ["py.typed"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = "fire.*"
+ignore_missing_imports = true
+
+
+
+[[tool.mypy.overrides]]
+module = "lmstudio.*"
+ignore_missing_imports = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.isort]
+known-third-party = ["pydantic", "rich", "fire", "loguru", "tenacity"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_functions = ["test_*"]
+python_classes = ["Test*"]
+asyncio_mode = "auto"
+addopts = [
+    "--strict-markers",
+    "--tb=short",
+    "--cov=lmstrix",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+
+[tool.coverage.run]
+source = ["src/lmstrix"]
+omit = ["*/tests/*", "*/__init__.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if __name__ == .__main__.:",
+    "raise AssertionError",
+    "raise NotImplementedError",
+]
+</document_content>
+</document>
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/__init__.py
+# Language: python
+
+import asyncio
+from typing import List
+from lmstrix.__version__ import __version__
+from lmstrix.core.context_tester import ContextTester
+from lmstrix.core.inference import InferenceEngine, InferenceResult
+from lmstrix.core.models import Model
+from lmstrix.loaders.model_loader import (
+    load_model_registry,
+    save_model_registry,
+    scan_and_update_registry,
+)
+
+class LMStrix:
+    """Provides a high-level, simplified interface to LMStrix's core features."""
+    def __init__((self, verbose: bool = False)):
+        """Initializes the LMStrix API wrapper."""
+    def scan((self)) -> List[Model]:
+        """Scans for LM Studio models, updates the registry, and returns all models."""
+    def list_models((self)) -> List[Model]:
+        """Lists all models currently in the registry."""
+    def test_model((self, model_id: str)) -> Model:
+        """Runs the context-length test on a specific model and returns the updated model data."""
+    def infer((
+        self, 
+        model_id: str, 
+        prompt: str, 
+        max_tokens: int = -1, 
+        temperature: float = 0.7
+    )) -> InferenceResult:
+        """Runs inference on a specified model."""
+
+def __init__((self, verbose: bool = False)):
+    """Initializes the LMStrix API wrapper."""
+
+def scan((self)) -> List[Model]:
+    """Scans for LM Studio models, updates the registry, and returns all models."""
+
+def list_models((self)) -> List[Model]:
+    """Lists all models currently in the registry."""
+
+def test_model((self, model_id: str)) -> Model:
+    """Runs the context-length test on a specific model and returns the updated model data."""
+
+def infer((
+        self, 
+        model_id: str, 
+        prompt: str, 
+        max_tokens: int = -1, 
+        temperature: float = 0.7
+    )) -> InferenceResult:
+    """Runs inference on a specified model."""
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/__version__.py
+# Language: python
+
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/api/__init__.py
+# Language: python
+
+from lmstrix.api.client import CompletionResponse, LMStudioClient
+from lmstrix.api.exceptions import (
+    APIConnectionError,
+    ConfigurationError,
+    ContextLimitExceededError,
+    InferenceError,
+    LMStrixError,
+    ModelLoadError,
+    ModelNotFoundError,
+)
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py
+# Language: python
+
+from typing import Any
+import lmstudio
+from loguru import logger
+from pydantic import BaseModel, Field
+from lmstrix.api.exceptions import APIConnectionError, InferenceError, ModelLoadError
+
+class CompletionResponse(B, a, s, e, M, o, d, e, l):
+    """Response from a completion request."""
+
+class LMStudioClient:
+    """Client for interacting with LM Studio."""
+    def __init__((self, verbose: bool = False)):
+        """Initialize the LM Studio client."""
+    def list_models((self)) -> list[dict[str, Any]]:
+        """List all downloaded models."""
+    def load_model((self, model_id: str, context_len: int)) -> Any:
+        """Load a model with a specific context length."""
+    def acompletion((
+        self,
+        llm: Any,  # The loaded model object from lmstudio.llm
+        prompt: str,
+        temperature: float = 0.7,
+        max_tokens: int = -1,  # -1 for unlimited
+    )) -> CompletionResponse:
+        """Make an async completion request to a loaded LM Studio model."""
+
+def __init__((self, verbose: bool = False)):
+    """Initialize the LM Studio client."""
+
+def list_models((self)) -> list[dict[str, Any]]:
+    """List all downloaded models."""
+
+def load_model((self, model_id: str, context_len: int)) -> Any:
+    """Load a model with a specific context length."""
+
+def acompletion((
+        self,
+        llm: Any,  # The loaded model object from lmstudio.llm
+        prompt: str,
+        temperature: float = 0.7,
+        max_tokens: int = -1,  # -1 for unlimited
+    )) -> CompletionResponse:
+    """Make an async completion request to a loaded LM Studio model."""
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/api/exceptions.py
+# Language: python
+
+class LMStrixError(E, x, c, e, p, t, i, o, n):
+    """Base exception for all LMStrix errors."""
+    def __init__((self, message: str, details: dict | None = None)):
+        """Initialize the exception."""
+
+class ModelLoadError(L, M, S, t, r, i, x, E, r, r, o, r):
+    """Raised when a model fails to load."""
+    def __init__((self, model_id: str, reason: str, details: dict | None = None)):
+        """Initialize the exception."""
+
+class InferenceError(L, M, S, t, r, i, x, E, r, r, o, r):
+    """Raised when inference fails."""
+    def __init__((self, model_id: str, reason: str, details: dict | None = None)):
+        """Initialize the exception."""
+
+class APIConnectionError(L, M, S, t, r, i, x, E, r, r, o, r):
+    """Raised when connection to LM Studio API fails."""
+    def __init__((self, endpoint: str, reason: str, details: dict | None = None)):
+        """Initialize the exception."""
+
+class ContextLimitExceededError(I, n, f, e, r, e, n, c, e, E, r, r, o, r):
+    """Raised when the input exceeds the model's context limit."""
+    def __init__((
+        self,
+        model_id: str,
+        input_tokens: int,
+        context_limit: int,
+        details: dict | None = None,
+    )):
+        """Initialize the exception."""
+
+class ModelNotFoundError(L, M, S, t, r, i, x, E, r, r, o, r):
+    """Raised when a requested model is not found."""
+    def __init__((self, model_id: str, available_models: list[str] | None = None)):
+        """Initialize the exception."""
+
+class ConfigurationError(L, M, S, t, r, i, x, E, r, r, o, r):
+    """Raised when there's a configuration issue."""
+    def __init__((self, config_name: str, reason: str, details: dict | None = None)):
+        """Initialize the exception."""
+
+def __init__((self, message: str, details: dict | None = None)):
+    """Initialize the exception."""
+
+def __init__((self, model_id: str, reason: str, details: dict | None = None)):
+    """Initialize the exception."""
+
+def __init__((self, model_id: str, reason: str, details: dict | None = None)):
+    """Initialize the exception."""
+
+def __init__((self, endpoint: str, reason: str, details: dict | None = None)):
+    """Initialize the exception."""
+
+def __init__((
+        self,
+        model_id: str,
+        input_tokens: int,
+        context_limit: int,
+        details: dict | None = None,
+    )):
+    """Initialize the exception."""
+
+def __init__((self, model_id: str, available_models: list[str] | None = None)):
+    """Initialize the exception."""
+
+def __init__((self, config_name: str, reason: str, details: dict | None = None)):
+    """Initialize the exception."""
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/__init__.py
+# Language: python
+
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py
+# Language: python
+
+import asyncio
+import fire
+from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.table import Table
+from lmstrix.core.context_tester import ContextTester
+from lmstrix.core.inference import InferenceEngine
+from lmstrix.loaders.model_loader import (
+    load_model_registry,
+    save_model_registry,
+    scan_and_update_registry,
+)
+
+class LMStrixCLI:
+    """A CLI for testing and managing LM Studio models."""
+    def scan((self, verbose: bool = False)):
+        """Scan for LM Studio models and update the local registry."""
+    def list((self, verbose: bool = False)):
+        """List all models from the registry with their test status."""
+    def test((self, model_id: str = None, all: bool = False, verbose: bool = False)):
+        """Test the context limits for models."""
+    def infer((
+        self,
+        prompt: str,
+        model_id: str,
+        max_tokens: int = -1,
+        temperature: float = 0.7,
+        verbose: bool = False,
+    )):
+        """Run inference on a specified model."""
+
+def scan((self, verbose: bool = False)):
+    """Scan for LM Studio models and update the local registry."""
+
+def list((self, verbose: bool = False)):
+    """List all models from the registry with their test status."""
+
+def test((self, model_id: str = None, all: bool = False, verbose: bool = False)):
+    """Test the context limits for models."""
+
+def infer((
+        self,
+        prompt: str,
+        model_id: str,
+        max_tokens: int = -1,
+        temperature: float = 0.7,
+        verbose: bool = False,
+    )):
+    """Run inference on a specified model."""
+
+def main(()):
+    """Main entry point for the CLI."""
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/core/__init__.py
+# Language: python
+
+from lmstrix.core.context import ContextOptimizer, OptimizationResult
+from lmstrix.core.context_tester import ContextTester, ContextTestResult
+from lmstrix.core.inference import InferenceEngine, InferenceResult
+from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
+from lmstrix.core.prompts import PromptResolver, ResolvedPrompt
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context.py
+# Language: python
+
+import json
+from pathlib import Path
+from loguru import logger
+from pydantic import BaseModel, Field
+from lmstrix.api.client import LMStudioClient
+from lmstrix.core.models import Model
+
+class OptimizationResult(B, a, s, e, M, o, d, e, l):
+    """Result from context optimization."""
+
+class ContextOptimizer:
+    """Finds the maximum effective context window for models."""
+    def __init__((
+        self,
+        client: LMStudioClient | None = None,
+        cache_file: Path | None = None,
+        verbose: bool = False,
+    )):
+        """Initialize the context optimizer."""
+    def _load_cache((self)) -> dict[str, int]:
+        """Load cached optimization results."""
+    def _save_cache((self)) -> None:
+        """Save optimization results to cache."""
+    def _generate_test_prompt((self, size: int)) -> str:
+        """Generate a test prompt of approximately the given token size."""
+    def _test_context_size((
+        self,
+        model_id: str,
+        context_size: int,
+        test_prompt: str | None = None,
+    )) -> tuple[bool, str]:
+        """Test if a model can handle a specific context size."""
+    def find_optimal_context((
+        self,
+        model: Model,
+        initial_size: int | None = None,
+        min_size: int = 1024,
+        max_attempts: int = 20,
+    )) -> OptimizationResult:
+        """Find the optimal context size for a model using binary search."""
+
+def succeeded((self)) -> bool:
+    """Check if optimization was successful."""
+
+def __init__((
+        self,
+        client: LMStudioClient | None = None,
+        cache_file: Path | None = None,
+        verbose: bool = False,
+    )):
+    """Initialize the context optimizer."""
+
+def _load_cache((self)) -> dict[str, int]:
+    """Load cached optimization results."""
+
+def _save_cache((self)) -> None:
+    """Save optimization results to cache."""
+
+def _generate_test_prompt((self, size: int)) -> str:
+    """Generate a test prompt of approximately the given token size."""
+
+def _test_context_size((
+        self,
+        model_id: str,
+        context_size: int,
+        test_prompt: str | None = None,
+    )) -> tuple[bool, str]:
+    """Test if a model can handle a specific context size."""
+
+def find_optimal_context((
+        self,
+        model: Model,
+        initial_size: int | None = None,
+        min_size: int = 1024,
+        max_attempts: int = 20,
+    )) -> OptimizationResult:
+    """Find the optimal context size for a model using binary search."""
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py
+# Language: python
+
+import json
+from datetime import datetime
+from pathlib import Path
+from loguru import logger
+from lmstrix.api import LMStudioClient
+from lmstrix.api.exceptions import ModelLoadError
+from lmstrix.core.models import ContextTestStatus, Model
+from lmstrix.utils import get_context_test_log_path
+
+class ContextTestResult:
+    """Result of a context test attempt."""
+    def __init__((
+        self,
+        context_size: int,
+        load_success: bool,
+        inference_success: bool = False,
+        prompt: str = "",
+        response: str = "",
+        error: str = "",
+    )):
+        """Initialize test result."""
+    def to_dict((self)) -> dict:
+        """Convert to dictionary for logging."""
+    def is_valid_response((self, expected: str)) -> bool:
+        """Check if response matches expected output."""
+
+class ContextTester:
+    """Tests models to find their true operational context limits."""
+    def __init__((self, client: LMStudioClient | None = None)):
+        """Initialize context tester."""
+    def _log_result((self, log_path: Path, result: ContextTestResult)) -> None:
+        """Append test result to log file."""
+    def _test_at_context((
+        self, model_id: str, context_size: int, log_path: Path
+    )) -> ContextTestResult:
+        """Test model at a specific context size."""
+    def test_model((
+        self,
+        model: Model,
+        min_context: int = 2048,
+        max_context: int | None = None,
+    )) -> Model:
+        """Run full context test on a model using binary search."""
+
+def __init__((
+        self,
+        context_size: int,
+        load_success: bool,
+        inference_success: bool = False,
+        prompt: str = "",
+        response: str = "",
+        error: str = "",
+    )):
+    """Initialize test result."""
+
+def to_dict((self)) -> dict:
+    """Convert to dictionary for logging."""
+
+def is_valid_response((self, expected: str)) -> bool:
+    """Check if response matches expected output."""
+
+def __init__((self, client: LMStudioClient | None = None)):
+    """Initialize context tester."""
+
+def _log_result((self, log_path: Path, result: ContextTestResult)) -> None:
+    """Append test result to log file."""
+
+def _test_at_context((
+        self, model_id: str, context_size: int, log_path: Path
+    )) -> ContextTestResult:
+    """Test model at a specific context size."""
+
+def test_model((
+        self,
+        model: Model,
+        min_context: int = 2048,
+        max_context: int | None = None,
+    )) -> Model:
+    """Run full context test on a model using binary search."""
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py
+# Language: python
+
+import time
+from typing import Any
+from loguru import logger
+from pydantic import BaseModel, Field
+from lmstrix.api.client import LMStudioClient
+from lmstrix.api.exceptions import ModelNotFoundError
+from lmstrix.core.models import Model, ModelRegistry
+
+class InferenceResult(B, a, s, e, M, o, d, e, l):
+    """Result from an inference run."""
+
+class InferenceEngine:
+    """Engine for running inference on models."""
+    def __init__((
+        self,
+        client: LMStudioClient | None = None,
+        model_registry: ModelRegistry | None = None,
+        verbose: bool = False,
+    )):
+        """Initialize the inference engine."""
+    def infer((
+        self,
+        model_id: str,
+        prompt: str,
+        max_tokens: int = -1,  # Use -1 for unlimited as per new client
+        temperature: float = 0.7,
+        **kwargs: Any,
+    )) -> InferenceResult:
+        """Run inference on a model."""
+
+def succeeded((self)) -> bool:
+    """Check if the inference was successful."""
+
+def __init__((
+        self,
+        client: LMStudioClient | None = None,
+        model_registry: ModelRegistry | None = None,
+        verbose: bool = False,
+    )):
+    """Initialize the inference engine."""
+
+def infer((
+        self,
+        model_id: str,
+        prompt: str,
+        max_tokens: int = -1,  # Use -1 for unlimited as per new client
+        temperature: float = 0.7,
+        **kwargs: Any,
+    )) -> InferenceResult:
+    """Run inference on a model."""
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py
+# Language: python
+
+import json
+from datetime import datetime
+from enum import Enum
+from pathlib import Path
+from typing import Any
+from loguru import logger
+from pydantic import BaseModel, Field, field_validator
+from lmstrix.utils import get_models_registry_path
+
+class ContextTestStatus(s, t, r, ,,  , E, n, u, m):
+    """Status of context testing for a model."""
+
+class Model(B, a, s, e, M, o, d, e, l):
+    """Represents a single LM Studio model with its metadata."""
+    def sanitized_id((self)) -> str:
+        """Return a sanitized version of the model ID suitable for filenames."""
+    def to_registry_dict((self)) -> dict[str, Any]:
+        """Convert to dictionary format for registry storage."""
+
+class Config:
+    """Pydantic configuration."""
+
+class ModelRegistry:
+    """Manages the collection of available models."""
+    def __init__((self, models_file: Path | None = None)):
+        """Initialize the model registry."""
+    def load((self)) -> None:
+        """Load models from the JSON file."""
+    def save((self)) -> None:
+        """Save models to the JSON file."""
+    def get_model((self, model_id: str)) -> Model | None:
+        """Get a model by ID."""
+    def list_models((self)) -> list[Model]:
+        """Get all models in the registry."""
+    def update_model((self, model_id: str, model: Model)) -> None:
+        """Update a model in the registry and save."""
+    def remove_model((self, model_id: str)) -> None:
+        """Remove a model from the registry and save."""
+    def __len__((self)) -> int:
+        """Return the number of models in the registry."""
+
+def validate_path((cls, v: Any)) -> Path:
+    """Ensure path is a Path object."""
+
+def sanitized_id((self)) -> str:
+    """Return a sanitized version of the model ID suitable for filenames."""
+
+def to_registry_dict((self)) -> dict[str, Any]:
+    """Convert to dictionary format for registry storage."""
+
+def __init__((self, models_file: Path | None = None)):
+    """Initialize the model registry."""
+
+def load((self)) -> None:
+    """Load models from the JSON file."""
+
+def save((self)) -> None:
+    """Save models to the JSON file."""
+
+def get_model((self, model_id: str)) -> Model | None:
+    """Get a model by ID."""
+
+def list_models((self)) -> list[Model]:
+    """Get all models in the registry."""
+
+def update_model((self, model_id: str, model: Model)) -> None:
+    """Update a model in the registry and save."""
+
+def remove_model((self, model_id: str)) -> None:
+    """Remove a model from the registry and save."""
+
+def __len__((self)) -> int:
+    """Return the number of models in the registry."""
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/core/prompts.py
+# Language: python
+
+import re
+from collections.abc import Mapping
+from types import MappingProxyType
+from typing import Any
+import tiktoken
+from loguru import logger
+from pydantic import BaseModel, Field
+from lmstrix.api.exceptions import ConfigurationError
+
+class ResolvedPrompt(B, a, s, e, M, o, d, e, l):
+    """A prompt after placeholder resolution."""
+
+class PromptResolver:
+    """Handles two-phase placeholder resolution for prompt templates."""
+    def __init__((self, verbose: bool = False)):
+        """Initialize the prompt resolver."""
+    def _get_by_path((self, data: dict[str, Any], dotted_path: str)) -> Any:
+        """Get value at dotted path from nested dict."""
+    def _find_placeholders((self, text: str)) -> list[str]:
+        """Find all placeholders in text."""
+    def _resolve_internal_once((self, text: str, root: dict[str, Any])) -> tuple[str, list[str]]:
+        """Replace one pass of internal placeholders."""
+    def _resolve_external((self, text: str, params: Mapping[str, str])) -> tuple[str, list[str]]:
+        """Replace external placeholders using provided parameters."""
+    def resolve_prompt((
+        self,
+        prompt_name: str,
+        prompts_data: dict[str, Any],
+        **params: str,
+    )) -> ResolvedPrompt:
+        """Resolve a single prompt template."""
+    def resolve_all_prompts((
+        self,
+        prompts_data: dict[str, Any],
+        **params: str,
+    )) -> dict[str, ResolvedPrompt]:
+        """Resolve all prompts in the data."""
+    def truncate_to_limit((
+        self,
+        text: str,
+        limit: int,
+        strategy: str = "end",
+    )) -> str:
+        """Truncate text to fit within token limit."""
+    def inject_context((
+        self,
+        prompt: str,
+        context: str,
+        context_placeholder: str = "{{text}}",
+        max_tokens: int | None = None,
+    )) -> str:
+        """Inject context into a prompt, with optional truncation."""
+
+class _SafeDict(d, i, c, t):
+    """Dict that leaves unknown placeholders unchanged."""
+    def __missing__((self, key: str)) -> str:
+
+def __init__((self, verbose: bool = False)):
+    """Initialize the prompt resolver."""
+
+def _get_by_path((self, data: dict[str, Any], dotted_path: str)) -> Any:
+    """Get value at dotted path from nested dict."""
+
+def _find_placeholders((self, text: str)) -> list[str]:
+    """Find all placeholders in text."""
+
+def _resolve_internal_once((self, text: str, root: dict[str, Any])) -> tuple[str, list[str]]:
+    """Replace one pass of internal placeholders."""
+
+def repl((match: re.Match[str])) -> str:
+
+def _resolve_external((self, text: str, params: Mapping[str, str])) -> tuple[str, list[str]]:
+    """Replace external placeholders using provided parameters."""
+
+def __missing__((self, key: str)) -> str:
+
+def resolve_prompt((
+        self,
+        prompt_name: str,
+        prompts_data: dict[str, Any],
+        **params: str,
+    )) -> ResolvedPrompt:
+    """Resolve a single prompt template."""
+
+def resolve_all_prompts((
+        self,
+        prompts_data: dict[str, Any],
+        **params: str,
+    )) -> dict[str, ResolvedPrompt]:
+    """Resolve all prompts in the data."""
+
+def process_prompts((data: dict[str, Any], prefix: str = "")) -> None:
+
+def truncate_to_limit((
+        self,
+        text: str,
+        limit: int,
+        strategy: str = "end",
+    )) -> str:
+    """Truncate text to fit within token limit."""
+
+def inject_context((
+        self,
+        prompt: str,
+        context: str,
+        context_placeholder: str = "{{text}}",
+        max_tokens: int | None = None,
+    )) -> str:
+    """Inject context into a prompt, with optional truncation."""
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/core/scanner.py
+# Language: python
+
+from pathlib import Path
+from loguru import logger
+from lmstrix.core.models import Model, ModelRegistry
+from lmstrix.utils import get_lmstudio_path
+
+class ModelScanner:
+    """Scans LM Studio for available models."""
+    def __init__((self)):
+        """Initialize scanner."""
+    def _get_model_size((self, model_path: Path)) -> int:
+        """Get size of model file(s)."""
+    def _extract_model_info((self, model_path: Path)) -> dict | None:
+        """Extract model information from path."""
+    def scan_models((self)) -> dict[str, dict]:
+        """Scan for all models in LM Studio."""
+    def update_registry((self, registry: ModelRegistry | None = None)) -> ModelRegistry:
+        """Update model registry with scanned models."""
+
+def __init__((self)):
+    """Initialize scanner."""
+
+def _get_model_size((self, model_path: Path)) -> int:
+    """Get size of model file(s)."""
+
+def _extract_model_info((self, model_path: Path)) -> dict | None:
+    """Extract model information from path."""
+
+def scan_models((self)) -> dict[str, dict]:
+    """Scan for all models in LM Studio."""
+
+def update_registry((self, registry: ModelRegistry | None = None)) -> ModelRegistry:
+    """Update model registry with scanned models."""
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/__init__.py
+# Language: python
+
+from lmstrix.loaders.context_loader import (
+    estimate_tokens,
+    load_context,
+    load_context_with_limit,
+    load_multiple_contexts,
+    save_context,
+)
+from lmstrix.loaders.model_loader import load_model_registry, save_model_registry
+from lmstrix.loaders.prompt_loader import load_prompts, load_single_prompt, save_prompts
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/context_loader.py
+# Language: python
+
+from pathlib import Path
+import tiktoken
+from loguru import logger
+from lmstrix.api.exceptions import ConfigurationError
+
+def load_context((
+    file_path: str | Path,
+    encoding: str = "utf-8",
+    verbose: bool = False,
+)) -> str:
+    """Load context text from a file."""
+
+def load_multiple_contexts((
+    file_paths: list[str | Path],
+    separator: str = "\n\n",
+    encoding: str = "utf-8",
+    verbose: bool = False,
+)) -> str:
+    """Load and concatenate multiple context files."""
+
+def estimate_tokens((
+    text: str,
+    model_encoding: str = "cl100k_base",
+)) -> int:
+    """Estimate the number of tokens in a text."""
+
+def load_context_with_limit((
+    file_path: str | Path,
+    max_tokens: int,
+    encoding: str = "utf-8",
+    model_encoding: str = "cl100k_base",
+    verbose: bool = False,
+)) -> tuple[str, int, bool]:
+    """Load context with a token limit."""
+
+def save_context((
+    content: str,
+    file_path: str | Path,
+    encoding: str = "utf-8",
+)) -> None:
+    """Save context to a file."""
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py
+# Language: python
+
+from pathlib import Path
+from loguru import logger
+from lmstrix.api.client import LMStudioClient
+from lmstrix.core.models import Model, ModelRegistry
+from lmstrix.utils.paths import get_default_models_file
+
+def load_model_registry((
+    json_path: Path | None = None,
+    verbose: bool = False,
+)) -> ModelRegistry:
+    """Load the model registry from a JSON file."""
+
+def save_model_registry((
+    registry: ModelRegistry,
+    json_path: Path | None = None,
+)) -> Path:
+    """Save a ModelRegistry to a JSON file."""
+
+def scan_and_update_registry((verbose: bool = False)) -> ModelRegistry:
+    """Scan for downloaded LM Studio models and update the local registry."""
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py
+# Language: python
+
+from pathlib import Path
+from typing import Any
+import toml
+from loguru import logger
+from lmstrix.api.exceptions import ConfigurationError
+from lmstrix.core.prompts import PromptResolver, ResolvedPrompt
+
+def load_prompts((
+    toml_path: Path,
+    resolver: PromptResolver | None = None,
+    verbose: bool = False,
+    **params: str,
+)) -> dict[str, ResolvedPrompt]:
+    """Load and resolve prompts from a TOML file."""
+
+def load_single_prompt((
+    toml_path: Path,
+    prompt_name: str,
+    resolver: PromptResolver | None = None,
+    verbose: bool = False,
+    **params: str,
+)) -> ResolvedPrompt:
+    """Load and resolve a single prompt from a TOML file."""
+
+def save_prompts((
+    prompts: dict[str, Any],
+    toml_path: Path,
+)) -> None:
+    """Save prompts to a TOML file."""
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/__init__.py
+# Language: python
+
+from lmstrix.utils.paths import (
+    get_context_test_log_path,
+    get_context_tests_dir,
+    get_lmstrix_data_dir,
+    get_lmstudio_path,
+    get_models_registry_path,
+)
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/paths.py
+# Language: python
+
+from pathlib import Path
+from loguru import logger
+
+def get_lmstudio_path(()) -> Path:
+    """Get the LM Studio installation path."""
+
+def get_lmstrix_data_dir(()) -> Path:
+    """Get the LMStrix data directory within LM Studio."""
+
+def get_default_models_file(()) -> Path:
     """Get the path to the models registry JSON file."""
 
 def get_context_tests_dir(()) -> Path:

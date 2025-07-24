@@ -117,6 +117,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Input validation on all user data
 - Secure model ID sanitization
 
+## [1.0.0] - 2025-07-24
+
+### Changed
+
+#### Major Refactoring: litellm to lmstudio Native Integration
+- **Dependency Pivot**: Completely removed `litellm` dependency and replaced with native `lmstudio` package
+- **API Client** (`api/client.py`): 
+  - Rewritten to directly use `lmstudio.list_downloaded_models()`
+  - Now uses `lmstudio.llm()` for model loading
+  - Implements `llm.complete()` for all model interactions
+- **Context Tester** (`core/context_tester.py`):
+  - Completely rewritten to use native lmstudio client
+  - Implements binary search to find maximum effective context window
+  - Efficiently loads, tests, and unloads models during testing
+- **Inference Engine** (`core/inference.py`):
+  - Updated to use native client
+  - Ensures models are loaded with tested context length before inference
+- **Model Discovery** (`loaders/model_loader.py`):
+  - Now uses lmstudio to discover models
+  - Ensures local registry is always in sync with LM Studio's downloaded models
+
+### Updated
+- **CLI** (`cli/main.py`): All commands (scan, list, test, infer) updated to use refactored core logic
+- **Public API** (`__init__.py`): Simplified to provide clean interface to lmstudio-native functionality
+- **Development Plan** (`PLAN.md`): Rewritten to reflect new technical direction
+
+### Technical Improvements
+- Direct integration with LM Studio for better reliability and performance
+- More efficient model loading and unloading
+- Better alignment with project's core goal of testing true context limits
+
 ## [Unreleased]
 
 ### Planned
