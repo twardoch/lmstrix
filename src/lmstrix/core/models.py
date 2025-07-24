@@ -10,7 +10,7 @@ from typing import Any
 from loguru import logger
 from pydantic import BaseModel, Field, field_validator
 
-from lmstrix.utils import get_models_registry_path
+from lmstrix.utils import get_default_models_file as get_models_registry_path
 
 
 class ContextTestStatus(str, Enum):
@@ -103,7 +103,7 @@ class ModelRegistry:
 
     def __init__(self, models_file: Path | None = None):
         """Initialize the model registry."""
-        self.models_file = models_file or get_models_registry_path()
+        self.models_file = models_file or get_default_models_file()
         self._models: dict[str, Model] = {}
         self.lms_path: Path | None = None
         self.load()
