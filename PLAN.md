@@ -1,58 +1,50 @@
-# LMStrix Development Plan - v1.0 Native `lmstudio` Integration
+# LMStrix Development Plan - v1.0 Next Steps
 
-## 1. Project Vision
+## 1. Project Vision & Status
 
-**Vision**: LMStrix v1.0 will be a minimal viable product focused on solving the critical problem with LM Studio: many models falsely declare higher maximum context lengths than they can actually handle.
+**Vision**: Deliver a reliable, installable tool that solves the critical problem of models in LM Studio declaring false context limits. The tool provides automated discovery of true operational context limits.
 
-**Core Problem**: LM Studio models often declare context limits (e.g., 128k tokens) that fail in practice. Models may fail to load, produce gibberish, or only work correctly below a certain "real" max context.
+**Current Status**: The core functionality is complete. The project has been successfully refactored to use the native `lmstudio` package for all model interactions, and all data is stored in the correct, centralized location. The CLI and Python API are functional.
 
-**Solution**: LMStrix provides automated testing and validation of true operational context limits using native `lmstudio` package integration for direct and reliable model interaction.
+The immediate next steps are to build a comprehensive test suite to ensure reliability and to prepare the package for its initial public release.
 
-## 2. Core Technical Approach: Native Integration
+## 2. Phase 2: Testing & Quality Assurance
 
-All core functionality is built directly on top of the `lmstudio` Python package:
+This phase focuses on ensuring the existing codebase is robust, reliable, and free of bugs.
 
-- **Model Discovery**: `lmstudio.list_downloaded_models()`
-- **Model Loading/Unloading**: `lmstudio.llm()` and `llm.unload()`
-- **Model Information**: `llm.get_info()`
-- **Inference**: `llm.complete()`
-- **Configuration**: Model loading configured with `config={"context_length": size}`
+### 2.1. Unit & Integration Testing
+**Goal**: Achieve comprehensive test coverage for all critical components.
 
-## 3. Completed Features (v1.0.0)
+- **Testing Framework**: Tests will be implemented using `pytest`.
+- **Mocking**: The `pytest-mock` library will be used to create a mock of the `lmstudio` package. This allows for testing the application's logic without needing a live LM Studio instance, ensuring that tests are fast, repeatable, and can run in any environment (like a CI/CD pipeline).
 
-### Major Refactoring Complete
-- ✅ Removed `litellm` dependency completely
-- ✅ Implemented native `lmstudio` package integration
-- ✅ Refactored all core components for direct LM Studio interaction
+- **Test Implementation Plan**:
 
-### Core Components Implemented
-- ✅ **API Client**: Direct wrapper around `lmstudio` package functions
-- ✅ **Context Tester**: Binary search algorithm for finding true context limits
-- ✅ **Inference Engine**: Native model loading with tested context lengths
-- ✅ **Model Discovery**: Sync with LM Studio's downloaded models
-- ✅ **CLI Interface**: Full command set (scan, list, test, infer, status)
-- ✅ **Python API**: Clean programmatic interface to all functionality
+  - **`tests/core/test_context_tester.py`**: 
+    - Create a `test_binary_search_logic` function that uses a mocked `lmstudio` client.
+    - The mock will simulate different scenarios: a model that loads and passes inference at certain context sizes but fails at others.
+    - Assert that the `find_max_working_context` method correctly identifies the highest passing context size.
+    - Test edge cases: a model that never loads, a model that loads but always fails inference, and a model that works at all tested sizes.
 
-## 4. Phase 2: Testing, Documentation, and Release
+  - **`tests/loaders/test_model_loader.py`**:
+    - Mock the `lmstudio.list_downloaded_models` function to return a predefined list of model dictionaries.
+    - Test the `scan_and_update_registry` function.
+    - Assert that new models are added, existing models are updated (without overwriting test results), and deleted models are removed from the registry.
 
-### 4.1. Testing
-- **Unit Tests**: Cover the core logic for the binary search algorithm, response validation, and registry management
-- **Integration Tests**: Write tests that use a mock of the `lmstudio` package to simulate end-to-end workflows without requiring a live LM Studio instance
+  - **`tests/utils/test_paths.py`**:
+    - Mock the `Path.home()` and `Path.exists()` methods.
+    - Test the `get_lmstudio_path` function to ensure it correctly finds the path from the `.lmstudio-home-pointer` file.
+    - Test the fallback logic to common directories if the pointer file does not exist.
+    - Assert that `get_default_models_file` returns the correct `lmstrix.json` path.
 
-### 4.2. Documentation
-- Update `README.md` to reflect the new `lmstudio`-based approach
-- Create a clear guide on the context testing methodology
-- Document the CLI commands and Python API
+## 3. Phase 3: Documentation & Release
 
-### 4.3. Release
-- Ensure `pyproject.toml` is complete and accurate
-- Publish v1.0.0 to PyPI
+**Goal**: Prepare the project for a successful v1.0.0 release on PyPI.
 
-## 5. Future Enhancements (Post v1.0)
+### 3.1. Documentation
+- **`README.md`**: Update the README to include a clear, concise quick-start guide, installation instructions, and examples for the new CLI commands (`scan`, `test`, `list`).
+- **API Documentation**: Add comprehensive docstrings to all public functions and classes, explaining their purpose, arguments, and return values.
 
-- Advanced context optimization algorithms (beyond binary search validation)
-- Streaming support for real-time inference
-- Multi-model workflow capabilities
-- GUI/web interface for easier interaction
-- Performance benchmarking tools
-- Model comparison features
+### 3.2. Packaging & Release
+- **`pyproject.toml`**: Verify that all dependencies, project metadata (version, author, license), and entry points are correct.
+- **PyPI Release**: Once testing and documentation are complete, the project will be built and published to PyPI, making it installable via `pip install lmstrix`.
