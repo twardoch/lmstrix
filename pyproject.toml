@@ -10,9 +10,9 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
-    {name = "LMStrix Contributors"},
+    {name = "Adam Twardoch", email = "adam+github@twardoch.com"},
 ]
-keywords = ["llm", "lmstudio", "context", "optimization", "testing"]
+keywords = ["llm", "lmstudio", "context", "optimization", "testing", "ai", "developer-tools", "cli"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -23,6 +23,8 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Operating System :: OS Independent",
+    "Typing :: Typed",
 ]
 
 dependencies = [
@@ -34,7 +36,7 @@ dependencies = [
     "loguru>=0.7",
     "httpx>=0.24",
     "tiktoken>=0.5",
-    "lmstudio>=0.1",
+    "lmstudio-api>=0.1.2",
 ]
 
 [project.urls]
