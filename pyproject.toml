@@ -33,11 +33,11 @@ classifiers = [
 dependencies = [
   "fire>=0.5",
   "httpx>=0.24",
-  "lmstudio>=0.1.0",
+  "lmstudio>=1.4.1",
   "loguru>=0.7",
   "pydantic>=2.0",
-  "rich>=13.0",
-  "tenacity>=8.0",
+  "rich>=13.9.4",
+  "tenacity>=8.5.0",
   "tiktoken>=0.5",
   "toml>=0.10",
 ]
@@ -57,14 +57,9 @@ build-backend = "hatchling.build"
 [tool.hatch.version]
 source = "vcs"
 
-[tool.hatch.build.hooks.vcs]
-version-file = "src/lmstrix/_version.py"
-
 [tool.hatch.build.targets.sdist]
-include = ["/src", "/tests"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/lmstrix"]
 
 [tool.hatch.envs.default]
 dependencies = [
