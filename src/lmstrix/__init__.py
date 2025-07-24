@@ -2,9 +2,9 @@
 """High-level API for LMStrix functionality."""
 
 import asyncio
+from importlib.metadata import version, PackageNotFoundError
 from typing import List
 
-from lmstrix.__version__ import __version__
 from lmstrix.core.context_tester import ContextTester
 from lmstrix.core.inference import InferenceEngine, InferenceResult
 from lmstrix.core.models import Model
@@ -13,6 +13,14 @@ from lmstrix.loaders.model_loader import (
     save_model_registry,
     scan_and_update_registry,
 )
+
+try:
+    from lmstrix._version import __version__
+except ImportError:
+    try:
+        __version__ = version("lmstrix")
+    except PackageNotFoundError:
+        __version__ = "0.0.0+unknown"
 
 
 class LMStrix:
