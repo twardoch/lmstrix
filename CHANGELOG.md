@@ -5,156 +5,37 @@ All notable changes to the LMStrix project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2025-07-25
+
+### Changed
+
+- **Major Refactoring: `litellm` to Native `lmstudio` Integration**
+  - **Dependency Pivot**: Completely removed the `litellm` dependency and replaced it with the native `lmstudio` package for all model interactions. This provides a more robust, reliable, and direct integration.
+  - **API Client (`api/client.py`)**: Rewritten to be a direct, thin wrapper around the `lmstudio` package’s core functions (`list_downloaded_models`, `llm`, `complete`, `unload`).
+  - **Context Tester (`core/context_tester.py`)**: The engine for finding the true context limit of a model has been completely rewritten to use the native `lmstudio` client. It now performs a binary search, efficiently loading, testing, and unloading models to determine the maximum operational context size.
+  - **Inference Engine (`core/inference.py`)**: Updated to use the native client, ensuring models are loaded with their tested, validated context length before running inference.
+  - **Model Discovery (`loaders/model_loader.py`)**: The model scanner now uses `lmstudio` to discover all downloaded models, ensuring the local registry is always perfectly in sync with the LM Studio application.
+
+### Added
+
+- **System Path and Data Storage**
+  - Implemented robust detection of the LM Studio data directory by reading the `$HOME/.lmstudio-home-pointer` file.
+  - All application data, including the model registry, is now stored in a clean, standardized `lmstrix.json` file directly within the located LM Studio data directory.
+  - All test logs are stored in a `context_tests` subdirectory within a new `lmstrix` folder in the LM Studio data directory.
+
+- **CLI and API Enhancements**
+  - **CLI (`cli/main.py`)**: All commands (`scan`, `list`, `test`, `infer`) have been updated to use the new, refactored core logic, providing a seamless user experience.
+  - **Public API (`__init__.py`)**: The high-level `LMStrix` class has been simplified to provide a clean, modern, and programmatic interface to the library's `lmstudio`-native functionality.
+
+### Fixed
+
+- Resolved all previous import and dependency issues related to `litellm`.
+- Standardized the data storage location to prevent fragmentation and improve reliability.
+
 ## [0.1.0] - 2025-07-24
 
 ### Added
 
-#### Project Structure
-- Created modern Python package structure with `src/` layout
-- Established modular architecture with clear separation of concerns
-- Set up proper package metadata in `pyproject.toml`
-- Added MIT License
-- Created comprehensive `.gitignore` for Python projects
-
-#### Core Components
-- **Model Management** (`core/models.py`)
-  - Implemented `Model` Pydantic class with validation
-  - Created `ModelRegistry` for managing LM Studio models
-  - Added backward compatibility with existing `lmsm.json` format
-  - Implemented model ID sanitization for safe file operations
-
-- **Inference Engine** (`core/inference.py`)
-  - Built async `InferenceEngine` class
-  - Integrated with LM Studio API via litellm
-  - Added configurable temperature and max_tokens
-  - Implemented proper error handling and result formatting
-
-- **Context Optimizer** (`core/context.py`)
-  - Developed binary search algorithm for optimal context discovery
-  - Created `OptimizationResult` model for tracking results
-  - Implemented caching mechanism to avoid redundant optimizations
-  - Added configurable min/max bounds and retry logic
-
-- **Prompt Resolution** (`core/prompts.py`)
-  - Built two-phase placeholder resolution system
-  - Created `PromptTemplate` class with validation
-  - Implemented nested placeholder support
-  - Added comprehensive error messages for missing placeholders
-
-#### API Client
-- **LM Studio Client** (`api/client.py`)
-  - Wrapped litellm for LM Studio integration
-  - Implemented retry logic with exponential backoff
-  - Suppressed litellm verbose output
-  - Added proper async/await support
-  - Created unified completion interface
-
-- **Exception Hierarchy** (`api/exceptions.py`)
-  - Designed comprehensive exception classes
-  - Added specific errors for API, validation, and model issues
-  - Implemented helpful error messages
-
-#### Data Loaders
-- **Model Loader** (`loaders/model_loader.py`)
-  - Created functions to load/save model registries
-  - Added automatic discovery of model files
-  - Implemented verbose logging support
-
-- **Prompt Loader** (`loaders/prompt_loader.py`)
-  - Built TOML-based prompt management
-  - Added support for categories and descriptions
-  - Implemented single and bulk prompt loading
-
-- **Context Loader** (`loaders/context_loader.py`)
-  - Created flexible context loading from files
-  - Added token estimation using tiktoken
-  - Implemented size-limited loading
-  - Built support for multiple context files
-
-#### Command Line Interface
-- **CLI Framework** (`cli/main.py`)
-  - Implemented Fire-based command structure
-  - Added Rich formatting for beautiful output
-  - Created commands: `models list`, `models scan`, `infer`, `optimize`
-  - Integrated progress bars and status indicators
-
-#### Public API
-- **High-Level Interface** (`__init__.py`)
-  - Created `LMStrix` class for simplified usage
-  - Exposed key components in public API
-  - Added comprehensive docstrings
-  - Implemented convenience methods
-
-### Technical Implementation Details
-
-#### Code Quality
-- Full type hints throughout the codebase
-- Comprehensive docstrings following Google style
-- Structured imports with proper `__all__` exports
-- Consistent error handling patterns
-
-#### Architecture Decisions
-- Async-first design for better performance
-- Dependency injection for testability
-- Pydantic models for data validation
-- Modular design with clear boundaries
-
-#### Integration Features
-- Seamless LM Studio server integration
-- Environment variable configuration support
-- Flexible file path resolution
-- Backward compatibility with existing tools
-
-### Fixed
-- Resolved import issues after file reorganization
-- Fixed Pydantic model validation errors
-- Corrected async/await usage patterns
-- Addressed path resolution for cross-platform compatibility
-
-### Security
-- No hardcoded credentials or API keys
-- Safe file path handling
-- Input validation on all user data
-- Secure model ID sanitization
-
-## [1.0.0] - 2025-07-24
-
-### Changed
-
-#### Major Refactoring: litellm to lmstudio Native Integration
-- **Dependency Pivot**: Completely removed `litellm` dependency and replaced with native `lmstudio` package
-- **API Client** (`api/client.py`): 
-  - Rewritten to directly use `lmstudio.list_downloaded_models()`
-  - Now uses `lmstudio.llm()` for model loading
-  - Implements `llm.complete()` for all model interactions
-- **Context Tester** (`core/context_tester.py`):
-  - Completely rewritten to use native lmstudio client
-  - Implements binary search to find maximum effective context window
-  - Efficiently loads, tests, and unloads models during testing
-- **Inference Engine** (`core/inference.py`):
-  - Updated to use native client
-  - Ensures models are loaded with tested context length before inference
-- **Model Discovery** (`loaders/model_loader.py`):
-  - Now uses lmstudio to discover models
-  - Ensures local registry is always in sync with LM Studio's downloaded models
-
-### Updated
-- **CLI** (`cli/main.py`): All commands (scan, list, test, infer) updated to use refactored core logic
-- **Public API** (`__init__.py`): Simplified to provide clean interface to lmstudio-native functionality
-- **Development Plan** (`PLAN.md`): Rewritten to reflect new technical direction
-
-### Technical Improvements
-- Direct integration with LM Studio for better reliability and performance
-- More efficient model loading and unloading
-- Better alignment with project's core goal of testing true context limits
-
-## [Unreleased]
-
-### Planned
-- Unit tests for all core modules
-- Integration tests for API client
-- Documentation generation with MkDocs
-- GitHub Actions CI/CD pipeline
-- PyPI package publishing setup
-- Performance benchmarks
-- Additional model optimization strategies
+- Initial project structure with `src/` layout.
+- First implementation of core components using `litellm`.
+- Basic CLI and API interfaces.

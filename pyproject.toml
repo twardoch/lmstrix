@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
 [project]
 name = "lmstrix"
-version = "1.0.0"
+dynamic = ["version"]
 description = "A toolkit for managing and testing LM Studio models with automatic context limit discovery"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -27,7 +27,6 @@ classifiers = [
 
 dependencies = [
     "pydantic>=2.0",
-    
     "rich>=13.0",
     "fire>=0.5",
     "toml>=0.10",
@@ -35,68 +34,54 @@ dependencies = [
     "loguru>=0.7",
     "httpx>=0.24",
     "tiktoken>=0.5",
-    "lmstudio>=0.1",  # For actual LM Studio integration
-]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.0",
-    "pytest-asyncio>=0.21",
-    "pytest-cov>=4.0",
-    "pytest-mock>=3.0",
-    "mypy>=1.0",
-    "ruff>=0.1",
-    "black>=23.0",
-]
-
-docs = [
-    "mkdocs>=1.5",
-    "mkdocs-material>=9.0",
-    "mkdocstrings[python]>=0.22",
+    "lmstudio>=0.1",
 ]
 
 [project.urls]
 "Homepage" = "https://github.com/yourusername/lmstrix"
 "Bug Tracker" = "https://github.com/yourusername/lmstrix/issues"
-"Documentation" = "https://lmstrix.readthedocs.io"
 
 [project.scripts]
 lmstrix = "lmstrix.cli.main:main"
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.hatch.version]
+source = "vcs"
 
-[tool.setuptools.package-data]
-lmstrix = ["py.typed"]
+[tool.hatch.build.targets.sdist]
+include = ["/src", "/tests"]
 
-[tool.mypy]
-python_version = "3.10"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
-warn_unreachable = true
-strict_equality = true
+[tool.hatch.build.targets.wheel]
+packages = ["src/lmstrix"]
 
-[[tool.mypy.overrides]]
-module = "fire.*"
-ignore_missing_imports = true
+[tool.hatch.envs.default]
+dependencies = [
+  "pytest",
+  "pytest-asyncio",
+  "pytest-cov",
+  "pytest-mock",
+]
 
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+cov = "pytest --cov-report=term-missing --cov-report=html --cov=src/lmstrix {args:tests}"
 
+[tool.hatch.envs.lint]
+detached = true
+dependencies = ["ruff"]
 
-[[tool.mypy.overrides]]
-module = "lmstudio.*"
-ignore_missing_imports = true
+[tool.hatch.envs.lint.scripts]
+fmt = "ruff format ."
+check = "ruff check ."
+all = [
+  "fmt",
+  "check",
+]
 
 [tool.ruff]
 target-version = "py310"
 line-length = 100
+
+[tool.ruff.lint]
 select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
@@ -107,41 +92,16 @@ select = [
     "UP", # pyupgrade
 ]
 ignore = [
-    "E501",  # line too long, handled by black
+    "E501",  # line too long, handled by formatter
     "B008",  # do not perform function calls in argument defaults
     "C901",  # too complex
 ]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
 
-[tool.ruff.isort]
-known-third-party = ["pydantic", "rich", "fire", "loguru", "tenacity"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py", "*_test.py"]
-python_functions = ["test_*"]
-python_classes = ["Test*"]
-asyncio_mode = "auto"
-addopts = [
-    "--strict-markers",
-    "--tb=short",
-    "--cov=lmstrix",
-    "--cov-report=term-missing",
-    "--cov-report=html",
-]
-
-[tool.coverage.run]
-source = ["src/lmstrix"]
-omit = ["*/tests/*", "*/__init__.py"]
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if self.debug:",
-    "if __name__ == .__main__.:",
-    "raise AssertionError",
-    "raise NotImplementedError",
-]
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "lf"
