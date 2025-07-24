@@ -1,16 +1,5 @@
 # TODO List for LMStrix v1.0 MVP
 
-## PRIORITY: Replace litellm with lmstudio package
-
-### Immediate Tasks
-- [ ] Remove litellm dependency from pyproject.toml
-- [ ] Rewrite LMStudioClient to use native lmstudio package
-- [ ] Update ContextTester to use lmstudio.llm() for model loading
-- [ ] Replace litellm completion calls with model.complete()
-- [ ] Add proper model unloading with model.unload()
-- [ ] Update model discovery to use lmstudio.list_downloaded_models()
-- [ ] Test with real LM Studio instance
-
 ## Phase 1: Core Functionality
 
 ### Model Discovery & Registry
@@ -23,21 +12,21 @@
 - [x] Add model metadata extraction (size, declared context, capabilities)
 - [x] Create model registry update mechanism
 - [x] Add model removal detection and cleanup
-- [ ] Update model discovery to use lmstudio.list_downloaded_models()
-- [ ] Extract real model metadata using model.get_info()
+- [x] Update model discovery to use lmstudio.list_downloaded_models()
+- [x] Extract real model metadata using model.get_info()
 
 ### Context Validation System
 
-- [ ] Replace litellm with native lmstudio package
-- [ ] Update LMStudioClient to use lmstudio.llm() for model loading
-- [ ] Implement model loading with specific context size using config parameter
-- [ ] Update inference to use model.complete() instead of litellm
-- [ ] Add model.unload() after each test to free resources
-- [ ] Create context testing engine base class
-- [ ] Add simple prompt testing ("2+2=" -> "4")
-- [ ] Implement binary search for maximum loadable context
-- [ ] Create progressive context testing from min to max
-- [ ] Add response validation logic
+- [x] Replace litellm with native lmstudio package
+- [x] Update LMStudioClient to use lmstudio.llm() for model loading
+- [x] Implement model loading with specific context size using config parameter
+- [x] Update inference to use model.complete() instead of litellm
+- [x] Add model.unload() after each test to free resources
+- [x] Create context testing engine base class
+- [x] Add simple prompt testing ("2+2=" -> "4")
+- [x] Implement binary search for maximum loadable context
+- [x] Create progressive context testing from min to max
+- [x] Add response validation logic
 - [ ] Implement per-model logging system
 - [ ] Create log file format and structure
 - [ ] Add context test status tracking
@@ -59,14 +48,14 @@
 
 ### Python API Updates
 
-- [ ] Update LMStrix class with context testing methods
-- [ ] Add test_context_limits method
-- [ ] Create get_tested_context_limit method
-- [ ] Add context test status query methods
-- [ ] Implement async context testing support
-- [ ] Add batch testing capabilities
-- [ ] Create context test result models
-- [ ] Add proper exception handling
+- [x] Update LMStrix class with context testing methods
+- [x] Add test_context_limits method
+- [x] Create get_tested_context_limit method
+- [x] Add context test status query methods
+- [x] Implement async context testing support
+- [x] Add batch testing capabilities
+- [x] Create context test result models
+- [x] Add proper exception handling
 
 ## Phase 2: Testing & Quality
 
@@ -154,9 +143,9 @@
 
 These must be completed for MVP:
 
-1. [ ] Model discovery with proper paths
-2. [ ] Context testing engine
+1. [x] Model discovery with proper paths
+2. [x] Context testing engine
 3. [ ] Result logging and storage
-4. [ ] Basic CLI commands
+4. [x] Basic CLI commands
 5. [ ] Minimal documentation
 6. [ ] Package configuration
