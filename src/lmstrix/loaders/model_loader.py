@@ -35,7 +35,7 @@ def load_model_registry(
             Path(__file__).parent.parent.parent.parent / "lmsm.json",
             Path.home() / ".lmstrix" / "lmsm.json",
         ]
-        
+
         for candidate in candidates:
             if candidate.exists():
                 json_path = candidate
@@ -44,11 +44,11 @@ def load_model_registry(
         else:
             logger.warning("No model registry file found in default locations")
             return ModelRegistry()
-    
+
     # Create and return registry
     registry = ModelRegistry(models_file=json_path)
     logger.info(f"Loaded {len(registry)} models from {json_path}")
-    
+
     return registry
 
 
@@ -67,6 +67,6 @@ def save_model_registry(
     """
     if json_path:
         registry.models_file = json_path
-    
+
     registry.save()
     return registry.models_file

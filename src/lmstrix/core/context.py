@@ -1,0 +1,151 @@
+# this_file: src/lmstrix/core/context.py
+"""Adaptive context optimizer for finding optimal context window sizes."""
+
+import json
+from pathlib import Path
+from typing import Optional, Tuple
+
+from loguru import logger
+from pydantic import BaseModel, Field
+
+from lmstrix.api.client import LMStudioClient
+from lmstrix.core.models import Model
+
+
+class OptimizationResult(BaseModel):
+    """Result from context optimization."""
+
+    model_id: str = Field(..., description="ID of the model")
+    declared_limit: int = Field(..., description="Model's declared context limit")
+    optimal_context: int = Field(..., description="Optimal context size found")
+    attempts: int = Field(0, description="Number of attempts made")
+    error: Optional[str] = Field(
+        None, description="Error message if optimization failed"
+    )
+
+    @property
+    def succeeded(self) -> bool:
+        """Check if optimization was successful."""
+        return self.error is None and self.optimal_context > 0
+
+
+class ContextOptimizer:
+    """Finds the maximum effective context window for models."""
+
+    def __init__(
+        self,
+        client: Optional[LMStudioClient] = None,
+        cache_file: Optional[Path] = None,
+        verbose: bool = False,
+    ):
+        """Initialize the context optimizer."""
+        self.client = client or LMStudioClient(verbose=verbose)
+        self.cache_file = cache_file or Path("context_cache.json")
+        self.verbose = verbose
+        self._cache: dict[str, int] = self._load_cache()
+
+        if verbose:
+            logger.enable("lmstrix")
+        else:
+            logger.disable("lmstrix")
+
+    def _load_cache(self) -> dict[str, int]:
+        """Load cached optimization results."""
+        if self.cache_file.exists():
+            try:
+                return json.loads(self.cache_file.read_text())
+            except Exception as e:
+                logger.warning(f"Failed to load cache: {e}")
+        return {}
+
+    def _save_cache(self) -> None:
+        """Save optimization results to cache."""
+        try:
+            self.cache_file.write_text(json.dumps(self._cache, indent=2))
+        except Exception as e:
+            logger.warning(f"Failed to save cache: {e}")
+
+    def _generate_test_prompt(self, size: int) -> str:
+        """Generate a test prompt of approximately the given token size."""
+        word_count = int(size / 1.3)
+        base_text = "The quick brown fox jumps over the lazy dog. "
+        words_per_base = len(base_text.split())
+        repetitions = max(1, word_count // words_per_base)
+
+        prompt = base_text * repetitions
+        return f"Please summarize the following text:\n\n{prompt}"
+
+    async def _test_context_size(
+        self,
+        model_id: str,
+        context_size: int,
+        test_prompt: Optional[str] = None,
+    ) -> Tuple[bool, str]:
+        """Test if a model can handle a specific context size."""
+        if test_prompt is None:
+            test_prompt = self._generate_test_prompt(context_size)
+
+        try:
+            response = await self.client.acompletion(
+                model_id=model_id,
+                messages=[{"role": "user", "content": test_prompt}],
+                max_tokens=50,
+                temperature=0.1,
+            )
+            return bool(response.content), ""
+        except Exception as e:
+            return False, str(e)
+
+    async def find_optimal_context(
+        self,
+        model: Model,
+        initial_size: Optional[int] = None,
+        min_size: int = 1024,
+        max_attempts: int = 20,
+    ) -> OptimizationResult:
+        """Find the optimal context size for a model using binary search."""
+        model_id = model.id
+        logger.info(f"Starting context optimization for {model_id}")
+
+        if model_id in self._cache:
+            logger.info(f"Using cached result for {model_id}: {self._cache[model_id]}")
+            return OptimizationResult(
+                model_id=model_id,
+                declared_limit=model.context_limit,
+                optimal_context=self._cache[model_id],
+                attempts=0,
+            )
+
+        high = initial_size or model.context_limit
+        low = min_size
+        optimal = low
+        attempts = 0
+
+        while low <= high and attempts < max_attempts:
+            attempts += 1
+            mid = (low + high) // 2
+            logger.debug(f"Testing context size {mid} (attempt {attempts})")
+
+            success, error = await self._test_context_size(model_id, mid)
+
+            if success:
+                optimal = mid
+                low = mid + 1
+                logger.debug(f"Success at {mid}, trying higher")
+            else:
+                high = mid - 1
+                logger.debug(f"Failed at {mid}: {error}, trying lower")
+
+        self._cache[model_id] = optimal
+        self._save_cache()
+
+        logger.info(
+            f"Optimal context for {model_id}: {optimal} (from {model.context_limit})"
+        )
+
+        return OptimizationResult(
+            model_id=model_id,
+            declared_limit=model.context_limit,
+            optimal_context=optimal,
+            attempts=attempts,
+        )

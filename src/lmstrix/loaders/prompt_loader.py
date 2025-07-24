@@ -62,7 +62,7 @@ def load_prompts(
 
     # Resolve all prompts
     resolved_prompts = resolver.resolve_all_prompts(data, **params)
-    
+
     logger.info(f"Resolved {len(resolved_prompts)} prompts")
     if params:
         logger.info(f"Applied parameters: {list(params.keys())}")
@@ -123,7 +123,7 @@ def load_single_prompt(
 
     # Resolve the specific prompt
     resolved = resolver.resolve_prompt(prompt_name, data, **params)
-    
+
     logger.info(f"Resolved prompt '{prompt_name}'")
     if resolved.placeholders_unresolved:
         logger.warning(
@@ -149,5 +149,5 @@ def save_prompts(
     # Save to TOML
     with open(toml_path, "w") as f:
         toml.dump(prompts, f)
-    
+
     logger.info(f"Saved {len(prompts)} prompts to {toml_path}")
