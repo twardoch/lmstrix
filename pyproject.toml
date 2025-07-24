@@ -1,50 +1,58 @@
-[build-system]
-requires = ["hatchling", "hatch-vcs"]
-build-backend = "hatchling.build"
-
 [project]
 name = "lmstrix"
-dynamic = ["version"]
 description = "A toolkit for managing and testing LM Studio models with automatic context limit discovery"
 readme = "README.md"
-requires-python = ">=3.10"
-license = {text = "MIT"}
+requires-python = ">=3.11"
+license = { text = "MIT" }
 authors = [
-    {name = "Adam Twardoch", email = "adam+github@twardoch.com"},
+  { name = "Adam Twardoch", email = "adam+github@twardoch.com" },
 ]
-keywords = ["llm", "lmstudio", "context", "optimization", "testing", "ai", "developer-tools", "cli"]
+keywords = [
+  "ai",
+  "cli",
+  "context",
+  "developer-tools",
+  "llm",
+  "lmstudio",
+  "optimization",
+  "testing",
+]
 classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    "Operating System :: OS Independent",
-    "Typing :: Typed",
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Typing :: Typed",
 ]
-
 dependencies = [
-    "pydantic>=2.0",
-    "rich>=13.0",
-    "fire>=0.5",
-    "toml>=0.10",
-    "tenacity>=8.0",
-    "loguru>=0.7",
-    "httpx>=0.24",
-    "tiktoken>=0.5",
-    "lmstudio-api>=0.1.2",
+  "fire>=0.5",
+  "httpx>=0.24",
+  "lmstudio>=0.1.0",
+  "loguru>=0.7",
+  "pydantic>=2.0",
+  "rich>=13.0",
+  "tenacity>=8.0",
+  "tiktoken>=0.5",
+  "toml>=0.10",
 ]
+dynamic = ["version"]
 
 [project.urls]
-"Homepage" = "https://github.com/yourusername/lmstrix"
 "Bug Tracker" = "https://github.com/yourusername/lmstrix/issues"
+"Homepage" = "https://github.com/yourusername/lmstrix"
 
 [project.scripts]
 lmstrix = "lmstrix.cli.main:main"
+
+[build-system]
+requires = ["hatch-vcs", "hatchling"]
+build-backend = "hatchling.build"
 
 [tool.hatch.version]
 source = "vcs"
@@ -88,18 +96,18 @@ line-length = 100
 
 [tool.ruff.lint]
 select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
-    "I",  # isort
-    "B",  # flake8-bugbear
-    "C4", # flake8-comprehensions
-    "UP", # pyupgrade
+  "E",  # pycodestyle errors
+  "W",  # pycodestyle warnings
+  "F",  # pyflakes
+  "I",  # isort
+  "B",  # flake8-bugbear
+  "C4",  # flake8-comprehensions
+  "UP",  # pyupgrade
 ]
 ignore = [
-    "E501",  # line too long, handled by formatter
-    "B008",  # do not perform function calls in argument defaults
-    "C901",  # too complex
+  "E501",  # line too long, handled by formatter
+  "B008",  # do not perform function calls in argument defaults
+  "C901",  # too complex
 ]
 
 [tool.ruff.lint.per-file-ignores]

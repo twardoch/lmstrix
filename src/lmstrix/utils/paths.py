@@ -104,3 +104,37 @@ def get_context_test_log_path(model_id: str) -> Path:
     # Sanitize model ID for filename
     safe_id = "".join(c if c.isalnum() or c in "-_" else "_" for c in model_id)
     return get_context_tests_dir() / f"{safe_id}_context_test.log"
+
+
+def get_prompts_dir() -> Path:
+    """Get the directory for prompts.
+
+    Creates the directory if it doesn't exist.
+
+    Returns:
+        Path to prompts directory.
+    """
+    prompts_dir = get_lmstrix_data_dir() / "prompts"
+
+    if not prompts_dir.exists():
+        logger.info(f"Creating prompts directory at {prompts_dir}")
+        prompts_dir.mkdir(parents=True, exist_ok=True)
+
+    return prompts_dir
+
+
+def get_contexts_dir() -> Path:
+    """Get the directory for contexts.
+
+    Creates the directory if it doesn't exist.
+
+    Returns:
+        Path to contexts directory.
+    """
+    contexts_dir = get_lmstrix_data_dir() / "contexts"
+
+    if not contexts_dir.exists():
+        logger.info(f"Creating contexts directory at {contexts_dir}")
+        contexts_dir.mkdir(parents=True, exist_ok=True)
+
+    return contexts_dir
