@@ -2,6 +2,28 @@
 
 ## Phase 2: Testing & Quality Assurance
 
+### Functional Tests & Usage Examples (HIGH PRIORITY)
+- [ ] Create `examples` directory structure with subdirectories for CLI, Python, prompts, and data.
+- [ ] Write CLI usage examples:
+  - [ ] `examples/cli/basic_workflow.sh` - Complete workflow demonstration
+  - [ ] `examples/cli/model_testing.sh` - Context testing focused examples
+  - [ ] `examples/cli/inference_examples.sh` - Various inference scenarios
+- [ ] Write Python package usage examples:
+  - [ ] `examples/python/basic_usage.py` - Simple API usage
+  - [ ] `examples/python/advanced_testing.py` - Advanced context testing
+  - [ ] `examples/python/custom_inference.py` - Custom inference workflows
+  - [ ] `examples/python/batch_processing.py` - Processing multiple models
+- [ ] Create sample prompt files:
+  - [ ] `examples/prompts/analysis.toml` - Analysis templates
+  - [ ] `examples/prompts/creative.toml` - Creative writing prompts
+  - [ ] `examples/prompts/coding.toml` - Code generation prompts
+  - [ ] `examples/prompts/qa.toml` - Question-answering prompts
+- [ ] Create sample data files:
+  - [ ] `examples/data/sample_context.txt` - Large text for context testing
+  - [ ] `examples/data/test_questions.json` - Test questions for QA
+- [ ] Create `examples/run_all_examples.sh` to test all examples
+- [ ] Write `examples/README.md` documenting all examples
+
 ### Unit & Integration Tests
 - [ ] Create `tests/core` directory.
 - [ ] Create `tests/core/test_context_tester.py`.
