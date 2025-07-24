@@ -1,7 +1,5 @@
 """Tests for prompt loader functionality."""
 
-from pathlib import Path
-from unittest.mock import Mock, patch
 
 import pytest
 import toml
@@ -26,17 +24,17 @@ class TestPromptLoader:
             "question": {
                 "template": "{{query}} Please provide a detailed answer.",
                 "description": "Question template",
-            }
+            },
         }
         toml_file.write_text(toml.dumps(toml_content))
-        
+
         # Load prompts
         prompts = load_prompts(toml_file, verbose=True, name="World", query="What is Python?")
-        
+
         assert len(prompts) == 2
         assert "greeting" in prompts
         assert "question" in prompts
-        
+
         # Check resolved prompts
         greeting = prompts["greeting"]
         assert isinstance(greeting, ResolvedPrompt)
@@ -44,17 +42,17 @@ class TestPromptLoader:
         assert greeting.template == "Hello {{name}}!"
         assert greeting.resolved == "Hello World!"
         assert greeting.placeholders_resolved == ["name"]
-        
+
         question = prompts["question"]
         assert question.resolved == "What is Python? Please provide a detailed answer."
 
     def test_load_prompts_nonexistent_file(self, tmp_path):
         """Test loading prompts from non-existent file."""
         nonexistent = tmp_path / "does_not_exist.toml"
-        
+
         with pytest.raises(ConfigurationError) as exc_info:
             load_prompts(nonexistent)
-        
+
         assert "not found" in str(exc_info.value)
         assert str(nonexistent) in str(exc_info.value)
 
@@ -62,10 +60,10 @@ class TestPromptLoader:
         """Test loading prompts from invalid TOML file."""
         invalid_file = tmp_path / "invalid.toml"
         invalid_file.write_text("This is not valid TOML { syntax")
-        
+
         with pytest.raises(ConfigurationError) as exc_info:
             load_prompts(invalid_file)
-        
+
         assert "parse" in str(exc_info.value).lower()
 
     def test_load_prompts_with_nested_placeholders(self, tmp_path):
@@ -80,12 +78,12 @@ class TestPromptLoader:
             },
             "final": {
                 "template": "{{base}}",
-            }
+            },
         }
         toml_file.write_text(toml.dumps(toml_content))
-        
+
         prompts = load_prompts(toml_file, content="Test message")
-        
+
         # Check that nested resolution worked
         final = prompts["final"]
         assert final.resolved == "Important: Test message"
@@ -98,13 +96,13 @@ class TestPromptLoader:
         toml_content = {
             "template1": {
                 "template": "Hello {{name}} from {{city}}!",
-            }
+            },
         }
         toml_file.write_text(toml.dumps(toml_content))
-        
+
         # Load with only partial params
         prompts = load_prompts(toml_file, name="Alice")
-        
+
         template1 = prompts["template1"]
         assert template1.resolved == "Hello Alice from {{city}}!"
         assert template1.placeholders_unresolved == ["city"]
@@ -116,24 +114,24 @@ class TestPromptLoader:
         toml_content = {
             "test": {
                 "template": "Result: {{value}}",
-            }
+            },
         }
         toml_file.write_text(toml.dumps(toml_content))
-        
+
         # Create custom resolver
         custom_resolver = PromptResolver(verbose=True)
-        
+
         prompts = load_prompts(toml_file, resolver=custom_resolver, value="42")
-        
+
         assert prompts["test"].resolved == "Result: 42"
 
     def test_load_prompts_empty_file(self, tmp_path):
         """Test loading prompts from empty TOML file."""
         empty_file = tmp_path / "empty.toml"
         empty_file.write_text("")
-        
+
         prompts = load_prompts(empty_file)
-        
+
         assert len(prompts) == 0
 
     def test_load_prompt_file_simple(self, tmp_path):
@@ -145,18 +143,18 @@ class TestPromptLoader:
             "metadata": {
                 "version": "1.0",
                 "author": "test",
-            }
+            },
         }
         prompt_file.write_text(toml.dumps(toml_content))
-        
+
         # Load single prompt
         prompt = load_prompt_file(
             prompt_file,
             name="code_analysis",
             language="Python",
-            code="def hello(): pass"
+            code="def hello(): pass",
         )
-        
+
         assert isinstance(prompt, ResolvedPrompt)
         assert prompt.name == "code_analysis"
         assert prompt.template == "Analyze this {{language}} code: {{code}}"
@@ -171,10 +169,10 @@ class TestPromptLoader:
             "metadata": {"version": "1.0"},
         }
         prompt_file.write_text(toml.dumps(toml_content))
-        
+
         with pytest.raises(ConfigurationError) as exc_info:
             load_prompt_file(prompt_file, name="test")
-        
+
         assert "template" in str(exc_info.value).lower()
 
     def test_load_prompt_file_with_defaults(self, tmp_path):
@@ -185,16 +183,16 @@ class TestPromptLoader:
             "defaults": {
                 "model": "gpt-4",
                 "temperature": "0.7",
-            }
+            },
         }
         prompt_file.write_text(toml.dumps(toml_content))
-        
+
         # Load without providing params - should use defaults
         prompt = load_prompt_file(prompt_file, name="test")
-        
+
         assert prompt.resolved == "Model: gpt-4, Temperature: 0.7"
-        
+
         # Load with partial params - should override defaults
         prompt2 = load_prompt_file(prompt_file, name="test", model="claude")
-        
+
         assert prompt2.resolved == "Model: claude, Temperature: 0.7"

@@ -27,7 +27,7 @@ class TestModel:
     def test_model_creation_minimal(self, sample_model_data):
         """Test creating a model with minimal required fields."""
         model = Model(**sample_model_data)
-        
+
         assert model.id == "test-model"
         assert str(model.path) == "/path/to/test-model.gguf"
         assert model.size == 1500000
@@ -51,7 +51,7 @@ class TestModel:
             "has_vision": True,     # Using alias
         }
         model = Model(**data)
-        
+
         assert model.size == 2000000
         assert model.context_limit == 8192
         assert model.context_out == 4096
@@ -67,9 +67,9 @@ class TestModel:
             "context_test_date": datetime.now(),
             "context_test_log": "/path/to/log.json",
         })
-        
+
         model = Model(**sample_model_data)
-        
+
         assert model.tested_max_context == 3500
         assert model.loadable_max_context == 4000
         assert model.context_test_status == ContextTestStatus.COMPLETED
@@ -87,7 +87,7 @@ class TestModel:
         model = Model(**data)
         assert isinstance(model.path, Path)
         assert str(model.path) == "/string/path/model.gguf"
-        
+
         # Test with Path object
         data["path"] = Path("/path/object/model.gguf")
         model2 = Model(**data)
@@ -103,7 +103,7 @@ class TestModel:
             "ctx_in": 4096,
         }
         model = Model(**data)
-        
+
         sanitized = model.sanitized_id()
         assert sanitized == "test-model_with_special_chars_"
         assert all(c in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_" for c in sanitized)
@@ -118,10 +118,10 @@ class TestModel:
             "failed": True,
             "error_msg": "Test error",
         })
-        
+
         model = Model(**sample_model_data)
         registry_dict = model.to_registry_dict()
-        
+
         assert registry_dict["id"] == "test-model"
         assert registry_dict["path"] == "/path/to/test-model.gguf"
         assert registry_dict["size_bytes"] == 1500000
@@ -147,7 +147,7 @@ class TestModelRegistry:
     def test_registry_initialization(self, tmp_registry_file):
         """Test registry initialization with custom file path."""
         registry = ModelRegistry(tmp_registry_file)
-        
+
         assert registry.models_file == tmp_registry_file
         assert len(registry) == 0
         assert registry.lms_path is None
@@ -157,24 +157,24 @@ class TestModelRegistry:
         # Create and save models
         registry = ModelRegistry(tmp_registry_file)
         registry.lms_path = Path("/path/to/lms")
-        
+
         model1 = Model(**sample_model_data)
         model2_data = sample_model_data.copy()
         model2_data.update({"id": "test-model-2", "size_bytes": 2000000})
         model2 = Model(**model2_data)
-        
+
         registry.update_model("test-model", model1)
         registry.update_model("test-model-2", model2)
-        
+
         # Verify file was created
         assert tmp_registry_file.exists()
-        
+
         # Load in new registry instance
         new_registry = ModelRegistry(tmp_registry_file)
-        
+
         assert len(new_registry) == 2
         assert new_registry.lms_path == Path("/path/to/lms")
-        
+
         loaded_model1 = new_registry.get_model("test-model")
         assert loaded_model1 is not None
         assert loaded_model1.id == "test-model"
@@ -185,25 +185,25 @@ class TestModelRegistry:
         registry = ModelRegistry(tmp_registry_file)
         model = Model(**sample_model_data)
         registry.update_model("test-model", model)
-        
+
         retrieved = registry.get_model("test-model")
         assert retrieved is not None
         assert retrieved.id == "test-model"
-        
+
         # Test non-existent model
         assert registry.get_model("non-existent") is None
 
     def test_registry_list_models(self, tmp_registry_file, sample_model_data):
         """Test listing all models."""
         registry = ModelRegistry(tmp_registry_file)
-        
+
         # Add multiple models
         for i in range(3):
             data = sample_model_data.copy()
             data["id"] = f"model-{i}"
             model = Model(**data)
             registry.update_model(f"model-{i}", model)
-        
+
         models = registry.list_models()
         assert len(models) == 3
         assert all(isinstance(m, Model) for m in models)
@@ -214,20 +214,20 @@ class TestModelRegistry:
         registry = ModelRegistry(tmp_registry_file)
         model = Model(**sample_model_data)
         registry.update_model("test-model", model)
-        
+
         assert len(registry) == 1
-        
+
         registry.remove_model("test-model")
         assert len(registry) == 0
         assert registry.get_model("test-model") is None
-        
+
         # Test removing non-existent model (should not raise)
         registry.remove_model("non-existent")
 
     def test_registry_with_context_test_data(self, tmp_registry_file, sample_model_data):
         """Test saving/loading models with context test information."""
         registry = ModelRegistry(tmp_registry_file)
-        
+
         # Add model with context test data
         test_date = datetime.now()
         sample_model_data.update({
@@ -237,11 +237,11 @@ class TestModelRegistry:
         })
         model = Model(**sample_model_data)
         registry.update_model("test-model", model)
-        
+
         # Load in new registry
         new_registry = ModelRegistry(tmp_registry_file)
         loaded_model = new_registry.get_model("test-model")
-        
+
         assert loaded_model is not None
         assert loaded_model.tested_max_context == 3500
         assert loaded_model.context_test_status == ContextTestStatus.COMPLETED
@@ -251,18 +251,18 @@ class TestModelRegistry:
         """Test that the saved JSON has the expected format."""
         registry = ModelRegistry(tmp_registry_file)
         registry.lms_path = Path("/lms/path")
-        
+
         model = Model(**sample_model_data)
         registry.update_model("test-model", model)
-        
+
         # Read and parse the JSON file
         data = json.loads(tmp_registry_file.read_text())
-        
+
         assert "path" in data
         assert data["path"] == "/lms/path"
         assert "llms" in data
         assert "test-model" in data["llms"]
-        
+
         model_data = data["llms"]["test-model"]
         assert model_data["id"] == "test-model"
         assert model_data["size_bytes"] == 1500000

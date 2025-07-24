@@ -5,7 +5,6 @@ import asyncio
 
 import fire
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
 from lmstrix.core.context_tester import ContextTester
@@ -36,7 +35,7 @@ class LMStrixCLI:
 
         if not models:
             console.print(
-                "[yellow]No models found. Run 'lmstrix scan' to discover models.[/yellow]"
+                "[yellow]No models found. Run 'lmstrix scan' to discover models.[/yellow]",
             )
             return
 
@@ -105,7 +104,7 @@ class LMStrixCLI:
 
             if updated_model.context_test_status.value == "completed":
                 console.print(
-                    f"[green]✓ Test for {model.id} complete. Optimal context: {updated_model.tested_max_context:,}[/green]"
+                    f"[green]✓ Test for {model.id} complete. Optimal context: {updated_model.tested_max_context:,}[/green]",
                 )
             else:
                 console.print(f"[red]✗ Test for {model.id} failed. Check logs for details.[/red]")
@@ -137,14 +136,14 @@ class LMStrixCLI:
                     prompt=prompt,
                     max_tokens=max_tokens,
                     temperature=temperature,
-                )
+                ),
             )
 
         if result.succeeded:
             console.print("\n[green]Model Response:[/green]")
             console.print(result.response)
             console.print(
-                f"\n[dim]Tokens: {result.tokens_used}, Time: {result.inference_time:.2f}s[/dim]"
+                f"\n[dim]Tokens: {result.tokens_used}, Time: {result.inference_time:.2f}s[/dim]",
             )
         else:
             console.print(f"[red]Inference failed: {result.error}[/red]")

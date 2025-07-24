@@ -29,16 +29,15 @@ def test_get_lmstudio_path_from_pointer_file(mock_home):
     expected_path = "/fake/lmstudio/custom/path"
 
     # Use mock_open to simulate reading the file content
-    with patch("pathlib.Path.open", mock_open(read_data=expected_path)) as mock_file,
-         patch("pathlib.Path.exists", return_value=True) as mock_exists:
-        
-        # Run the function
-        lmstudio_path = get_lmstudio_path()
+    with patch("pathlib.Path.exists", return_value=True) as mock_exists:
+        with patch("pathlib.Path.open", mock_open(read_data=expected_path)) as mock_file:
+            # Run the function
+            lmstudio_path = get_lmstudio_path()
 
-        # Assertions
-        mock_exists.assert_called_with(pointer_path)
-        mock_file.assert_called_once_with("r", encoding="utf-8")
-        assert lmstudio_path == Path(expected_path)
+            # Assertions
+            mock_exists.assert_called_with(pointer_path)
+            mock_file.assert_called_once_with("r", encoding="utf-8")
+            assert lmstudio_path == Path(expected_path)
 
 @patch("pathlib.Path.home")
 def test_get_lmstudio_path_fallback_to_default(mock_home):

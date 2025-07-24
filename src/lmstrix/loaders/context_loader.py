@@ -54,7 +54,7 @@ def load_context(
 
         logger.info(
             f"Loaded context from {path}: {size_bytes:,} bytes ({size_mb:.2f} MB), "
-            f"{line_count:,} lines"
+            f"{line_count:,} lines",
         )
 
         return content
@@ -105,7 +105,7 @@ def load_multiple_contexts(
 
     logger.info(
         f"Loaded {len(file_paths)} context files, "
-        f"total size: {total_size:,} bytes ({total_size / (1024 * 1024):.2f} MB)"
+        f"total size: {total_size:,} bytes ({total_size / (1024 * 1024):.2f} MB)",
     )
 
     return combined
@@ -173,7 +173,7 @@ def load_context_with_limit(
 
     # Need to truncate
     logger.warning(
-        f"Context exceeds limit: {total_tokens} tokens > {max_tokens} tokens, truncating"
+        f"Context exceeds limit: {total_tokens} tokens > {max_tokens} tokens, truncating",
     )
 
     # Binary search to find the right truncation point

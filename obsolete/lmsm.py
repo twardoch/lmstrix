@@ -87,7 +87,7 @@ class LmsM(BaseModel):
                         "has_tools": v["has_tools"],
                         "has_vision": v["has_vision"],
                         "failed": v.get(
-                            "failed", False
+                            "failed", False,
                         ),  # Handle older JSON files without these fields
                         "error_msg": v.get("error_msg", ""),
                     })
@@ -161,7 +161,7 @@ class LmsM(BaseModel):
         return table
 
     def update_from_lmstudio(
-        self, all_rescan: bool = False, failed_rescan: bool = False
+        self, all_rescan: bool = False, failed_rescan: bool = False,
     ) -> None:
         console = Console()
 
@@ -217,7 +217,7 @@ class LmsM(BaseModel):
                 models_to_update = set(current_models.keys())
                 # Clear status for all models we're about to rescan
                 console.print(
-                    f"\n[yellow]Rescanning all {len(models_to_update)} models...[/yellow]\n"
+                    f"\n[yellow]Rescanning all {len(models_to_update)} models...[/yellow]\n",
                 )
                 self.clear_models()
                 live.update(render_table())
@@ -231,7 +231,7 @@ class LmsM(BaseModel):
 
                 if failed_model_keys:
                     console.print(
-                        f"\n[yellow]Rescanning {len(failed_model_keys)} previously failed models...[/yellow]\n"
+                        f"\n[yellow]Rescanning {len(failed_model_keys)} previously failed models...[/yellow]\n",
                     )
                     # Remove failed models from cache so they're fully rescanned
                     for model_key in failed_model_keys:
@@ -239,14 +239,14 @@ class LmsM(BaseModel):
                     live.update(render_table())
                 else:
                     console.print(
-                        "\n[green]No failed models found to rescan.[/green]\n"
+                        "\n[green]No failed models found to rescan.[/green]\n",
                     )
             else:
                 # Only process new models
                 models_to_update = set(current_models.keys()) - set(self.llms.keys())
                 if models_to_update:
                     console.print(
-                        f"\n[yellow]Scanning {len(models_to_update)} new models...[/yellow]\n"
+                        f"\n[yellow]Scanning {len(models_to_update)} new models...[/yellow]\n",
                     )
 
             for model_key in models_to_update:
@@ -306,7 +306,7 @@ class LmsM(BaseModel):
         # Show failed models if any
         if failed_models:
             console.print(
-                "\n[bold red]Failed Models (Consider removing from LMStudio):[/bold red]"
+                "\n[bold red]Failed Models (Consider removing from LMStudio):[/bold red]",
             )
             error_table = self.create_error_table("Failed Models")
             for model_key, error in failed_models:
@@ -323,7 +323,7 @@ class LmsmCLI:
             Path(Path.home() / ".lmstudio-home-pointer")
             .read_text()
             .splitlines()[0]
-            .strip()
+            .strip(),
         )
         self.lmsm = LmsM.load_or_create(self.lms_path)
 
@@ -335,7 +335,7 @@ class LmsmCLI:
             failed_rescan: Rescan only previously failed models
         """
         self.lmsm.update_from_lmstudio(
-            all_rescan=all_rescan, failed_rescan=failed_rescan
+            all_rescan=all_rescan, failed_rescan=failed_rescan,
         )
 
 

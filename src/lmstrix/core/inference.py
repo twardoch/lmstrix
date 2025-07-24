@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 
 from lmstrix.api.client import LMStudioClient
 from lmstrix.api.exceptions import ModelNotFoundError
-from lmstrix.core.models import Model, ModelRegistry
+from lmstrix.core.models import ModelRegistry
 
 
 class InferenceResult(BaseModel):

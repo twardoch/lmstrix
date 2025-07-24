@@ -29,7 +29,7 @@ def load_model_registry(
         logger.disable("lmstrix")
 
     registry_path = json_path or get_default_models_file()
-    
+
     if not registry_path.exists():
         logger.warning(f"Model registry not found at {registry_path}. Returning empty registry.")
         return ModelRegistry(models_file=registry_path)
@@ -97,7 +97,7 @@ def scan_and_update_registry(verbose: bool = False) -> ModelRegistry:
                 path=model_data.get("path"),
                 size_bytes=model_data.get("size_bytes"),
                 # This is the declared limit, not the tested one
-                context_limit=model_data.get("context_length", 8192)
+                context_limit=model_data.get("context_length", 8192),
             )
             registry.add_model(new_model)
 

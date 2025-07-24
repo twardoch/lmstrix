@@ -1,47 +1,63 @@
-# LMStrix Examples
+# LMStrix Usage Examples
 
-This directory contains a comprehensive set of examples to demonstrate the usage of both the `lmstrix` command-line interface (CLI) and the Python library. These examples are designed to be run from the root of the project repository.
+This directory contains a comprehensive set of runnable examples demonstrating the features of the LMStrix CLI and Python API.
 
-## How to Run the Examples
+## Prerequisites
 
-A convenience script, `run_all_examples.sh`, is provided to execute all the examples in this directory. To run it, simply execute the following command from the project root:
+1.  **LMStrix Installed**: Ensure you have installed LMStrix (`pip install lmstrix`).
+2.  **LM Studio Running**: For most examples, you need LM Studio running in the background with a model loaded.
+3.  **Model Downloaded**: You must have at least one model downloaded in LM Studio.
+
+**Note**: Many scripts use a placeholder model identifier like `"phi"`. You may need to edit these scripts to use an identifier that matches a model you have downloaded (e.g., `"gemma"`, `"llama"`). You can see available model identifiers by running `lmstrix list`.
+
+## How to Run Examples
+
+You can run all examples at once using the main runner script. Open your terminal and run:
 
 ```bash
-bash examples/run_all_examples.sh
+bash run_all_examples.sh
 ```
 
-**Note**: Most of the long-running operations within the example scripts (like model testing and inference) are commented out by default to prevent accidental execution. You can inspect each script and uncomment the relevant lines to run them fully.
+Alternatively, you can run each example individually.
 
-## Directory Structure
-
--   `cli/`: Contains shell scripts that demonstrate the usage of the `lmstrix` CLI.
--   `python/`: Contains Python scripts that show how to use the `lmstrix` library.
--   `prompts/`: Contains sample TOML files with predefined prompts for different tasks.
--   `data/`: Contains sample data files used in the examples, such as a large text file for context testing.
+---
 
 ## CLI Examples (`cli/`)
 
--   `basic_workflow.sh`: A complete, step-by-step workflow showing how to scan for models, list them, test one, and run inference.
--   `model_testing.sh`: Focused examples of the `lmstrix test` command, including how to test a specific model, force a re-test, and customize the test range.
--   `inference_examples.sh`: Demonstrates various ways to run inference, such as using system prompts, reading prompts from files, and streaming responses.
+These examples are shell scripts that show how to use the `lmstrix` command-line tool.
 
-## Python Library Examples (`python/`)
+-   **`basic_workflow.sh`**: Demonstrates the core end-to-end workflow: scanning for models, listing them, running a context test, and performing inference.
+-   **`model_testing.sh`**: Provides focused examples of the `test` command, showing different strategies like binary search vs. linear ramp-up, forcing re-tests, and using custom prompts.
+-   **`inference_examples.sh`**: Showcases the `infer` command, including how to use custom system prompts, adjust inference parameters, and load prompts from files.
 
--   `basic_usage.py`: Covers the fundamental operations of the library: scanning, listing, and running a simple inference.
--   `advanced_testing.py`: Shows more advanced context testing scenarios, like running a full scan on all untested models and forcing a re-test.
--   `custom_inference.py`: Illustrates how to customize the inference process with system prompts, streaming, and custom generation parameters.
--   `batch_processing.py`: An example of how to run inference on multiple models in a batch.
+### To run a specific CLI example:
 
-## Prompt Files (`prompts/`)
+```bash
+bash cli/basic_workflow.sh
+```
 
-These files contain sample prompts that can be used with the `lmstrix` library. They are organized by task type:
+---
 
--   `analysis.toml`
--   `creative.toml`
--   `coding.toml`
--   `qa.toml`
+## Python API Examples (`python/`)
 
-## Data Files (`data/`)
+These examples are Python scripts that illustrate how to use the LMStrix library in your own projects.
 
--   `sample_context.txt`: A large text file used for context length testing.
--   `test_questions.json`: A set of sample questions for use in question-answering scenarios.
+-   **`basic_usage.py`**: Covers the fundamentals: initializing the client, scanning and listing models, and running a simple inference task.
+-   **`advanced_testing.py`**: Dives deeper into context testing, showing how to run different test patterns (`BINARY`, `LINEAR`) and save the results.
+-   **`custom_inference.py`**: Demonstrates advanced inference techniques, such as setting a custom system prompt, adjusting temperature, and prompting for structured (JSON) output.
+-   **`batch_processing.py`**: Shows how to work with multiple models at once, including batch testing all untested models and running the same prompt across your entire model library.
+
+### To run a specific Python example:
+
+```bash
+python3 python/basic_usage.py
+```
+
+---
+
+## Prompt & Data Files
+
+-   **`prompts/`**: Contains sample `.toml` files that show how to create structured, reusable prompt templates for different tasks (coding, analysis, etc.). These are used in some of the inference examples.
+-   **`data/`**: Contains sample data used by the examples.
+    -   `sample_context.txt`: A large text file used for context length testing.
+    -   `test_questions.json`: A set of questions for demonstrating question-answering scenarios.

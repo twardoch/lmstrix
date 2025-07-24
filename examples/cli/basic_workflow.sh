@@ -1,58 +1,54 @@
 #!/bin/bash
-# This script demonstrates a basic, complete workflow for using the LMStrix CLI.
-# It covers the main commands in a logical sequence:
-# 1. Scan: Discover models downloaded in LM Studio.
-# 2. List: View the models found.
-# 3. Test: Run a context length test on a specific model.
-# 4. Infer: Run a simple inference with the tested model.
+#
+# This script demonstrates the complete, basic workflow of LMStrix.
+# 1. Scan for downloaded models.
+# 2. List the models found.
+# 3. Test the context length of a specific model.
+# 4. Run inference with the tested model.
+#
 
-# --- Introduction ---
-echo "LMStrix Basic Workflow Example"
-echo "---------------------------------"
-echo "This script requires LM Studio to be running."
-echo "Make sure you have at least one model downloaded."
+# Exit immediately if a command exits with a non-zero status.
+set -e
 
-# --- Step 1: Scan for Models ---
-echo "\nStep 1: Scanning for models..."
-# The `scan` command finds all models in your LM Studio models folder
-# and updates the local `lmstrix.json` registry.
+echo "### LMStrix Basic Workflow Demo ###"
+
+# Step 1: Scan for models
+# This command discovers all models downloaded in your LM Studio installation
+# and updates the local registry file (lmstrix.json).
+echo -e "
+--- Step 1: Scanning for models ---"
 lmstrix scan
+echo "Scan complete. Model registry updated."
 
-# --- Step 2: List Models ---
-echo "\nStep 2: Listing available models..."
-# The `list` command displays all models found in the registry.
-# It shows their name, path, and whether they have been tested.
+# Step 2: List models
+# This command displays the models found in the registry, along with any
+# test results or metadata.
+echo -e "
+--- Step 2: Listing available models ---"
 lmstrix list
+echo "Model list displayed."
 
-# --- Step 3: Test a Model's Context Length ---
-echo "\nStep 3: Testing a model's context length..."
-# The `test` command runs a binary search to find the maximum working context.
-# We will try to find the first model from the list to test.
-# Note: This can take several minutes depending on the model and your hardware.
+# Step 3: Test a model's context length
+# Replace "model-identifier" with a unique part of your model's path from the list.
+# For example, if you have "gemma-2b-it-q8_0.gguf", you can use "gemma-2b".
+# This test will determine the maximum context size the model can handle.
+echo -e "
+--- Step 3: Testing a model's context length ---"
+echo "Note: This may take several minutes depending on the model and your hardware."
+# We will use a placeholder model identifier here.
+# In a real scenario, you would replace 'phi' with a model you have.
+MODEL_ID="phi" # <--- CHANGE THIS to a model you have downloaded
+echo "Testing model: $MODEL_ID"
+lmstrix test "$MODEL_ID" --max-context 8192 --test-pattern binary
+echo "Context test complete."
 
-# Get the path of the first model from the registry (using jq to parse the JSON)
-MODEL_PATH=$(lmstrix list --json | jq -r 'keys[0]')
+# Step 4: Run inference
+# Use the same model identifier to run a simple inference task.
+echo -e "
+--- Step 4: Running inference ---"
+lmstrix infer "$MODEL_ID" "What is the capital of France?"
+echo -e "
+Inference complete."
 
-if [ -z "$MODEL_PATH" ] || [ "$MODEL_PATH" == "null" ]; then
-    echo "Error: Could not find a model to test. Please make sure models are downloaded and scanned."
-    exit 1
-fi
-
-echo "Testing model: $MODEL_PATH"
-# The `--model` flag specifies which model to test.
-lmstrix test --model "$MODEL_PATH"
-
-# --- Step 4: Run Inference ---
-echo "\nStep 4: Running inference with the tested model..."
-# The `infer` command runs a prompt through the specified model.
-PROMPT="What is the capital of the United Kingdom?"
-
-echo "Using prompt: '$PROMPT'"
-lmstrix infer --model "$MODEL_PATH" --prompt "$PROMPT"
-
-# --- Step 5: Review Results ---
-echo "\nStep 5: Reviewing updated model list..."
-# After testing, the list command will show the updated status and max context length.
-lmstrix list
-
-echo "\nWorkflow complete."
+echo -e "
+### Workflow Demo Finished ###"

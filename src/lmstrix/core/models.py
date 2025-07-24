@@ -10,8 +10,6 @@ from typing import Any
 from loguru import logger
 from pydantic import BaseModel, Field, field_validator
 
-from lmstrix.utils import get_default_models_file as get_models_registry_path
-
 
 class ContextTestStatus(str, Enum):
     """Status of context testing for a model."""
@@ -29,29 +27,29 @@ class Model(BaseModel):
     path: Path = Field(..., description="Path to the model file")
     size: int = Field(..., description="Size of the model in bytes", alias="size_bytes")
     context_limit: int = Field(
-        ..., description="Declared maximum context window size", alias="ctx_in"
+        ..., description="Declared maximum context window size", alias="ctx_in",
     )
     context_out: int = Field(default=4096, description="Output context size", alias="ctx_out")
     supports_tools: bool = Field(
-        default=False, description="Whether model supports tool use", alias="has_tools"
+        default=False, description="Whether model supports tool use", alias="has_tools",
     )
     supports_vision: bool = Field(
-        default=False, description="Whether model supports vision", alias="has_vision"
+        default=False, description="Whether model supports vision", alias="has_vision",
     )
 
     # Context testing fields
     tested_max_context: int | None = Field(
-        default=None, description="Maximum context that produces correct output"
+        default=None, description="Maximum context that produces correct output",
     )
     loadable_max_context: int | None = Field(
-        default=None, description="Maximum context at which model loads successfully"
+        default=None, description="Maximum context at which model loads successfully",
     )
     context_test_status: ContextTestStatus = Field(
-        default=ContextTestStatus.UNTESTED, description="Status of context testing"
+        default=ContextTestStatus.UNTESTED, description="Status of context testing",
     )
     context_test_log: str | None = Field(default=None, description="Path to context test log file")
     context_test_date: datetime | None = Field(
-        default=None, description="When context was last tested"
+        default=None, description="When context was last tested",
     )
 
     # Error tracking
@@ -131,13 +129,13 @@ class ModelRegistry:
                     # Parse context test status
                     if "context_test_status" in model_info:
                         model_info["context_test_status"] = ContextTestStatus(
-                            model_info["context_test_status"]
+                            model_info["context_test_status"],
                         )
 
                     # Parse datetime
                     if model_info.get("context_test_date"):
                         model_info["context_test_date"] = datetime.fromisoformat(
-                            model_info["context_test_date"]
+                            model_info["context_test_date"],
                         )
 
                     model = Model(**model_info)
@@ -157,7 +155,7 @@ class ModelRegistry:
         data = {
             "llms": {
                 model_id: model.to_registry_dict() for model_id, model in sorted_models.items()
-            }
+            },
         }
 
         # Add LMS path if available

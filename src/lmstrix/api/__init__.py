@@ -13,13 +13,13 @@ from lmstrix.api.exceptions import (
 )
 
 __all__ = [
-    "LMStudioClient",
-    "CompletionResponse",
-    "LMStrixError",
-    "ModelLoadError",
-    "InferenceError",
     "APIConnectionError",
-    "ContextLimitExceededError",
-    "ModelNotFoundError",
+    "CompletionResponse",
     "ConfigurationError",
+    "ContextLimitExceededError",
+    "InferenceError",
+    "LMStrixError",
+    "LMStudioClient",
+    "ModelLoadError",
+    "ModelNotFoundError",
 ]

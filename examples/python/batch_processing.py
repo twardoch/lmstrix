@@ -1,80 +1,73 @@
-"""
-This script demonstrates how to use the LMStrix library to perform batch processing on multiple models.
-It showcases the following workflow:
-1.  Scan for all available models.
-2.  Filter for models that have successfully passed context length verification.
-3.  Run a batch inference job on the filtered models using a specified prompt.
-4.  Print the results for each model.
-"""
+# examples/python/batch_processing.py
+import time
+from lmstrix.api.client import LmsClient
 
-import asyncio
-from lmstrix.core.models import LmsModel, ModelRegistry
-from lmstrix.core.inference import InferenceManager
-from lmstrix.loaders.model_loader import scan_and_update_registry
-from lmstrix.utils.paths import get_default_models_file
-
-async def batch_inference_example():
+def main():
     """
-    An example function that demonstrates batch processing of models.
+    Demonstrates batch processing of multiple models for testing or inference.
     """
-    print("Starting batch processing example...")
+    print("### LMStrix Python API: Batch Processing ###")
 
-    # 1. Scan for models and update the local registry
-    print("Scanning for available models...")
-    await scan_and_update_registry()
-    print("Model scan complete.")
+    client = LmsClient()
 
-    # Load the registry
-    registry = ModelRegistry.load()
-    if not registry.models:
-        print("No models found. Please download models in LM Studio and run the scan command.")
+    # 1. Scan and load all models
+    print("
+--- Scanning for all available models ---")
+    client.scan_models()
+    all_models = client.get_all_models()
+
+    if not all_models:
+        print("No models found. Aborting.")
         return
 
-    # 2. Filter for models that are ready for inference
-    # For this example, we'll consider models that have a known working context > 0.
-    ready_models = [
-        model for model in registry.models.values()
-        if model.test_result and model.test_result.max_context_length > 0
-    ]
+    print(f"Found {len(all_models)} models.")
 
-    if not ready_models:
-        print("No models have passed context verification yet.")
-        print("Please run the context tester before running batch inference.")
-        return
+    # 2. Batch Context Testing
+    # Test all models that haven't been tested yet.
+    print("
+--- Batch testing all untested models (up to 2048 tokens) ---")
+    for model in all_models:
+        if model.max_context_tested is None:
+            print(f"
+Testing model: {model.path}...")
+            try:
+                start_time = time.time()
+                result = model.test_context(max_context=2048)
+                end_time = time.time()
+                print(
+                    f"Test complete for {model.id}. "
+                    f"Max context: {result}. "
+                    f"Time taken: {end_time - start_time:.2f}s"
+                )
+            except Exception as e:
+                print(f"Could not test model {model.id}. Error: {e}")
+        else:
+            print(f"
+Skipping already tested model: {model.id} "
+                  f"(Max context: {model.max_context_tested})")
 
-    print(f"Found {len(ready_models)} models ready for batch inference.")
+    # Save results to disk
+    client.save_registry()
+    print("
+--- All test results saved. ---")
 
-    # 3. Define the prompt for the batch job
-    prompt = "What is the capital of France?"
-    print(f"Using prompt: '{prompt}'")
-
-    # 4. Run inference on each ready model
-    inference_manager = InferenceManager()
-    for model in ready_models:
-        print(f"--- Running inference on: {model.name} ---")
+    # 3. Batch Inference
+    # Run the same prompt on all available models.
+    print("
+--- Running the same prompt on all models ---")
+    prompt = "What is the most interesting fact you know?"
+    for model in all_models:
+        print(f"
+--- Querying model: {model.path} ---")
+        print(f"Prompt: {prompt}")
         try:
-            # Ensure the model is loaded
-            loaded_model = await inference_manager.load_model(model.path)
-
-            # Run inference
-            response = await inference_manager.run_inference(prompt)
-
-            # Print the response
-            if response and response.get("choices"):
-                content = response["choices"][0].get("message", {}).get("content", "No content returned.")
-                print(f"Model response: {content.strip()}")
-            else:
-                print("Inference failed or returned an empty response.")
-
+            response_stream = model.infer(prompt, max_tokens=150)
+            print("Response: ", end="")
+            for chunk in response_stream:
+                print(chunk, end="", flush=True)
+            print()
         except Exception as e:
-            print(f"An error occurred during inference for model {model.name}: {e}")
-        finally:
-            # Unload the model to free up resources for the next one
-            await inference_manager.unload_model()
-            print("--- Finished with model ---")
-
+            print(f"Could not run inference on model {model.id}. Error: {e}")
 
 if __name__ == "__main__":
-    # To run this example, you need to have LM Studio running.
-    # You can run this script directly using `python -m examples.python.batch_processing`
-    asyncio.run(batch_inference_example())
+    main()

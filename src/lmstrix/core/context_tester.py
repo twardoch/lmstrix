@@ -67,7 +67,7 @@ class ContextTester:
             f.write(json.dumps(result.to_dict()) + "\n")
 
     async def _test_at_context(
-        self, model_id: str, context_size: int, log_path: Path
+        self, model_id: str, context_size: int, log_path: Path,
     ) -> ContextTestResult:
         """Test model at a specific context size."""
         logger.debug(f"Testing {model_id} at context size {context_size}")
@@ -77,7 +77,7 @@ class ContextTester:
             logger.debug(f"Model {model_id} loaded successfully at {context_size}.")
 
             response = await self.client.acompletion(
-                llm=llm, prompt=self.test_prompt, max_tokens=10, temperature=0.0
+                llm=llm, prompt=self.test_prompt, max_tokens=10, temperature=0.0,
             )
 
             result = ContextTestResult(
@@ -91,7 +91,7 @@ class ContextTester:
         except ModelLoadError as e:
             logger.warning(f"Failed to load {model_id} at context {context_size}: {e}")
             result = ContextTestResult(
-                context_size=context_size, load_success=False, error=str(e)
+                context_size=context_size, load_success=False, error=str(e),
             )
         except Exception as e:
             logger.error(f"Inference failed for {model_id} at context {context_size}: {e}")
@@ -148,7 +148,7 @@ class ContextTester:
 
             logger.info(
                 f"Context test completed for {model.id}. "
-                f"Optimal working context: {best_working_context}"
+                f"Optimal working context: {best_working_context}",
             )
 
         except Exception as e:
