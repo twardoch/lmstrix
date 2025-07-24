@@ -1,0 +1,22 @@
+# Prompt templates for code generation tasks
+
+[python_function]
+name = "Python Function Generator"
+description = "Generate a Python function based on a description."
+prompt = """
+Write a Python function that does the following: {description}
+"""
+
+[sql_query]
+name = "SQL Query Generator"
+description = "Generate a SQL query from a natural language description."
+prompt = """
+Generate a SQL query that {description}.
+"""
+
+[regex_generator]
+name = "Regex Generator"
+description = "Generate a regular expression for a given pattern."
+prompt = """
+Create a regular expression that matches the following pattern: {pattern_description}
+"""

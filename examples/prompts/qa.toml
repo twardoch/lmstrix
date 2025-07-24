@@ -1,0 +1,22 @@
+# Prompt templates for question-answering tasks
+
+[open_domain_qa]
+name = "Open Domain Question Answering"
+description = "Answer a question based on general knowledge."
+prompt = """
+Question: {question}
+Answer:
+"""
+
+[closed_domain_qa]
+name = "Closed Domain Question Answering"
+description = "Answer a question based on a provided context."
+prompt = """
+Read the following context and answer the question.
+
+Context: {context}
+
+Question: {question}
+
+Answer:
+"""

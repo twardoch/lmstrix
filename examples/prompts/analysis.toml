@@ -1,0 +1,34 @@
+# Prompt templates for analysis tasks
+
+[sentiment_analysis]
+name = "Sentiment Analysis"
+description = "Analyze the sentiment of a given text."
+prompt = """
+Analyze the sentiment of the following text and classify it as positive, negative, or neutral. Provide a brief explanation for your classification.
+
+Text: {text}
+
+Sentiment:
+"""
+
+[summarization]
+name = "Text Summarization"
+description = "Summarize a long piece of text."
+prompt = """
+Summarize the following text into a few key points.
+
+Text: {text}
+
+Summary:
+"""
+
+[keyword_extraction]
+name = "Keyword Extraction"
+description = "Extract the main keywords from a text."
+prompt = """
+Extract the most important keywords from the following text.
+
+Text: {text}
+
+Keywords:
+"""
