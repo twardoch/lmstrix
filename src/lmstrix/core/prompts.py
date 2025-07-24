@@ -4,7 +4,7 @@
 import re
 from collections.abc import Mapping
 from types import MappingProxyType
-from typing import Any, Optional
+from typing import Any
 
 import tiktoken
 from loguru import logger
@@ -20,9 +20,7 @@ class ResolvedPrompt(BaseModel):
     template: str = Field(..., description="Original template with placeholders")
     resolved: str = Field(..., description="Resolved prompt text")
     tokens: int = Field(0, description="Estimated token count")
-    placeholders_found: list[str] = Field(
-        default_factory=list, description="Placeholders found"
-    )
+    placeholders_found: list[str] = Field(default_factory=list, description="Placeholders found")
     placeholders_resolved: list[str] = Field(
         default_factory=list, description="Placeholders resolved"
     )
@@ -79,9 +77,7 @@ class PromptResolver:
         """
         return [match.group(1).strip() for match in self.PLACEHOLDER_RE.finditer(text)]
 
-    def _resolve_internal_once(
-        self, text: str, root: dict[str, Any]
-    ) -> tuple[str, list[str]]:
+    def _resolve_internal_once(self, text: str, root: dict[str, Any]) -> tuple[str, list[str]]:
         """Replace one pass of internal placeholders.
 
         Args:
@@ -104,9 +100,7 @@ class PromptResolver:
         new_text = self.PLACEHOLDER_RE.sub(repl, text)
         return new_text, resolved
 
-    def _resolve_external(
-        self, text: str, params: Mapping[str, str]
-    ) -> tuple[str, list[str]]:
+    def _resolve_external(self, text: str, params: Mapping[str, str]) -> tuple[str, list[str]]:
         """Replace external placeholders using provided parameters.
 
         Args:
@@ -198,9 +192,7 @@ class PromptResolver:
             )
 
         # Phase 2: External resolution
-        current_text, resolved = self._resolve_external(
-            current_text, MappingProxyType(params)
-        )
+        current_text, resolved = self._resolve_external(current_text, MappingProxyType(params))
         resolved_placeholders.extend(resolved)
 
         # Find unresolved placeholders
@@ -241,9 +233,7 @@ class PromptResolver:
 
                 if isinstance(value, str):
                     try:
-                        results[full_key] = self.resolve_prompt(
-                            full_key, prompts_data, **params
-                        )
+                        results[full_key] = self.resolve_prompt(full_key, prompts_data, **params)
                     except ConfigurationError as e:
                         logger.error(f"Failed to resolve prompt '{full_key}': {e}")
                 elif isinstance(value, dict):
@@ -289,7 +279,7 @@ class PromptResolver:
         prompt: str,
         context: str,
         context_placeholder: str = "{{text}}",
-        max_tokens: Optional[int] = None,
+        max_tokens: int | None = None,
     ) -> str:
         """Inject context into a prompt, with optional truncation.
 
@@ -303,9 +293,7 @@ class PromptResolver:
             Prompt with context injected.
         """
         if context_placeholder not in prompt:
-            logger.warning(
-                f"Context placeholder '{context_placeholder}' not found in prompt"
-            )
+            logger.warning(f"Context placeholder '{context_placeholder}' not found in prompt")
             return prompt
 
         if max_tokens:

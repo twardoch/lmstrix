@@ -2,7 +2,6 @@
 """Context file loading functionality."""
 
 from pathlib import Path
-from typing import Union
 
 import tiktoken
 from loguru import logger
@@ -11,7 +10,7 @@ from lmstrix.api.exceptions import ConfigurationError
 
 
 def load_context(
-    file_path: Union[str, Path],
+    file_path: str | Path,
     encoding: str = "utf-8",
     verbose: bool = False,
 ) -> str:
@@ -69,7 +68,7 @@ def load_context(
 
 
 def load_multiple_contexts(
-    file_paths: list[Union[str, Path]],
+    file_paths: list[str | Path],
     separator: str = "\n\n",
     encoding: str = "utf-8",
     verbose: bool = False,
@@ -136,7 +135,7 @@ def estimate_tokens(
 
 
 def load_context_with_limit(
-    file_path: Union[str, Path],
+    file_path: str | Path,
     max_tokens: int,
     encoding: str = "utf-8",
     model_encoding: str = "cl100k_base",
@@ -169,9 +168,7 @@ def load_context_with_limit(
     total_tokens = estimate_tokens(content, model_encoding)
 
     if total_tokens <= max_tokens:
-        logger.info(
-            f"Context fits within limit: {total_tokens} tokens <= {max_tokens} tokens"
-        )
+        logger.info(f"Context fits within limit: {total_tokens} tokens <= {max_tokens} tokens")
         return content, total_tokens, False
 
     # Need to truncate
@@ -194,7 +191,7 @@ def load_context_with_limit(
 
 def save_context(
     content: str,
-    file_path: Union[str, Path],
+    file_path: str | Path,
     encoding: str = "utf-8",
 ) -> None:
     """Save context to a file.

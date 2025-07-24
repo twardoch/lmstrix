@@ -2,7 +2,7 @@
 """LM Studio API client for interacting with the local server."""
 
 import os
-from typing import Any, Optional
+from typing import Any
 
 import litellm
 from litellm import acompletion
@@ -28,20 +28,14 @@ class CompletionResponse(BaseModel):
 
     content: str = Field(..., description="The generated text")
     model: str = Field(..., description="Model used for generation")
-    usage: dict[str, int] = Field(
-        default_factory=dict, description="Token usage statistics"
-    )
-    finish_reason: Optional[str] = Field(
-        None, description="Reason for completion termination"
-    )
+    usage: dict[str, int] = Field(default_factory=dict, description="Token usage statistics")
+    finish_reason: str | None = Field(None, description="Reason for completion termination")
 
 
 class LMStudioClient:
     """Async client for interacting with LM Studio API."""
 
-    def __init__(
-        self, endpoint: str = "http://localhost:1234/v1", verbose: bool = False
-    ):
+    def __init__(self, endpoint: str = "http://localhost:1234/v1", verbose: bool = False):
         """Initialize the LM Studio client."""
         self.endpoint = endpoint.rstrip("/")
         self.verbose = verbose
@@ -51,9 +45,7 @@ class LMStudioClient:
         else:
             logger.disable("lmstrix")
 
-    @retry(
-        stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=60)
-    )
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=60))
     async def acompletion(
         self,
         model_id: str,

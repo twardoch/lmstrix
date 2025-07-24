@@ -1,293 +1,272 @@
-# LMStrix Development Plan
+# LMStrix Development Plan - v1.0 MVP
 
 ## Project Vision
 
-LMStrix aims to become the definitive toolkit for working with LM Studio, providing developers with a professional, reliable, and feature-rich interface for local LLM operations. The project will evolve from its current foundation into a comprehensive ecosystem supporting advanced use cases while maintaining simplicity for basic operations.
+LMStrix v1.0 will be a minimal viable product focused on solving the critical problem with LM Studio: many models falsely declare higher maximum context lengths than they can actually handle. The tool will provide automated discovery of true operational context limits and maintain a reliable model registry.
 
-## Phase 5: Testing & Quality Assurance (Immediate Priority)
+## Core Problem Statement
 
-### 5.1 Unit Testing Framework
-**Goal**: Achieve 90%+ test coverage for all core modules
+LM Studio models often declare context limits (e.g., 128k tokens) that fail in practice:
+1. Models may fail to load at declared context length
+2. Models may load but produce gibberish output
+3. Only below a certain "real" max context do models produce correct output
 
-**Implementation Details**:
-- Set up pytest with pytest-cov for coverage reporting
-- Create comprehensive test fixtures in `tests/conftest.py`
-- Mock LM Studio API responses using pytest-mock
-- Test edge cases and error conditions
+## Technical Approach
 
-**Specific Test Modules**:
-1. `tests/unit/test_models.py`
-   - Model validation and serialization
-   - ModelRegistry CRUD operations
-   - Path handling and sanitization
-   
-2. `tests/unit/test_inference.py`
-   - InferenceEngine async operations
-   - Error handling and retries
-   - Result formatting
-   
-3. `tests/unit/test_context.py`
-   - Binary search algorithm correctness
-   - Caching mechanism
-   - Boundary conditions
-   
-4. `tests/unit/test_prompts.py`
-   - Two-phase resolution algorithm
-   - Nested placeholder handling
-   - Error cases for missing placeholders
+Use the native `lmstudio` Python package for all model operations:
+- Model discovery: `lmstudio.list_downloaded_models()`
+- Model loading: `lmstudio.llm(model_id, config={"contextLength": size})`
+- Model info: `model.get_info()`
+- Inference: `model.complete(prompt)`
+- Unloading: `model.unload()`
 
-### 5.2 Integration Testing
-**Goal**: Verify end-to-end functionality with real LM Studio server
+This avoids the limitations and issues with `litellm` and provides direct integration with LM Studio.
 
-**Implementation**:
-- Create `tests/integration/` directory
-- Use Docker for LM Studio test instance
-- Test real model loading and inference
-- Verify context optimization with actual models
-- Test CLI commands programmatically
+## Current Implementation Status
 
-### 5.3 Type Checking & Linting
-**Goal**: Ensure code quality and type safety
+### Completed Components
+1. **Project Structure** ✓
+   - Modern Python package with `src/` layout
+   - Modular architecture: api/, core/, cli/, loaders/, utils/
+   - Comprehensive pyproject.toml configuration
+
+2. **Core Models & Registry** ✓
+   - `Model` class with context testing fields
+   - `ModelRegistry` with save/load functionality
+   - `ModelScanner` for automatic discovery
+   - `ContextTestStatus` enum for tracking
+
+3. **Context Testing Framework** ✓
+   - `ContextTester` class with binary search algorithm
+   - `ContextTestResult` for logging attempts
+   - Per-model logging system
+   - Test status tracking and resumption
+
+4. **CLI Interface** ✓
+   - `lmstrix scan` - Discover models
+   - `lmstrix list` - Show models with test status
+   - `lmstrix test <model>` - Test specific model
+   - `lmstrix test --all` - Batch testing
+   - `lmstrix status` - Testing progress
+   - Rich formatting with progress bars
+
+5. **Utilities** ✓
+   - Path detection for LM Studio directory
+   - Data storage in proper system locations
+   - Backward compatibility with lmsm.json
+
+### Pending Critical Changes
+
+**PRIORITY: Replace litellm with native lmstudio package**
+- Current implementation uses litellm (inadequate for our needs)
+- Must rewrite LMStudioClient to use native lmstudio APIs
+- Update ContextTester to properly load/unload models
+- Ensure real model metadata extraction
+
+## Phase 1: Core Functionality Completion
+
+### 1.1 LM Studio Native Integration (IMMEDIATE PRIORITY)
+**Goal**: Replace litellm with native lmstudio package
 
 **Tasks**:
-- Configure mypy with strict settings
-- Add type stubs for external dependencies
-- Set up pre-commit hooks for automated checks
-- Create custom ruff rules for project conventions
+1. Remove litellm dependency from pyproject.toml
+2. Rewrite `LMStudioClient` class:
+   ```python
+   class LMStudioClient:
+       async def load_model(self, model_id: str, context_length: int):
+           return lmstudio.llm(model_id, config={"contextLength": context_length})
+       
+       async def complete(self, model, prompt: str):
+           return await model.complete(prompt)
+       
+       async def unload_model(self, model):
+           model.unload()
+   ```
 
-## Phase 6: Documentation & User Experience
+3. Update `ContextTester._test_at_context()`:
+   - Use actual model loading instead of simulation
+   - Properly handle load failures
+   - Test with real completions
+   - Unload models after each test
 
-### 6.1 API Documentation
-**Goal**: Comprehensive, searchable documentation
+4. Update `ModelScanner`:
+   - Use `lmstudio.list_downloaded_models()`
+   - Extract real metadata with `model.get_info()`
+
+### 1.2 Context Validation System Enhancement
+**Goal**: Implement real context testing with proper model operations
 
 **Implementation**:
-- Set up MkDocs with Material theme
-- Generate API docs from docstrings
-- Create interactive examples
-- Add architecture diagrams using Mermaid
-
-**Documentation Structure**:
+```python
+async def test_context_limits(model_id, min_ctx=32, max_ctx=None):
+    # 1. Binary search for loadable context
+    loadable_ctx = await find_max_loadable(model_id, min_ctx, max_ctx)
+    
+    # 2. Binary search for working context
+    working_ctx = await find_max_working(model_id, min_ctx, loadable_ctx)
+    
+    # 3. Log all attempts with results
+    # 4. Update registry with tested limits
+    
+async def find_max_loadable(model_id, min_ctx, max_ctx):
+    # Binary search with actual model loading
+    while left <= right:
+        mid = (left + right) // 2
+        try:
+            model = lmstudio.llm(model_id, config={"contextLength": mid})
+            model.unload()
+            best = mid
+            left = mid + 1
+        except:
+            right = mid - 1
+    return best
+    
+async def find_max_working(model_id, min_ctx, max_ctx):
+    # Binary search with inference testing
+    while left <= right:
+        mid = (left + right) // 2
+        try:
+            model = lmstudio.llm(model_id, config={"contextLength": mid})
+            response = await model.complete("2+2=")
+            model.unload()
+            if response.strip() == "4":
+                best = mid
+                left = mid + 1
+            else:
+                right = mid - 1
+        except:
+            right = mid - 1
+    return best
 ```
-docs/
-├── index.md          # Overview and quick start
-├── installation.md   # Detailed installation guide
-├── user-guide/
-│   ├── cli.md       # CLI command reference
-│   ├── python-api.md # Python API guide
-│   └── examples.md   # Cookbook examples
-├── api-reference/    # Auto-generated from code
-├── development/
-│   ├── contributing.md
-│   ├── architecture.md
-│   └── testing.md
-└── changelog.md
+
+### 1.3 Data Storage & Registry
+**Goal**: Proper system-aware data storage
+
+**Implementation**:
+- Model registry: `{lm_studio_path}/lmstrix/models.json`
+- Context test logs: `{lm_studio_path}/lmstrix/context_tests/{model_id}_context_test.log`
+- Maintain backward compatibility with existing `lmsm.json`
+- Never store data in package directory
+
+### 1.4 Python API Completion
+**Goal**: Complete the high-level API
+
+**Implementation**:
+```python
+class LMStrix:
+    async def test_context_limits(self, model_id: str, min_context: int = 32):
+        """Test and return real context limits for a model."""
+        tester = ContextTester(self.client)
+        model = self.registry.get_model(model_id)
+        if not model:
+            raise ModelNotFoundError(model_id)
+        
+        updated_model = await tester.test_model(model, min_context)
+        self.registry.update_model(model_id, updated_model)
+        
+        return {
+            "declared": model.context_limit,
+            "loadable": updated_model.loadable_max_context,
+            "working": updated_model.tested_max_context,
+            "reduction": (1 - updated_model.tested_max_context / model.context_limit) * 100
+        }
+    
+    def get_tested_context_limit(self, model_id: str) -> Optional[int]:
+        """Get the tested working context limit for a model."""
+        model = self.registry.get_model(model_id)
+        return model.tested_max_context if model else None
 ```
 
-### 6.2 Example Gallery
-**Goal**: Practical examples for common use cases
+## Phase 2: Testing & Quality Assurance
 
-**Examples to Create**:
-1. **Basic Chat Interface**: Simple conversational AI
-2. **Document Summarizer**: Process large documents with context optimization
-3. **Code Generator**: Generate code with proper formatting
-4. **Multi-Model Comparison**: Compare outputs from different models
-5. **Streaming Responses**: Real-time token streaming
-6. **Batch Processing**: Process multiple prompts efficiently
+### 2.1 Unit Tests
+**Goal**: Test core functionality
 
-### 6.3 Interactive Tutorials
-**Goal**: Jupyter notebooks for learning
+**Priority Tests**:
+- Path detection and directory creation
+- Model discovery and registry operations
+- Context binary search algorithm
+- Log file writing and parsing
+- CLI command parsing
 
-**Notebooks**:
-- Getting Started with LMStrix
-- Understanding Context Optimization
-- Building Custom Workflows
-- Performance Tuning Guide
+### 2.2 Integration Tests
+**Goal**: Test with real LM Studio
 
-## Phase 7: Advanced Features
+**Tests**:
+- Real model loading/unloading
+- Actual inference with context sizes
+- Interrupted test resumption
+- Batch testing operations
 
-### 7.1 Streaming Support
-**Goal**: Real-time token streaming for better UX
+## Phase 3: Documentation & Release
 
-**Implementation**:
-- Add streaming methods to LMStudioClient
-- Create async generators for token streams
-- Update CLI with real-time output
-- Add progress callbacks
-
-### 7.2 Multi-Model Workflows
-**Goal**: Chain multiple models for complex tasks
-
-**Features**:
-- Model routing based on capabilities
-- Automatic fallback mechanisms
-- Ensemble predictions
-- Cost/performance optimization
-
-### 7.3 Advanced Context Management
-**Goal**: Sophisticated context window optimization
-
-**Features**:
-- Dynamic context adjustment during inference
-- Context compression techniques
-- Semantic chunking for large documents
-- Context caching and reuse
-
-### 7.4 Plugin System
-**Goal**: Extensible architecture for custom functionality
-
-**Implementation**:
-- Define plugin interface
-- Create plugin discovery mechanism
-- Build example plugins:
-  - Custom prompt formats
-  - Model-specific optimizations
-  - Output post-processors
-  - Metric collectors
-
-## Phase 8: Performance & Scalability
-
-### 8.1 Performance Optimization
-**Goal**: Maximize throughput and minimize latency
-
-**Optimizations**:
-- Connection pooling for API calls
-- Async batch processing
-- Response caching strategies
-- Memory-efficient data structures
-
-### 8.2 Monitoring & Metrics
-**Goal**: Comprehensive performance insights
-
-**Features**:
-- OpenTelemetry integration
-- Custom metrics dashboard
-- Performance profiling tools
-- Resource usage tracking
-
-### 8.3 Distributed Processing
-**Goal**: Scale across multiple LM Studio instances
-
-**Implementation**:
-- Load balancer for multiple servers
-- Distributed context optimization
-- Fault tolerance and failover
-- Horizontal scaling strategies
-
-## Phase 9: Enterprise Features
-
-### 9.1 Security Enhancements
-**Goal**: Enterprise-grade security
-
-**Features**:
-- API key management
-- Request/response encryption
-- Audit logging
-- Role-based access control
-
-### 9.2 Deployment Tools
-**Goal**: Easy deployment in various environments
+### 3.1 Essential Documentation
+**Goal**: Clear usage instructions
 
 **Deliverables**:
-- Docker images with best practices
-- Kubernetes Helm charts
-- Terraform modules
-- Cloud-specific templates (AWS, Azure, GCP)
+- Updated README.md with real examples
+- Context testing methodology explanation
+- Troubleshooting guide for common issues
+- API reference with code examples
 
-### 9.3 Enterprise Support
-**Goal**: Tools for large-scale deployments
-
-**Features**:
-- Multi-tenant support
-- Usage quotas and limits
-- Billing integration hooks
-- SLA monitoring
-
-## Phase 10: Community & Ecosystem
-
-### 10.1 Package Publishing
-**Goal**: Available on PyPI with automated releases
+### 3.2 Package Release
+**Goal**: v1.0.0 on PyPI
 
 **Steps**:
-1. Set up GitHub Actions for CI/CD
-2. Configure automatic version bumping
-3. Create release automation
-4. Set up PyPI trusted publishing
-5. Add badge collection to README
+1. Remove litellm, ensure lmstudio dependency
+2. Test with real LM Studio instance
+3. Update version to 1.0.0
+4. Build and test distribution
+5. Publish to PyPI
 
-### 10.2 Community Building
-**Goal**: Active, helpful community
+## Success Criteria for v1.0
 
-**Initiatives**:
-- GitHub Discussions for Q&A
-- Discord server for real-time help
-- Regular release schedule
-- Contributor recognition program
-- Blog posts and tutorials
+1. **Functional**:
+   - Uses native lmstudio package for all operations
+   - Accurately discovers real context limits
+   - Properly loads/unloads models
+   - Saves results in system-appropriate location
 
-### 10.3 Ecosystem Integration
-**Goal**: Work seamlessly with popular tools
+2. **Reliable**:
+   - Handles model loading failures gracefully
+   - Resumes interrupted tests
+   - Provides clear error messages
+   - Doesn't leave models loaded in memory
 
-**Integrations**:
-- LangChain compatibility layer
-- Hugging Face datasets support
-- Weights & Biases logging
-- MLflow experiment tracking
-- Jupyter notebook extensions
+3. **Usable**:
+   - Simple CLI commands work reliably
+   - Progress indication during long tests
+   - Clear reporting of context limit issues
+   - Helpful documentation
 
-## Technical Debt & Maintenance
+## Out of Scope for v1.0
 
-### Ongoing Tasks
-1. **Dependency Management**
-   - Regular dependency updates
-   - Security vulnerability scanning
-   - Compatibility testing
+- Advanced optimization algorithms beyond binary search
+- Streaming support
+- Multi-model parallel testing
+- Web interface
+- Plugin system
+- Docker/Kubernetes support
 
-2. **Code Quality**
-   - Refactoring for maintainability
-   - Performance profiling
-   - Documentation updates
+## Implementation Notes
 
-3. **Testing Infrastructure**
-   - Continuous integration improvements
-   - Test environment automation
-   - Benchmark suite maintenance
+### Critical Path for MVP
+1. Replace litellm with lmstudio package (BLOCKER)
+2. Implement real model loading/unloading
+3. Complete context testing with actual inference
+4. Ensure proper data persistence
+5. Test with real LM Studio instance
+6. Package and release
 
-## Success Metrics
+### Error Handling
+- Graceful handling of model load failures
+- Clear error messages for connection issues
+- Automatic retry with exponential backoff
+- Save partial results on interruption
+- Proper cleanup (unload models) on errors
 
-### Technical Metrics
-- Test coverage > 90%
-- Type coverage 100%
-- API response time < 100ms (excluding model inference)
-- Zero security vulnerabilities
-- Documentation coverage 100%
-
-### Community Metrics
-- 1000+ GitHub stars
-- 50+ contributors
-- 95%+ user satisfaction
-- Active community engagement
-- Regular release cadence (monthly)
-
-## Risk Mitigation
-
-### Technical Risks
-1. **LM Studio API Changes**
-   - Maintain compatibility layer
-   - Version detection and adaptation
-   - Clear migration guides
-
-2. **Performance Degradation**
-   - Continuous benchmarking
-   - Performance regression tests
-   - Optimization guidelines
-
-### Community Risks
-1. **Maintainer Burnout**
-   - Build strong contributor base
-   - Clear governance model
-   - Sustainable development pace
-
-2. **Feature Creep**
-   - Clear project scope
-   - Plugin system for extensions
-   - Community-driven prioritization
+### Performance Considerations
+- Unload models immediately after testing to free VRAM
+- Cache results to avoid retesting
+- Binary search minimizes test attempts
+- Progress indication for user feedback

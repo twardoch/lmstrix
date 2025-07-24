@@ -1,0 +1,1 @@
+Shouldn't the code use @ref/llmstudio.txt for much more? We don't want to use inferencing by `litellm`, it's shit. We want to use to use the `lmstudio` package for loading models and also for completion/inferencing.
