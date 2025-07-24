@@ -37,7 +37,7 @@ This gives you a reliable, empirical measurement of the model's true capabilitie
 ## Installation
 
 ```bash
-pip install lmstrix
+uv pip install --system lmstrix
 ```
 
 ## Quick Start
