@@ -4,12 +4,9 @@
 
 ### User Documentation
 
-- [ ] Update `README.md` with the new CLI commands and examples.
-- [ ] Add a section to the `README.md` explaining the context testing methodology.
 
 ### API Documentation
 
-- [ ] Add comprehensive docstrings to all public functions and classes.
 
 ## Phase 4: Package & Release
 

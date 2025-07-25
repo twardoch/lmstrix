@@ -1,5 +1,4 @@
 ---
-layout: default
 ---
 
 # LMStrix: The Unofficial Toolkit for Mastering LM Studio

@@ -1,9 +1,9 @@
-
-theme: jekyll-theme-minimal
 title: LMStrix
-description: "The Unofficial Toolkit for Mastering LM Studio"
-logo: /assets/img/logo.png
-show_downloads: true
-github:
-  zip_url: https://github.com/twardoch/lmstrix/archive/main.zip
-  tar_url: https://github.com/twardoch/lmstrix/archive/main.tar.gz
+description: The Unofficial Toolkit for Mastering LM Studio
+theme: just-the-docs
+
+url: https://twardoch.github.io/lmstrix
+
+aux_links:
+  "LMStrix on GitHub":
+    - "https://github.com/twardoch/lmstrix"
