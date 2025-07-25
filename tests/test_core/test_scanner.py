@@ -9,7 +9,7 @@ class TestModelScanner:
     """Test ModelScanner class."""
 
     @patch("lmstrix.core.scanner.get_lmstudio_path")
-    def test_scanner_initialization(self, mock_get_path, tmp_path):
+    def test_scanner_initialization(self, mock_get_path, tmp_path) -> None:
         """Test scanner initialization."""
         mock_lms_path = tmp_path / "lmstudio"
         mock_get_path.return_value = mock_lms_path
@@ -19,7 +19,7 @@ class TestModelScanner:
         assert scanner.lms_path == mock_lms_path
         assert scanner.models_dir == mock_lms_path / "models"
 
-    def test_get_model_size_file(self, tmp_path):
+    def test_get_model_size_file(self, tmp_path) -> None:
         """Test getting size of a single model file."""
         scanner = ModelScanner()
 
@@ -30,7 +30,7 @@ class TestModelScanner:
         size = scanner._get_model_size(model_file)
         assert size == 1000
 
-    def test_get_model_size_directory(self, tmp_path):
+    def test_get_model_size_directory(self, tmp_path) -> None:
         """Test getting size of a model directory."""
         scanner = ModelScanner()
 
@@ -46,7 +46,7 @@ class TestModelScanner:
         size = scanner._get_model_size(model_dir)
         assert size == 800  # 500 + 100 + 200
 
-    def test_get_model_size_nonexistent(self, tmp_path):
+    def test_get_model_size_nonexistent(self, tmp_path) -> None:
         """Test getting size of non-existent path."""
         scanner = ModelScanner()
 
@@ -54,7 +54,7 @@ class TestModelScanner:
         size = scanner._get_model_size(non_existent)
         assert size == 0
 
-    def test_extract_model_info_gguf_file(self, tmp_path):
+    def test_extract_model_info_gguf_file(self, tmp_path) -> None:
         """Test extracting info from GGUF model file."""
         scanner = ModelScanner()
 
@@ -69,7 +69,7 @@ class TestModelScanner:
         assert info["size_bytes"] == 1000
         assert info["type"] == "gguf"
 
-    def test_extract_model_info_mlx_directory(self, tmp_path):
+    def test_extract_model_info_mlx_directory(self, tmp_path) -> None:
         """Test extracting info from MLX model directory."""
         scanner = ModelScanner()
 
@@ -86,7 +86,7 @@ class TestModelScanner:
         assert info["path"] == str(model_dir)
         assert info["type"] == "mlx"
 
-    def test_extract_model_info_hidden_file(self, tmp_path):
+    def test_extract_model_info_hidden_file(self, tmp_path) -> None:
         """Test that hidden files are skipped."""
         scanner = ModelScanner()
 
@@ -96,7 +96,7 @@ class TestModelScanner:
         info = scanner._extract_model_info(hidden_file)
         assert info is None
 
-    def test_extract_model_info_non_model_file(self, tmp_path):
+    def test_extract_model_info_non_model_file(self, tmp_path) -> None:
         """Test that non-model files are skipped."""
         scanner = ModelScanner()
 
@@ -107,7 +107,7 @@ class TestModelScanner:
         assert info is None
 
     @patch("lmstrix.core.scanner.get_lmstudio_path")
-    def test_scan_models(self, mock_get_path, tmp_path):
+    def test_scan_models(self, mock_get_path, tmp_path) -> None:
         """Test scanning for models."""
         # Set up mock LM Studio directory structure
         lms_path = tmp_path / "lmstudio"
@@ -147,7 +147,7 @@ class TestModelScanner:
         assert model_dict["model3-mlx"]["size_bytes"] == 3000
 
     @patch("lmstrix.core.scanner.get_lmstudio_path")
-    def test_sync_with_registry(self, mock_get_path, tmp_path):
+    def test_sync_with_registry(self, mock_get_path, tmp_path) -> None:
         """Test syncing scanned models with registry."""
         # Set up mock LM Studio directory
         lms_path = tmp_path / "lmstudio"

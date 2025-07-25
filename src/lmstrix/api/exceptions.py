@@ -1,11 +1,10 @@
-# this_file: src/lmstrix/api/exceptions.py
 """Custom exceptions for LMStrix API operations."""
 
 
 class LMStrixError(Exception):
     """Base exception for all LMStrix errors."""
 
-    def __init__(self, message: str, details: dict | None = None):
+    def __init__(self, message: str, details: dict | None = None) -> None:
         """Initialize the exception."""
         super().__init__(message)
         self.message = message
@@ -15,7 +14,7 @@ class LMStrixError(Exception):
 class ModelLoadError(LMStrixError):
     """Raised when a model fails to load."""
 
-    def __init__(self, model_id: str, reason: str, details: dict | None = None):
+    def __init__(self, model_id: str, reason: str, details: dict | None = None) -> None:
         """Initialize the exception."""
         message = f"Failed to load model '{model_id}': {reason}"
         super().__init__(message, details)
@@ -26,7 +25,7 @@ class ModelLoadError(LMStrixError):
 class InferenceError(LMStrixError):
     """Raised when inference fails."""
 
-    def __init__(self, model_id: str, reason: str, details: dict | None = None):
+    def __init__(self, model_id: str, reason: str, details: dict | None = None) -> None:
         """Initialize the exception."""
         message = f"Inference failed for model '{model_id}': {reason}"
         super().__init__(message, details)
@@ -37,7 +36,7 @@ class InferenceError(LMStrixError):
 class APIConnectionError(LMStrixError):
     """Raised when connection to LM Studio API fails."""
 
-    def __init__(self, endpoint: str, reason: str, details: dict | None = None):
+    def __init__(self, endpoint: str, reason: str, details: dict | None = None) -> None:
         """Initialize the exception."""
         message = f"Failed to connect to LM Studio API at '{endpoint}': {reason}"
         super().__init__(message, details)
@@ -54,7 +53,7 @@ class ContextLimitExceededError(InferenceError):
         input_tokens: int,
         context_limit: int,
         details: dict | None = None,
-    ):
+    ) -> None:
         """Initialize the exception."""
         reason = f"Input tokens ({input_tokens}) exceed context limit ({context_limit})"
         super().__init__(model_id, reason, details)
@@ -65,7 +64,7 @@ class ContextLimitExceededError(InferenceError):
 class ModelNotFoundError(LMStrixError):
     """Raised when a requested model is not found."""
 
-    def __init__(self, model_id: str, available_models: list[str] | None = None):
+    def __init__(self, model_id: str, available_models: list[str] | None = None) -> None:
         """Initialize the exception."""
         message = f"Model '{model_id}' not found"
         details = {}
@@ -79,7 +78,7 @@ class ModelNotFoundError(LMStrixError):
 class ConfigurationError(LMStrixError):
     """Raised when there's a configuration issue."""
 
-    def __init__(self, config_name: str, reason: str, details: dict | None = None):
+    def __init__(self, config_name: str, reason: str, details: dict | None = None) -> None:
         """Initialize the exception."""
         message = f"Configuration error for '{config_name}': {reason}"
         super().__init__(message, details)

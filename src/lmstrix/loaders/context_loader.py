@@ -1,4 +1,3 @@
-# this_file: src/lmstrix/loaders/context_loader.py
 """Context file loading functionality."""
 
 from pathlib import Path

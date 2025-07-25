@@ -1,6 +1,5 @@
 """Tests for prompt loader functionality."""
 
-
 import pytest
 import toml
 
@@ -12,7 +11,7 @@ from lmstrix.loaders.prompt_loader import load_prompt_file, load_prompts
 class TestPromptLoader:
     """Test prompt loading functions."""
 
-    def test_load_prompts_simple(self, tmp_path):
+    def test_load_prompts_simple(self, tmp_path) -> None:
         """Test loading simple prompts from TOML file."""
         # Create test TOML file
         toml_file = tmp_path / "prompts.toml"
@@ -46,7 +45,7 @@ class TestPromptLoader:
         question = prompts["question"]
         assert question.resolved == "What is Python? Please provide a detailed answer."
 
-    def test_load_prompts_nonexistent_file(self, tmp_path):
+    def test_load_prompts_nonexistent_file(self, tmp_path) -> None:
         """Test loading prompts from non-existent file."""
         nonexistent = tmp_path / "does_not_exist.toml"
 
@@ -56,7 +55,7 @@ class TestPromptLoader:
         assert "not found" in str(exc_info.value)
         assert str(nonexistent) in str(exc_info.value)
 
-    def test_load_prompts_invalid_toml(self, tmp_path):
+    def test_load_prompts_invalid_toml(self, tmp_path) -> None:
         """Test loading prompts from invalid TOML file."""
         invalid_file = tmp_path / "invalid.toml"
         invalid_file.write_text("This is not valid TOML { syntax")
@@ -66,7 +65,7 @@ class TestPromptLoader:
 
         assert "parse" in str(exc_info.value).lower()
 
-    def test_load_prompts_with_nested_placeholders(self, tmp_path):
+    def test_load_prompts_with_nested_placeholders(self, tmp_path) -> None:
         """Test loading prompts with nested placeholders."""
         toml_file = tmp_path / "nested.toml"
         toml_content = {
@@ -90,7 +89,7 @@ class TestPromptLoader:
         assert set(final.placeholders_found) == {"base"}
         assert set(final.placeholders_resolved) == {"base"}
 
-    def test_load_prompts_with_missing_params(self, tmp_path):
+    def test_load_prompts_with_missing_params(self, tmp_path) -> None:
         """Test loading prompts with missing parameters."""
         toml_file = tmp_path / "missing.toml"
         toml_content = {
@@ -108,7 +107,7 @@ class TestPromptLoader:
         assert template1.placeholders_unresolved == ["city"]
         assert template1.placeholders_resolved == ["name"]
 
-    def test_load_prompts_with_custom_resolver(self, tmp_path):
+    def test_load_prompts_with_custom_resolver(self, tmp_path) -> None:
         """Test loading prompts with custom resolver."""
         toml_file = tmp_path / "custom.toml"
         toml_content = {
@@ -125,7 +124,7 @@ class TestPromptLoader:
 
         assert prompts["test"].resolved == "Result: 42"
 
-    def test_load_prompts_empty_file(self, tmp_path):
+    def test_load_prompts_empty_file(self, tmp_path) -> None:
         """Test loading prompts from empty TOML file."""
         empty_file = tmp_path / "empty.toml"
         empty_file.write_text("")
@@ -134,7 +133,7 @@ class TestPromptLoader:
 
         assert len(prompts) == 0
 
-    def test_load_prompt_file_simple(self, tmp_path):
+    def test_load_prompt_file_simple(self, tmp_path) -> None:
         """Test loading a single prompt file."""
         prompt_file = tmp_path / "single_prompt.toml"
         toml_content = {
@@ -161,7 +160,7 @@ class TestPromptLoader:
         assert prompt.resolved == "Analyze this Python code: def hello(): pass"
         assert set(prompt.placeholders_resolved) == {"language", "code"}
 
-    def test_load_prompt_file_missing_template(self, tmp_path):
+    def test_load_prompt_file_missing_template(self, tmp_path) -> None:
         """Test loading prompt file without template field."""
         prompt_file = tmp_path / "no_template.toml"
         toml_content = {
@@ -175,7 +174,7 @@ class TestPromptLoader:
 
         assert "template" in str(exc_info.value).lower()
 
-    def test_load_prompt_file_with_defaults(self, tmp_path):
+    def test_load_prompt_file_with_defaults(self, tmp_path) -> None:
         """Test loading prompt file with default values."""
         prompt_file = tmp_path / "defaults.toml"
         toml_content = {

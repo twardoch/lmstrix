@@ -1,4 +1,3 @@
-# this_file: src/lmstrix/core/prompts.py
 """Prompt template resolution and management."""
 
 import re
@@ -22,10 +21,12 @@ class ResolvedPrompt(BaseModel):
     tokens: int = Field(0, description="Estimated token count")
     placeholders_found: list[str] = Field(default_factory=list, description="Placeholders found")
     placeholders_resolved: list[str] = Field(
-        default_factory=list, description="Placeholders resolved",
+        default_factory=list,
+        description="Placeholders resolved",
     )
     placeholders_unresolved: list[str] = Field(
-        default_factory=list, description="Unresolved placeholders",
+        default_factory=list,
+        description="Unresolved placeholders",
     )
 
 
@@ -35,7 +36,7 @@ class PromptResolver:
     PLACEHOLDER_RE = re.compile(r"{{([^{}]+)}}")
     MAX_INTERNAL_PASSES = 10  # Prevent infinite loops on circular refs
 
-    def __init__(self, verbose: bool = False):
+    def __init__(self, verbose: bool = False) -> None:
         """Initialize the prompt resolver.
 
         Args:

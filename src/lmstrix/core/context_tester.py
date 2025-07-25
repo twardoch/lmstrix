@@ -1,4 +1,3 @@
-# this_file: src/lmstrix/core/context_tester.py
 """Context testing functionality for discovering true model limits."""
 
 import json
@@ -24,7 +23,7 @@ class ContextTestResult:
         prompt: str = "",
         response: str = "",
         error: str = "",
-    ):
+    ) -> None:
         """Initialize test result."""
         self.timestamp = datetime.now()
         self.context_size = context_size
@@ -54,7 +53,7 @@ class ContextTestResult:
 class ContextTester:
     """Tests models to find their true operational context limits."""
 
-    def __init__(self, client: LMStudioClient | None = None):
+    def __init__(self, client: LMStudioClient | None = None) -> None:
         """Initialize context tester."""
         self.client = client or LMStudioClient()
         self.test_prompt = "2+2="
@@ -67,7 +66,10 @@ class ContextTester:
             f.write(json.dumps(result.to_dict()) + "\n")
 
     async def _test_at_context(
-        self, model_id: str, context_size: int, log_path: Path,
+        self,
+        model_id: str,
+        context_size: int,
+        log_path: Path,
     ) -> ContextTestResult:
         """Test model at a specific context size."""
         logger.debug(f"Testing {model_id} at context size {context_size}")
@@ -77,7 +79,10 @@ class ContextTester:
             logger.debug(f"Model {model_id} loaded successfully at {context_size}.")
 
             response = await self.client.acompletion(
-                llm=llm, prompt=self.test_prompt, max_tokens=10, temperature=0.0,
+                llm=llm,
+                prompt=self.test_prompt,
+                max_tokens=10,
+                temperature=0.0,
             )
 
             result = ContextTestResult(
@@ -91,7 +96,9 @@ class ContextTester:
         except ModelLoadError as e:
             logger.warning(f"Failed to load {model_id} at context {context_size}: {e}")
             result = ContextTestResult(
-                context_size=context_size, load_success=False, error=str(e),
+                context_size=context_size,
+                load_success=False,
+                error=str(e),
             )
         except Exception as e:
             logger.error(f"Inference failed for {model_id} at context {context_size}: {e}")
@@ -132,11 +139,16 @@ class ContextTester:
         try:
             while left <= right:
                 mid = (left + right) // 2
-                if mid == 0: break
+                if mid == 0:
+                    break
 
                 result = await self._test_at_context(model.id, mid, log_path)
 
-                if result.load_success and result.inference_success and result.is_valid_response(self.expected_response):
+                if (
+                    result.load_success
+                    and result.inference_success
+                    and result.is_valid_response(self.expected_response)
+                ):
                     best_working_context = mid
                     left = mid + 1  # Try for a larger context
                 else:
@@ -144,7 +156,11 @@ class ContextTester:
 
             model.tested_max_context = best_working_context
             model.context_test_log = str(log_path)
-            model.context_test_status = ContextTestStatus.COMPLETED if best_working_context > 0 else ContextTestStatus.FAILED
+            model.context_test_status = (
+                ContextTestStatus.COMPLETED
+                if best_working_context > 0
+                else ContextTestStatus.FAILED
+            )
 
             logger.info(
                 f"Context test completed for {model.id}. "

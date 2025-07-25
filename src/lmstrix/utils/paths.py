@@ -1,4 +1,3 @@
-# this_file: src/lmstrix/utils/paths.py
 """Path utilities for LMStrix."""
 
 from pathlib import Path

@@ -52,18 +52,21 @@ class TestCLIIntegration:
 
     @patch("lmstrix.utils.paths.get_lmstudio_path")
     @patch("lmstrix.cli.main.LMStudioClient")
-    def test_list_models_command(self, mock_client_class, mock_get_path, mock_lmstudio_setup, capsys):
+    def test_list_models_command(
+        self, mock_client_class, mock_get_path, mock_lmstudio_setup, capsys
+    ) -> None:
         """Test 'models list' command."""
         lms_path, registry_file = mock_lmstudio_setup
         mock_get_path.return_value = lms_path
 
         # Create app and execute command
-        app = create_app()
+        create_app()
 
         # Mock Fire to call the method directly
-        with patch("fire.Fire") as mock_fire:
+        with patch("fire.Fire"):
             # Call the list method directly
             from lmstrix.cli.main import CLI
+
             cli = CLI(verbose=False)
             cli.models.list()
 
@@ -77,7 +80,9 @@ class TestCLIIntegration:
     @patch("lmstrix.utils.paths.get_lmstudio_path")
     @patch("lmstrix.cli.main.LMStudioClient")
     @patch("lmstrix.cli.main.ModelScanner")
-    def test_scan_models_command(self, mock_scanner_class, mock_client_class, mock_get_path, mock_lmstudio_setup):
+    def test_scan_models_command(
+        self, mock_scanner_class, mock_client_class, mock_get_path, mock_lmstudio_setup
+    ) -> None:
         """Test 'models scan' command."""
         lms_path, registry_file = mock_lmstudio_setup
         mock_get_path.return_value = lms_path
@@ -96,6 +101,7 @@ class TestCLIIntegration:
 
         # Create CLI and execute scan
         from lmstrix.cli.main import CLI
+
         cli = CLI(verbose=False)
         cli.models.scan()
 
@@ -105,7 +111,9 @@ class TestCLIIntegration:
     @patch("lmstrix.utils.paths.get_lmstudio_path")
     @patch("lmstrix.cli.main.LMStudioClient")
     @pytest.mark.asyncio
-    async def test_optimize_command(self, mock_client_class, mock_get_path, mock_lmstudio_setup):
+    async def test_optimize_command(
+        self, mock_client_class, mock_get_path, mock_lmstudio_setup
+    ) -> None:
         """Test 'optimize' command."""
         lms_path, registry_file = mock_lmstudio_setup
         mock_get_path.return_value = lms_path
@@ -131,6 +139,7 @@ class TestCLIIntegration:
 
             # Create CLI and call optimize
             from lmstrix.cli.main import CLI
+
             cli = CLI(verbose=False)
 
             # Need to run async method
@@ -140,12 +149,13 @@ class TestCLIIntegration:
             mock_tester.optimize_model.assert_called_once()
 
     @patch("lmstrix.utils.paths.get_lmstudio_path")
-    def test_infer_command_missing_prompt(self, mock_get_path, mock_lmstudio_setup, capsys):
+    def test_infer_command_missing_prompt(self, mock_get_path, mock_lmstudio_setup, capsys) -> None:
         """Test 'infer' command with missing prompt."""
         lms_path, registry_file = mock_lmstudio_setup
         mock_get_path.return_value = lms_path
 
         from lmstrix.cli.main import CLI
+
         cli = CLI(verbose=False)
 
         # Should show error for missing prompt
@@ -156,7 +166,9 @@ class TestCLIIntegration:
     @patch("lmstrix.cli.main.load_prompts")
     @patch("lmstrix.cli.main.InferenceEngine")
     @pytest.mark.asyncio
-    async def test_infer_with_prompt_file(self, mock_engine_class, mock_load_prompts, mock_get_path, mock_lmstudio_setup, tmp_path):
+    async def test_infer_with_prompt_file(
+        self, mock_engine_class, mock_load_prompts, mock_get_path, mock_lmstudio_setup, tmp_path
+    ) -> None:
         """Test 'infer' command with prompt file."""
         lms_path, registry_file = mock_lmstudio_setup
         mock_get_path.return_value = lms_path
@@ -166,6 +178,7 @@ class TestCLIIntegration:
 
         # Mock prompt loading
         from lmstrix.core.prompts import ResolvedPrompt
+
         mock_prompt = ResolvedPrompt(
             name="test_prompt",
             template="Analyze: {{input}}",
@@ -178,6 +191,7 @@ class TestCLIIntegration:
         mock_engine_class.return_value = mock_engine
 
         from lmstrix.core.inference import InferenceResult
+
         mock_result = InferenceResult(
             model_id="test-model-1",
             prompt="Analyze: Test input",
@@ -189,6 +203,7 @@ class TestCLIIntegration:
 
         # Run inference
         from lmstrix.cli.main import CLI
+
         cli = CLI(verbose=False)
 
         await cli.infer(
@@ -201,10 +216,11 @@ class TestCLIIntegration:
         mock_load_prompts.assert_called_once()
         mock_engine.infer.assert_called_once()
 
-    def test_cli_help(self, capsys):
+    def test_cli_help(self, capsys) -> None:
         """Test CLI help output."""
         with patch("fire.Fire") as mock_fire:
             from lmstrix.cli.main import main
+
             main()
 
             # Fire should be called to create the CLI

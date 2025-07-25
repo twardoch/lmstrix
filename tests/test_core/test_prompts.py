@@ -1,13 +1,12 @@
 """Tests for prompt template resolution."""
 
-
 from lmstrix.core.prompts import PromptResolver, ResolvedPrompt
 
 
 class TestResolvedPrompt:
     """Test ResolvedPrompt model."""
 
-    def test_resolved_prompt_creation(self):
+    def test_resolved_prompt_creation(self) -> None:
         """Test creating a resolved prompt."""
         prompt = ResolvedPrompt(
             name="test_prompt",
@@ -26,7 +25,7 @@ class TestResolvedPrompt:
         assert prompt.placeholders_resolved == ["name"]
         assert prompt.placeholders_unresolved == []
 
-    def test_resolved_prompt_minimal(self):
+    def test_resolved_prompt_minimal(self) -> None:
         """Test creating resolved prompt with minimal fields."""
         prompt = ResolvedPrompt(
             name="minimal",
@@ -46,7 +45,7 @@ class TestResolvedPrompt:
 class TestPromptResolver:
     """Test PromptResolver class."""
 
-    def test_resolver_initialization(self):
+    def test_resolver_initialization(self) -> None:
         """Test resolver initialization."""
         resolver = PromptResolver(verbose=True)
         assert resolver.verbose is True
@@ -55,7 +54,7 @@ class TestPromptResolver:
         resolver2 = PromptResolver(verbose=False)
         assert resolver2.verbose is False
 
-    def test_find_placeholders(self):
+    def test_find_placeholders(self) -> None:
         """Test finding placeholders in templates."""
         resolver = PromptResolver()
 
@@ -75,7 +74,7 @@ class TestPromptResolver:
         placeholders = resolver._find_placeholders("Code: {function() { return {{x}}; }}")
         assert placeholders == ["x"]
 
-    def test_resolve_phase_simple(self):
+    def test_resolve_phase_simple(self) -> None:
         """Test simple single-phase resolution."""
         resolver = PromptResolver()
 
@@ -89,7 +88,7 @@ class TestPromptResolver:
         assert resolved_list == ["name"]
         assert unresolved == []
 
-    def test_resolve_phase_missing_placeholder(self):
+    def test_resolve_phase_missing_placeholder(self) -> None:
         """Test resolution with missing placeholders."""
         resolver = PromptResolver()
 
@@ -103,7 +102,7 @@ class TestPromptResolver:
         assert resolved_list == ["name"]
         assert unresolved == ["location"]
 
-    def test_resolve_phase_extra_context(self):
+    def test_resolve_phase_extra_context(self) -> None:
         """Test resolution with extra context values."""
         resolver = PromptResolver()
 
@@ -117,7 +116,7 @@ class TestPromptResolver:
         assert resolved_list == ["name"]
         assert unresolved == []
 
-    def test_resolve_template_two_phase(self):
+    def test_resolve_template_two_phase(self) -> None:
         """Test two-phase template resolution."""
         resolver = PromptResolver()
 
@@ -135,7 +134,7 @@ class TestPromptResolver:
         assert result.placeholders_unresolved == []
         assert result.tokens > 0
 
-    def test_resolve_template_recursive(self):
+    def test_resolve_template_recursive(self) -> None:
         """Test recursive placeholder resolution."""
         resolver = PromptResolver()
 
@@ -151,7 +150,7 @@ class TestPromptResolver:
         assert "level1" in result.placeholders_found
         assert "level1" in result.placeholders_resolved
 
-    def test_resolve_template_circular_reference(self):
+    def test_resolve_template_circular_reference(self) -> None:
         """Test handling of circular references."""
         resolver = PromptResolver()
 
@@ -168,7 +167,7 @@ class TestPromptResolver:
         assert "{{" in result.resolved
         assert len(result.placeholders_unresolved) > 0
 
-    def test_resolve_template_no_placeholders(self):
+    def test_resolve_template_no_placeholders(self) -> None:
         """Test template with no placeholders."""
         resolver = PromptResolver()
 
@@ -181,7 +180,7 @@ class TestPromptResolver:
         assert result.placeholders_resolved == []
         assert result.placeholders_unresolved == []
 
-    def test_resolve_template_numeric_values(self):
+    def test_resolve_template_numeric_values(self) -> None:
         """Test resolution with numeric values."""
         resolver = PromptResolver()
 
@@ -193,7 +192,7 @@ class TestPromptResolver:
         assert result.resolved == "The answer is 42 and pi is 3.14159"
         assert set(result.placeholders_resolved) == {"number", "pi"}
 
-    def test_resolve_template_empty_value(self):
+    def test_resolve_template_empty_value(self) -> None:
         """Test resolution with empty string values."""
         resolver = PromptResolver()
 
@@ -205,7 +204,7 @@ class TestPromptResolver:
         assert result.resolved == "StartEnd"
         assert result.placeholders_resolved == ["middle"]
 
-    def test_count_tokens(self):
+    def test_count_tokens(self) -> None:
         """Test token counting."""
         resolver = PromptResolver()
 
@@ -223,7 +222,7 @@ class TestPromptResolver:
         count = resolver._count_tokens(long_text)
         assert count > 50  # Should be many tokens
 
-    def test_resolve_with_special_characters(self):
+    def test_resolve_with_special_characters(self) -> None:
         """Test resolution with special characters in values."""
         resolver = PromptResolver()
 

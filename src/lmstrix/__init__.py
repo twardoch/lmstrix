@@ -1,9 +1,7 @@
-# this_file: src/lmstrix/__init__.py
 """High-level API for LMStrix functionality."""
 
 import asyncio
 from importlib.metadata import PackageNotFoundError, version
-from typing import List
 
 from lmstrix.core.context_tester import ContextTester
 from lmstrix.core.inference import InferenceEngine, InferenceResult
@@ -26,7 +24,7 @@ except ImportError:
 class LMStrix:
     """Provides a high-level, simplified interface to LMStrix's core features."""
 
-    def __init__(self, verbose: bool = False):
+    def __init__(self, verbose: bool = False) -> None:
         """Initializes the LMStrix API wrapper.
 
         Args:

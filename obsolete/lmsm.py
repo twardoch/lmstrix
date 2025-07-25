@@ -78,19 +78,22 @@ class LmsM(BaseModel):
             # Convert the llms dict to use LmsMInfo objects
             if "llms" in data:
                 data["llms"] = {
-                    k: LmsMInfo.from_dict({
-                        "id": v["id"],
-                        "path": v["path"],
-                        "size_bytes": v["size_bytes"],
-                        "ctx_in": v["ctx_in"],
-                        "ctx_out": v["ctx_out"],
-                        "has_tools": v["has_tools"],
-                        "has_vision": v["has_vision"],
-                        "failed": v.get(
-                            "failed", False,
-                        ),  # Handle older JSON files without these fields
-                        "error_msg": v.get("error_msg", ""),
-                    })
+                    k: LmsMInfo.from_dict(
+                        {
+                            "id": v["id"],
+                            "path": v["path"],
+                            "size_bytes": v["size_bytes"],
+                            "ctx_in": v["ctx_in"],
+                            "ctx_out": v["ctx_out"],
+                            "has_tools": v["has_tools"],
+                            "has_vision": v["has_vision"],
+                            "failed": v.get(
+                                "failed",
+                                False,
+                            ),  # Handle older JSON files without these fields
+                            "error_msg": v.get("error_msg", ""),
+                        }
+                    )
                     for k, v in data["llms"].items()
                 }
             if isinstance(data.get("path"), str):
@@ -161,7 +164,9 @@ class LmsM(BaseModel):
         return table
 
     def update_from_lmstudio(
-        self, all_rescan: bool = False, failed_rescan: bool = False,
+        self,
+        all_rescan: bool = False,
+        failed_rescan: bool = False,
     ) -> None:
         console = Console()
 
@@ -184,9 +189,7 @@ class LmsM(BaseModel):
             for model_id, model_info in dict(self.llms).items():
                 row = model_info.to_table_row(self.path)
                 # Add status column
-                status = (
-                    "[red]Failed[/red]" if model_info.failed else "[green]OK[/green]"
-                )
+                status = "[red]Failed[/red]" if model_info.failed else "[green]OK[/green]"
                 table.add_row(model_id, *row, status)
 
             # Add processing model if any
@@ -286,9 +289,7 @@ class LmsM(BaseModel):
                     # Update model info to mark as failed
                     model_info = LmsMInfo(
                         id=model_key,
-                        path=self.path
-                        / "models"
-                        / model_key,  # Use model_key as fallback path
+                        path=self.path / "models" / model_key,  # Use model_key as fallback path
                         size_bytes=0,
                         ctx_in=0,
                         ctx_out=0,
@@ -317,17 +318,14 @@ class LmsM(BaseModel):
 class LmsmCLI:
     """LMStudio Model Manager CLI"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         # Get LMStudio path
         self.lms_path = Path(
-            Path(Path.home() / ".lmstudio-home-pointer")
-            .read_text()
-            .splitlines()[0]
-            .strip(),
+            Path(Path.home() / ".lmstudio-home-pointer").read_text().splitlines()[0].strip(),
         )
         self.lmsm = LmsM.load_or_create(self.lms_path)
 
-    def list(self, all_rescan: bool = False, failed_rescan: bool = False):
+    def list(self, all_rescan: bool = False, failed_rescan: bool = False) -> None:
         """List all models in LMStudio
 
         Args:
@@ -335,7 +333,8 @@ class LmsmCLI:
             failed_rescan: Rescan only previously failed models
         """
         self.lmsm.update_from_lmstudio(
-            all_rescan=all_rescan, failed_rescan=failed_rescan,
+            all_rescan=all_rescan,
+            failed_rescan=failed_rescan,
         )
 
 

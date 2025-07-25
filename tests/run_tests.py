@@ -12,7 +12,9 @@ def run_tests():
 
     # Run pytest with coverage
     cmd = [
-        sys.executable, "-m", "pytest",
+        sys.executable,
+        "-m",
+        "pytest",
         "-v",  # Verbose output
         "--tb=short",  # Shorter traceback format
         "tests/",

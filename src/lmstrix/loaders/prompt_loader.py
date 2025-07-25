@@ -1,4 +1,3 @@
-# this_file: src/lmstrix/loaders/prompt_loader.py
 """Prompt loading functionality."""
 
 from pathlib import Path
