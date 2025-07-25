@@ -33,7 +33,9 @@ Project Structure:
 │   └── 📄 run_all_examples.sh
 ├── 📁 issues
 │   ├── 📄 106.txt
-│   └── 📄 107.txt
+│   ├── 📄 107.txt
+│   ├── 📄 108.txt
+│   └── 📄 109.txt
 ├── 📁 obsolete
 │   ├── 📄 lmsm.json
 │   └── 📄 lmsm.py
@@ -4813,6 +4815,38 @@ This should be MORE VERBOSE, like actually inform me about the various operation
 </document>
 
 <document index="41">
+<source>issues/108.txt</source>
+<document_content>
+lmstrix test --all --verbose
+
+amoral-qwen3-14b-i1 │ 9.79 │ 40,960 │ - │ - │ 128 │ ✗ Failed │
+
+I had to manually cancel the one above. We need to insttitute some logic that gives up if a model is not properly working.
+
+│ bge-small-en-v1.5 │ 0.02 │ 512 │ - │ - │ 128 │ ✗ Failed │
+
+This is OK because it's an embedding model.
+
+│ comedy_13b_dpo │ 9.95 │ 4,096 │ 3,104 │ 3,104 │ - │ Testing.… │
+
+Here I don't understand — why is "last good" 3104 and we don't have 4096?
+
+Analyze the 'test' code and make it more robust so that it can handle these cases better.
+
+</document_content>
+</document>
+
+<document index="42">
+<source>issues/109.txt</source>
+<document_content>
+{"timestamp": "2025-07-25T04:50:26.832173", "context_size": 128, "load_success": true, "inference_success": true, "prompt": "Say hello", "response": " to the newest addition to our team, Michael! Michael is joining us as a part-time graphic designer and will be working with us to create engaging visual content for our website and social media platforms. Welcome aboard, Michael!", "error": ""}
+{"timestamp": "2025-07-25T04:50:53.453713", "context_size": 2112, "load_success": true, "inference_success": true, "prompt": "Say hello", "response": " to the future: 5G connectivity is here, and it's faster than ever before. With 5G, you can enjoy lightning-fast download speeds, lower latency, and the ability to connect multiple devices simultaneously. This technology is poised to revolutionize the way we live our lives, from remote healthcare to autonomous vehicles, and much more. Get ready for a brighter, faster future with 5G.", "error": ""}
+{"timestamp": "2025-07-25T04:51:12.375928", "context_size": 3104, "load_success": true, "inference_success": true, "prompt": "Say hello", "response": " to the newest member of the team: Kate, our summer intern. Kate is a rising senior at Smith College studying sociology. She joined us earlier this week and will be with us for the duration of the summer. Please make sure to give her a warm welcome and answer any questions she may have.", "error": ""}
+
+</document_content>
+</document>
+
+<document index="43">
 <source>obsolete/lmsm.json</source>
 <document_content>
 {
@@ -4901,7 +4935,7 @@ def list((self, all_rescan: bool = False, failed_rescan: bool = False)) -> None:
     """List all models in LMStudio"""
 
 
-<document index="42">
+<document index="44">
 <source>prompt.txt</source>
 <document_content>
 This is a prompt from a file.
@@ -4909,7 +4943,7 @@ This is a prompt from a file.
 </document_content>
 </document>
 
-<document index="43">
+<document index="45">
 <source>pyproject.toml</source>
 <document_content>
 [build-system]
@@ -5228,7 +5262,7 @@ directory = "htmlcov"
 </document_content>
 </document>
 
-<document index="44">
+<document index="46">
 <source>pytest.ini</source>
 <document_content>
 [pytest]
@@ -5330,6 +5364,7 @@ import lmstudio
 from loguru import logger
 from pydantic import BaseModel, Field
 from lmstrix.api.exceptions import APIConnectionError, InferenceError, ModelLoadError
+import asyncio
 
 class CompletionResponse(B, a, s, e, M, o, d, e, l):
     """Response from a completion request."""
@@ -5349,6 +5384,7 @@ class LMStudioClient:
         temperature: float = 0.7,
         max_tokens: int = -1,  # -1 for unlimited
         model_id: str | None = None,  # Pass model_id separately since llm object may not have it
+        timeout: float = 30.0,  # Timeout in seconds
         **kwargs: Any,
     )) -> CompletionResponse:
         """Make an async completion request to a loaded LM Studio model."""
@@ -5369,6 +5405,7 @@ def acompletion((
         temperature: float = 0.7,
         max_tokens: int = -1,  # -1 for unlimited
         model_id: str | None = None,  # Pass model_id separately since llm object may not have it
+        timeout: float = 30.0,  # Timeout in seconds
         **kwargs: Any,
     )) -> CompletionResponse:
     """Make an async completion request to a loaded LM Studio model."""
@@ -6111,7 +6148,7 @@ def save_prompts((
     """Save prompts to a TOML file."""
 
 
-<document index="45">
+<document index="47">
 <source>src/lmstrix/py.typed</source>
 <document_content>
 # This file indicates that the package supports type hints
@@ -7203,7 +7240,7 @@ def test_get_default_models_file_path((mock_get_lmstudio_path)) -> None:
     """ Ensures the models file path is correctly constructed inside the LM Studio dir...."""
 
 
-<document index="46">
+<document index="48">
 <source>verbose_output_example.txt</source>
 <document_content>
 # Example Verbose Output for `lmstrix test llama-3.2-3b-instruct --verbose`

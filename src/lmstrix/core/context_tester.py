@@ -82,6 +82,8 @@ class ContextTester:
         self.client = client or LMStudioClient()
         self.test_prompt = "Say hello"
         self.verbose = verbose
+        self.inference_timeout = 30.0  # 30 seconds timeout for inference
+        self.max_retries = 3  # Max retries for timeout/transient errors
 
     def _log_result(self, log_path: Path, result: ContextTestResult) -> None:
         """Append test result to log file."""
@@ -121,6 +123,7 @@ class ContextTester:
                 prompt=self.test_prompt,
                 max_tokens=10,
                 model_id=model_id,
+                timeout=self.inference_timeout,
             )
 
             if self.verbose:
@@ -128,9 +131,11 @@ class ContextTester:
                     f"[Context Test] ✓ Inference successful! Response length: {len(response.content)} chars",
                 )
                 logger.debug(
-                    f"[Context Test] Response: {response.content[:50]}..."
-                    if len(response.content) > 50
-                    else f"[Context Test] Response: {response.content}",
+                    (
+                        f"[Context Test] Response: {response.content[:50]}..."
+                        if len(response.content) > 50
+                        else f"[Context Test] Response: {response.content}"
+                    ),
                 )
 
             result = ContextTestResult(
@@ -152,7 +157,7 @@ class ContextTester:
                 if "noModelMatchingQuery" in str(e):
                     logger.info(f"[Context Test] ⚠️  Model '{model_id}' is not loaded in LM Studio")
                     logger.info(
-                        "[Context Test] ⚠️  Please load the model in LM Studio first before testing"
+                        "[Context Test] ⚠️  Please load the model in LM Studio first before testing",
                     )
 
             result = ContextTestResult(
@@ -166,6 +171,13 @@ class ContextTester:
             if self.verbose:
                 logger.info(f"[Context Test] ✗ Inference failed at context {context_size:,}")
                 logger.debug(f"[Context Test] Inference error: {e!s}")
+
+                # Special handling for timeout errors
+                if "timed out" in str(e).lower():
+                    logger.warning(
+                        f"[Context Test] ⏱️  Model timed out after {self.inference_timeout}s. "
+                        "Model may be unresponsive or context size too large.",
+                    )
 
             result = ContextTestResult(
                 context_size=context_size,
@@ -197,6 +209,9 @@ class ContextTester:
         registry=None,
     ) -> Model:
         """Run full context test on a model using smart binary search with progress saving."""
+        # Track consecutive failures to detect unresponsive models
+        consecutive_timeouts = 0
+        max_consecutive_timeouts = 2  # Give up after 2 consecutive timeouts
         logger.info(f"Starting context test for {model.id}")
 
         if self.verbose:
@@ -260,7 +275,7 @@ class ContextTester:
 
         if self.verbose:
             logger.info("[Phase 1] ✓ Success! Model is operational")
-            logger.info("[Phase 2] Starting binary search for maximum context...")
+            logger.info("[Phase 2] Testing declared maximum context...")
 
         # Resume from previous test if available
         if model.last_known_good_context and model.last_known_bad_context:
@@ -271,8 +286,51 @@ class ContextTester:
             if self.verbose:
                 logger.info("[Resume] Found previous test data - resuming from checkpoint")
         else:
+            # NEW STRATEGY: Test the declared max first!
+            logger.info(f"Testing declared maximum context {max_context} for {model.id}")
+            if self.verbose:
+                logger.info(
+                    f"[Phase 2] Testing at declared limit ({max_context:,} tokens) first...",
+                )
+
+            max_result = await self._test_at_context(model.id, max_context, log_path)
+
+            if max_result.load_success and max_result.inference_success:
+                # Model works at declared max! We're done.
+                model.tested_max_context = max_context
+                model.last_known_good_context = max_context
+                model.context_test_status = ContextTestStatus.COMPLETED
+                model.context_test_log = str(log_path)
+
+                logger.info(
+                    f"✓ Model {model.id} works at full declared context limit {max_context}!",
+                )
+                if self.verbose:
+                    logger.info(
+                        f"[Phase 2] ✓ SUCCESS! Model works at full declared limit ({max_context:,} tokens)",
+                    )
+                    logger.info(
+                        "[Test Complete] No binary search needed - model handles full context!",
+                    )
+
+                # Save and return early
+                registry.update_model(model.id, model)
+                save_model_registry(registry)
+                return model
+            # Declared max failed, need to binary search
+            model.last_known_bad_context = max_context
+            if max_result.load_success:
+                model.loadable_max_context = max_context
+
+            logger.info(
+                f"✗ Model {model.id} failed at declared context {max_context}, starting binary search",
+            )
+            if self.verbose:
+                logger.info(f"[Phase 2] ✗ FAILED at declared limit ({max_context:,} tokens)")
+                logger.info("[Phase 3] Starting binary search to find actual limit...")
+
             left = min_context
-            right = max_context
+            right = max_context - 1  # We know max_context doesn't work
 
         logger.info(f"Testing range for {model.id}: {left} - {right}")
 
@@ -284,6 +342,7 @@ class ContextTester:
 
         best_working_context = left  # We know this works
         iteration = 0
+        consecutive_timeouts = 0  # Reset counter
 
         try:
             while left <= right:
@@ -307,6 +366,28 @@ class ContextTester:
                     logger.info(f"[Iteration {iteration}] Search progress: ~{progress:.1f}%")
 
                 result = await self._test_at_context(model.id, mid, log_path)
+
+                # Check for timeout
+                is_timeout = "timed out" in str(result.error).lower()
+                if is_timeout:
+                    consecutive_timeouts += 1
+                    if consecutive_timeouts >= max_consecutive_timeouts:
+                        logger.error(
+                            f"Model {model.id} appears unresponsive after "
+                            f"{consecutive_timeouts} consecutive timeouts. Aborting test.",
+                        )
+                        if self.verbose:
+                            logger.error(
+                                f"[Test Abort] Model has timed out {consecutive_timeouts} times in a row. "
+                                "The model appears to be unresponsive or stuck.",
+                            )
+                        model.context_test_status = ContextTestStatus.FAILED
+                        model.error_msg = (
+                            f"Model unresponsive - {consecutive_timeouts} consecutive timeouts"
+                        )
+                        break
+                else:
+                    consecutive_timeouts = 0  # Reset on non-timeout result
 
                 if result.load_success and result.inference_success:
                     # Model loaded and generated something - this is "good"
@@ -359,6 +440,7 @@ class ContextTester:
                         f"[Progress] Current best working context: {best_working_context:,} tokens",
                     )
 
+            # No need for special final check since we test max first now
             model.tested_max_context = best_working_context
             model.context_test_log = str(log_path)
             model.context_test_status = (

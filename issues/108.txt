@@ -1,0 +1,15 @@
+lmstrix test --all --verbose
+
+amoral-qwen3-14b-i1 │ 9.79 │ 40,960 │ - │ - │ 128 │ ✗ Failed │
+
+I had to manually cancel the one above. We need to insttitute some logic that gives up if a model is not properly working.
+
+│ bge-small-en-v1.5 │ 0.02 │ 512 │ - │ - │ 128 │ ✗ Failed │
+
+This is OK because it's an embedding model.
+
+│ comedy_13b_dpo │ 9.95 │ 4,096 │ 3,104 │ 3,104 │ - │ Testing.… │
+
+Here I don't understand — why is "last good" 3104 and we don't have 4096?
+
+Analyze the 'test' code and make it more robust so that it can handle these cases better.
