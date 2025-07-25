@@ -21,14 +21,14 @@ console = Console()
 class LMStrixCLI:
     """A CLI for testing and managing LM Studio models."""
 
-    def scan(self, verbose: bool = False):
+    def scan(self, verbose: bool = False) -> None:
         """Scan for LM Studio models and update the local registry."""
         with console.status("Scanning for models..."):
             scan_and_update_registry(verbose=verbose)
         console.print("[green]Model scan complete.[/green]")
         self.list()
 
-    def list(self, verbose: bool = False):
+    def list(self, verbose: bool = False) -> None:
         """List all models from the registry with their test status."""
         registry = load_model_registry(verbose=verbose)
         models = registry.list_models()
@@ -60,14 +60,14 @@ class LMStrixCLI:
 
             table.add_row(
                 model.id,
-                f"{model.size_bytes / (1024**3):.2f}" if model.size_bytes else "N/A",
+                f"{model.size / (1024**3):.2f}" if model.size else "N/A",
                 f"{model.context_limit:,}",
                 tested_ctx,
                 status,
             )
         console.print(table)
 
-    def test(self, model_id: str = None, all: bool = False, verbose: bool = False):
+    def test(self, model_id: str | None = None, all: bool = False, verbose: bool = False) -> None:
         """Test the context limits for models.
 
         Args:
@@ -99,7 +99,7 @@ class LMStrixCLI:
         tester = ContextTester()
         for model in models_to_test:
             updated_model = asyncio.run(tester.test_model(model))
-            registry.add_model(updated_model)  # Update the model in the registry
+            registry.update_model(updated_model.id, updated_model)  # Update the model in the registry
             save_model_registry(registry)  # Save after each test
 
             if updated_model.context_test_status.value == "completed":
@@ -116,7 +116,7 @@ class LMStrixCLI:
         max_tokens: int = -1,
         temperature: float = 0.7,
         verbose: bool = False,
-    ):
+    ) -> None:
         """Run inference on a specified model.
 
         Args:
@@ -148,7 +148,7 @@ class LMStrixCLI:
         else:
             console.print(f"[red]Inference failed: {result.error}[/red]")
 
-def main():
+def main() -> None:
     """Main entry point for the CLI."""
     fire.Fire(LMStrixCLI)
 

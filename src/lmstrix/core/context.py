@@ -50,7 +50,8 @@ class ContextOptimizer:
         """Load cached optimization results."""
         if self.cache_file.exists():
             try:
-                return json.loads(self.cache_file.read_text())
+                data = json.loads(self.cache_file.read_text())
+                return data if isinstance(data, dict) else {}
             except Exception as e:
                 logger.warning(f"Failed to load cache: {e}")
         return {}
@@ -83,12 +84,20 @@ class ContextOptimizer:
             test_prompt = self._generate_test_prompt(context_size)
 
         try:
+            # Load the model with specified context size
+            llm = self.client.load_model(model_id, context_len=context_size)
+            
             response = await self.client.acompletion(
-                model_id=model_id,
-                messages=[{"role": "user", "content": test_prompt}],
+                llm=llm,
+                prompt=test_prompt,
                 max_tokens=50,
                 temperature=0.1,
             )
+            
+            # Unload the model after testing
+            if hasattr(llm, 'unload'):
+                llm.unload()
+                
             return bool(response.content), ""
         except Exception as e:
             return False, str(e)
@@ -111,6 +120,7 @@ class ContextOptimizer:
                 declared_limit=model.context_limit,
                 optimal_context=self._cache[model_id],
                 attempts=0,
+                error=None,
             )
 
         high = initial_size or model.context_limit
@@ -143,4 +153,5 @@ class ContextOptimizer:
             declared_limit=model.context_limit,
             optimal_context=optimal,
             attempts=attempts,
+            error=None,
         )

@@ -87,6 +87,7 @@ class InferenceEngine:
                 response=response.content,
                 tokens_used=tokens_used,
                 inference_time=inference_time,
+                error=None,
             )
 
         except Exception as e:
@@ -95,6 +96,7 @@ class InferenceEngine:
                 model_id=model_id,
                 prompt=prompt,
                 response="",
+                tokens_used=0,
                 inference_time=time.time() - start_time,
                 error=str(e),
             )

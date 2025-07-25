@@ -54,7 +54,7 @@ class LMStrix:
         tester = ContextTester()
         updated_model = asyncio.run(tester.test_model(model))
 
-        registry.add_model(updated_model)
+        registry.update_model(updated_model.id, updated_model)
         save_model_registry(registry)
 
         return updated_model

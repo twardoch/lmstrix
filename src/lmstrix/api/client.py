@@ -32,14 +32,28 @@ class LMStudioClient:
     def list_models(self) -> list[dict[str, Any]]:
         """List all downloaded models."""
         try:
-            return lmstudio.list_downloaded_models()
+            models = lmstudio.list_downloaded_models()
+            # Convert DownloadedModel objects to dicts
+            result = []
+            for model in models:
+                # Extract attributes dynamically
+                model_dict = {
+                    "id": getattr(model, 'id', str(model)),
+                    "path": str(getattr(model, 'path', "")),
+                    "size_bytes": getattr(model, 'size', 0),
+                    "context_length": getattr(model, 'context_length', 8192)
+                }
+                result.append(model_dict)
+            return result
         except Exception as e:
             raise APIConnectionError("local", f"Failed to list models: {e}")
 
     def load_model(self, model_id: str, context_len: int) -> Any:
         """Load a model with a specific context length."""
         try:
-            return lmstudio.llm(model_id, config={"context_length": context_len})
+            # Use a plain dict for config to avoid TypedDict issues
+            config = {"context_length": context_len}
+            return lmstudio.llm(model_id, config=config)
         except Exception as e:
             raise ModelLoadError(model_id, f"Failed to load model: {e}")
 

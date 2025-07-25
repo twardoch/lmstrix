@@ -10,6 +10,8 @@ from typing import Any
 from loguru import logger
 from pydantic import BaseModel, Field, field_validator
 
+from ..utils.paths import get_default_models_file
+
 
 class ContextTestStatus(str, Enum):
     """Status of context testing for a model."""
@@ -67,7 +69,9 @@ class Model(BaseModel):
         """Ensure path is a Path object."""
         if isinstance(v, str):
             return Path(v)
-        return v
+        if isinstance(v, Path):
+            return v
+        return Path(str(v))
 
     def sanitized_id(self) -> str:
         """Return a sanitized version of the model ID suitable for filenames."""
@@ -152,7 +156,7 @@ class ModelRegistry:
         # Sort models by ID for consistent output
         sorted_models = dict(sorted(self._models.items()))
 
-        data = {
+        data: dict[str, Any] = {
             "llms": {
                 model_id: model.to_registry_dict() for model_id, model in sorted_models.items()
             },

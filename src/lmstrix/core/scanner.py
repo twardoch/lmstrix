@@ -12,7 +12,7 @@ from lmstrix.utils import get_lmstudio_path
 class ModelScanner:
     """Scans LM Studio for available models."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize scanner."""
         self.lms_path = get_lmstudio_path()
         self.models_dir = self.lms_path / "models"
