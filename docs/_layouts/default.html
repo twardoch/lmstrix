@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{{ page.title }} | {{ site.title }}</title>
+
+    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      <div class="d-flex flex-wrap flex-items-center">
+        <header class="flex-1">
+          <h1 class="f00-light lh-condensed">{{ site.title }}</h1>
+          <p class="f3 text-gray-600">{{ site.description }}</p>
+        </header>
+        <div class="d-flex flex-items-center">
+          <a href="{{ site.github.zip_url }}" class="btn btn-primary mr-2">Download .zip</a>
+          <a href="{{ site.github.tar_url }}" class="btn">Download .tar.gz</a>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="d-flex">
+        <nav class="flex-self-start col-3 pr-4">
+          <ul>
+            <li><a href="{{ "/" | relative_url }}">Home</a></li>
+            <li><a href="{{ "/installation" | relative_url }}">Installation</a></li>
+            <li><a href="{{ "/usage" | relative_url }}">Usage</a></li>
+            <li><a href="{{ "/api" | relative_url }}">API Reference</a></li>
+          </ul>
+        </nav>
+
+        <main id="content" class="col-9">
+          {{ content }}
+        </main>
+      </div>
+
+      <hr>
+
+      <footer class="d-flex flex-wrap flex-items-center">
+        <div class="flex-1">
+          <p>This project is maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>
+        </div>
+        <div class="d-flex">
+          <a href="{{ site.github.repository_url }}" class="btn">View on GitHub</a>
+        </div>
+      </footer>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPubOtv7VzzJccNvKvMYo=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>
