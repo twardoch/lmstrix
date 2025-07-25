@@ -1,6 +1,57 @@
 # Work Progress
 
-## Current Work Session - Issue #106 Improvements
+## Current Work Session - Issue #107 Enhanced Verbose Output
+
+### Completed Tasks
+
+1. **Enhanced Verbose Logging** (Issue #107) ✓
+   - Created new logging utility module at `src/lmstrix/utils/logging.py`
+   - Implemented `setup_logging()` function that configures loguru based on verbose flag
+   - Updated all CLI commands (scan, list, test, infer) to use setup_logging
+   - Added verbose flag to ContextTester constructor
+   - Verbose mode now shows:
+     - DEBUG level messages with file/function/line info
+     - Detailed context loading operations
+     - Binary search progress with iterations and search space
+     - Model loading/unloading status
+     - Inference results and response lengths
+     - Progress percentages and estimated iterations
+     - Test phase indicators (Phase 1: verification, Phase 2: binary search)
+     - Final test results with efficiency metrics
+
+2. **Improved Progress Reporting** ✓
+   - Added iteration counter and progress percentage
+   - Shows current search range and remaining tokens
+   - Displays estimated iterations using log2 calculation
+   - Reports when model loads successfully, fails to load, or fails inference
+   - Shows response lengths and snippets in verbose mode
+   - Displays final efficiency as percentage of declared limit
+
+3. **Better User Experience** ✓
+   - Clear phase separation: initial verification vs. binary search
+   - Informative messages about what's happening at each step
+   - Progress indicators showing how close to completion
+   - Final summary with all relevant metrics
+
+### Technical Changes
+
+1. **New File: `src/lmstrix/utils/logging.py`**:
+   - Configures loguru with appropriate format and level
+   - Verbose mode: DEBUG level with detailed format including file/function/line
+   - Normal mode: INFO level with simple time and message format
+
+2. **Updated `src/lmstrix/cli/main.py`**:
+   - All commands now call `setup_logging(verbose=verbose)`
+   - Passes verbose flag to ContextTester
+
+3. **Enhanced `src/lmstrix/core/context_tester.py`**:
+   - Added verbose parameter to constructor
+   - Added detailed logging throughout the testing process
+   - Special [Context Test], [Phase 1/2], [Binary Search], [Iteration N], and [Test Complete] prefixes
+   - Shows token counts with thousand separators
+   - Reports efficiency metrics at completion
+
+## Previous Work Session - Issue #106 Improvements
 
 ### Completed Tasks
 
@@ -21,7 +72,7 @@
 
 4. **Implemented Smart Context Testing** (Issue #106) ✓
    - Changed from "2+2=" test to "Say hello" for better reliability
-   - Start with small context (32) to verify model loads
+   - Start with small context (128) to verify model loads
    - Extended Model data structure to track:
      - last_known_good_context
      - last_known_bad_context
@@ -46,7 +97,7 @@
    - Changed validation to check if "hello" is in response (case-insensitive)
    - Complete rewrite of `test_model()` method:
      - Accepts registry parameter for saving progress
-     - Starts with context 32 instead of 2048
+     - Starts with context 128 instead of 2048
      - Saves after each test iteration
      - Can resume from previous test state
 
@@ -56,26 +107,11 @@
 
 ### Next Steps
 
-The improvements requested in Issue #106 have been implemented. The testing system now:
-- Starts with a small context to verify the model loads
-- Uses a simple "Say hello" prompt that's more reliable
-- Saves progress after each test so it can resume if interrupted
-- Uses a smart binary search that tracks both good and bad context sizes
-- Provides clear error messages and progress indicators
+The verbose output enhancement requested in Issue #107 has been implemented. The `lmstrix test` command with `--verbose` flag now provides:
+- Detailed progress information during context testing
+- Clear phase indicators
+- Model loading/unloading status
+- Binary search iterations with progress percentages
+- Final efficiency metrics
 
 The code is ready for testing with actual models.
-
-## Bug Fix - API Call Issue
-
-### Problem Found
-- Test was failing with error: `LLM.complete() takes 2 positional arguments but 3 were given`
-- The LM Studio API's `complete()` method only accepts a prompt - no additional parameters
-
-### Solution
-1. Fixed the API call in `client.py` to only pass the prompt to `complete()`
-2. Changed minimum context size to 128 tokens
-3. Removed semantic validation - now any non-empty response is considered "good"
-4. Updated test logic:
-   - "good" = model loads AND generates any response
-   - "bad" = model fails to load OR crashes during inference
-   - All responses are logged for manual review
