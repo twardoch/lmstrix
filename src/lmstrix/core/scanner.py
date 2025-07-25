@@ -1,4 +1,3 @@
-# this_file: src/lmstrix/core/scanner.py
 """Model scanning functionality for LM Studio."""
 
 from pathlib import Path

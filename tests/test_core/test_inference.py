@@ -12,7 +12,7 @@ from lmstrix.core.models import Model
 class TestInferenceResult:
     """Test InferenceResult model."""
 
-    def test_inference_result_success(self):
+    def test_inference_result_success(self) -> None:
         """Test successful inference result."""
         result = InferenceResult(
             model_id="test-model",
@@ -30,7 +30,7 @@ class TestInferenceResult:
         assert result.error is None
         assert result.succeeded is True
 
-    def test_inference_result_failure(self):
+    def test_inference_result_failure(self) -> None:
         """Test failed inference result."""
         result = InferenceResult(
             model_id="test-model",
@@ -43,7 +43,7 @@ class TestInferenceResult:
         assert result.error == "Model failed to load"
         assert result.succeeded is False
 
-    def test_inference_result_empty_response(self):
+    def test_inference_result_empty_response(self) -> None:
         """Test result with empty response is considered failed."""
         result = InferenceResult(
             model_id="test-model",
@@ -58,7 +58,7 @@ class TestInferenceResult:
 class TestInferenceEngine:
     """Test InferenceEngine class."""
 
-    def test_engine_initialization_defaults(self):
+    def test_engine_initialization_defaults(self) -> None:
         """Test engine initialization with defaults."""
         with patch("lmstrix.core.inference.LMStudioClient") as mock_client_class:
             with patch("lmstrix.core.inference.ModelRegistry") as mock_registry_class:
@@ -68,7 +68,7 @@ class TestInferenceEngine:
                 mock_registry_class.assert_called_once()
                 assert engine.verbose is False
 
-    def test_engine_initialization_custom(self, mock_lmstudio_client):
+    def test_engine_initialization_custom(self, mock_lmstudio_client) -> None:
         """Test engine initialization with custom client and registry."""
         mock_registry = Mock()
 
@@ -83,7 +83,7 @@ class TestInferenceEngine:
         assert engine.verbose is True
 
     @pytest.mark.asyncio
-    async def test_infer_model_not_found(self):
+    async def test_infer_model_not_found(self) -> None:
         """Test inference with non-existent model."""
         mock_registry = Mock()
         mock_registry.get_model.return_value = None
@@ -99,7 +99,7 @@ class TestInferenceEngine:
         assert result.succeeded is False
 
     @pytest.mark.asyncio
-    async def test_infer_success(self, mock_lmstudio_client, mock_llm):
+    async def test_infer_success(self, mock_lmstudio_client, mock_llm) -> None:
         """Test successful inference."""
         # Set up mock model in registry
         model = Model(
@@ -144,7 +144,7 @@ class TestInferenceEngine:
         )
 
     @pytest.mark.asyncio
-    async def test_infer_with_untested_model(self, mock_lmstudio_client, mock_llm):
+    async def test_infer_with_untested_model(self, mock_lmstudio_client, mock_llm) -> None:
         """Test inference with model that hasn't been context tested."""
         # Model without tested_max_context
         model = Model(
@@ -173,7 +173,7 @@ class TestInferenceEngine:
         mock_lmstudio_client.load_model.assert_called_once_with("untested-model", 8192)
 
     @pytest.mark.asyncio
-    async def test_infer_with_max_tokens(self, mock_lmstudio_client, mock_llm):
+    async def test_infer_with_max_tokens(self, mock_lmstudio_client, mock_llm) -> None:
         """Test inference with custom max_tokens."""
         model = Model(
             id="test-model",
@@ -203,7 +203,7 @@ class TestInferenceEngine:
         assert call_args[1]["max_tokens"] == 50
 
     @pytest.mark.asyncio
-    async def test_infer_load_failure(self, mock_lmstudio_client):
+    async def test_infer_load_failure(self, mock_lmstudio_client) -> None:
         """Test inference when model fails to load."""
         model = Model(
             id="test-model",
@@ -229,7 +229,7 @@ class TestInferenceEngine:
         assert "Failed to load model" in result.error
 
     @pytest.mark.asyncio
-    async def test_infer_completion_failure(self, mock_lmstudio_client, mock_llm):
+    async def test_infer_completion_failure(self, mock_lmstudio_client, mock_llm) -> None:
         """Test inference when completion fails."""
         model = Model(
             id="test-model",
@@ -258,7 +258,7 @@ class TestInferenceEngine:
         assert "Context too long" in result.error
 
     @pytest.mark.asyncio
-    async def test_run_inference_simple(self, mock_lmstudio_client, mock_llm):
+    async def test_run_inference_simple(self, mock_lmstudio_client, mock_llm) -> None:
         """Test simple run_inference method."""
         model = Model(
             id="test-model",

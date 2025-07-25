@@ -1,4 +1,3 @@
-# this_file: src/lmstrix/core/models.py
 """Model definitions and registry for LMStrix."""
 
 import json
@@ -10,7 +9,7 @@ from typing import Any
 from loguru import logger
 from pydantic import BaseModel, Field, field_validator
 
-from ..utils.paths import get_default_models_file
+from lmstrix.utils.paths import get_default_models_file
 
 
 class ContextTestStatus(str, Enum):
@@ -29,29 +28,39 @@ class Model(BaseModel):
     path: Path = Field(..., description="Path to the model file")
     size: int = Field(..., description="Size of the model in bytes", alias="size_bytes")
     context_limit: int = Field(
-        ..., description="Declared maximum context window size", alias="ctx_in",
+        ...,
+        description="Declared maximum context window size",
+        alias="ctx_in",
     )
     context_out: int = Field(default=4096, description="Output context size", alias="ctx_out")
     supports_tools: bool = Field(
-        default=False, description="Whether model supports tool use", alias="has_tools",
+        default=False,
+        description="Whether model supports tool use",
+        alias="has_tools",
     )
     supports_vision: bool = Field(
-        default=False, description="Whether model supports vision", alias="has_vision",
+        default=False,
+        description="Whether model supports vision",
+        alias="has_vision",
     )
 
     # Context testing fields
     tested_max_context: int | None = Field(
-        default=None, description="Maximum context that produces correct output",
+        default=None,
+        description="Maximum context that produces correct output",
     )
     loadable_max_context: int | None = Field(
-        default=None, description="Maximum context at which model loads successfully",
+        default=None,
+        description="Maximum context at which model loads successfully",
     )
     context_test_status: ContextTestStatus = Field(
-        default=ContextTestStatus.UNTESTED, description="Status of context testing",
+        default=ContextTestStatus.UNTESTED,
+        description="Status of context testing",
     )
     context_test_log: str | None = Field(default=None, description="Path to context test log file")
     context_test_date: datetime | None = Field(
-        default=None, description="When context was last tested",
+        default=None,
+        description="When context was last tested",
     )
 
     # Error tracking
@@ -103,7 +112,7 @@ class Model(BaseModel):
 class ModelRegistry:
     """Manages the collection of available models."""
 
-    def __init__(self, models_file: Path | None = None):
+    def __init__(self, models_file: Path | None = None) -> None:
         """Initialize the model registry."""
         self.models_file = models_file or get_default_models_file()
         self._models: dict[str, Model] = {}

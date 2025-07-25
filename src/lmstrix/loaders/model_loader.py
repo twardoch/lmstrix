@@ -1,4 +1,3 @@
-# this_file: src/lmstrix/loaders/model_loader.py
 """Model loading and scanning functionality."""
 
 from pathlib import Path
@@ -38,6 +37,7 @@ def load_model_registry(
     logger.info(f"Loaded {len(registry)} models from {registry_path}")
     return registry
 
+
 def save_model_registry(
     registry: ModelRegistry,
     json_path: Path | None = None,
@@ -54,6 +54,7 @@ def save_model_registry(
     save_path = json_path or registry.models_file
     registry.save()
     return save_path
+
 
 def scan_and_update_registry(verbose: bool = False) -> ModelRegistry:
     """Scan for downloaded LM Studio models and update the local registry.
@@ -102,7 +103,7 @@ def scan_and_update_registry(verbose: bool = False) -> ModelRegistry:
             registry.update_model(model_id, new_model)
 
     # Remove models that are no longer present
-    registry_ids = set(model.id for model in registry.list_models())
+    registry_ids = {model.id for model in registry.list_models()}
     deleted_ids = registry_ids - discovered_ids
     for model_id in deleted_ids:
         logger.info(f"Removing deleted model: {model_id}")

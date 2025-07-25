@@ -1,4 +1,3 @@
-# this_file: src/lmstrix/api/__init__.py
 """API client and exceptions for LMStrix."""
 
 from lmstrix.api.client import CompletionResponse, LMStudioClient

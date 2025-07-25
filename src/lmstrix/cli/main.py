@@ -1,4 +1,3 @@
-# this_file: src/lmstrix/cli/main.py
 """Command-line interface for LMStrix."""
 
 import asyncio
@@ -47,9 +46,7 @@ class LMStrixCLI:
         table.add_column("Status", style="blue")
 
         for model in sorted(models, key=lambda m: m.id):
-            tested_ctx = (
-                f"{model.tested_max_context:,}" if model.tested_max_context else "-"
-            )
+            tested_ctx = f"{model.tested_max_context:,}" if model.tested_max_context else "-"
             status_map = {
                 "untested": "[dim]Untested[/dim]",
                 "testing": "[yellow]Testing...[/yellow]",
@@ -99,7 +96,9 @@ class LMStrixCLI:
         tester = ContextTester()
         for model in models_to_test:
             updated_model = asyncio.run(tester.test_model(model))
-            registry.update_model(updated_model.id, updated_model)  # Update the model in the registry
+            registry.update_model(
+                updated_model.id, updated_model
+            )  # Update the model in the registry
             save_model_registry(registry)  # Save after each test
 
             if updated_model.context_test_status.value == "completed":
@@ -147,6 +146,7 @@ class LMStrixCLI:
             )
         else:
             console.print(f"[red]Inference failed: {result.error}[/red]")
+
 
 def main() -> None:
     """Main entry point for the CLI."""

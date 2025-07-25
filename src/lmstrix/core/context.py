@@ -1,4 +1,3 @@
-# this_file: src/lmstrix/core/context.py
 """Adaptive context optimizer for finding optimal context window sizes."""
 
 import json
@@ -34,7 +33,7 @@ class ContextOptimizer:
         client: LMStudioClient | None = None,
         cache_file: Path | None = None,
         verbose: bool = False,
-    ):
+    ) -> None:
         """Initialize the context optimizer."""
         self.client = client or LMStudioClient(verbose=verbose)
         self.cache_file = cache_file or Path("context_cache.json")
@@ -86,18 +85,18 @@ class ContextOptimizer:
         try:
             # Load the model with specified context size
             llm = self.client.load_model(model_id, context_len=context_size)
-            
+
             response = await self.client.acompletion(
                 llm=llm,
                 prompt=test_prompt,
                 max_tokens=50,
                 temperature=0.1,
             )
-            
+
             # Unload the model after testing
-            if hasattr(llm, 'unload'):
+            if hasattr(llm, "unload"):
                 llm.unload()
-                
+
             return bool(response.content), ""
         except Exception as e:
             return False, str(e)

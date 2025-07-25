@@ -1,4 +1,3 @@
-# this_file: src/lmstrix/core/inference.py
 """Inference engine for running models."""
 
 import time
@@ -36,7 +35,7 @@ class InferenceEngine:
         client: LMStudioClient | None = None,
         model_registry: ModelRegistry | None = None,
         verbose: bool = False,
-    ):
+    ) -> None:
         """Initialize the inference engine."""
         self.client = client or LMStudioClient(verbose=verbose)
         self.registry = model_registry or ModelRegistry()

@@ -19,7 +19,7 @@ from lmstrix.utils.paths import (
 class TestPathUtilities:
     """Test path utility functions."""
 
-    def test_get_lmstudio_path_from_pointer(self, tmp_path):
+    def test_get_lmstudio_path_from_pointer(self, tmp_path) -> None:
         """Test getting LM Studio path from home pointer file."""
         # Create mock home directory with pointer file
         home_dir = tmp_path / "home"
@@ -37,7 +37,7 @@ class TestPathUtilities:
 
         assert result == lms_path
 
-    def test_get_lmstudio_path_fallback_locations(self, tmp_path):
+    def test_get_lmstudio_path_fallback_locations(self, tmp_path) -> None:
         """Test fallback to common LM Studio locations."""
         home_dir = tmp_path / "home"
         home_dir.mkdir()
@@ -52,23 +52,27 @@ class TestPathUtilities:
 
         assert result == cache_lms
 
-    def test_get_lmstudio_path_shared_location(self, tmp_path):
+    def test_get_lmstudio_path_shared_location(self, tmp_path) -> None:
         """Test finding LM Studio in shared location."""
         # No home pointer, no cache location
         home_dir = tmp_path / "home"
         home_dir.mkdir()
 
         # Mock the shared path check
-        shared_path = Path("/Users/Shared/lmstudio")
+        Path("/Users/Shared/lmstudio")
 
         with patch("pathlib.Path.home", return_value=home_dir):
             with patch("pathlib.Path.exists") as mock_exists:
-                def exists_side_effect(self):
-                    if str(self) == str(home_dir / ".lmstudio-home-pointer") or str(self) == str(home_dir / ".cache" / "lm-studio"):
+
+                def exists_side_effect(self) -> bool:
+                    if str(self) == str(home_dir / ".lmstudio-home-pointer") or str(self) == str(
+                        home_dir / ".cache" / "lm-studio"
+                    ):
                         return False
-                    if str(self) == "/Users/Shared/lmstudio" or str(self) == "/Users/Shared/lmstudio/models":
-                        return True
-                    return False
+                    return bool(
+                        str(self) == "/Users/Shared/lmstudio"
+                        or str(self) == "/Users/Shared/lmstudio/models"
+                    )
 
                 mock_exists.side_effect = exists_side_effect
 
@@ -76,7 +80,7 @@ class TestPathUtilities:
 
         assert str(result) == "/Users/Shared/lmstudio"
 
-    def test_get_lmstudio_path_not_found(self, tmp_path):
+    def test_get_lmstudio_path_not_found(self, tmp_path) -> None:
         """Test error when LM Studio is not found."""
         home_dir = tmp_path / "home"
         home_dir.mkdir()
@@ -87,7 +91,7 @@ class TestPathUtilities:
 
             assert "Could not find LM Studio" in str(exc_info.value)
 
-    def test_get_lmstrix_data_dir(self, tmp_path):
+    def test_get_lmstrix_data_dir(self, tmp_path) -> None:
         """Test getting LMStrix data directory."""
         lms_path = tmp_path / "lmstudio"
         lms_path.mkdir()
@@ -99,7 +103,7 @@ class TestPathUtilities:
         assert data_dir == lms_path / "lmstrix"
         assert data_dir.exists()
 
-    def test_get_lmstrix_data_dir_exists(self, tmp_path):
+    def test_get_lmstrix_data_dir_exists(self, tmp_path) -> None:
         """Test getting existing LMStrix data directory."""
         lms_path = tmp_path / "lmstudio"
         lms_path.mkdir()
@@ -111,7 +115,7 @@ class TestPathUtilities:
 
         assert result == data_dir
 
-    def test_get_default_models_file(self, tmp_path):
+    def test_get_default_models_file(self, tmp_path) -> None:
         """Test getting default models file path."""
         lms_path = tmp_path / "lmstudio"
         lms_path.mkdir()
@@ -121,7 +125,7 @@ class TestPathUtilities:
 
         assert models_file == lms_path / "lmstrix.json"
 
-    def test_get_context_tests_dir(self, tmp_path):
+    def test_get_context_tests_dir(self, tmp_path) -> None:
         """Test getting context tests directory."""
         lms_path = tmp_path / "lmstudio"
         lms_path.mkdir()
@@ -132,7 +136,7 @@ class TestPathUtilities:
         assert tests_dir == lms_path / "lmstrix" / "context_tests"
         assert tests_dir.exists()
 
-    def test_get_context_test_log_path(self, tmp_path):
+    def test_get_context_test_log_path(self, tmp_path) -> None:
         """Test getting context test log path."""
         lms_path = tmp_path / "lmstudio"
         lms_path.mkdir()
@@ -147,7 +151,7 @@ class TestPathUtilities:
             log_path2 = get_context_test_log_path("model/with:special@chars!")
             assert log_path2.name == "model_with_special_chars__context_test.log"
 
-    def test_get_prompts_dir(self, tmp_path):
+    def test_get_prompts_dir(self, tmp_path) -> None:
         """Test getting prompts directory."""
         lms_path = tmp_path / "lmstudio"
         lms_path.mkdir()
@@ -158,7 +162,7 @@ class TestPathUtilities:
         assert prompts_dir == lms_path / "lmstrix" / "prompts"
         assert prompts_dir.exists()
 
-    def test_get_contexts_dir(self, tmp_path):
+    def test_get_contexts_dir(self, tmp_path) -> None:
         """Test getting contexts directory."""
         lms_path = tmp_path / "lmstudio"
         lms_path.mkdir()
@@ -169,7 +173,7 @@ class TestPathUtilities:
         assert contexts_dir == lms_path / "lmstrix" / "contexts"
         assert contexts_dir.exists()
 
-    def test_directory_creation_permissions_error(self, tmp_path):
+    def test_directory_creation_permissions_error(self, tmp_path) -> None:
         """Test handling permission errors when creating directories."""
         lms_path = tmp_path / "lmstudio"
         lms_path.mkdir()

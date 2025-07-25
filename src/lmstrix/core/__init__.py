@@ -1,4 +1,3 @@
-# this_file: src/lmstrix/core/__init__.py
 """Core functionality for LMStrix."""
 
 from lmstrix.core.context import ContextOptimizer, OptimizationResult

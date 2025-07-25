@@ -1,4 +1,3 @@
-# this_file: src/lmstrix/api/client.py
 """LM Studio API client for interacting with the local server."""
 
 from typing import Any
@@ -22,7 +21,7 @@ class CompletionResponse(BaseModel):
 class LMStudioClient:
     """Client for interacting with LM Studio."""
 
-    def __init__(self, verbose: bool = False):
+    def __init__(self, verbose: bool = False) -> None:
         """Initialize the LM Studio client."""
         if verbose:
             logger.enable("lmstrix")
@@ -38,10 +37,10 @@ class LMStudioClient:
             for model in models:
                 # Extract attributes dynamically
                 model_dict = {
-                    "id": getattr(model, 'id', str(model)),
-                    "path": str(getattr(model, 'path', "")),
-                    "size_bytes": getattr(model, 'size', 0),
-                    "context_length": getattr(model, 'context_length', 8192)
+                    "id": getattr(model, "id", str(model)),
+                    "path": str(getattr(model, "path", "")),
+                    "size_bytes": getattr(model, "size", 0),
+                    "context_length": getattr(model, "context_length", 8192),
                 }
                 result.append(model_dict)
             return result
@@ -51,8 +50,8 @@ class LMStudioClient:
     def load_model(self, model_id: str, context_len: int) -> Any:
         """Load a model with a specific context length."""
         try:
-            # Use a plain dict for config to avoid TypedDict issues
-            config = {"context_length": context_len}
+            # Use Any type for config to avoid type checking issues
+            config: Any = {"context_length": context_len}
             return lmstudio.llm(model_id, config=config)
         except Exception as e:
             raise ModelLoadError(model_id, f"Failed to load model: {e}")
