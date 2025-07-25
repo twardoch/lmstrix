@@ -1,93 +1,75 @@
-"""Unit tests for path utility functions in LMStrix.
-
-This suite tests the functions responsible for locating the LM Studio home directory
-and the default model registry file. It uses mocking to simulate different
-environmental conditions, such as the presence or absence of the `.lmstudio-home-pointer`
-file and the existence of common LM Studio installation directories.
-
-Key functions tested:
-- `get_lmstudio_path()`: Verifies its ability to find the LM Studio path from the
-  pointer file and fall back to default locations.
-- `get_default_models_file()`: Ensures it correctly constructs the path to the
-  `lmstrix.json` file within the application's data directory.
-"""
-
+# tests/utils/test_paths.py
 import pytest
 from pathlib import Path
-from unittest.mock import patch, mock_open
-
+from unittest.mock import patch, MagicMock
 from lmstrix.utils.paths import get_lmstudio_path, get_default_models_file
 
-# --- Tests for get_lmstudio_path --- 
+@patch('lmstrix.utils.paths.Path.home')
+def test_get_lmstudio_path_from_pointer(mock_home):
+    """
+    Tests that the path is correctly read from the .lmstudio-home-pointer file.
+    """
+    # Arrange
+    mock_home_dir = MagicMock()
+    mock_pointer_file = MagicMock()
+    mock_pointer_file.exists.return_value = True
+    mock_pointer_file.read_text.return_value = "/custom/lmstudio/path"
+    mock_home.return_value = mock_home_dir
+    mock_home_dir / ".lmstudio-home-pointer" = mock_pointer_file
 
-@patch("pathlib.Path.home")
-def test_get_lmstudio_path_from_pointer_file(mock_home):
-    """Test that the path is correctly read from the .lmstudio-home-pointer file."""
-    # Setup: Mock the home directory and the pointer file
-    mock_home.return_value = Path("/fake/home")
-    pointer_path = Path("/fake/home/.lmstudio-home-pointer")
-    expected_path = "/fake/lmstudio/custom/path"
+    # Act
+    path = get_lmstudio_path()
 
-    # Use mock_open to simulate reading the file content
-    with patch("pathlib.Path.exists", return_value=True) as mock_exists:
-        with patch("pathlib.Path.open", mock_open(read_data=expected_path)) as mock_file:
-            # Run the function
-            lmstudio_path = get_lmstudio_path()
+    # Assert
+    assert path == Path("/custom/lmstudio/path")
 
-            # Assertions
-            mock_exists.assert_called_with(pointer_path)
-            mock_file.assert_called_once_with("r", encoding="utf-8")
-            assert lmstudio_path == Path(expected_path)
-
-@patch("pathlib.Path.home")
-def test_get_lmstudio_path_fallback_to_default(mock_home):
-    """Test the fallback mechanism when the pointer file does not exist."""
-    # Setup: No pointer file, but a default directory exists
-    mock_home.return_value = Path("/fake/home")
-    pointer_path = Path("/fake/home/.lmstudio-home-pointer")
-    default_path = Path("/fake/home/.cache/lm-studio")
-
-    # Simulate which paths exist
-    def path_exists_side_effect(path):
-        if path == pointer_path:
-            return False # Pointer file does not exist
-        if path == default_path:
-            return True  # Default directory exists
-        return False
-
-    with patch("pathlib.Path.exists", side_effect=path_exists_side_effect):
-        # Run the function
-        lmstudio_path = get_lmstudio_path()
-
-        # Assertion
-        assert lmstudio_path == default_path
-
-@patch("pathlib.Path.home")
-def test_get_lmstudio_path_not_found(mock_home):
-    """Test that an exception is raised if no path can be found."""
-    # Setup: No pointer file and no default directories exist
-    mock_home.return_value = Path("/fake/home")
+@patch('lmstrix.utils.paths.Path.exists')
+@patch('lmstrix.utils.paths.Path.home')
+def test_fallback_to_default_directories(mock_home, mock_exists):
+    """
+    Tests the fallback mechanism when the pointer file doesn't exist.
+    """
+    # Arrange
+    mock_home_dir = Path("/home/user")
+    mock_home.return_value = mock_home_dir
     
-    with patch("pathlib.Path.exists", return_value=False):
-        # Run and assert that a FileNotFoundError is raised
-        with pytest.raises(FileNotFoundError, match="Could not find LM Studio home directory."):
-            get_lmstudio_path()
+    # Simulate pointer file not existing, but a default path existing
+    def path_exists_side_effect(path):
+        return str(path) == str(mock_home_dir / ".cache/lm-studio")
 
-# --- Tests for get_default_models_file ---
+    mock_exists.side_effect = path_exists_side_effect
 
-@patch("appdirs.user_data_dir")
-@patch("pathlib.Path.mkdir")
-def test_get_default_models_file_creates_dir(mock_mkdir, mock_appdirs):
-    """Test that the function creates the necessary directory and returns the correct file path."""
-    # Setup
-    expected_dir = Path("/fake/appdata/lmstrix")
-    expected_file = expected_dir / "lmstrix.json"
-    mock_appdirs.return_value = str(expected_dir)
+    # Act
+    path = get_lmstudio_path()
 
-    # Run the function
+    # Assert
+    assert path == mock_home_dir / ".cache/lm-studio"
+
+@patch('lmstrix.utils.paths.Path.exists')
+@patch('lmstrix.utils.paths.Path.home')
+def test_no_path_found_raises_error(mock_home, mock_exists):
+    """
+    Tests that a FileNotFoundError is raised if no LM Studio path can be found.
+    """
+    # Arrange
+    mock_home.return_value = Path("/home/user")
+    mock_exists.return_value = False # Simulate no paths existing
+
+    # Act & Assert
+    with pytest.raises(FileNotFoundError):
+        get_lmstudio_path()
+
+@patch('lmstrix.utils.paths.get_lmstudio_path')
+def test_get_default_models_file_path(mock_get_lmstudio_path):
+    """
+    Ensures the models file path is correctly constructed inside the LM Studio dir.
+    """
+    # Arrange
+    mock_lmstudio_path = Path("/fake/lmstudio")
+    mock_get_lmstudio_path.return_value = mock_lmstudio_path
+
+    # Act
     models_file_path = get_default_models_file()
 
-    # Assertions
-    mock_appdirs.assert_called_once_with("lmstrix", "lmstrix")
-    mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
-    assert models_file_path == expected_file
+    # Assert
+    assert models_file_path == mock_lmstudio_path / "lmstrix.json"

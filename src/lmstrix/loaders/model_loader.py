@@ -34,7 +34,7 @@ def load_model_registry(
         logger.warning(f"Model registry not found at {registry_path}. Returning empty registry.")
         return ModelRegistry(models_file=registry_path)
 
-    registry = ModelRegistry.load(registry_path)
+    registry = ModelRegistry(models_file=registry_path)
     logger.info(f"Loaded {len(registry)} models from {registry_path}")
     return registry
 
@@ -51,8 +51,8 @@ def save_model_registry(
     Returns:
         The path where the registry was saved.
     """
-    save_path = json_path or get_default_models_file()
-    registry.save(save_path)
+    save_path = json_path or registry.models_file
+    registry.save()
     return save_path
 
 def scan_and_update_registry(verbose: bool = False) -> ModelRegistry:
@@ -88,21 +88,21 @@ def scan_and_update_registry(verbose: bool = False) -> ModelRegistry:
             logger.debug(f"Updating existing model: {model_id}")
             # Update potentially changed data, but preserve test results
             existing_model = registry.get_model(model_id)
-            existing_model.path = model_data.get("path")
-            existing_model.size_bytes = model_data.get("size_bytes")
+            if existing_model:
+                existing_model.path = Path(model_data.get("path", existing_model.path))
+                existing_model.size = model_data.get("size_bytes", existing_model.size)
         else:
             logger.info(f"Discovered new model: {model_id}")
             new_model = Model(
                 id=model_id,
-                path=model_data.get("path"),
-                size_bytes=model_data.get("size_bytes"),
-                # This is the declared limit, not the tested one
-                context_limit=model_data.get("context_length", 8192),
+                path=Path(model_data.get("path", "")),
+                size_bytes=model_data.get("size_bytes", 0),
+                ctx_in=model_data.get("context_length", 8192),
             )
-            registry.add_model(new_model)
+            registry.update_model(model_id, new_model)
 
     # Remove models that are no longer present
-    registry_ids = set(registry.list_models_ids())
+    registry_ids = set(model.id for model in registry.list_models())
     deleted_ids = registry_ids - discovered_ids
     for model_id in deleted_ids:
         logger.info(f"Removing deleted model: {model_id}")
