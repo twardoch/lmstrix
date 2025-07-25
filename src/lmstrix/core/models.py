@@ -26,7 +26,8 @@ class Model(BaseModel):
 
     id: str  # Unique identifier, the model's relative path
     short_id: str | None = Field(
-        default=None, description="Short identifier, path without file extension",
+        default=None,
+        description="Short identifier, path without file extension",
     )
     path: str  # Full absolute path to the model file or directory
     size: int = Field(..., description="Size of the model in bytes", alias="size_bytes")

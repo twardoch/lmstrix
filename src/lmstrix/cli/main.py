@@ -158,7 +158,9 @@ class LMStrixCLI:
             console.print(f"[dim]Threshold: {threshold:,} tokens[/dim]\n")
 
             updated_models = tester.test_all_models(
-                models_to_test, threshold=threshold, registry=registry,
+                models_to_test,
+                threshold=threshold,
+                registry=registry,
             )
 
             # Print final summary table
@@ -204,7 +206,9 @@ class LMStrixCLI:
             # Use threshold to limit initial test size and prevent crashes
             max_test_context = min(threshold, model.context_limit)
             updated_model = tester.test_model(
-                model, max_context=max_test_context, registry=registry,
+                model,
+                max_context=max_test_context,
+                registry=registry,
             )
 
             if updated_model.context_test_status.value == "completed":

@@ -64,9 +64,8 @@ class ModelScanner:
         model_id = str(relative_path).replace("\\", "/")
 
         # Create a short ID by removing the file extension
-        short_id = model_id
         if model_path.is_file():
-            short_id = str(relative_path.with_suffix(""))
+            str(relative_path.with_suffix(""))
 
         # Try to extract context info from filename or path
         # This is a heuristic - actual values come from model metadata

@@ -103,7 +103,6 @@ class ContextTester:
         """Test model at a specific context size with retry logic for timeouts."""
         logger.debug(f"Testing {model_path} at context size {context_size}")
 
-
         # Always print progress for context testing
         print(f"  → Testing context size: {context_size:,} tokens...")
 
@@ -611,7 +610,7 @@ class ContextTester:
             return []
 
         # Filter out embedding models - they can't be used for LLM context testing
-        def is_embedding_model(model):
+        def is_embedding_model(model) -> bool:
             # Check ID patterns
             if model.id.startswith("text-embedding-"):
                 return True
@@ -620,9 +619,7 @@ class ContextTester:
             if "embed" in model.id.lower():
                 return True
             # Check if model has model_type field indicating it's an embedding model
-            if hasattr(model, "model_type") and model.model_type == "embedding":
-                return True
-            return False
+            return bool(hasattr(model, "model_type") and model.model_type == "embedding")
 
         llm_models = [m for m in models if not is_embedding_model(m)]
 
