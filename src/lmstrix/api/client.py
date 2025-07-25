@@ -52,6 +52,7 @@ class LMStudioClient:
                     "architecture": info.architecture,
                     "has_tools": getattr(info, "trainedForToolUse", False),
                     "has_vision": getattr(info, "vision", False),
+                    "model_type": getattr(info, "type", "llm"),  # 'llm' or 'embedding'
                 }
                 result.append(model_dict)
             return result
@@ -74,13 +75,20 @@ class LMStudioClient:
         temperature: float = 0.7,
         max_tokens: int = -1,  # -1 for unlimited
         model_id: str | None = None,  # Pass model_id separately since llm object may not have it
+        timeout: float = 30.0,  # Timeout in seconds
         **kwargs: Any,
     ) -> CompletionResponse:
         """Make an async completion request to a loaded LM Studio model."""
         try:
+            import asyncio
+
             # LM Studio's complete() method only accepts the prompt
             # It doesn't support temperature, max_tokens, or other options
-            response = llm.complete(prompt)
+            # Wrap in asyncio timeout
+            response = await asyncio.wait_for(
+                asyncio.to_thread(llm.complete, prompt),
+                timeout=timeout,
+            )
 
             # Parse the response - could be PredictionResult or string
             if hasattr(response, "content"):
@@ -95,6 +103,11 @@ class LMStudioClient:
                 model=model_id or "unknown",
                 usage={},  # lmstudio doesn't provide usage stats in the same way
                 finish_reason="stop",
+            )
+        except TimeoutError:
+            raise InferenceError(
+                model_id or "unknown",
+                f"Inference timed out after {timeout} seconds. Model may be unresponsive.",
             )
         except Exception as e:
             raise InferenceError(model_id or "unknown", f"Inference failed: {e}") from e
