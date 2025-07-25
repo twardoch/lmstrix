@@ -1,0 +1,1446 @@
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 16 models.
+D Initial filtered models length: 1
+D Removing model from last loaded models: ahishamm/SmolDocling-256M-preview-mlx-fp16
+D Updating cliPref
+I Loading model "ahishamm/SmolDocling-256M-preview-mlx-fp16"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Error loading model.                                                      │
+│                                                                             │
+│                                                                             │
+│   (!) SUGGESTION                                                            │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│   (X) CAUSE                                                                 │
+│                                                                             │
+│   (Exit code: 6). Please check settings and try loading the model again.    │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+Model "smoldocling-256m-preview-mlx" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 16 models.
+D Initial filtered models length: 1
+D Removing model from last loaded models: AlejandroOlmedo/DeepScaleR-1.5B-Preview-mlx
+D Updating cliPref
+I Loading model "AlejandroOlmedo/DeepScaleR-1.5B-Preview-mlx"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Error loading model.                                                      │
+│                                                                             │
+│                                                                             │
+│   (!) SUGGESTION                                                            │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│   (X) CAUSE                                                                 │
+│                                                                             │
+│   (Exit code: 6). Please check settings and try loading the model again.    │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+Model "deepscaler-1.5b-preview-mlx" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 16 models.
+D Initial filtered models length: 1
+D Removing model from last loaded models: bartowski/Dream-org_Dream-v0-Instruct-7B-GGUF/Dream-org_Dream-v0-Instruct-7B-IQ2_M.gguf
+D Updating cliPref
+I Loading model "bartowski/Dream-org_Dream-v0-Instruct-7B-GGUF/Dream-org_Dream-v0-Instruct-7B-IQ2_M.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 801.00ms. (2.78 GB)
+I To use the model in the API/SDK, use the identifier "dream-org_dream-v0-instruct-7b".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "dream-org_dream-v0-instruct-7b" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 16 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "bartowski/Llama-3-8B-LexiFun-Uncensored-V1-GGUF/Llama-3-8B-LexiFun-Uncensored-V1-Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 5.89s. (8.54 GB)
+I To use the model in the API/SDK, use the identifier "llama-3-8b-lexifun-uncensored-v1".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "llama-3-8b-lexifun-uncensored-v1" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 17 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "bartowski/Llama-3.2-3B-Instruct-GGUF/Llama-3.2-3B-Instruct-Q4_K_S.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 1.62s. (1.93 GB)
+I To use the model in the API/SDK, use the identifier "llama-3.2-3b-instruct".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "llama-3.2-3b-instruct" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 18 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "bartowski/MegaBeam-Mistral-7B-512k-GGUF/MegaBeam-Mistral-7B-512k-Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 5.19s. (7.70 GB)
+I To use the model in the API/SDK, use the identifier "megabeam-mistral-7b-512k".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "megabeam-mistral-7b-512k" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 19 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "bartowski/mlabonne_Qwen3-14B-abliterated-GGUF/mlabonne_Qwen3-14B-abliterated-Q5_K_L.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 7.33s. (10.99 GB)
+I To use the model in the API/SDK, use the identifier "mlabonne_qwen3-14b-abliterated".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "mlabonne_qwen3-14b-abliterated" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "crusoeai/Llama-3-8B-Instruct-Gradient-1048k-GGUF/llama-3-8b-instruct-gradient-1048k.Q3_K_S.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 2.54s. (3.66 GB)
+I To use the model in the API/SDK, use the identifier "llama-3-8b-instruct-gradient-1048k".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "llama-3-8b-instruct-gradient-1048k" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "DavidAU/Llama-3.1-1-million-ctx-DeepHermes-Deep-Reasoning-8B-GGUF/Llama-3.1-1-million-ctx-DeepHermes-Deep-Reasoning-8B-Q3_k_s.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 2.67s. (3.66 GB)
+I To use the model in the API/SDK, use the identifier "llama-3.1-1-million-ctx-deephermes-deep-reasoning-8b".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "llama-3.1-1-million-ctx-deephermes-deep-reasoning-8b" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Removing model from last loaded models: deepseek/deepseek-r1-0528-qwen3-8b
+D Updating cliPref
+I Loading model "deepseek/deepseek-r1-0528-qwen3-8b"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Error loading model.                                                      │
+│                                                                             │
+│                                                                             │
+│   (!) SUGGESTION                                                            │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│   (X) CAUSE                                                                 │
+│                                                                             │
+│   (Exit code: 6). Please check settings and try loading the model again.    │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+Model "deepseek/deepseek-r1-0528-qwen3-8b" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "DevQuasar/princeton-nlp.Llama-3-8B-ProLong-512k-Instruct-GGUF/princeton-nlp.Llama-3-8B-ProLong-512k-Instruct.Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 5.50s. (8.54 GB)
+I To use the model in the API/SDK, use the identifier "princeton-nlp.llama-3-8b-prolong-512k-instruct".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "princeton-nlp.llama-3-8b-prolong-512k-instruct" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "DevQuasar/prithivMLmods.Llama-Chat-Summary-3.2-3B-GGUF/prithivMLmods.Llama-Chat-Summary-3.2-3B.Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 2.43s. (3.42 GB)
+I To use the model in the API/SDK, use the identifier "prithivmlmods.llama-chat-summary-3.2-3b".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "prithivmlmods.llama-chat-summary-3.2-3b" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "featherless-ai-quants/WeMake-Llama-3-8B-Instruct-V41-1048k-GGUF/WeMake-Llama-3-8B-Instruct-V41-1048k-Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 5.40s. (8.54 GB)
+I To use the model in the API/SDK, use the identifier "wemake-llama-3-8b-instruct-v41-1048k".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "wemake-llama-3-8b-instruct-v41-1048k" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "google/gemma-3-12b"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Error loading model.                                                      │
+│                                                                             │
+│                                                                             │
+│   (!) SUGGESTION                                                            │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│   (X) CAUSE                                                                 │
+│                                                                             │
+│   (Exit code: 6). Please check settings and try loading the model again.    │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+Model "google/gemma-3-12b" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "jinaai/jina-embeddings-v4-text-retrieval-GGUF/jina-embeddings-v4-retrieval-Q3_K_M.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 1.42s. (1.59 GB)
+I To use the model in the API/SDK, use the identifier "jina-embeddings-v4-text-retrieval@q3_k_m".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "jina-embeddings-v4-text-retrieval@q3_k_m" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "jinaai/jina-embeddings-v4-text-retrieval-GGUF/jina-embeddings-v4-retrieval-Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 2.36s. (3.29 GB)
+I To use the model in the API/SDK, use the identifier "jina-embeddings-v4-text-retrieval@q8_0".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "jina-embeddings-v4-text-retrieval@q8_0" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "kerncore/Qwen3-Embedding-0.6B-MXL-4bit"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Error loading model.                                                      │
+│                                                                             │
+│                                                                             │
+│   (!) SUGGESTION                                                            │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│   (X) CAUSE                                                                 │
+│                                                                             │
+│   (Exit code: 6). Please check settings and try loading the model again.    │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+Model "qwen3-embedding-0.6b-mxl" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "Klevin/J.A.R.V.I.S-v2.0-Q8_0-GGUF/j.a.r.v.i.s-v2.0-q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 5.53s. (8.54 GB)
+I To use the model in the API/SDK, use the identifier "j.a.r.v.i.s-v2.0".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "j.a.r.v.i.s-v2.0" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 2
+W 2 models match the provided path. Loading the first one.
+D Updating cliPref
+I Loading model "liquid/lfm2-1.2b"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Error loading model.                                                      │
+│                                                                             │
+│                                                                             │
+│   (!) SUGGESTION                                                            │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│   (X) CAUSE                                                                 │
+│                                                                             │
+│   (Exit code: 6). Please check settings and try loading the model again.    │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+Model "liquid/lfm2-1.2b" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "LiquidAI/LFM2-1.2B-GGUF/LFM2-1.2B-Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 1.10s. (1.25 GB)
+I To use the model in the API/SDK, use the identifier "lfm2-1.2b".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "lfm2-1.2b" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "lmstudio-community/DeepSeek-R1-Distill-Qwen-14B-GGUF/DeepSeek-R1-Distill-Qwen-14B-Q4_K_M.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 5.68s. (8.99 GB)
+I To use the model in the API/SDK, use the identifier "deepseek-r1-distill-qwen-14b".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "deepseek-r1-distill-qwen-14b" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "lmstudio-community/LFM2-1.2B-MLX-8bit"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Error loading model.                                                      │
+│                                                                             │
+│                                                                             │
+│   (!) SUGGESTION                                                            │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│   (X) CAUSE                                                                 │
+│                                                                             │
+│   (Exit code: 6). Please check settings and try loading the model again.    │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+Model "lfm2-1.2b-mlx@8bit" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "lmstudio-community/Meta-Llama-3-8B-Instruct-GGUF/Meta-Llama-3-8B-Instruct-Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 5.34s. (8.54 GB)
+I To use the model in the API/SDK, use the identifier "meta-llama-3-8b-instruct".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "meta-llama-3-8b-instruct" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "lmstudio-community/Qwen2.5-3B-Instruct-MLX-4bit"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Error loading model.                                                      │
+│                                                                             │
+│                                                                             │
+│   (!) SUGGESTION                                                            │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│   (X) CAUSE                                                                 │
+│                                                                             │
+│   (Exit code: 6). Please check settings and try loading the model again.    │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+Model "qwen2.5-3b-instruct-mlx" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "lmstudio-community/SmolLM3-3B-GGUF/SmolLM3-3B-Q4_K_M.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 1.66s. (1.92 GB)
+I To use the model in the API/SDK, use the identifier "smollm3-3b@q4_k_m".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "smollm3-3b@q4_k_m" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "lmstudio-community/SmolLM3-3B-GGUF/SmolLM3-3B-Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 2.35s. (3.28 GB)
+I To use the model in the API/SDK, use the identifier "smollm3-3b@q8_0".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "smollm3-3b@q8_0" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "LWDCLS/llama3-8B-DarkIdol-2.1-Uncensored-1048K-GGUF-IQ-Imatrix-Request/llama3-8B-DarkIdol-2.1-Uncensored-1048K-IQ3_XXS-imat.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 2.41s. (3.27 GB)
+I To use the model in the API/SDK, use the identifier "llama3-8b-darkidol-2.1-uncensored-1048k-iq-imatrix-request".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "llama3-8b-darkidol-2.1-uncensored-1048k-iq-imatrix-request" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "MaziyarPanahi/Llama-3-8B-Instruct-64k-GGUF/Llama-3-8B-Instruct-64k.Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 5.37s. (8.54 GB)
+I To use the model in the API/SDK, use the identifier "llama-3-8b-instruct-64k".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "llama-3-8b-instruct-64k" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "Menlo/Lucy-128k-gguf/lucy_128k-Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 1.50s. (1.83 GB)
+I To use the model in the API/SDK, use the identifier "lucy-128k".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "lucy-128k" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mistralai/devstral-small-2507"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Model loading aborted due to insufficient system resources. Overloading   │
+│   the system will likely cause it to freeze. If you believe this is a       │
+│   mistake, you can try to change the model loading guardrails in the        │
+│   settings.                                                                 │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mistralai/magistral-small"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Model loading aborted due to insufficient system resources. Overloading   │
+│   the system will likely cause it to freeze. If you believe this is a       │
+│   mistake, you can try to change the model loading guardrails in the        │
+│   settings.                                                                 │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mistralai/mistral-small-3.2"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Model loading aborted due to insufficient system resources. Overloading   │
+│   the system will likely cause it to freeze. If you believe this is a       │
+│   mistake, you can try to change the model loading guardrails in the        │
+│   settings.                                                                 │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mlx-community/bge-small-en-v1.5-4bit"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Error loading model.                                                      │
+│                                                                             │
+│                                                                             │
+│   (!) SUGGESTION                                                            │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│   (X) CAUSE                                                                 │
+│                                                                             │
+│   (Exit code: 6). Please check settings and try loading the model again.    │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+Model "bge-small-en-v1.5" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mlx-community/deepseek-vl2-small-4bit"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Error loading model.                                                      │
+│                                                                             │
+│                                                                             │
+│   (!) SUGGESTION                                                            │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│   (X) CAUSE                                                                 │
+│                                                                             │
+│   (Exit code: 6). Please check settings and try loading the model again.    │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+Model "deepseek-vl2-small" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mlx-community/jinaai-ReaderLM-v2"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Error loading model.                                                      │
+│                                                                             │
+│                                                                             │
+│   (!) SUGGESTION                                                            │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│   (X) CAUSE                                                                 │
+│                                                                             │
+│   (Exit code: 6). Please check settings and try loading the model again.    │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+Model "jinaai-readerlm-v2" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mlx-community/nomicai-modernbert-embed-base-4bit"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Error loading model.                                                      │
+│                                                                             │
+│                                                                             │
+│   (!) SUGGESTION                                                            │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│   (X) CAUSE                                                                 │
+│                                                                             │
+│   (Exit code: 6). Please check settings and try loading the model again.    │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+Model "nomicai-modernbert-embed-base" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/COMEDY_13B_DPO-GGUF/COMEDY_13B_DPO.Q6_K.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 6.75s. (10.68 GB)
+I To use the model in the API/SDK, use the identifier "comedy_13b_dpo".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "comedy_13b_dpo" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/granite-4.0-tiny-preview-GGUF/granite-4.0-tiny-preview.Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 4.60s. (7.10 GB)
+I To use the model in the API/SDK, use the identifier "granite-4.0-tiny-preview".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "granite-4.0-tiny-preview" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/llama-3.1-8b-sarcasm-GGUF/llama-3.1-8b-sarcasm.Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 5.48s. (8.54 GB)
+I To use the model in the API/SDK, use the identifier "llama-3.1-8b-sarcasm".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "llama-3.1-8b-sarcasm" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/Meta-Llama-3-8B-Instruct-64k-GGUF/Meta-Llama-3-8B-Instruct-64k.Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 5.45s. (8.54 GB)
+I To use the model in the API/SDK, use the identifier "meta-llama-3-8b-instruct-64k".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "meta-llama-3-8b-instruct-64k" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/Mistral-7B-sarcasm-scrolls-v2-GGUF/Mistral-7B-sarcasm-scrolls-v2.Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 4.76s. (7.70 GB)
+I To use the model in the API/SDK, use the identifier "mistral-7b-sarcasm-scrolls-v2".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "mistral-7b-sarcasm-scrolls-v2" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/Qwen2.5-Microsoft-NextCoder-Brainstorm20x-128k-ctx-12B-i1-GGUF/Qwen2.5-Microsoft-NextCoder-Brainstorm20x-128k-ctx-12B.i1-Q5_K_S.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 5.25s. (8.36 GB)
+I To use the model in the API/SDK, use the identifier "qwen2.5-microsoft-nextcoder-brainstorm20x-128k-ctx-12b-i1".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "qwen2.5-microsoft-nextcoder-brainstorm20x-128k-ctx-12b-i1" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/Qwen3-8B-256k-Context-8X-Grand-GGUF/Qwen3-8B-256k-Context-8X-Grand.Q3_K_M.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 2.89s. (4.12 GB)
+I To use the model in the API/SDK, use the identifier "qwen3-8b-256k-context-8x-grand@q3_k_m".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "qwen3-8b-256k-context-8x-grand@q3_k_m" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/Qwen3-8B-256k-Context-8X-Grand-GGUF/Qwen3-8B-256k-Context-8X-Grand.Q4_K_M.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 3.40s. (5.03 GB)
+I To use the model in the API/SDK, use the identifier "qwen3-8b-256k-context-8x-grand@q4_k_m".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "qwen3-8b-256k-context-8x-grand@q4_k_m" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/Qwen3-8B-256k-Context-8X-Grand-GGUF/Qwen3-8B-256k-Context-8X-Grand.Q5_K_M.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 3.83s. (5.85 GB)
+I To use the model in the API/SDK, use the identifier "qwen3-8b-256k-context-8x-grand@q5_k_m".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "qwen3-8b-256k-context-8x-grand@q5_k_m" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/Qwen3-8B-256k-Context-8X-Grand-i1-GGUF/Qwen3-8B-256k-Context-8X-Grand.i1-IQ1_S.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 1.73s. (2.12 GB)
+I To use the model in the API/SDK, use the identifier "qwen3-8b-256k-context-8x-grand-i1@iq1_s".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "qwen3-8b-256k-context-8x-grand-i1@iq1_s" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/Qwen3-8B-256k-Context-8X-Grand-i1-GGUF/Qwen3-8B-256k-Context-8X-Grand.i1-IQ2_M.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 2.63s. (3.05 GB)
+I To use the model in the API/SDK, use the identifier "qwen3-8b-256k-context-8x-grand-i1@iq2_m".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "qwen3-8b-256k-context-8x-grand-i1@iq2_m" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/Qwen3-8B-256k-Context-8X-Grand-i1-GGUF/Qwen3-8B-256k-Context-8X-Grand.i1-IQ4_XS.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 3.12s. (4.56 GB)
+I To use the model in the API/SDK, use the identifier "qwen3-8b-256k-context-8x-grand-i1@iq4_xs".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "qwen3-8b-256k-context-8x-grand-i1@iq4_xs" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/Qwen3-8B-256k-Context-8X-Grand-i1-GGUF/Qwen3-8B-256k-Context-8X-Grand.i1-Q6_K.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 4.40s. (6.73 GB)
+I To use the model in the API/SDK, use the identifier "qwen3-8b-256k-context-8x-grand-i1@q6_k".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "qwen3-8b-256k-context-8x-grand-i1@q6_k" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/Qwen3-8B-320k-Context-10X-Massive-GGUF/Qwen3-8B-320k-Context-10X-Massive.Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 5.53s. (8.71 GB)
+I To use the model in the API/SDK, use the identifier "qwen3-8b-320k-context-10x-massive".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "qwen3-8b-320k-context-10x-massive" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/Rei-24B-KTO-GGUF/Rei-24B-KTO.Q3_K_M.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 7.88s. (11.47 GB)
+I To use the model in the API/SDK, use the identifier "rei-24b-kto".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "rei-24b-kto" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/SarcasMLL-1B-GGUF/SarcasMLL-1B.Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 1.36s. (1.32 GB)
+I To use the model in the API/SDK, use the identifier "sarcasmll-1b".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "sarcasmll-1b" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/Smoothie-Qwen3-14B-i1-GGUF/Smoothie-Qwen3-14B.i1-Q5_K_M.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 6.90s. (10.51 GB)
+I To use the model in the API/SDK, use the identifier "smoothie-qwen3-14b-i1".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "smoothie-qwen3-14b-i1" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/Ultron-Summarizer-1B-GGUF/Ultron-Summarizer-1B.Q3_K_S.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 870.00ms. (641.69 MB)
+I To use the model in the API/SDK, use the identifier "ultron-summarizer-1b".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "ultron-summarizer-1b" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/Ultron-Summarizer-8B-GGUF/Ultron-Summarizer-8B.Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 5.40s. (8.54 GB)
+I To use the model in the API/SDK, use the identifier "ultron-summarizer-8b".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "ultron-summarizer-8b" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "mradermacher/Ward-12B-Model_Stock-i1-GGUF/Ward-12B-Model_Stock.i1-Q5_K_S.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 5.43s. (8.52 GB)
+I To use the model in the API/SDK, use the identifier "ward-12b-model_stock-i1".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "ward-12b-model_stock-i1" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "nightmedia/Qwen3-1.7B-128k-dwq8-mlx"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Error loading model.                                                      │
+│                                                                             │
+│                                                                             │
+│   (!) SUGGESTION                                                            │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│   (X) CAUSE                                                                 │
+│                                                                             │
+│   (Exit code: 6). Please check settings and try loading the model again.    │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+Model "qwen3-1.7b-128k-dwq8-mlx" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "nightmedia/UIGEN-X-8B-q8-mlx"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Error loading model.                                                      │
+│                                                                             │
+│                                                                             │
+│   (!) SUGGESTION                                                            │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│   (X) CAUSE                                                                 │
+│                                                                             │
+│   (Exit code: 6). Please check settings and try loading the model again.    │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+Model "uigen-x-8b-mlx" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "njwright92/ComicBot_v.2-gguf/mistral-comedy-3.0-ckpt-1600.Q6_K.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 3.91s. (5.94 GB)
+I To use the model in the API/SDK, use the identifier "comicbot_v.2".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "comicbot_v.2" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "OscarBui/QwenSummarizer3.0/unsloth.Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 2.63s. (3.29 GB)
+I To use the model in the API/SDK, use the identifier "qwensummarizer3.0".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "qwensummarizer3.0" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "qwen/qwen2.5-coder-14b"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Error loading model.                                                      │
+│                                                                             │
+│                                                                             │
+│   (!) SUGGESTION                                                            │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│                                                                             │
+│   (X) CAUSE                                                                 │
+│                                                                             │
+│   (Exit code: 6). Please check settings and try loading the model again.    │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+Model "qwen/qwen2.5-coder-14b" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "qwen/qwen2.5-vl-7b"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 7.82s. (9.45 GB)
+I To use the model in the API/SDK, use the identifier "qwen/qwen2.5-vl-7b".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "qwen/qwen2.5-vl-7b" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "seedgularity/NazareAI-Senior-Marketing-Strategist/unsloth.Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 2.51s. (3.42 GB)
+I To use the model in the API/SDK, use the identifier "nazareai-senior-marketing-strategist".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "nazareai-senior-marketing-strategist" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "SolidSnacke/Llama-3-Soliloquy-8B-v1.5-64k-i-GGUF/Llama-3-Soliloquy-8B-v1.5-64k-Q6_K-imat.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 4.32s. (6.60 GB)
+I To use the model in the API/SDK, use the identifier "llama-3-soliloquy-8b-v1.5-64k-i".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "llama-3-soliloquy-8b-v1.5-64k-i" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "SpongeEngine/Mistral-Small-24B-Instruct-2501-writer-i1-GGUF/mistral-small-24b-instruct-2501-writer-i1-Q3_K_S.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 6.83s. (10.40 GB)
+I To use the model in the API/SDK, use the identifier "mistral-small-24b-instruct-2501-writer-i1".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "mistral-small-24b-instruct-2501-writer-i1" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "tensorblock/SummLlama3.1-8B-GGUF/SummLlama3.1-8B-Q8_0.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 5.89s. (8.54 GB)
+I To use the model in the API/SDK, use the identifier "summllama3.1-8b".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "summllama3.1-8b" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "ubaitur5/Qwen2.5-32B-Instruct-Q3-mlx"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+Error: 
+
+┌ Error ──────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   Model loading aborted due to insufficient system resources. Overloading   │
+│   the system will likely cause it to freeze. If you believe this is a       │
+│   mistake, you can try to change the model loading guardrails in the        │
+│   settings.                                                                 │
+│                                                                             │
+│                                                                             │
+│   </> STACK TRACE                                                           │
+│                                                                             │
+│   at loadModel (./dist/index.js:103746:83)                                  │
+│   at Object.handler (./dist/index.js:103694:15)                             │
+│   at process.processTicksAndRejections                                      │
+│   (node:internal/process/task_queues:95:5)                                  │
+│   at async Object.run (./dist/index.js:3178:23)                             │
+│   at async Object.run (./dist/index.js:2939:32)                             │
+│   at async runSafely (./dist/index.js:4687:24)                              │
+│   at async run (./dist/index.js:4672:20)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "unsloth/Qwen3-14B-128K-GGUF/Qwen3-14B-128K-UD-Q5_K_XL.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 6.80s. (10.55 GB)
+I To use the model in the API/SDK, use the identifier "qwen3-14b-128k".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "qwen3-14b-128k" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "unsloth/Qwen3-8B-128K-GGUF/Qwen3-8B-128K-UD-Q6_K_XL.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 4.80s. (7.49 GB)
+I To use the model in the API/SDK, use the identifier "qwen3-8b-128k".
+I To set a custom identifier, use the --identifier <identifier> option.
+Model "qwen3-8b-128k" unloaded.
+D Found local API server at ws://127.0.0.1:41343
+D [CliPref] Initializing FileData
+D Last loaded map loaded with 20 models.
+D Initial filtered models length: 1
+D Updating cliPref
+I Loading model "unsloth/SmolLM3-3B-128K-GGUF/SmolLM3-3B-128K-UD-IQ2_XXS.gguf"...
+D Identifier: undefined
+D Config: { contextLength: 1024 }
+D [CliPref] File changed, reading data
+D [CliPref] File content is the same as last written, skipping read
+I Model loaded successfully in 1.08s. (955.16 MB)
+I To use the model in the API/SDK, use the identifier "smollm3-3b-128k".
+I To set a custom identifier, use the --identifier <identifier> option.

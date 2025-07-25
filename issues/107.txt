@@ -1,5 +1,0 @@
-```
-lmstrix test llama-3.2-3b-instruct --verbose
-```
-
-This should be MORE VERBOSE, like actually inform me about the various operations like loading with various context values. 

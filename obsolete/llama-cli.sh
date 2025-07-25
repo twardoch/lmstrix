@@ -1,0 +1,1 @@
+llama-cli -m "mradermacher/llama-3.1-8b-sarcasm-GGUF/llama-3.1-8b-sarcasm.Q8_0.gguf" -fa -c 5000 -p "Capital of Poland? In one word: "

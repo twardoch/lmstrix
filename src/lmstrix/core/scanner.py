@@ -58,13 +58,10 @@ class ModelScanner:
             return None
 
         # Create model ID from path
-        # Remove models_dir prefix and use forward slashes
+        # The model ID is the relative path from the LM Studio models directory.
+        # This allows using the path directly to load the model in LM Studio.
         relative_path = model_path.relative_to(self.models_dir)
         model_id = str(relative_path).replace("\\", "/")
-
-        # Remove file extension from ID
-        if model_path.is_file():
-            model_id = str(relative_path.with_suffix(""))
 
         # Try to extract context info from filename or path
         # This is a heuristic - actual values come from model metadata

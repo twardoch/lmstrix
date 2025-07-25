@@ -1,13 +1,37 @@
 # TODO List for LMStrix
 
-## Immediate Tasks
+## Issue #201: Enhanced Context Testing Strategy
 
-- [ ] Test the improved context testing with actual models
-- [ ] Verify progress saving/resuming works correctly
-- [ ] Update documentation to reflect new testing behavior
-- [ ] Consider adding unit tests for new functionality
+### Core Implementation
+- [ ] Add --threshold parameter to CLI test command (default: 102400)
+- [ ] Refactor ContextTester.test_model() for new incremental/binary search algorithm
+- [ ] Implement test_all_models() method for efficient batch testing
+- [ ] Update output to use Rich tables for test results
 
-## Phase 4: Package & Release
+### Testing Algorithm Changes
+- [ ] Implement initial test at min(threshold, declared_max)
+- [ ] Add incremental testing (increase by 10240) when threshold > declared_max
+- [ ] Ensure binary search only happens on failure
+- [ ] Save progress after each individual test
+
+### Multi-Model Optimization (--all flag)
+- [ ] Sort models by declared context size before testing
+- [ ] Implement pass-based testing to minimize model loading
+- [ ] Track failed models and exclude from subsequent passes
+- [ ] Persist progress between passes
+
+### Output Improvements
+- [ ] Create tabular output similar to 'list' command
+- [ ] Show: Model ID, Context Size, Result, Duration
+- [ ] Remove live updates, just append rows
+
+### Validation & Documentation
+- [ ] Test with actual models to verify no system crashes
+- [ ] Update unit tests for new functionality
+- [ ] Update documentation for new --threshold parameter
+- [ ] Update README with new testing strategy explanation
+
+## Phase 5: Package & Release (After Issue #201)
 
 ### Release Tasks
 

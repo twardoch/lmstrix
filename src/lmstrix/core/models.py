@@ -90,6 +90,11 @@ class Model(BaseModel):
             return v
         return Path(str(v))
 
+    def sanitized_path(self) -> str:
+        """Return a sanitized version of the model path suitable for filenames."""
+        safe_chars = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_")
+        return "".join(c if c in safe_chars else "_" for c in str(self.path))
+
     def sanitized_id(self) -> str:
         """Return a sanitized version of the model ID suitable for filenames."""
         safe_chars = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_")
@@ -125,7 +130,7 @@ class ModelRegistry:
     def __init__(self, models_file: Path | None = None) -> None:
         """Initialize the model registry."""
         self.models_file = models_file or get_default_models_file()
-        self._models: dict[str, Model] = {}
+        self._models: dict[str, Model] = {}  # path -> Model mapping
         self.lms_path: Path | None = None
         self.load()
 
@@ -144,10 +149,10 @@ class ModelRegistry:
 
             models_data = data.get("llms", {})
 
-            for model_id, model_info in models_data.items():
+            for model_key, model_info in models_data.items():
                 try:
-                    # Ensure model_info has an ID
-                    model_info["id"] = model_info.get("id", model_id)
+                    # Ensure model_info has an ID - use model_key as fallback
+                    model_info["id"] = model_info.get("id", model_key)
 
                     # Parse context test status
                     if "context_test_status" in model_info:
@@ -162,9 +167,11 @@ class ModelRegistry:
                         )
 
                     model = Model(**model_info)
-                    self._models[model_id] = model
+                    # Use path as the key instead of model_id
+                    model_path = str(model.path)
+                    self._models[model_path] = model
                 except Exception as e:
-                    logger.error(f"Failed to load model {model_id}: {e}")
+                    logger.error(f"Failed to load model {model_key}: {e}")
 
             logger.info(f"Read {len(self._models)} models from {self.models_file}")
         except Exception as e:
@@ -172,12 +179,12 @@ class ModelRegistry:
 
     def save(self) -> None:
         """Save models to the JSON file."""
-        # Sort models by ID for consistent output
+        # Sort models by path for consistent output
         sorted_models = dict(sorted(self._models.items()))
 
         data: dict[str, Any] = {
             "llms": {
-                model_id: model.to_registry_dict() for model_id, model in sorted_models.items()
+                model_path: model.to_registry_dict() for model_path, model in sorted_models.items()
             },
         }
 
@@ -194,24 +201,47 @@ class ModelRegistry:
 
         logger.info(f"Saved {len(self._models)} models to {self.models_file}")
 
-    def get_model(self, model_id: str) -> Model | None:
-        """Get a model by ID."""
-        return self._models.get(model_id)
+    def get_model(self, model_path: str) -> Model | None:
+        """Get a model by path."""
+        return self._models.get(model_path)
+
+    def get_model_by_id(self, model_id: str) -> Model | None:
+        """Get a model by ID (backward compatibility)."""
+        for model in self._models.values():
+            if model.id == model_id:
+                return model
+        return None
 
     def list_models(self) -> list[Model]:
         """Get all models in the registry."""
         return list(self._models.values())
 
-    def update_model(self, model_id: str, model: Model) -> None:
+    def update_model(self, model_path: str, model: Model) -> None:
         """Update a model in the registry and save."""
-        self._models[model_id] = model
+        self._models[model_path] = model
         self.save()
 
-    def remove_model(self, model_id: str) -> None:
+    def update_model_by_id(self, model_id: str, model: Model) -> None:
+        """Update a model by ID (backward compatibility)."""
+        # Find existing model by ID and update it
+        model_path = str(model.path)
+        self._models[model_path] = model
+        self.save()
+
+    def remove_model(self, model_path: str) -> None:
         """Remove a model from the registry and save."""
-        if model_id in self._models:
-            del self._models[model_id]
+        if model_path in self._models:
+            del self._models[model_path]
             self.save()
+
+    def remove_model_by_id(self, model_id: str) -> None:
+        """Remove a model by ID (backward compatibility)."""
+        model = self.get_model_by_id(model_id)
+        if model:
+            model_path = str(model.path)
+            if model_path in self._models:
+                del self._models[model_path]
+                self.save()
 
     def __len__(self) -> int:
         """Return the number of models in the registry."""

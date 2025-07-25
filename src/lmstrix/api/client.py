@@ -59,8 +59,17 @@ class LMStudioClient:
         except Exception as e:
             raise APIConnectionError("local", f"Failed to list models: {e}") from e
 
-    def load_model(self, model_id: str, context_len: int) -> Any:
-        """Load a model with a specific context length."""
+    def load_model(self, model_path: str, context_len: int) -> Any:
+        """Load a model with a specific context length using model path."""
+        try:
+            # Use Any type for config to avoid type checking issues
+            config: Any = {"context_length": context_len}
+            return lmstudio.llm(model_path, config=config)
+        except Exception as e:
+            raise ModelLoadError(model_path, f"Failed to load model: {e}") from e
+
+    def load_model_by_id(self, model_id: str, context_len: int) -> Any:
+        """Load a model with a specific context length using model ID (backward compatibility)."""
         try:
             # Use Any type for config to avoid type checking issues
             config: Any = {"context_length": context_len}
