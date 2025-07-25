@@ -45,7 +45,7 @@ def load_prompts(
 
     # Load TOML data
     try:
-        with open(toml_path) as f:
+        with toml_path.open() as f:
             data = toml.load(f)
         logger.info(f"Loaded prompts from {toml_path}")
     except Exception as e:
@@ -53,7 +53,7 @@ def load_prompts(
             "prompts_file",
             f"Failed to load TOML file: {e}",
             {"path": str(toml_path), "error": str(e)},
-        )
+        ) from e
 
     # Create resolver if not provided
     if resolver is None:
@@ -106,7 +106,7 @@ def load_single_prompt(
 
     # Load TOML data
     try:
-        with open(toml_path) as f:
+        with toml_path.open() as f:
             data = toml.load(f)
         logger.info(f"Loaded prompts from {toml_path}")
     except Exception as e:
@@ -114,7 +114,7 @@ def load_single_prompt(
             "prompts_file",
             f"Failed to load TOML file: {e}",
             {"path": str(toml_path), "error": str(e)},
-        )
+        ) from e
 
     # Create resolver if not provided
     if resolver is None:
@@ -146,7 +146,7 @@ def save_prompts(
     toml_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Save to TOML
-    with open(toml_path, "w") as f:
+    with toml_path.open("w") as f:
         toml.dump(prompts, f)
 
     logger.info(f"Saved {len(prompts)} prompts to {toml_path}")

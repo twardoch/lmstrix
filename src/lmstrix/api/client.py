@@ -35,17 +35,26 @@ class LMStudioClient:
             # Convert DownloadedModel objects to dicts
             result = []
             for model in models:
-                # Extract attributes dynamically
+                # Access the info property which contains all model metadata
+                info = model.info
+
+                # Handle different attribute names for LLMs vs Embeddings
                 model_dict = {
-                    "id": getattr(model, "id", str(model)),
-                    "path": str(getattr(model, "path", "")),
-                    "size_bytes": getattr(model, "size", 0),
-                    "context_length": getattr(model, "context_length", 8192),
+                    "id": getattr(info, "model_key", getattr(info, "modelKey", None)),
+                    "path": info.path,
+                    "size_bytes": getattr(info, "size_bytes", getattr(info, "sizeBytes", 0)),
+                    "context_length": getattr(
+                        info, "max_context_length", getattr(info, "maxContextLength", 8192)
+                    ),
+                    "display_name": getattr(info, "display_name", getattr(info, "displayName", "")),
+                    "architecture": info.architecture,
+                    "has_tools": getattr(info, "trainedForToolUse", False),
+                    "has_vision": getattr(info, "vision", False),
                 }
                 result.append(model_dict)
             return result
         except Exception as e:
-            raise APIConnectionError("local", f"Failed to list models: {e}")
+            raise APIConnectionError("local", f"Failed to list models: {e}") from e
 
     def load_model(self, model_id: str, context_len: int) -> Any:
         """Load a model with a specific context length."""
@@ -54,7 +63,7 @@ class LMStudioClient:
             config: Any = {"context_length": context_len}
             return lmstudio.llm(model_id, config=config)
         except Exception as e:
-            raise ModelLoadError(model_id, f"Failed to load model: {e}")
+            raise ModelLoadError(model_id, f"Failed to load model: {e}") from e
 
     async def acompletion(
         self,
@@ -75,4 +84,4 @@ class LMStudioClient:
                 finish_reason=response.get("finish_reason"),
             )
         except Exception as e:
-            raise InferenceError(llm.model_id, f"Inference failed: {e}")
+            raise InferenceError(llm.model_id, f"Inference failed: {e}") from e

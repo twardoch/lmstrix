@@ -20,10 +20,20 @@ console = Console()
 class LMStrixCLI:
     """A CLI for testing and managing LM Studio models."""
 
-    def scan(self, verbose: bool = False) -> None:
-        """Scan for LM Studio models and update the local registry."""
+    def scan(self, failed: bool = False, all: bool = False, verbose: bool = False) -> None:
+        """Scan for LM Studio models and update the local registry.
+
+        Args:
+            failed: Re-scan only models that previously failed.
+            all: Re-scan all models (clear existing test data).
+            verbose: Enable verbose output.
+        """
+        if failed and all:
+            console.print("[red]Error: Cannot use --failed and --all together.[/red]")
+            return
+
         with console.status("Scanning for models..."):
-            scan_and_update_registry(verbose=verbose)
+            scan_and_update_registry(rescan_failed=failed, rescan_all=all, verbose=verbose)
         console.print("[green]Model scan complete.[/green]")
         self.list()
 
@@ -64,18 +74,20 @@ class LMStrixCLI:
             )
         console.print(table)
 
-    def test(self, model_id: str | None = None, all: bool = False, verbose: bool = False) -> None:
+    def test(
+        self, model_id: str | None = None, all_models: bool = False, verbose: bool = False
+    ) -> None:
         """Test the context limits for models.
 
         Args:
             model_id: The specific model ID to test.
-            all: Flag to test all untested or previously failed models.
+            all_models: Flag to test all untested or previously failed models.
             verbose: Enable verbose output.
         """
         registry = load_model_registry(verbose=verbose)
         models_to_test = []
 
-        if all:
+        if all_models:
             models_to_test = [
                 m for m in registry.list_models() if m.context_test_status.value != "completed"
             ]

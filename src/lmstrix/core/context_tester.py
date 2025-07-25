@@ -62,7 +62,7 @@ class ContextTester:
     def _log_result(self, log_path: Path, result: ContextTestResult) -> None:
         """Append test result to log file."""
         log_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(log_path, "a") as f:
+        with log_path.open("a") as f:
             f.write(json.dumps(result.to_dict()) + "\n")
 
     async def _test_at_context(

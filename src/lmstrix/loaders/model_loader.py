@@ -5,7 +5,7 @@ from pathlib import Path
 from loguru import logger
 
 from lmstrix.api.client import LMStudioClient
-from lmstrix.core.models import Model, ModelRegistry
+from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 from lmstrix.utils.paths import get_default_models_file
 
 
@@ -56,10 +56,16 @@ def save_model_registry(
     return save_path
 
 
-def scan_and_update_registry(verbose: bool = False) -> ModelRegistry:
+def scan_and_update_registry(
+    rescan_failed: bool = False,
+    rescan_all: bool = False,
+    verbose: bool = False,
+) -> ModelRegistry:
     """Scan for downloaded LM Studio models and update the local registry.
 
     Args:
+        rescan_failed: Only re-scan models that previously failed.
+        rescan_all: Re-scan all models (clear existing test data).
         verbose: Enable verbose logging.
 
     Returns:
@@ -85,13 +91,40 @@ def scan_and_update_registry(verbose: bool = False) -> ModelRegistry:
     # Update existing models and add new ones
     for model_data in discovered_models:
         model_id = model_data["id"]
-        if registry.get_model(model_id):
+        existing_model = registry.get_model(model_id)
+
+        if existing_model:
             logger.debug(f"Updating existing model: {model_id}")
-            # Update potentially changed data, but preserve test results
-            existing_model = registry.get_model(model_id)
-            if existing_model:
-                existing_model.path = Path(model_data.get("path", existing_model.path))
-                existing_model.size = model_data.get("size_bytes", existing_model.size)
+            # Update potentially changed data
+            existing_model.path = Path(model_data.get("path", existing_model.path))
+            existing_model.size = model_data.get("size_bytes", existing_model.size)
+            existing_model.context_limit = model_data.get(
+                "context_length", existing_model.context_limit
+            )
+            existing_model.supports_tools = model_data.get(
+                "has_tools", existing_model.supports_tools
+            )
+            existing_model.supports_vision = model_data.get(
+                "has_vision", existing_model.supports_vision
+            )
+
+            # Handle rescan options
+            if rescan_all:
+                # Clear all test data
+                logger.info(f"Clearing test data for {model_id} (--all flag)")
+                existing_model.tested_max_context = None
+                existing_model.loadable_max_context = None
+                existing_model.context_test_status = ContextTestStatus.UNTESTED
+                existing_model.context_test_log = None
+                existing_model.context_test_date = None
+            elif rescan_failed and existing_model.context_test_status == ContextTestStatus.FAILED:
+                # Clear test data only for failed models
+                logger.info(f"Clearing test data for failed model {model_id} (--failed flag)")
+                existing_model.tested_max_context = None
+                existing_model.loadable_max_context = None
+                existing_model.context_test_status = ContextTestStatus.UNTESTED
+                existing_model.context_test_log = None
+                existing_model.context_test_date = None
         else:
             logger.info(f"Discovered new model: {model_id}")
             new_model = Model(
@@ -99,6 +132,9 @@ def scan_and_update_registry(verbose: bool = False) -> ModelRegistry:
                 path=Path(model_data.get("path", "")),
                 size_bytes=model_data.get("size_bytes", 0),
                 ctx_in=model_data.get("context_length", 8192),
+                ctx_out=4096,  # Default output context
+                has_tools=model_data.get("has_tools", False),
+                has_vision=model_data.get("has_vision", False),
             )
             registry.update_model(model_id, new_model)
 

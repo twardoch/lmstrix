@@ -1,7 +1,8 @@
 # examples/python/custom_inference.py
 from lmstrix.api.client import LmsClient
 
-def main():
+
+def main() -> None:
     """Demonstrates custom inference workflows with the LMStrix Python API."""
     print("### LMStrix Python API: Custom Inference ###")
 
@@ -12,15 +13,13 @@ def main():
         print("No models found. Please download a model in LM Studio.")
         return
 
-    model_id = list(client.models.keys())[0]
+    model_id = next(iter(client.models.keys()))
     model = client.get_model(model_id)
-    print(f"
---- Using model: {model.path} ---")
+    print(f"\n--- Using model: {model.path} ---")
 
     # 1. Custom system prompt
     # Guide the model's behavior, personality, or output format.
-    print("
---- 1. Inference with a custom system prompt ---")
+    print("\n--- 1. Inference with a custom system prompt ---")
     prompt = "Generate a list of three creative names for a new coffee shop."
     system_prompt = "You are a branding expert. You provide concise, creative, and memorable names."
     print(f"Prompt: {prompt}")
@@ -31,17 +30,13 @@ def main():
         print("Response:")
         for chunk in response_stream:
             print(chunk, end="", flush=True)
-        print("
-")
+        print("\n")
     except Exception as e:
-        print(f"
-An error occurred: {e}
-")
+        print(f"\nAn error occurred: {e}\n")
 
     # 2. Adjusting inference parameters
     # Control creativity (temperature) and response length (max_tokens).
-    print("
---- 2. Adjusting temperature and max_tokens ---")
+    print("\n--- 2. Adjusting temperature and max_tokens ---")
     prompt = "Write a single sentence that is surprising and philosophical."
     print(f"Prompt: {prompt}")
     print("Settings: temperature=1.8 (highly creative), max_tokens=50")
@@ -51,18 +46,16 @@ An error occurred: {e}
         print("Response:")
         for chunk in response_stream:
             print(chunk, end="", flush=True)
-        print("
-")
+        print("\n")
     except Exception as e:
-        print(f"
-An error occurred: {e}
-")
+        print(f"\nAn error occurred: {e}\n")
 
     # 3. Structured output (JSON)
     # Instructing the model to return JSON. This works best with capable models.
-    print("
---- 3. Requesting structured JSON output ---")
-    prompt = "Return a JSON object with two keys: 'city' and 'population', for the capital of Japan."
+    print("\n--- 3. Requesting structured JSON output ---")
+    prompt = (
+        "Return a JSON object with two keys: 'city' and 'population', for the capital of Japan."
+    )
     system_prompt = "You are a helpful assistant that only returns valid, raw JSON objects."
     print(f"Prompt: {prompt}")
 
@@ -74,12 +67,10 @@ An error occurred: {e}
         # You can now parse the JSON string
         # import json
         # data = json.loads(full_response)
-        # print(f"
-Parsed city: {data.get('city')}")
+        # print(f"\nParsed city: {data.get('city')}")
     except Exception as e:
-        print(f"
-An error occurred: {e}
-")
+        print(f"\nAn error occurred: {e}\n")
+
 
 if __name__ == "__main__":
     main()
