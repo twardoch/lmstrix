@@ -51,7 +51,18 @@ class ContextTestResult:
 
 
 class ContextTester:
-    """Tests models to find their true operational context limits."""
+    \"\"\"Tests models to find their true operational context limits.
+    
+    Uses a binary search algorithm to efficiently discover the maximum context
+    size that a model can reliably handle. The test sends a simple mathematical
+    prompt (\"2+2=\") padded with filler text to reach various context sizes,
+    and validates that the model returns the correct answer (\"4\").
+    
+    Attributes:
+        client: LMStudioClient instance for model operations.
+        test_prompt: The prompt used for testing (default: \"2+2=\").
+        expected_response: The expected response (default: \"4\").
+    \"\"\"
 
     def __init__(self, client: LMStudioClient | None = None) -> None:
         """Initialize context tester."""

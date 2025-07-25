@@ -75,7 +75,10 @@ class LMStrixCLI:
         console.print(table)
 
     def test(
-        self, model_id: str | None = None, all_models: bool = False, verbose: bool = False
+        self,
+        model_id: str | None = None,
+        all_models: bool = False,
+        verbose: bool = False,
     ) -> None:
         """Test the context limits for models.
 

@@ -22,7 +22,18 @@ except ImportError:
 
 
 class LMStrix:
-    """Provides a high-level, simplified interface to LMStrix's core features."""
+    """High-level interface to LMStrix's core features.
+
+    This class provides a simplified API for common LMStrix operations including
+    model scanning, listing, context testing, and inference. It handles the
+    underlying async operations and registry management automatically.
+
+    Example:
+        >>> lms = LMStrix(verbose=True)
+        >>> models = lms.scan()  # Discover all LM Studio models
+        >>> lms.test_model(models[0].id)  # Test context limits
+        >>> await lms.infer(models[0].id, "Hello, world!")
+    """
 
     def __init__(self, verbose: bool = False) -> None:
         """Initializes the LMStrix API wrapper.
@@ -33,17 +44,63 @@ class LMStrix:
         self.verbose = verbose
 
     def scan(self) -> list[Model]:
-        """Scans for LM Studio models, updates the registry, and returns all models."""
+        """Scan for LM Studio models and update the registry.
+
+        Discovers all models currently available in LM Studio, updates the
+        local registry with any new models found, and returns the complete
+        list of models.
+
+        Returns:
+            List of all Model objects found in LM Studio.
+
+        Example:
+            >>> lms = LMStrix()
+            >>> models = lms.scan()
+            >>> print(f"Found {len(models)} models")
+        """
         registry = scan_and_update_registry(verbose=self.verbose)
         return registry.list_models()
 
     def list_models(self) -> list[Model]:
-        """Lists all models currently in the registry."""
+        """List all models currently in the registry.
+
+        Returns the cached list of models from the local registry without
+        performing a new scan. Use scan() to update the registry first.
+
+        Returns:
+            List of Model objects from the local registry.
+
+        Example:
+            >>> lms = LMStrix()
+            >>> models = lms.list_models()
+            >>> for model in models:
+            ...     print(f"{model.id}: {model.context_test_status}")
+        """
         registry = load_model_registry(verbose=self.verbose)
         return registry.list_models()
 
     def test_model(self, model_id: str) -> Model:
-        """Runs the context-length test on a specific model and returns the updated model data."""
+        """Test a model's true operational context limits.
+
+        Performs a binary search to find the maximum context size that the
+        model can reliably handle on the current hardware. The test uses
+        a simple prompt ("2+2=") padded with filler text to various lengths
+        and validates that the model returns the correct answer ("4").
+
+        Args:
+            model_id: The ID of the model to test.
+
+        Returns:
+            Updated Model object with test results.
+
+        Raises:
+            ValueError: If the model is not found in the registry.
+
+        Example:
+            >>> lms = LMStrix()
+            >>> model = lms.test_model("llama-model-id")
+            >>> print(f"Max context: {model.tested_max_context} tokens")
+        """
         registry = load_model_registry(verbose=self.verbose)
         model = registry.get_model(model_id)
         if not model:

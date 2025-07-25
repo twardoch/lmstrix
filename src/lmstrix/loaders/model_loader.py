@@ -99,13 +99,16 @@ def scan_and_update_registry(
             existing_model.path = Path(model_data.get("path", existing_model.path))
             existing_model.size = model_data.get("size_bytes", existing_model.size)
             existing_model.context_limit = model_data.get(
-                "context_length", existing_model.context_limit
+                "context_length",
+                existing_model.context_limit,
             )
             existing_model.supports_tools = model_data.get(
-                "has_tools", existing_model.supports_tools
+                "has_tools",
+                existing_model.supports_tools,
             )
             existing_model.supports_vision = model_data.get(
-                "has_vision", existing_model.supports_vision
+                "has_vision",
+                existing_model.supports_vision,
             )
 
             # Handle rescan options
