@@ -10,7 +10,6 @@ from lmstrix.core.context_tester import ContextTester
 from lmstrix.core.inference import InferenceEngine
 from lmstrix.loaders.model_loader import (
     load_model_registry,
-    save_model_registry,
     scan_and_update_registry,
 )
 
@@ -110,12 +109,13 @@ class LMStrixCLI:
 
         tester = ContextTester()
         for model in models_to_test:
-            updated_model = asyncio.run(tester.test_model(model))
+            updated_model = asyncio.run(tester.test_model(model, registry=registry))
+            # Registry is already updated and saved within test_model,
+            # but we'll update here too for consistency
             registry.update_model(
                 updated_model.id,
                 updated_model,
-            )  # Update the model in the registry
-            save_model_registry(registry)  # Save after each test
+            )
 
             if updated_model.context_test_status.value == "completed":
                 console.print(

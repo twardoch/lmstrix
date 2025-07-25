@@ -5,6 +5,35 @@ All notable changes to the LMStrix project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Smart Context Testing with Progress Saving**
+  - Context tests now start with small context (32) to verify model loads
+  - Added fields to track last known good/bad context sizes
+  - Tests can resume from previous state if interrupted
+  - Progress is saved to JSON after each test iteration
+  - Changed test prompt from "2+2=" to "Say hello" for better reliability
+
+### Fixed
+
+- **Terminology Improvements**
+  - Changed "Loaded X models" to "Read X models" to avoid confusion with LM Studio's model loading
+  - Replaced generic "Check logs for details" with specific error messages
+
+- **Context Testing Stability**
+  - Added delays between model load/unload operations to prevent rapid cycling
+  - Fixed connection reset issues caused by too-rapid operations
+  - Enhanced binary search logging to show progress clearly
+
+### Changed
+
+- **Model Data Structure**
+  - Added `last_known_good_context` field for resumable testing
+  - Added `last_known_bad_context` field for resumable testing
+  - Updated registry serialization to include new fields
+
 ## [1.0.28] - 2025-07-25
 
 ### Added

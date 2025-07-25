@@ -53,6 +53,14 @@ class Model(BaseModel):
         default=None,
         description="Maximum context at which model loads successfully",
     )
+    last_known_good_context: int | None = Field(
+        default=None,
+        description="Last confirmed working context size (for resuming tests)",
+    )
+    last_known_bad_context: int | None = Field(
+        default=None,
+        description="Last confirmed failing context size (for resuming tests)",
+    )
     context_test_status: ContextTestStatus = Field(
         default=ContextTestStatus.UNTESTED,
         description="Status of context testing",
@@ -99,11 +107,13 @@ class Model(BaseModel):
             "has_vision": self.supports_vision,
             "tested_max_context": self.tested_max_context,
             "loadable_max_context": self.loadable_max_context,
+            "last_known_good_context": self.last_known_good_context,
+            "last_known_bad_context": self.last_known_bad_context,
             "context_test_status": self.context_test_status.value,
             "context_test_log": self.context_test_log,
-            "context_test_date": self.context_test_date.isoformat()
-            if self.context_test_date
-            else None,
+            "context_test_date": (
+                self.context_test_date.isoformat() if self.context_test_date else None
+            ),
             "failed": self.failed,
             "error_msg": self.error_msg,
         }

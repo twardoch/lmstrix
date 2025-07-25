@@ -893,6 +893,35 @@ All notable changes to the LMStrix project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Smart Context Testing with Progress Saving**
+  - Context tests now start with small context (32) to verify model loads
+  - Added fields to track last known good/bad context sizes
+  - Tests can resume from previous state if interrupted
+  - Progress is saved to JSON after each test iteration
+  - Changed test prompt from "2+2=" to "Say hello" for better reliability
+
+### Fixed
+
+- **Terminology Improvements**
+  - Changed "Loaded X models" to "Read X models" to avoid confusion with LM Studio's model loading
+  - Replaced generic "Check logs for details" with specific error messages
+
+- **Context Testing Stability**
+  - Added delays between model load/unload operations to prevent rapid cycling
+  - Fixed connection reset issues caused by too-rapid operations
+  - Enhanced binary search logging to show progress clearly
+
+### Changed
+
+- **Model Data Structure**
+  - Added `last_known_good_context` field for resumable testing
+  - Added `last_known_bad_context` field for resumable testing
+  - Updated registry serialization to include new fields
+
 ## [1.0.28] - 2025-07-25
 
 ### Added
@@ -2084,7 +2113,14 @@ The test suite is designed to run in CI/CD pipelines:
 <document index="14">
 <source>TODO.md</source>
 <document_content>
-# TODO List for LMStrix v1.0 Release
+# TODO List for LMStrix
+
+## Immediate Tasks
+
+- [ ] Test the improved context testing with actual models
+- [ ] Verify progress saving/resuming works correctly
+- [ ] Update documentation to reflect new testing behavior
+- [ ] Consider adding unit tests for new functionality
 
 ## Phase 4: Package & Release
 
@@ -2099,6 +2135,14 @@ The test suite is designed to run in CI/CD pipelines:
 - [ ] Verify all CLI commands work after PyPI install
 - [ ] Create GitHub release from v1.0.30 tag
 - [ ] Write comprehensive release notes for GitHub
+
+## Future Improvements
+
+- [ ] Add support for custom test prompts via CLI argument
+- [ ] Add option to test multiple prompts for more robust validation
+- [ ] Consider adding GPU memory monitoring during tests
+- [ ] Add visual progress bar for context testing
+- [ ] Support for testing with specific document types (code, prose, etc.)
 </document_content>
 </document>
 
@@ -2107,41 +2151,70 @@ The test suite is designed to run in CI/CD pipelines:
 <document_content>
 # Work Progress
 
-## Current Work Session - v1.0.30 Release
+## Current Work Session - Issue #106 Improvements
 
 ### Completed Tasks
 
-1. **Git Tag Creation** ✓
-   - Created annotated tag v1.0.30
-   - Tag includes release message with changelog summary
+1. **Fixed Terminology Issues** (Issue #105) ✓
+   - Changed "Loaded X models" to "Read X models" in log messages
+   - Updated both models.py and model_loader.py
+   - Avoids confusion with LM Studio's model loading functionality
 
-2. **Package Building** ✓
-   - Successfully built wheel and sdist packages
-   - Files created: lmstrix-1.0.30-py3-none-any.whl and lmstrix-1.0.30.tar.gz
-   - Version automatically updated via hatch-vcs
+2. **Improved Error Messages** ✓
+   - Replaced generic "Check logs for details" with specific error messages
+   - Now shows actual error: e.g., "Failed: Model not found"
+   - Much more helpful for debugging
 
-3. **Release Preparation** ✓
-   - Created RELEASE_NOTES.md with comprehensive information
-   - Documented PyPI upload instructions
-   - Verified twine is installed and ready
+3. **Fixed Rapid Load/Unload Issues** (Issue #106) ✓
+   - Added 0.5s delays before loading and after unloading models
+   - Prevents rapid cycling that was causing connection resets
+   - Added better logging to show binary search progress
 
-### Ready for PyPI Upload
+4. **Implemented Smart Context Testing** (Issue #106) ✓
+   - Changed from "2+2=" test to "Say hello" for better reliability
+   - Start with small context (32) to verify model loads
+   - Extended Model data structure to track:
+     - last_known_good_context
+     - last_known_bad_context
+   - Test can now resume from previous state if interrupted
+   - Progress is saved after each test iteration
 
-The release packages are built and ready for upload. To publish:
+5. **Enhanced Binary Search Algorithm** ✓
+   - First tests with minimal context to ensure model loads
+   - If previous test was interrupted, resumes from last known state
+   - Saves progress to JSON after each test
+   - Tracks both working context and loadable context separately
 
-```bash
-python -m twine upload dist/*
-```
+### Technical Changes
 
-### Work Log
+1. **Model.py Changes**:
+   - Added `last_known_good_context` field
+   - Added `last_known_bad_context` field
+   - Updated `to_registry_dict()` to include new fields
 
-- Executed /report command - cleaned up completed tasks
-- Updated PLAN.md with comprehensive release plan
-- Created fresh TODO.md with release tasks only
-- Created git tag v1.0.30
-- Built distribution packages successfully
-- Created release documentation
-- Project is ready for PyPI publication
+2. **ContextTester Changes**:
+   - Changed test prompt from "2+2=" to "Say hello"
+   - Changed validation to check if "hello" is in response (case-insensitive)
+   - Complete rewrite of `test_model()` method:
+     - Accepts registry parameter for saving progress
+     - Starts with context 32 instead of 2048
+     - Saves after each test iteration
+     - Can resume from previous test state
+
+3. **CLI Changes**:
+   - Updated to pass registry to test_model()
+   - Shows specific error messages instead of generic ones
+
+### Next Steps
+
+The improvements requested in Issue #106 have been implemented. The testing system now:
+- Starts with a small context to verify the model loads
+- Uses a simple "Say hello" prompt that's more reliable
+- Saves progress after each test so it can resume if interrupted
+- Uses a smart binary search that tracks both good and bad context sizes
+- Provides clear error messages and progress indicators
+
+The code is ready for testing with actual models.
 </document_content>
 </document>
 
@@ -5244,7 +5317,6 @@ from lmstrix.core.context_tester import ContextTester
 from lmstrix.core.inference import InferenceEngine
 from lmstrix.loaders.model_loader import (
     load_model_registry,
-    save_model_registry,
     scan_and_update_registry,
 )
 
@@ -5402,6 +5474,7 @@ from loguru import logger
 from lmstrix.api import LMStudioClient
 from lmstrix.api.exceptions import ModelLoadError
 from lmstrix.core.models import ContextTestStatus, Model
+from lmstrix.loaders.model_loader import load_model_registry, save_model_registry
 from lmstrix.utils import get_context_test_log_path
 
 class ContextTestResult:
@@ -5419,7 +5492,7 @@ class ContextTestResult:
     def to_dict((self)) -> dict:
         """Convert to dictionary for logging."""
     def is_valid_response((self, expected: str)) -> bool:
-        """Check if response matches expected output."""
+        """Check if response contains expected output."""
 
 class ContextTester:
     """Tests models to find their true operational context limits."""
@@ -5437,10 +5510,11 @@ class ContextTester:
     def test_model((
         self,
         model: Model,
-        min_context: int = 2048,
+        min_context: int = 32,
         max_context: int | None = None,
+        registry=None,
     )) -> Model:
-        """Run full context test on a model using binary search."""
+        """Run full context test on a model using smart binary search with progress saving."""
 
 def __init__((
         self,
@@ -5457,7 +5531,7 @@ def to_dict((self)) -> dict:
     """Convert to dictionary for logging."""
 
 def is_valid_response((self, expected: str)) -> bool:
-    """Check if response matches expected output."""
+    """Check if response contains expected output."""
 
 def __init__((self, client: LMStudioClient | None = None)) -> None:
     """Initialize context tester."""
@@ -5476,10 +5550,11 @@ def _test_at_context((
 def test_model((
         self,
         model: Model,
-        min_context: int = 2048,
+        min_context: int = 32,
         max_context: int | None = None,
+        registry=None,
     )) -> Model:
-    """Run full context test on a model using binary search."""
+    """Run full context test on a model using smart binary search with progress saving."""
 
 
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py
@@ -6950,23 +7025,23 @@ def test_directory_creation_permissions_error((self, tmp_path)) -> None:
 # File: /Users/Shared/lmstudio/lmstrix/tests/utils/test_paths.py
 # Language: python
 
-import pytest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
-from lmstrix.utils.paths import get_lmstudio_path, get_default_models_file
+from unittest.mock import MagicMock, patch
+import pytest
+from lmstrix.utils.paths import get_default_models_file, get_lmstudio_path
 
-def test_get_lmstudio_path_from_pointer((mock_home)):
+def test_get_lmstudio_path_from_pointer((mock_home)) -> None:
     """ Tests that the path is correctly read from the .lmstudio-home-pointer file...."""
 
-def test_fallback_to_default_directories((mock_home, mock_exists)):
+def test_fallback_to_default_directories((mock_home, mock_exists)) -> None:
     """ Tests the fallback mechanism when the pointer file doesn't exist...."""
 
 def path_exists_side_effect((path)):
 
-def test_no_path_found_raises_error((mock_home, mock_exists)):
+def test_no_path_found_raises_error((mock_home, mock_exists)) -> None:
     """ Tests that a FileNotFoundError is raised if no LM Studio path can be found...."""
 
-def test_get_default_models_file_path((mock_get_lmstudio_path)):
+def test_get_default_models_file_path((mock_get_lmstudio_path)) -> None:
     """ Ensures the models file path is correctly constructed inside the LM Studio dir...."""
 
 
