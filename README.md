@@ -1,12 +1,10 @@
-# LMStrix: The Unofficial Toolkit for Mastering LM Studio
-
 LMStrix is a professional, installable Python toolkit designed to supercharge your interaction with [LM Studio](https://lmstudio.ai/). It provides a powerful command-line interface (CLI) and a clean Python API for managing, testing, and running local language models, with a standout feature: the **Adaptive Context Optimizer**.
 
 **For the full documentation, please visit the [LMStrix GitHub Pages site](https://twardoch.github.io/lmstrix/).**
 
 ## Key Features
 
-- **Automatic Context Optimization**: Discover the true context limit of any model with the `optimize` command.
+- **Automatic Context Optimization**: Discover the true context limit of any model with the `test` command.
 - **Full Model Management**: Programmatically `list` available models and `scan` for newly downloaded ones.
 - **Flexible Inference Engine**: Run inference with a powerful two-phase prompt templating system that separates prompt structure from its content.
 - **Rich CLI**: A beautiful and intuitive command-line interface built with `rich` and `fire`.
@@ -93,6 +91,10 @@ pip install -e ".[dev]"
 # Run the test suite
 pytest
 ```
+
+## Changelog
+
+All notable changes to this project are documented in the [CHANGELOG.md](https://twardoch.github.io/lmstrix/changelog) file.
 
 ## License
 

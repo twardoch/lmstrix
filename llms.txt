@@ -2,7 +2,8 @@ Project Structure:
 📁 lmstrix
 ├── 📁 context_tests
 ├── 📁 docs
-│   ├── 📁 _includes
+│   ├── 📁 _data
+│   │   └── 📄 navigation.yml
 │   ├── 📁 _layouts
 │   │   └── 📄 default.html
 │   ├── 📁 assets
@@ -10,6 +11,8 @@ Project Structure:
 │   │       └── 📄 style.css
 │   ├── 📄 _config.yml
 │   ├── 📄 api.md
+│   ├── 📄 changelog.md
+│   ├── 📄 how-it-works.md
 │   ├── 📄 index.md
 │   ├── 📄 installation.md
 │   └── 📄 usage.md
@@ -1690,15 +1693,13 @@ This phase focuses on ensuring the existing codebase is robust, reliable, and fr
 <document index="11">
 <source>README.md</source>
 <document_content>
-# LMStrix: The Unofficial Toolkit for Mastering LM Studio
-
 LMStrix is a professional, installable Python toolkit designed to supercharge your interaction with [LM Studio](https://lmstudio.ai/). It provides a powerful command-line interface (CLI) and a clean Python API for managing, testing, and running local language models, with a standout feature: the **Adaptive Context Optimizer**.
 
 **For the full documentation, please visit the [LMStrix GitHub Pages site](https://twardoch.github.io/lmstrix/).**
 
 ## Key Features
 
-- **Automatic Context Optimization**: Discover the true context limit of any model with the `optimize` command.
+- **Automatic Context Optimization**: Discover the true context limit of any model with the `test` command.
 - **Full Model Management**: Programmatically `list` available models and `scan` for newly downloaded ones.
 - **Flexible Inference Engine**: Run inference with a powerful two-phase prompt templating system that separates prompt structure from its content.
 - **Rich CLI**: A beautiful and intuitive command-line interface built with `rich` and `fire`.
@@ -1785,6 +1786,10 @@ pip install -e ".[dev]"
 # Run the test suite
 pytest
 ```
+
+## Changelog
+
+All notable changes to this project are documented in the [CHANGELOG.md](https://twardoch.github.io/lmstrix/changelog) file.
 
 ## License
 
@@ -2176,6 +2181,25 @@ github:
 </document>
 
 <document index="18">
+<source>docs/_data/navigation.yml</source>
+<document_content>
+- title: Home
+  url: /
+- title: Installation
+  url: /installation
+- title: Usage
+  url: /usage
+- title: API Reference
+  url: /api
+- title: How It Works
+  url: /how-it-works
+- title: Changelog
+  url: /changelog
+
+</document_content>
+</document>
+
+<document index="19">
 <source>docs/_layouts/default.html</source>
 <document_content>
 <!DOCTYPE html>
@@ -2207,10 +2231,9 @@ github:
       <div class="d-flex">
         <nav class="flex-self-start col-3 pr-4">
           <ul>
-            <li><a href="{{ "/" | relative_url }}">Home</a></li>
-            <li><a href="{{ "/installation" | relative_url }}">Installation</a></li>
-            <li><a href="{{ "/usage" | relative_url }}">Usage</a></li>
-            <li><a href="{{ "/api" | relative_url }}">API Reference</a></li>
+            {% for item in site.data.navigation %}
+              <li><a href="{{ item.url | relative_url }}">{{ item.title }}</a></li>
+            {% endfor %}
           </ul>
         </nav>
 
@@ -2238,7 +2261,7 @@ github:
 </document_content>
 </document>
 
-<document index="19">
+<document index="20">
 <source>docs/api.md</source>
 <document_content>
 ---
@@ -2260,10 +2283,10 @@ The main entry point for interacting with the API.
 
 #### Methods
 
-- `async scan_models()`: Scans for available models in LM Studio.
-- `async list_models()`: Returns a list of `Model` objects.
-- `async test_model(model_id: str)`: Tests the context limit of a specific model.
-- `async infer(prompt: str, model_id: str, **kwargs)`: Runs inference on a model.
+- `async scan_models()`: Scans for available models in LM Studio and updates the local model registry.
+- `async list_models()`: Returns a list of `Model` objects from the local registry.
+- `async test_model(model_id: str)`: Tests the context limit of a specific model and updates the registry with the result.
+- `async infer(prompt: str, model_id: str, **kwargs)`: Runs inference on a model. Any additional keyword arguments are passed to the `complete()` method of the `lmstudio` client.
 
 ### The `Model` Class
 
@@ -2271,10 +2294,10 @@ Represents a model in LM Studio.
 
 #### Attributes
 
-- `id`: The model ID.
-- `context_limit`: The declared context limit of the model.
-- `tested_max_context`: The tested maximum context limit.
-- `context_test_status`: The status of the context test.
+- `id`: The model ID (e.g., `lmstudio-community/gemma-2b-it-GGUF`).
+- `context_limit`: The declared context limit of the model, as reported by LM Studio.
+- `tested_max_context`: The empirically tested maximum context limit that the model can handle on your machine. `None` if the model has not been tested.
+- `context_test_status`: The status of the context test. Can be one of `"passed"`, `"failed"`, or `"not_tested"`.
 
 ### The `InferenceResponse` Class
 
@@ -2282,13 +2305,13 @@ Represents the response from an inference request.
 
 #### Attributes
 
-- `content`: The content of the response.
-- `usage`: A dictionary containing token usage information.
+- `content`: The text content of the model's response.
+- `usage`: A dictionary containing token usage information, e.g., `{'prompt_tokens': 10, 'completion_tokens': 20, 'total_tokens': 30}`.
 
 </document_content>
 </document>
 
-<document index="20">
+<document index="21">
 <source>docs/assets/css/style.css</source>
 <document_content>
 @import "https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css";
@@ -2355,7 +2378,124 @@ body {
 </document_content>
 </document>
 
-<document index="21">
+<document index="22">
+<source>docs/changelog.md</source>
+<document_content>
+---
+layout: default
+title: Changelog
+---
+
+# Changelog
+
+All notable changes to the LMStrix project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.0.23] - 2025-07-25
+
+### Added
+
+- Implemented comprehensive `test_binary_search_logic` test function with edge cases:
+  - Model that works at all sizes
+  - Model that never works  
+  - Model that loads but never passes inference
+  - Model that works up to a specific context size
+  - Model that never loads
+
+### Fixed
+
+- Fixed syntax errors in Python example files:
+  - `examples/python/batch_processing.py` - Fixed unterminated string literals
+  - `examples/python/custom_inference.py` - Fixed similar syntax issues
+- Improved code quality by fixing linting issues:
+  - Updated file operations to use `Path.open()` instead of `open()` (PTH123)
+  - Added proper exception chaining with `from e` (B904)
+  - Fixed shadowing of Python builtin `all` by renaming to `all_models` (A002)
+- Updated `api/client.py` to handle different attribute names for LLMs vs Embeddings
+
+### Changed
+
+- All mypy type checking now passes without errors
+- Package builds successfully as v1.0.23
+
+## [1.0.21] - 2025-07-25
+
+### Fixed
+
+- Code formatting improvements in test files for better readability
+- Updated `cleanup.sh` script
+- Reduced size of `llms.txt` file significantly for better performance
+
+## [1.0.0] - 2025-07-25
+
+### Changed
+
+- **Major Refactoring: `litellm` to Native `lmstudio` Integration**
+  - **Dependency Pivot**: Completely removed the `litellm` dependency and replaced it with the native `lmstudio` package for all model interactions. This provides a more robust, reliable, and direct integration.
+  - **API Client (`api/client.py`)**: Rewritten to be a direct, thin wrapper around the `lmstudio` package’s core functions (`list_downloaded_models`, `llm`, `complete`, `unload`).
+  - **Context Tester (`core/context_tester.py`)**: The engine for finding the true context limit of a model has been completely rewritten to use the native `lmstudio` client. It now performs a binary search, efficiently loading, testing, and unloading models to determine the maximum operational context size.
+  - **Inference Engine (`core/inference.py`)**: Updated to use the native client, ensuring models are loaded with their tested, validated context length before running inference.
+  - **Model Discovery (`loaders/model_loader.py`)**: The model scanner now uses `lmstudio` to discover all downloaded models, ensuring the local registry is always perfectly in sync with the LM Studio application.
+
+### Added
+
+- **System Path and Data Storage**
+  - Implemented robust detection of the LM Studio data directory by reading the `$HOME/.lmstudio-home-pointer` file.
+  - All application data, including the model registry, is now stored in a clean, standardized `lmstrix.json` file directly within the located LM Studio data directory.
+  - All test logs are stored in a `context_tests` subdirectory within a new `lmstrix` folder in the LM Studio data directory.
+
+- **CLI and API Enhancements**
+  - **CLI (`cli/main.py`)**: All commands (`scan`, `list`, `test`, `infer`) have been updated to use the new, refactored core logic, providing a seamless user experience.
+  - **Public API (`__init__.py`)**: The high-level `LMStrix` class has been simplified to provide a clean, modern, and programmatic interface to the library's `lmstudio`-native functionality.
+
+### Fixed
+
+- Resolved all previous import and dependency issues related to `litellm`.
+- Standardized the data storage location to prevent fragmentation and improve reliability.
+
+## [0.1.0] - 2025-07-24
+
+### Added
+
+- Initial project structure with `src/` layout.
+- First implementation of core components using `litellm`.
+- Basic CLI and API interfaces.
+
+</document_content>
+</document>
+
+<document index="23">
+<source>docs/how-it-works.md</source>
+<document_content>
+---
+layout: default
+title: How It Works
+---
+
+## How It Works: The Adaptive Context Optimizer
+
+The core innovation in LMStrix is its ability to **automatically discover the maximum operational context length** for any model loaded in LM Studio.
+
+It uses a sophisticated **binary search algorithm**:
+1.  It starts with a wide range for the possible context size.
+2.  It sends a specially crafted prompt to the model, progressively increasing the amount of "filler" text.
+3.  It analyzes the model's response (or lack thereof) to see if it successfully processed the context.
+4.  By repeatedly narrowing the search range, it quickly pinpoints the precise token count where the model's performance degrades or fails.
+
+This gives you a reliable, empirical measurement of the model's true capabilities on your specific hardware, eliminating guesswork and ensuring your applications run with optimal performance.
+
+### The `test` Command
+
+The `test` command is the heart of the context optimization process. When you run `lmstrix test <model-id>`, it performs the binary search algorithm described above.
+
+The command saves the results of the test to a local registry, so you only need to test each model once.
+
+</document_content>
+</document>
+
+<document index="24">
 <source>docs/index.md</source>
 <document_content>
 ---
@@ -2401,7 +2541,7 @@ This gives you a reliable, empirical measurement of the model's true capabilitie
 </document_content>
 </document>
 
-<document index="22">
+<document index="25">
 <source>docs/installation.md</source>
 <document_content>
 ---
@@ -2442,7 +2582,7 @@ pip install -e .[dev]
 </document_content>
 </document>
 
-<document index="23">
+<document index="26">
 <source>docs/usage.md</source>
 <document_content>
 ---
@@ -2481,6 +2621,8 @@ lmstrix test "model-id-here"
 # Test all models that haven't been tested yet
 lmstrix test --all
 ```
+
+For more details on how this works, see the [How It Works](./how-it-works.md) page.
 
 ### Running Inference
 
@@ -2549,7 +2691,7 @@ if __name__ == "__main__":
 </document_content>
 </document>
 
-<document index="24">
+<document index="27">
 <source>examples/README.md</source>
 <document_content>
 # LMStrix Usage Examples
@@ -2618,7 +2760,7 @@ python3 python/basic_usage.py
 </document_content>
 </document>
 
-<document index="25">
+<document index="28">
 <source>examples/cli/basic_workflow.sh</source>
 <document_content>
 #!/bin/bash
@@ -2678,7 +2820,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="26">
+<document index="29">
 <source>examples/cli/inference_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -2740,7 +2882,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="27">
+<document index="30">
 <source>examples/cli/model_testing.sh</source>
 <document_content>
 #!/bin/bash
@@ -2798,7 +2940,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="28">
+<document index="31">
 <source>examples/data/sample_context.txt</source>
 <document_content>
 This is a sample text file designed for context length testing in LMStrix. The purpose of this file is to provide a sufficiently large and repetitive block of text that can be used to fill the context window of a large language model. By feeding a model a long prompt composed of this text, we can determine the maximum number of tokens it can process before it fails to load or produce a coherent response. This process is crucial for understanding the true operational limits of a model, which may differ from the limits advertised by its developers. The text itself is not intended to be meaningful, but rather to serve as a consistent and measurable filler for the model's context buffer. The repetition ensures that the content is uniform and does not introduce unexpected variables into the testing process.
@@ -2814,7 +2956,7 @@ This is a sample text file designed for context length testing in LMStrix. The p
 </document_content>
 </document>
 
-<document index="29">
+<document index="32">
 <source>examples/data/test_questions.json</source>
 <document_content>
 [
@@ -2826,7 +2968,7 @@ This is a sample text file designed for context length testing in LMStrix. The p
 </document_content>
 </document>
 
-<document index="30">
+<document index="33">
 <source>examples/examples.err.txt</source>
 <document_content>
   File "/Users/Shared/lmstudio/lmstrix/examples/./python/basic_usage.py", line 12
@@ -2837,7 +2979,7 @@ SyntaxError: unterminated string literal (detected at line 12)
 </document_content>
 </document>
 
-<document index="31">
+<document index="34">
 <source>examples/examples.log.txt</source>
 <document_content>
 ===== Running All LMStrix Examples =====
@@ -4253,7 +4395,7 @@ NOTE: The Python scripts will use the first model they find.
 </document_content>
 </document>
 
-<document index="32">
+<document index="35">
 <source>examples/prompts/analysis.toml</source>
 <document_content>
 # examples/prompts/analysis.toml
@@ -4274,7 +4416,7 @@ description = "Analyzes the sentiment of a given text."
 </document_content>
 </document>
 
-<document index="33">
+<document index="36">
 <source>examples/prompts/coding.toml</source>
 <document_content>
 # examples/prompts/coding.toml
@@ -4296,7 +4438,7 @@ description = "Explains a snippet of code."
 </document_content>
 </document>
 
-<document index="34">
+<document index="37">
 <source>examples/prompts/creative.toml</source>
 <document_content>
 # examples/prompts/creative.toml
@@ -4313,7 +4455,7 @@ description = "Generates a story idea from a genre and character."
 </document_content>
 </document>
 
-<document index="35">
+<document index="38">
 <source>examples/prompts/qa.toml</source>
 <document_content>
 # examples/prompts/qa.toml
@@ -4372,7 +4514,7 @@ def main(()) -> None:
     """Demonstrates custom inference workflows with the LMStrix Python API."""
 
 
-<document index="36">
+<document index="39">
 <source>examples/run_all_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -4444,7 +4586,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="37">
+<document index="40">
 <source>issues/101.txt</source>
 <document_content>
 Shouldn't the code use @ref/llmstudio.txt for much more? We don't want to use inferencing by `litellm`, it's shit. We want to use to use the `lmstudio` package for loading models and also for completion/inferencing.
@@ -4452,7 +4594,7 @@ Shouldn't the code use @ref/llmstudio.txt for much more? We don't want to use in
 </document_content>
 </document>
 
-<document index="38">
+<document index="41">
 <source>issues/102.txt</source>
 <document_content>
 ```
@@ -4496,7 +4638,7 @@ Make sure @examples complement @tests well. Include sensible prompt files and ot
 </document_content>
 </document>
 
-<document index="39">
+<document index="42">
 <source>issues/103.txt</source>
 <document_content>
 Now /report then /cleanup and then /plan the next steps and then /work /work /work
@@ -4504,7 +4646,7 @@ Now /report then /cleanup and then /plan the next steps and then /work /work /wo
 </document_content>
 </document>
 
-<document index="40">
+<document index="43">
 <source>issues/104.txt</source>
 <document_content>
 
@@ -4721,7 +4863,7 @@ Othello:lmstudio adam$
 </document_content>
 </document>
 
-<document index="41">
+<document index="44">
 <source>obsolete/lmsm.json</source>
 <document_content>
 {
@@ -4810,7 +4952,7 @@ def list((self, all_rescan: bool = False, failed_rescan: bool = False)) -> None:
     """List all models in LMStudio"""
 
 
-<document index="42">
+<document index="45">
 <source>prompt.txt</source>
 <document_content>
 This is a prompt from a file.
@@ -4818,7 +4960,7 @@ This is a prompt from a file.
 </document_content>
 </document>
 
-<document index="43">
+<document index="46">
 <source>pyproject.toml</source>
 <document_content>
 [build-system]
@@ -5137,7 +5279,7 @@ directory = "htmlcov"
 </document_content>
 </document>
 
-<document index="44">
+<document index="47">
 <source>pytest.ini</source>
 <document_content>
 [pytest]
@@ -6015,7 +6157,7 @@ def save_prompts((
     """Save prompts to a TOML file."""
 
 
-<document index="45">
+<document index="48">
 <source>src/lmstrix/py.typed</source>
 <document_content>
 # This file indicates that the package supports type hints
