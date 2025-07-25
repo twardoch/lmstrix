@@ -1,0 +1,211 @@
+
+
+
+NAME
+    __main__.py - A CLI for testing and managing LM Studio models.
+
+SYNOPSIS
+    __main__.py COMMAND
+
+DESCRIPTION
+    A CLI for testing and managing LM Studio models.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     infer
+       Run inference on a specified model.
+
+     list
+       List all models from the registry with their test status.
+
+     scan
+       Scan for LM Studio models and update the local registry.
+
+     test
+       Test the context limits for models.
+(END)...skipping...
+NAME
+    __main__.py - A CLI for testing and managing LM Studio models.
+
+SYNOPSIS
+    __main__.py COMMAND
+
+DESCRIPTION
+    A CLI for testing and managing LM Studio models.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     infer
+       Run inference on a specified model.
+
+     list
+       List all models from the registry with their test status.
+
+     scan
+       Scan for LM Studio models and update the local registry.
+
+     test
+       Test the context limits for models.
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+Othello:lmstudio adam$ lmstrix list
+No models found. Run 'lmstrix scan' to discover models.
+Othello:lmstudio adam$ lmstrix scan
+Model scan complete.
+                                                             LM Studio Models
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳┳┳┳┓
+┃ Model ID                                                                                                                            ┃┃┃┃┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇╇╇╇┩
+│ DownloadedEmbeddingModel(model_key='text-embedding-mxbai-embed-xsmall-v1-i1', display_name='Mxbai Embed Xsmall v1 I1', architectur… │││││
+│ DownloadedEmbeddingModel(model_key='text-embedding-nomic-embed-text-v1.5', display_name='Nomic Embed Text v1.5', architecture='nom… │││││
+│ DownloadedEmbeddingModel(model_key='text-embedding-nomic-embed-text-v2', display_name='Nomic Embed Text v2 MoE', architecture='nom… │││││
+│ DownloadedEmbeddingModel(model_key='text-embedding-qwen3-embedding-0.6b', display_name='Qwen3 Embedding 0.6B', architecture='qwen3… │││││
+│ DownloadedLlm(model_key='amoral-qwen3-14b-i1', display_name='Amoral Qwen3 14B I1', architecture='qwen3', vision=False)              │││││
+│ DownloadedLlm(model_key='bge-small-en-v1.5', display_name='Bge Small En v1.5', architecture='bert', vision=False)                   │││││
+│ DownloadedLlm(model_key='comedy_13b_dpo', display_name='COMEDY 13B DPO', architecture='llama', vision=False)                        │││││
+│ DownloadedLlm(model_key='comicbot_v.2', display_name='Mistral Comedy 3.0 Ckpt 1600', architecture='llama', vision=False)            │││││
+│ DownloadedLlm(model_key='deepscaler-1.5b-preview-mlx', display_name='DeepScaleR 1.5B Preview', architecture='qwen2', vision=False)  │││││
+│ DownloadedLlm(model_key='deepseek-r1-distill-qwen-14b', display_name='DeepSeek R1 Distill Qwen 14B', architecture='qwen2', vision=… │││││
+│ DownloadedLlm(model_key='deepseek-vl2-small', display_name='Deepseek Vl2 Small', architecture='deepseek_vl_v2', vision=True)        │││││
+│ DownloadedLlm(model_key='deepseek/deepseek-r1-0528-qwen3-8b', display_name='Deepseek R1 0528 Qwen3 8B', architecture='qwen3', visi… │││││
+│ DownloadedLlm(model_key='dream-org_dream-v0-instruct-7b', display_name='Dream Org Dream v0 Instruct 7B', architecture='dream', vis… │││││
+│ DownloadedLlm(model_key='google/gemma-3-12b', display_name='Gemma 3 12B', architecture='gemma3', vision=True)                       │││││
+│ DownloadedLlm(model_key='granite-4.0-tiny-preview', display_name='Granite 4.0 Tiny Preview', architecture='granitehybrid', vision=… │││││
+│ DownloadedLlm(model_key='j.a.r.v.i.s-v2.0', display_name='J a R V I S v2.0', architecture='llama', vision=False)                    │││││
+│ DownloadedLlm(model_key='jina-embeddings-v4-text-retrieval@q3_k_m', display_name='Jina Embeddings v4 Retrieval', architecture='qwe… │││││
+│ DownloadedLlm(model_key='jina-embeddings-v4-text-retrieval@q8_0', display_name='Jina Embeddings v4 Retrieval', architecture='qwen2… │││││
+│ DownloadedLlm(model_key='jinaai-readerlm-v2', display_name='Jinaai ReaderLM v2', architecture='qwen2', vision=False)                │││││
+│ DownloadedLlm(model_key='llama-3-8b-instruct-64k', display_name='Llama 3 8B Instruct 64k', architecture='llama', vision=False)      │││││
+│ DownloadedLlm(model_key='llama-3-8b-instruct-gradient-1048k', display_name='Llama 3 8B Instruct Gradient 1048k', architecture='lla… │││││
+│ DownloadedLlm(model_key='llama-3-8b-lexifun-uncensored-v1', display_name='Llama 3 8B LexiFun Uncensored v1', architecture='llama',… │││││
+│ DownloadedLlm(model_key='llama-3-soliloquy-8b-v1.5-64k-i', display_name='Llama 3 Soliloquy 8B v1.5 64k Imat', architecture='llama'… │││││
+│ DownloadedLlm(model_key='llama-3.1-1-million-ctx-deephermes-deep-reasoning-8b', display_name='Llama 3.1 1 Million Ctx DeepHermes D… │││││
+│ DownloadedLlm(model_key='llama-3.1-8b-sarcasm', display_name='Llama 3.1 8B Sarcasm', architecture='llama', vision=False)            │││││
+│ DownloadedLlm(model_key='llama3-8b-darkidol-2.1-uncensored-1048k-iq-imatrix-request', display_name='Llama3 8B DarkIdol 2.1 Uncenso… │││││
+│ DownloadedLlm(model_key='lucy-128k', display_name='Lucy 128k', architecture='qwen3', vision=False)                                  │││││
+│ DownloadedLlm(model_key='megabeam-mistral-7b-512k', display_name='MegaBeam Mistral 7B 512k', architecture='llama', vision=False)    │││││
+│ DownloadedLlm(model_key='meta-llama-3-8b-instruct', display_name='Meta Llama 3 8B Instruct', architecture='llama', vision=False)    │││││
+│ DownloadedLlm(model_key='meta-llama-3-8b-instruct-64k', display_name='Meta Llama 3 8B Instruct 64k', architecture='llama', vision=… │││││
+│ DownloadedLlm(model_key='mistral-7b-sarcasm-scrolls-v2', display_name='Mistral 7B Sarcasm Scrolls v2', architecture='llama', visio… │││││
+│ DownloadedLlm(model_key='mistral-small-24b-instruct-2501-writer-i1', display_name='Mistral Small 24B Instruct 2501 Writer I1', arc… │││││
+│ DownloadedLlm(model_key='mistralai/devstral-small-2507', display_name='Devstral Small 2507', architecture='mistral', vision=False)  │││││
+│ DownloadedLlm(model_key='mistralai/magistral-small', display_name='Magistral Small', architecture='mistral', vision=False)          │││││
+│ DownloadedLlm(model_key='mistralai/mistral-small-3.2', display_name='Mistral Small 3.2', architecture='mistral3', vision=True)      │││││
+│ DownloadedLlm(model_key='mlabonne_qwen3-14b-abliterated', display_name='Mlabonne Qwen3 14B Abliterated', architecture='qwen3', vis… │││││
+│ DownloadedLlm(model_key='nazareai-senior-marketing-strategist', display_name='Unsloth', architecture='llama', vision=False)         │││││
+│ DownloadedLlm(model_key='nomicai-modernbert-embed-base', display_name='Nomicai Modernbert Embed Base', architecture='modernbert', … │││││
+│ DownloadedLlm(model_key='princeton-nlp.llama-3-8b-prolong-512k-instruct', display_name='Princeton Nlp Llama 3 8B ProLong 512k Inst… │││││
+│ DownloadedLlm(model_key='prithivmlmods.llama-chat-summary-3.2-3b', display_name='PrithivMLmods Llama Chat Summary 3.2 3B', archite… │││││
+│ DownloadedLlm(model_key='qwen/qwen2.5-coder-14b', display_name='Qwen2.5 Coder 14B', architecture='qwen2', vision=False)             │││││
+│ DownloadedLlm(model_key='qwen/qwen2.5-vl-7b', display_name='Qwen2.5 Vl 7B', architecture='qwen2vl', vision=True)                    │││││
+│ DownloadedLlm(model_key='qwen2.5-32b-instruct-mlx', display_name='Qwen2.5 32B Instruct', architecture='qwen2', vision=False)        │││││
+│ DownloadedLlm(model_key='qwen3-1.7b-128k-dwq8-mlx', display_name='Qwen3 1.7B 128k Dwq8', architecture='qwen3', vision=False)        │││││
+│ DownloadedLlm(model_key='qwen3-14b-128k', display_name='Qwen3 14B 128K UD', architecture='qwen3', vision=False)                     │││││
+│ DownloadedLlm(model_key='qwen3-8b-128k', display_name='Qwen3 8B 128K UD', architecture='qwen3', vision=False)                       │││││
+│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand-i1@iq1_s', display_name='Qwen3 8B 256k Context 8X Grand I1', architecture=… │││││
+│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand-i1@iq2_m', display_name='Qwen3 8B 256k Context 8X Grand I1', architecture=… │││││
+│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand-i1@iq4_xs', display_name='Qwen3 8B 256k Context 8X Grand I1', architecture… │││││
+│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand-i1@q6_k', display_name='Qwen3 8B 256k Context 8X Grand I1', architecture='… │││││
+│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand@q3_k_m', display_name='Qwen3 8B 256k Context 8X Grand', architecture='qwen… │││││
+│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand@q4_k_m', display_name='Qwen3 8B 256k Context 8X Grand', architecture='qwen… │││││
+│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand@q5_k_m', display_name='Qwen3 8B 256k Context 8X Grand', architecture='qwen… │││││
+│ DownloadedLlm(model_key='qwen3-8b-320k-context-10x-massive', display_name='Qwen3 8B 320k Context 10X Massive', architecture='qwen3… │││││
+│ DownloadedLlm(model_key='qwen3-embedding-0.6b-mxl', display_name='Qwen3 Embedding 0.6B MXL', architecture='qwen3', vision=False)    │││││
+│ DownloadedLlm(model_key='qwensummarizer3.0', display_name='Unsloth', architecture='qwen2', vision=False)                            │││││
+│ DownloadedLlm(model_key='rei-24b-kto', display_name='Rei 24B KTO', architecture='llama', vision=False)                              │││││
+│ DownloadedLlm(model_key='sarcasmll-1b', display_name='SarcasMLL 1B', architecture='llama', vision=False)                            │││││
+│ DownloadedLlm(model_key='smoldocling-256m-preview-mlx', display_name='SmolDocling 256M Preview', architecture='idefics3', vision=T… │││││
+│ DownloadedLlm(model_key='smoothie-qwen3-14b-i1', display_name='Smoothie Qwen3 14B I1', architecture='qwen3', vision=False)          │││││
+│ DownloadedLlm(model_key='summllama3.1-8b', display_name='SummLlama3.1 8B', architecture='llama', vision=False)                      │││││
+│ DownloadedLlm(model_key='uigen-x-8b-mlx', display_name='UIGEN X 8B', architecture='qwen3', vision=False)                            │││││
+│ DownloadedLlm(model_key='ultron-summarizer-1b', display_name='Ultron Summarizer 1B', architecture='llama', vision=False)            │││││
+│ DownloadedLlm(model_key='ultron-summarizer-8b', display_name='Ultron Summarizer 8B', architecture='llama', vision=False)            │││││
+│ DownloadedLlm(model_key='wemake-llama-3-8b-instruct-v41-1048k', display_name='WeMake Llama 3 8B Instruct v41 1048k', architecture=… │││││
+└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┴┴┴┴┘
+Othello:lmstudio adam$ lmstrix list
+                                                             LM Studio Models
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳┳┳┳┓
+┃ Model ID                                                                                                                            ┃┃┃┃┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇╇╇╇┩
+│ DownloadedEmbeddingModel(model_key='text-embedding-mxbai-embed-xsmall-v1-i1', display_name='Mxbai Embed Xsmall v1 I1', architectur… │││││
+│ DownloadedEmbeddingModel(model_key='text-embedding-nomic-embed-text-v1.5', display_name='Nomic Embed Text v1.5', architecture='nom… │││││
+│ DownloadedEmbeddingModel(model_key='text-embedding-nomic-embed-text-v2', display_name='Nomic Embed Text v2 MoE', architecture='nom… │││││
+│ DownloadedEmbeddingModel(model_key='text-embedding-qwen3-embedding-0.6b', display_name='Qwen3 Embedding 0.6B', architecture='qwen3… │││││
+│ DownloadedLlm(model_key='amoral-qwen3-14b-i1', display_name='Amoral Qwen3 14B I1', architecture='qwen3', vision=False)              │││││
+│ DownloadedLlm(model_key='bge-small-en-v1.5', display_name='Bge Small En v1.5', architecture='bert', vision=False)                   │││││
+│ DownloadedLlm(model_key='comedy_13b_dpo', display_name='COMEDY 13B DPO', architecture='llama', vision=False)                        │││││
+│ DownloadedLlm(model_key='comicbot_v.2', display_name='Mistral Comedy 3.0 Ckpt 1600', architecture='llama', vision=False)            │││││
+│ DownloadedLlm(model_key='deepscaler-1.5b-preview-mlx', display_name='DeepScaleR 1.5B Preview', architecture='qwen2', vision=False)  │││││
+│ DownloadedLlm(model_key='deepseek-r1-distill-qwen-14b', display_name='DeepSeek R1 Distill Qwen 14B', architecture='qwen2', vision=… │││││
+│ DownloadedLlm(model_key='deepseek-vl2-small', display_name='Deepseek Vl2 Small', architecture='deepseek_vl_v2', vision=True)        │││││
+│ DownloadedLlm(model_key='deepseek/deepseek-r1-0528-qwen3-8b', display_name='Deepseek R1 0528 Qwen3 8B', architecture='qwen3', visi… │││││
+│ DownloadedLlm(model_key='dream-org_dream-v0-instruct-7b', display_name='Dream Org Dream v0 Instruct 7B', architecture='dream', vis… │││││
+│ DownloadedLlm(model_key='google/gemma-3-12b', display_name='Gemma 3 12B', architecture='gemma3', vision=True)                       │││││
+│ DownloadedLlm(model_key='granite-4.0-tiny-preview', display_name='Granite 4.0 Tiny Preview', architecture='granitehybrid', vision=… │││││
+│ DownloadedLlm(model_key='j.a.r.v.i.s-v2.0', display_name='J a R V I S v2.0', architecture='llama', vision=False)                    │││││
+│ DownloadedLlm(model_key='jina-embeddings-v4-text-retrieval@q3_k_m', display_name='Jina Embeddings v4 Retrieval', architecture='qwe… │││││
+│ DownloadedLlm(model_key='jina-embeddings-v4-text-retrieval@q8_0', display_name='Jina Embeddings v4 Retrieval', architecture='qwen2… │││││
+│ DownloadedLlm(model_key='jinaai-readerlm-v2', display_name='Jinaai ReaderLM v2', architecture='qwen2', vision=False)                │││││
+│ DownloadedLlm(model_key='llama-3-8b-instruct-64k', display_name='Llama 3 8B Instruct 64k', architecture='llama', vision=False)      │││││
+│ DownloadedLlm(model_key='llama-3-8b-instruct-gradient-1048k', display_name='Llama 3 8B Instruct Gradient 1048k', architecture='lla… │││││
+│ DownloadedLlm(model_key='llama-3-8b-lexifun-uncensored-v1', display_name='Llama 3 8B LexiFun Uncensored v1', architecture='llama',… │││││
+│ DownloadedLlm(model_key='llama-3-soliloquy-8b-v1.5-64k-i', display_name='Llama 3 Soliloquy 8B v1.5 64k Imat', architecture='llama'… │││││
+│ DownloadedLlm(model_key='llama-3.1-1-million-ctx-deephermes-deep-reasoning-8b', display_name='Llama 3.1 1 Million Ctx DeepHermes D… │││││
+│ DownloadedLlm(model_key='llama-3.1-8b-sarcasm', display_name='Llama 3.1 8B Sarcasm', architecture='llama', vision=False)            │││││
+│ DownloadedLlm(model_key='llama3-8b-darkidol-2.1-uncensored-1048k-iq-imatrix-request', display_name='Llama3 8B DarkIdol 2.1 Uncenso… │││││
+│ DownloadedLlm(model_key='lucy-128k', display_name='Lucy 128k', architecture='qwen3', vision=False)                                  │││││
+│ DownloadedLlm(model_key='megabeam-mistral-7b-512k', display_name='MegaBeam Mistral 7B 512k', architecture='llama', vision=False)    │││││
+│ DownloadedLlm(model_key='meta-llama-3-8b-instruct', display_name='Meta Llama 3 8B Instruct', architecture='llama', vision=False)    │││││
+│ DownloadedLlm(model_key='meta-llama-3-8b-instruct-64k', display_name='Meta Llama 3 8B Instruct 64k', architecture='llama', vision=… │││││
+│ DownloadedLlm(model_key='mistral-7b-sarcasm-scrolls-v2', display_name='Mistral 7B Sarcasm Scrolls v2', architecture='llama', visio… │││││
+│ DownloadedLlm(model_key='mistral-small-24b-instruct-2501-writer-i1', display_name='Mistral Small 24B Instruct 2501 Writer I1', arc… │││││
+│ DownloadedLlm(model_key='mistralai/devstral-small-2507', display_name='Devstral Small 2507', architecture='mistral', vision=False)  │││││
+│ DownloadedLlm(model_key='mistralai/magistral-small', display_name='Magistral Small', architecture='mistral', vision=False)          │││││
+│ DownloadedLlm(model_key='mistralai/mistral-small-3.2', display_name='Mistral Small 3.2', architecture='mistral3', vision=True)      │││││
+│ DownloadedLlm(model_key='mlabonne_qwen3-14b-abliterated', display_name='Mlabonne Qwen3 14B Abliterated', architecture='qwen3', vis… │││││
+│ DownloadedLlm(model_key='nazareai-senior-marketing-strategist', display_name='Unsloth', architecture='llama', vision=False)         │││││
+│ DownloadedLlm(model_key='nomicai-modernbert-embed-base', display_name='Nomicai Modernbert Embed Base', architecture='modernbert', … │││││
+│ DownloadedLlm(model_key='princeton-nlp.llama-3-8b-prolong-512k-instruct', display_name='Princeton Nlp Llama 3 8B ProLong 512k Inst… │││││
+│ DownloadedLlm(model_key='prithivmlmods.llama-chat-summary-3.2-3b', display_name='PrithivMLmods Llama Chat Summary 3.2 3B', archite… │││││
+│ DownloadedLlm(model_key='qwen/qwen2.5-coder-14b', display_name='Qwen2.5 Coder 14B', architecture='qwen2', vision=False)             │││││
+│ DownloadedLlm(model_key='qwen/qwen2.5-vl-7b', display_name='Qwen2.5 Vl 7B', architecture='qwen2vl', vision=True)                    │││││
+│ DownloadedLlm(model_key='qwen2.5-32b-instruct-mlx', display_name='Qwen2.5 32B Instruct', architecture='qwen2', vision=False)        │││││
+│ DownloadedLlm(model_key='qwen3-1.7b-128k-dwq8-mlx', display_name='Qwen3 1.7B 128k Dwq8', architecture='qwen3', vision=False)        │││││
+│ DownloadedLlm(model_key='qwen3-14b-128k', display_name='Qwen3 14B 128K UD', architecture='qwen3', vision=False)                     │││││
+│ DownloadedLlm(model_key='qwen3-8b-128k', display_name='Qwen3 8B 128K UD', architecture='qwen3', vision=False)                       │││││
+│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand-i1@iq1_s', display_name='Qwen3 8B 256k Context 8X Grand I1', architecture=… │││││
+│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand-i1@iq2_m', display_name='Qwen3 8B 256k Context 8X Grand I1', architecture=… │││││
+│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand-i1@iq4_xs', display_name='Qwen3 8B 256k Context 8X Grand I1', architecture… │││││
+│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand-i1@q6_k', display_name='Qwen3 8B 256k Context 8X Grand I1', architecture='… │││││
+│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand@q3_k_m', display_name='Qwen3 8B 256k Context 8X Grand', architecture='qwen… │││││
+│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand@q4_k_m', display_name='Qwen3 8B 256k Context 8X Grand', architecture='qwen… │││││
+│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand@q5_k_m', display_name='Qwen3 8B 256k Context 8X Grand', architecture='qwen… │││││
+│ DownloadedLlm(model_key='qwen3-8b-320k-context-10x-massive', display_name='Qwen3 8B 320k Context 10X Massive', architecture='qwen3… │││││
+│ DownloadedLlm(model_key='qwen3-embedding-0.6b-mxl', display_name='Qwen3 Embedding 0.6B MXL', architecture='qwen3', vision=False)    │││││
+│ DownloadedLlm(model_key='qwensummarizer3.0', display_name='Unsloth', architecture='qwen2', vision=False)                            │││││
+│ DownloadedLlm(model_key='rei-24b-kto', display_name='Rei 24B KTO', architecture='llama', vision=False)                              │││││
+│ DownloadedLlm(model_key='sarcasmll-1b', display_name='SarcasMLL 1B', architecture='llama', vision=False)                            │││││
+│ DownloadedLlm(model_key='smoldocling-256m-preview-mlx', display_name='SmolDocling 256M Preview', architecture='idefics3', vision=T… │││││
+│ DownloadedLlm(model_key='smoothie-qwen3-14b-i1', display_name='Smoothie Qwen3 14B I1', architecture='qwen3', vision=False)          │││││
+│ DownloadedLlm(model_key='summllama3.1-8b', display_name='SummLlama3.1 8B', architecture='llama', vision=False)                      │││││
+│ DownloadedLlm(model_key='uigen-x-8b-mlx', display_name='UIGEN X 8B', architecture='qwen3', vision=False)                            │││││
+│ DownloadedLlm(model_key='ultron-summarizer-1b', display_name='Ultron Summarizer 1B', architecture='llama', vision=False)            │││││
+│ DownloadedLlm(model_key='ultron-summarizer-8b', display_name='Ultron Summarizer 8B', architecture='llama', vision=False)            │││││
+│ DownloadedLlm(model_key='wemake-llama-3-8b-instruct-v41-1048k', display_name='WeMake Llama 3 8B Instruct v41 1048k', architecture=… │││││
+└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┴┴┴┴┘
+Othello:lmstudio adam$
