@@ -34,10 +34,10 @@ def main() -> None:
 
     # 2. Run a linear ramp-up test
     # This is slower but useful for debugging. It tests at each step.
-    print("\n--- Running linear ramp-up test (1024 to 3072, step 1024) ---")
+    print("\n--- Running linear ramp-up test (2048 to 3072, step 1024) ---")
     try:
         result = model.test_context(
-            start_context=1024,
+            start_context=2048,
             max_context=3072,
             step=1024,
             pattern=TestPattern.LINEAR,

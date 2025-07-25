@@ -72,7 +72,7 @@ class ContextOptimizer:
         prompt = base_text * repetitions
         return f"Please summarize the following text:\n\n{prompt}"
 
-    async def _test_context_size(
+    def _test_context_size(
         self,
         model_id: str,
         context_size: int,
@@ -86,7 +86,7 @@ class ContextOptimizer:
             # Load the model with specified context size
             llm = self.client.load_model(model_id, context_len=context_size)
 
-            response = await self.client.acompletion(
+            response = self.client.completion(
                 llm=llm,
                 prompt=test_prompt,
                 max_tokens=50,
@@ -102,11 +102,11 @@ class ContextOptimizer:
         except Exception as e:
             return False, str(e)
 
-    async def find_optimal_context(
+    def find_optimal_context(
         self,
         model: Model,
         initial_size: int | None = None,
-        min_size: int = 1024,
+        min_size: int = 2048,
         max_attempts: int = 20,
     ) -> OptimizationResult:
         """Find the optimal context size for a model using binary search."""
@@ -133,7 +133,7 @@ class ContextOptimizer:
             mid = (low + high) // 2
             logger.debug(f"Testing context size {mid} (attempt {attempts})")
 
-            success, error = await self._test_context_size(model_id, mid)
+            success, error = self._test_context_size(model_id, mid)
 
             if success:
                 optimal = mid

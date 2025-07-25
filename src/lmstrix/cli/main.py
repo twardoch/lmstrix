@@ -1,7 +1,5 @@
 """Command-line interface for LMStrix."""
 
-import asyncio
-
 import fire
 from rich.console import Console
 from rich.table import Table
@@ -141,7 +139,7 @@ class LMStrixCLI:
                 return
             console.print(f"Testing {len(models_to_test)} models...")
         elif model_id:
-            model = registry.get_model(model_id)
+            model = registry.find_model(model_id)
             if not model:
                 console.print(f"[red]Error: Model '{model_id}' not found in registry.[/red]")
                 return
@@ -159,8 +157,8 @@ class LMStrixCLI:
             )
             console.print(f"[dim]Threshold: {threshold:,} tokens[/dim]\n")
 
-            updated_models = asyncio.run(
-                tester.test_all_models(models_to_test, threshold=threshold, registry=registry),
+            updated_models = tester.test_all_models(
+                models_to_test, threshold=threshold, registry=registry,
             )
 
             # Print final summary table
@@ -205,8 +203,8 @@ class LMStrixCLI:
 
             # Use threshold to limit initial test size and prevent crashes
             max_test_context = min(threshold, model.context_limit)
-            updated_model = asyncio.run(
-                tester.test_model(model, max_context=max_test_context, registry=registry),
+            updated_model = tester.test_model(
+                model, max_context=max_test_context, registry=registry,
             )
 
             if updated_model.context_test_status.value == "completed":
@@ -238,16 +236,19 @@ class LMStrixCLI:
         setup_logging(verbose=verbose)
 
         registry = load_model_registry(verbose=verbose)
+        model = registry.find_model(model_id)
+        if not model:
+            console.print(f"[red]Error: Model '{model_id}' not found in registry.[/red]")
+            return
+
         engine = InferenceEngine(model_registry=registry, verbose=verbose)
 
-        with console.status(f"Running inference on {model_id}..."):
-            result = asyncio.run(
-                engine.infer(
-                    model_id=model_id,
-                    prompt=prompt,
-                    max_tokens=max_tokens,
-                    temperature=temperature,
-                ),
+        with console.status(f"Running inference on {model.id}..."):
+            result = engine.infer(
+                model_id=model.id,  # Use the full ID for inference
+                prompt=prompt,
+                max_tokens=max_tokens,
+                temperature=temperature,
             )
 
         if result.succeeded:

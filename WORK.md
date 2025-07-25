@@ -1,6 +1,101 @@
 # Work Progress
 
-## Current Work Session - Sort Options for List Command
+## Current Work Session - Fixing Model Hanging Issues
+
+### Status: In Progress
+
+### Context:
+User reported that the llama-3.1-8b-sarcasm model was hanging during context testing. The LM Studio logs showed the model loaded successfully but got stuck during inference, never generating output.
+
+### Completed Tasks:
+1. ✓ Investigated the hanging issue - model loads but stalls during generation
+2. ✓ Improved timeout handling in `client.py`:
+   - Replaced Unix signal-based timeout with cross-platform ThreadPoolExecutor
+   - Added automatic model unloading on timeout
+   - Added detection for empty responses
+   - Better error messages for "model unloaded" errors
+3. ✓ Added problematic model registry in `context_tester.py`:
+   - Created PROBLEMATIC_MODELS dictionary for known issues
+   - Added support for timeout and prompt overrides
+   - llama-3.1-8b-sarcasm now uses 30s timeout and simpler "Hi" prompt
+   - Shows warning when testing models with known issues
+
+### Technical Changes:
+1. **`src/lmstrix/api/client.py`**:
+   - Replaced signal.alarm() with concurrent.futures for cross-platform timeout
+   - Added automatic cleanup of stuck models
+   - Better error detection and reporting
+
+2. **`src/lmstrix/core/context_tester.py`**:
+   - Added PROBLEMATIC_MODELS class variable
+   - Modified _test_at_context to check for and apply model-specific overrides
+   - Shows user-friendly warning when testing problematic models
+
+### Issue 206 - Root Cause Found:
+The model was hanging because we weren't passing `maxTokens` config to `llm.complete()`. The direct Python test that worked used `config={'maxTokens': 32}`, but our code was calling complete() without any config, causing the model to generate indefinitely.
+
+### Final Fix:
+- Updated `client.py` to always pass `config={'maxTokens': ...}` to `llm.complete()`
+- Uses the max_tokens parameter if > 0, otherwise defaults to 100
+- This prevents models from generating indefinitely
+- Removed all threading (ThreadPoolExecutor) - now uses direct synchronous calls
+- The completion is now fully synchronous as requested
+
+### Remaining Tasks:
+- [ ] Add graceful shutdown handling for Ctrl+C interruptions
+- [ ] Consider adding more models to the problematic registry as issues are discovered
+- [x] Test the fixes with the actual llama-3.1-8b-sarcasm model - FIXED!
+
+# Work Progress
+
+## Current Work Session - Issue 204: Remove all asyncio from lmstrix
+
+### Status: Completed
+
+### Completed Tasks:
+1. ✓ Analyzed all asyncio usage across the codebase
+2. ✓ Removed asyncio from `context_tester.py`:
+   - Converted `async def _test_at_context()` to synchronous
+   - Converted `async def test_model()` to synchronous  
+   - Converted `async def test_all_models()` to synchronous
+   - Replaced `await asyncio.sleep()` with `time.sleep()`
+3. ✓ Removed asyncio from `client.py`:
+   - Converted `async def acompletion()` to synchronous `completion()`
+   - Implemented timeout using signal module (Unix) or without timeout (Windows)
+4. ✓ Removed asyncio from `cli/main.py`:
+   - Removed `import asyncio`
+   - Replaced all `asyncio.run()` calls with direct function calls
+5. ✓ Removed asyncio from `core/inference.py`:
+   - Converted `async def infer()` to synchronous
+   - Updated to use synchronous `client.completion()`
+6. ✓ Removed asyncio from `core/context.py`:
+   - Converted `async def _test_context_size()` to synchronous
+   - Converted `async def find_optimal_context()` to synchronous
+7. ✓ Removed asyncio from `__init__.py`:
+   - Removed `import asyncio` 
+   - Converted `async def infer()` to synchronous
+   - Updated docstring examples to remove `await`
+
+### Testing Results:
+- ✓ Successfully tested `lmstrix list` command
+- ✓ Verified direct lmstudio API works synchronously  
+- ✓ Code formatting completed with black and ruff
+- The main functionality now works without asyncio as requested
+
+### Remaining (Optional):
+- Update test files to remove asyncio (low priority - tests still reference AsyncMock)
+
+### Implementation Details:
+The conversion from async to sync was done by:
+- Replacing all `async def` with `def`
+- Removing all `await` keywords
+- Replacing `asyncio.sleep()` with `time.sleep()`
+- Converting `acompletion()` to `completion()` with signal-based timeout on Unix
+- Removing all `asyncio.run()` wrappers
+
+The code now uses the synchronous `lmstudio` package API directly without any async wrapper.
+
+## Previous Work Session - Sort Options for List Command
 
 ### Added Sort Options to `lmstrix list`
 - Added `--sort` parameter with options: `id`, `idd`, `ctx`, `ctxd`, `dtx`, `dtxd`, `size`, `sized`

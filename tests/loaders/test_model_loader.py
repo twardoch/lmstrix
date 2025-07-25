@@ -109,7 +109,7 @@ def test_save_and_load_cycle(mock_models_file) -> None:
     """
     # Arrange
     loader1 = ModelLoader(models_file=mock_models_file)
-    model = Model(id="test", path="/fake/test.gguf", name="test.gguf", max_context_tested=1024)
+    model = Model(id="test", path="/fake/test.gguf", name="test.gguf", max_context_tested=2048)
     loader1.models = Models(models={"test": model})
 
     # Act
@@ -120,5 +120,5 @@ def test_save_and_load_cycle(mock_models_file) -> None:
 
     # Assert
     assert "test" in loaded_models.models
-    assert loaded_models.models["test"].max_context_tested == 1024
+    assert loaded_models.models["test"].max_context_tested == 2048
     assert loaded_models.models["test"].path == "/fake/test.gguf"

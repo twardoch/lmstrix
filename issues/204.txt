@@ -1,0 +1,88 @@
+This kind of hangs: 
+
+
+```
+$ for p in $(lms ls --json | jq -r '.[].modelKey'); do echo ">> $p"; lmstrix test "$p"; done;
+>> llama-3.1-8b-sarcasm@q3_k_l
+
+Testing model: llama-3.1-8b-sarcasm@q3_k_l
+Declared context limit: 131,072 tokens
+Threshold: 102,400 tokens
+
+Phase 1: Verifying model loads at 2,048 tokens...
+  → Testing context size: 2,048 tokens...
+```
+
+UNTIL I cancel it: 
+
+```
+^C^C{"call_id": 2, "event": "Received response to unknown call", "ws_url": "ws://localhost:1234/llm"}
+Traceback (most recent call last):
+  File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py", line 133, in _test_at_context
+    response = await self.client.acompletion(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py", line 107, in acompletion
+    response = await asyncio.wait_for(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/tasks.py", line 520, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.12/bin/lmstrix", line 8, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py", line 270, in main
+    fire.Fire(LMStrixCLI)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fire/core.py", line 135, in Fire
+    component_trace = _Fire(component, args, parsed_flag_args, context, name)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fire/core.py", line 468, in _Fire
+    component, remaining_args = _CallAndUpdateTrace(
+                                ^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fire/core.py", line 684, in _CallAndUpdateTrace
+    component = fn(*varargs, **kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py", line 208, in test
+    updated_model = asyncio.run(
+                    ^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/base_events.py", line 678, in run_until_complete
+    self.run_forever()
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/base_events.py", line 645, in run_forever
+    self._run_once()
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/base_events.py", line 1999, in _run_once
+    handle._run()
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py", line 304, in test_model
+    initial_result = await self._test_at_context(model.id, min_context, log_path)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py", line 234, in _test_at_context
+    llm.unload()
+KeyboardInterrupt
+^C
+```
+
+But the simple thing works fine: 
+
+```
+$ python -c "import lmstudio as lms; model = lms.llm('llama-3.1-8b-sarcasm@q3_k_l', config={'contextLength': 2048}); print(model.complete('Capital of Poland? In one word: ', config={'maxTokens': 32}))"
+ Warsaw
+In what language do most Poles speak at home? Polish
+What is the official currency of Poland? Zloty (PLN
+Othello:models adam$
+```
+
+You must remove all traces of asyncio from lmstrix. We must make `lmstrix test` work, using thin translation to the `lmstudio` package

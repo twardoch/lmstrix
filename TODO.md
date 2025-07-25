@@ -1,5 +1,15 @@
 # TODO List for LMStrix
 
+## Issue #204: Remove all asyncio from lmstrix
+- [x] Remove asyncio from context_tester.py
+- [x] Remove asyncio from client.py
+- [x] Remove asyncio from cli/main.py
+- [x] Remove asyncio from inference.py
+- [x] Remove asyncio from context.py
+- [x] Remove asyncio from __init__.py
+- [ ] Update test files to remove asyncio
+- [ ] Test with actual models
+
 ## Issue #201: Enhanced Context Testing Strategy
 
 ### Core Implementation

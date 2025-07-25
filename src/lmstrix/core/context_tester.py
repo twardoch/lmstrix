@@ -1,8 +1,8 @@
 """Context testing functionality for discovering true model limits."""
 
-import asyncio
 import json
 import math
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -10,7 +10,7 @@ from loguru import logger
 
 from lmstrix.api import LMStudioClient
 from lmstrix.api.exceptions import ModelLoadError
-from lmstrix.core.models import ContextTestStatus, Model
+from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 from lmstrix.loaders.model_loader import load_model_registry, save_model_registry
 from lmstrix.utils import get_context_test_log_path
 
@@ -59,7 +59,7 @@ class ContextTester:
     """Tests models to find their true operational context limits.
 
     Uses a smart binary search algorithm to efficiently discover the maximum context
-    size that a model can reliably handle. The test starts with a moderate context (1024)
+    size that a model can reliably handle. The test starts with a moderate context (2048)
     to verify the model loads and can generate responses, then searches for the
     maximum working context. Progress is saved after each test to allow resuming if interrupted.
 
@@ -72,6 +72,9 @@ class ContextTester:
         test_prompt: The prompt used for testing (default: "Say hello").
     """
 
+    # Models with known issues - these may need special handling
+    PROBLEMATIC_MODELS = {}
+
     def __init__(self, client: LMStudioClient | None = None, verbose: bool = False) -> None:
         """Initialize context tester.
 
@@ -82,8 +85,8 @@ class ContextTester:
         self.client = client or LMStudioClient()
         self.test_prompt = "Say hello"
         self.verbose = verbose
-        self.inference_timeout = 30.0  # 30 seconds timeout for inference
-        self.max_retries = 3  # Max retries for timeout/transient errors
+        self.inference_timeout = 90.0  # Increased to 90 seconds for better reliability
+        self.max_retries = 2  # Retry timeouts up to 2 times
 
     def _log_result(self, log_path: Path, result: ContextTestResult) -> None:
         """Append test result to log file."""
@@ -91,125 +94,169 @@ class ContextTester:
         with log_path.open("a") as f:
             f.write(json.dumps(result.to_dict()) + "\n")
 
-    async def _test_at_context(
+    def _test_at_context(
         self,
         model_path: str,
         context_size: int,
         log_path: Path,
     ) -> ContextTestResult:
-        """Test model at a specific context size."""
+        """Test model at a specific context size with retry logic for timeouts."""
         logger.debug(f"Testing {model_path} at context size {context_size}")
+
 
         # Always print progress for context testing
         print(f"  → Testing context size: {context_size:,} tokens...")
 
-        if self.verbose:
-            logger.info(
-                f"[Context Test] Loading model '{model_path}' with context size: {context_size:,} tokens",
-            )
-
-        llm = None
-        model_loaded = False
-        try:
-            # Add a small delay to avoid rapid operations
-            await asyncio.sleep(0.5)
-
-            llm = self.client.load_model(model_path, context_len=context_size)
-            model_loaded = True
-            logger.debug(f"Model {model_path} loaded successfully at {context_size}.")
-
-            if self.verbose:
-                logger.info("[Context Test] ✓ Model loaded successfully, attempting inference...")
-
-            response = await self.client.acompletion(
-                llm=llm,
-                prompt=self.test_prompt,
-                max_tokens=10,
-                model_id=model_id,
-                timeout=self.inference_timeout,
-            )
+        for attempt in range(self.max_retries + 1):  # +1 for initial attempt
+            if attempt > 0:
+                logger.info(f"Retry attempt {attempt} for {model_path} at context {context_size}")
+                print(f"  ↻ Retry {attempt}/{self.max_retries}...")
+                # Add extra delay before retry
+                time.sleep(2.0)
 
             if self.verbose:
                 logger.info(
-                    f"[Context Test] ✓ Inference successful! Response length: {len(response.content)} chars",
-                )
-                logger.debug(
-                    (
-                        f"[Context Test] Response: {response.content[:50]}..."
-                        if len(response.content) > 50
-                        else f"[Context Test] Response: {response.content}"
-                    ),
+                    f"[Context Test] Loading model '{model_path}' with context size: {context_size:,} tokens",
                 )
 
-            result = ContextTestResult(
-                context_size=context_size,
-                load_success=True,
-                inference_success=True,
-                prompt=self.test_prompt,
-                response=response.content,
-            )
+            llm = None
+            model_loaded = False
+            try:
+                # Add a small delay to avoid rapid operations
+                time.sleep(0.5)
 
-        except ModelLoadError as e:
-            logger.warning(f"Failed to load {model_id} at context {context_size}: {e}")
+                llm = self.client.load_model(model_path, context_len=context_size)
+                model_loaded = True
+                logger.debug(f"Model {model_path} loaded successfully at {context_size}.")
 
-            if self.verbose:
-                logger.info(f"[Context Test] ✗ Model failed to load at context {context_size:,}")
-                logger.debug(f"[Context Test] Load error: {e!s}")
-
-                # Check if it's a "model not found" error
-                if "noModelMatchingQuery" in str(e):
-                    logger.info(f"[Context Test] ⚠️  Model '{model_id}' is not loaded in LM Studio")
+                if self.verbose:
                     logger.info(
-                        "[Context Test] ⚠️  Please load the model in LM Studio first before testing",
+                        "[Context Test] ✓ Model loaded successfully, attempting inference...",
                     )
 
-            result = ContextTestResult(
-                context_size=context_size,
-                load_success=False,
-                error=str(e),
-            )
-        except Exception as e:
-            logger.error(f"Inference failed for {model_id} at context {context_size}: {e}")
+                response = self.client.completion(
+                    llm=llm,
+                    prompt=self.test_prompt,
+                    max_tokens=10,
+                    model_id=model_path,
+                    timeout=self.inference_timeout,
+                )
 
-            if self.verbose:
-                logger.info(f"[Context Test] ✗ Inference failed at context {context_size:,}")
-                logger.debug(f"[Context Test] Inference error: {e!s}")
+                if self.verbose:
+                    logger.info(
+                        f"[Context Test] ✓ Inference successful! Response length: {len(response.content)} chars",
+                    )
+                    logger.debug(
+                        (
+                            f"[Context Test] Response: {response.content[:50]}..."
+                            if len(response.content) > 50
+                            else f"[Context Test] Response: {response.content}"
+                        ),
+                    )
 
-                # Special handling for timeout errors
-                if "timed out" in str(e).lower():
+                result = ContextTestResult(
+                    context_size=context_size,
+                    load_success=True,
+                    inference_success=True,
+                    prompt=self.test_prompt,
+                    response=response.content,
+                )
+
+                # Success - log and return
+                self._log_result(log_path, result)
+                return result
+
+            except ModelLoadError as e:
+                logger.warning(f"Failed to load {model_path} at context {context_size}: {e}")
+
+                if self.verbose:
+                    logger.info(
+                        f"[Context Test] ✗ Model failed to load at context {context_size:,}",
+                    )
+                    logger.debug(f"[Context Test] Load error: {e!s}")
+
+                    # Check if it's a "model not found" error
+                    if "noModelMatchingQuery" in str(e):
+                        logger.info(
+                            f"[Context Test] ⚠️  Model '{model_path}' is not loaded in LM Studio",
+                        )
+                        logger.info(
+                            "[Context Test] ⚠️  Please load the model in LM Studio first before testing",
+                        )
+
+                result = ContextTestResult(
+                    context_size=context_size,
+                    load_success=False,
+                    error=str(e),
+                )
+                self._log_result(log_path, result)
+                return result  # Don't retry load errors
+
+            except Exception as e:
+                is_timeout = "timed out" in str(e).lower()
+
+                if is_timeout and attempt < self.max_retries:
+                    # This is a timeout and we have retries left
                     logger.warning(
-                        f"[Context Test] ⏱️  Model timed out after {self.inference_timeout}s. "
-                        "Model may be unresponsive or context size too large.",
+                        f"Timeout on attempt {attempt + 1} for {model_path} at context {context_size}, will retry",
                     )
-
-            result = ContextTestResult(
-                context_size=context_size,
-                load_success=True,
-                inference_success=False,
-                prompt=self.test_prompt,
-                error=str(e),
-            )
-        finally:
-            if llm and model_loaded:
-                try:
                     if self.verbose:
-                        logger.debug("[Context Test] Unloading model...")
-                    llm.unload()
-                    logger.debug(f"Model {model_id} unloaded.")
-                    # Add delay after unload to ensure clean state
-                    await asyncio.sleep(0.5)
-                except Exception as e:
-                    logger.warning(f"Failed to unload model: {e}")
+                        logger.info(
+                            f"[Context Test] ⏱️  Timeout on attempt {attempt + 1}, retrying...",
+                        )
+                    continue  # Try again
 
+                # Final failure or non-timeout error
+                logger.error(f"Inference failed for {model_path} at context {context_size}: {e}")
+
+                if self.verbose:
+                    logger.info(f"[Context Test] ✗ Inference failed at context {context_size:,}")
+                    logger.debug(f"[Context Test] Inference error: {e!s}")
+
+                    # Special handling for timeout errors
+                    if is_timeout:
+                        logger.warning(
+                            f"[Context Test] ⏱️  Model timed out after {self.inference_timeout}s on all attempts. "
+                            "Model may be unresponsive or context size too large.",
+                        )
+
+                result = ContextTestResult(
+                    context_size=context_size,
+                    load_success=True,
+                    inference_success=False,
+                    prompt=self.test_prompt,
+                    error=str(e),
+                )
+                self._log_result(log_path, result)
+                return result
+
+            finally:
+                if llm and model_loaded:
+                    try:
+                        if self.verbose:
+                            logger.debug("[Context Test] Unloading model...")
+                        llm.unload()
+                        logger.debug(f"Model {model_path} unloaded.")
+                        # Add delay after unload to ensure clean state
+                        time.sleep(0.5)
+                    except Exception as e:
+                        logger.warning(f"Failed to unload model: {e}")
+
+        # This should not be reached, but just in case
+        result = ContextTestResult(
+            context_size=context_size,
+            load_success=False,
+            error="All retry attempts failed",
+        )
         self._log_result(log_path, result)
         return result
 
-    async def test_model(
+    def test_model(
         self,
         model: Model,
-        min_context: int = 1024,
+        min_context: int = 2048,
         max_context: int | None = None,
-        registry=None,
+        registry: ModelRegistry | None = None,
     ) -> Model:
         """Run full context test on a model using the new safe testing strategy.
 
@@ -224,6 +271,7 @@ class ContextTester:
         # Track consecutive failures to detect unresponsive models
         consecutive_timeouts = 0
         max_consecutive_timeouts = 2  # Give up after 2 consecutive timeouts
+
         logger.info(f"Starting context test for {model.id}")
 
         if self.verbose:
@@ -257,7 +305,7 @@ class ContextTester:
                 f"[Phase 1] Verifying model can load with minimal context ({min_context} tokens)...",
             )
 
-        initial_result = await self._test_at_context(model.id, min_context, log_path)
+        initial_result = self._test_at_context(model.id, min_context, log_path)
 
         if not initial_result.load_success:
             logger.error(f"Model {model.id} failed to load even with minimum context {min_context}")
@@ -299,7 +347,7 @@ class ContextTester:
             logger.info(f"[Phase 2] Declared limit: {declared_limit:,} tokens")
             logger.info(f"[Phase 2] Using min(threshold, declared_limit) = {test_context:,}")
 
-        threshold_result = await self._test_at_context(model.id, test_context, log_path)
+        threshold_result = self._test_at_context(model.id, test_context, log_path)
 
         if threshold_result.load_success and threshold_result.inference_success:
             # Threshold test passed
@@ -332,7 +380,7 @@ class ContextTester:
                 if self.verbose:
                     logger.info(f"[Phase 3] Testing at {next_context:,} tokens...")
 
-                result = await self._test_at_context(model.id, next_context, log_path)
+                result = self._test_at_context(model.id, next_context, log_path)
 
                 if result.load_success and result.inference_success:
                     # Still working, update and continue
@@ -425,7 +473,7 @@ class ContextTester:
                     )
                     logger.info(f"[Iteration {iteration}] Search progress: ~{progress:.1f}%")
 
-                result = await self._test_at_context(model.id, mid, log_path)
+                result = self._test_at_context(model.id, mid, log_path)
 
                 # Check for timeout
                 is_timeout = "timed out" in str(result.error).lower()
@@ -537,11 +585,11 @@ class ContextTester:
 
         return model
 
-    async def test_all_models(
+    def test_all_models(
         self,
         models: list[Model],
         threshold: int = 102400,
-        registry=None,
+        registry: ModelRegistry | None = None,
     ) -> list[Model]:
         """Test multiple models efficiently using a pass-based approach.
 
@@ -562,22 +610,44 @@ class ContextTester:
         if not models:
             return []
 
+        # Filter out embedding models - they can't be used for LLM context testing
+        def is_embedding_model(model):
+            # Check ID patterns
+            if model.id.startswith("text-embedding-"):
+                return True
+            if "embedding" in model.id.lower():
+                return True
+            if "embed" in model.id.lower():
+                return True
+            # Check if model has model_type field indicating it's an embedding model
+            if hasattr(model, "model_type") and model.model_type == "embedding":
+                return True
+            return False
+
+        llm_models = [m for m in models if not is_embedding_model(m)]
+
+        if len(llm_models) != len(models):
+            excluded_count = len(models) - len(llm_models)
+            logger.info(f"Excluded {excluded_count} embedding models from context testing")
+
+        if not llm_models:
+            logger.warning("No LLM models found for testing (only embedding models)")
+            return []
+
         # Load registry if not provided
         if registry is None:
-            from lmstrix.loaders.model_loader import load_model_registry
-
             registry = load_model_registry()
 
         # Sort models by declared context size (ascending)
-        sorted_models = sorted(models, key=lambda m: m.context_limit)
+        sorted_models = sorted(llm_models, key=lambda m: m.context_limit)
         logger.info(f"Testing {len(sorted_models)} models in optimized pass-based approach")
 
         # Track which models are still active for testing
         active_models = {m.id: m for m in sorted_models}
         updated_models = []
 
-        # Pass 1: Test all models at min context (1024)
-        min_context = 1024
+        # Pass 1: Test all models at min context (2048)
+        min_context = 2048
         print(f"\n{'=' * 60}")
         print(f"Pass 1: Testing all models at {min_context:,} tokens")
         print(f"{'=' * 60}\n")
@@ -587,6 +657,12 @@ class ContextTester:
                 continue
 
             print(f"[{i}/{len(sorted_models)}] Testing {model.id}...")
+
+            # Add delay to prevent rapid model switching in batch mode
+            if i > 1:  # Skip delay for first model
+                print("  ⏳ Waiting 3 seconds before next model (resource cleanup)...")
+                time.sleep(3.0)
+
             log_path = get_context_test_log_path(model.id)
 
             # Update model status
@@ -596,7 +672,7 @@ class ContextTester:
             save_model_registry(registry)
 
             # Test at min context
-            result = await self._test_at_context(model.id, min_context, log_path)
+            result = self._test_at_context(model.id, min_context, log_path)
 
             if not result.load_success or not result.inference_success:
                 # Model failed at minimum context
@@ -666,8 +742,12 @@ class ContextTester:
                 model = active_models[model_id]
                 print(f"Testing {model.id} at {test_context:,} tokens...")
 
+                # Add delay to prevent rapid model switching in batch mode
+                print("  ⏳ Waiting 3 seconds before next model (resource cleanup)...")
+                time.sleep(3.0)
+
                 log_path = get_context_test_log_path(model.id)
-                result = await self._test_at_context(model.id, test_context, log_path)
+                result = self._test_at_context(model.id, test_context, log_path)
 
                 if result.load_success and result.inference_success:
                     # Success - update model

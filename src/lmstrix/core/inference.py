@@ -46,7 +46,7 @@ class InferenceEngine:
         else:
             logger.disable("lmstrix")
 
-    async def infer(
+    def infer(
         self,
         model_id: str,
         prompt: str,
@@ -69,7 +69,7 @@ class InferenceEngine:
             llm = self.client.load_model(model_id, context_len=context_len)
 
             logger.info(f"Running inference on model {model_id}")
-            response = await self.client.acompletion(
+            response = self.client.completion(
                 llm=llm,
                 prompt=prompt,
                 max_tokens=max_tokens,
