@@ -3,28 +3,21 @@ Project Structure:
 ├── 📁 examples
 │   ├── 📁 cli
 │   │   ├── 📄 basic_workflow.sh
-│   │   ├── 📄 
-│   │   │   inference_examples.s
-│   │   │   h
+│   │   ├── 📄 inference_examples.sh
 │   │   └── 📄 model_testing.sh
 │   ├── 📁 data
-│   │   ├── 📄 
-│   │   │   sample_context.txt
-│   │   └── 📄 
-│   │       test_questions.json
+│   │   ├── 📄 sample_context.txt
+│   │   └── 📄 test_questions.json
 │   ├── 📁 prompts
 │   │   ├── 📄 analysis.toml
 │   │   ├── 📄 coding.toml
 │   │   ├── 📄 creative.toml
 │   │   └── 📄 qa.toml
 │   ├── 📁 python
-│   │   ├── 📄 
-│   │   │   advanced_testing.py
+│   │   ├── 📄 advanced_testing.py
 │   │   ├── 📄 basic_usage.py
-│   │   ├── 📄 
-│   │   │   batch_processing.py
-│   │   └── 📄 
-│   │       custom_inference.py
+│   │   ├── 📄 batch_processing.py
+│   │   └── 📄 custom_inference.py
 │   ├── 📄 README.md
 │   └── 📄 run_all_examples.sh
 ├── 📁 issues
@@ -49,22 +42,16 @@ Project Structure:
 │   │   ├── 📁 core
 │   │   │   ├── 📄 __init__.py
 │   │   │   ├── 📄 context.py
-│   │   │   ├── 📄 
-│   │   │   │   context_tester.p
-│   │   │   │   y
+│   │   │   ├── 📄 context_tester.py
 │   │   │   ├── 📄 inference.py
 │   │   │   ├── 📄 models.py
 │   │   │   ├── 📄 prompts.py
 │   │   │   └── 📄 scanner.py
 │   │   ├── 📁 loaders
 │   │   │   ├── 📄 __init__.py
-│   │   │   ├── 📄 
-│   │   │   │   context_loader.p
-│   │   │   │   y
-│   │   │   ├── 📄 
-│   │   │   │   model_loader.py
-│   │   │   └── 📄 
-│   │   │       prompt_loader.py
+│   │   │   ├── 📄 context_loader.py
+│   │   │   ├── 📄 model_loader.py
+│   │   │   └── 📄 prompt_loader.py
 │   │   ├── 📁 utils
 │   │   │   ├── 📄 __init__.py
 │   │   │   └── 📄 paths.py
@@ -74,22 +61,16 @@ Project Structure:
 │   └── 📁 lmstrix.egg-info
 ├── 📁 tests
 │   ├── 📁 core
-│   │   └── 📄 
-│   │       test_context_tester.
-│   │       py
+│   │   └── 📄 test_context_tester.py
 │   ├── 📁 loaders
-│   │   └── 📄 
-│   │       test_model_loader.py
+│   │   └── 📄 test_model_loader.py
 │   ├── 📁 test_api
 │   │   ├── 📄 __init__.py
 │   │   ├── 📄 test_client.py
-│   │   └── 📄 
-│   │       test_exceptions.py
+│   │   └── 📄 test_exceptions.py
 │   ├── 📁 test_core
 │   │   ├── 📄 __init__.py
-│   │   ├── 📄 
-│   │   │   test_context_tester.
-│   │   │   py
+│   │   ├── 📄 test_context_tester.py
 │   │   ├── 📄 test_inference.py
 │   │   ├── 📄 test_models.py
 │   │   ├── 📄 test_prompts.py
@@ -98,19 +79,12 @@ Project Structure:
 │   │   └── 📄 __init__.py
 │   ├── 📁 test_integration
 │   │   ├── 📄 __init__.py
-│   │   └── 📄 
-│   │       test_cli_integration
-│   │       .py
+│   │   └── 📄 test_cli_integration.py
 │   ├── 📁 test_loaders
 │   │   ├── 📄 __init__.py
-│   │   ├── 📄 
-│   │   │   test_context_loader.
-│   │   │   py
-│   │   ├── 📄 
-│   │   │   test_model_loader.py
-│   │   └── 📄 
-│   │       test_prompt_loader.p
-│   │       y
+│   │   ├── 📄 test_context_loader.py
+│   │   ├── 📄 test_model_loader.py
+│   │   └── 📄 test_prompt_loader.py
 │   ├── 📁 test_utils
 │   │   ├── 📄 __init__.py
 │   │   └── 📄 test_paths.py
@@ -132,6 +106,7 @@ Project Structure:
 ├── 📄 pyproject.toml
 ├── 📄 pytest.ini
 ├── 📄 README.md
+├── 📄 test_lmstudio.py
 ├── 📄 TESTING.md
 ├── 📄 TODO.md
 └── 📄 WORK.md
@@ -3546,6 +3521,8 @@ class LMStudioClient:
         prompt: str,
         temperature: float = 0.7,
         max_tokens: int = -1,  # -1 for unlimited
+        model_id: str | None = None,  # Pass model_id separately since llm object may not have it
+        **kwargs: Any,
     )) -> CompletionResponse:
         """Make an async completion request to a loaded LM Studio model."""
 
@@ -3564,6 +3541,8 @@ def acompletion((
         prompt: str,
         temperature: float = 0.7,
         max_tokens: int = -1,  # -1 for unlimited
+        model_id: str | None = None,  # Pass model_id separately since llm object may not have it
+        **kwargs: Any,
     )) -> CompletionResponse:
     """Make an async completion request to a loaded LM Studio model."""
 
@@ -3833,6 +3812,25 @@ class ContextTestResult:
         """Check if response matches expected output."""
 
 class ContextTester:
+    """Tests models to find their true operational context limits."""
+    def __init__((self, client: LMStudioClient | None = None)) -> None:
+        """Initialize context tester."""
+    def _log_result((self, log_path: Path, result: ContextTestResult)) -> None:
+        """Append test result to log file."""
+    def _test_at_context((
+        self,
+        model_id: str,
+        context_size: int,
+        log_path: Path,
+    )) -> ContextTestResult:
+        """Test model at a specific context size."""
+    def test_model((
+        self,
+        model: Model,
+        min_context: int = 2048,
+        max_context: int | None = None,
+    )) -> Model:
+        """Run full context test on a model using binary search."""
 
 def __init__((
         self,
@@ -3850,6 +3848,12 @@ def to_dict((self)) -> dict:
 
 def is_valid_response((self, expected: str)) -> bool:
     """Check if response matches expected output."""
+
+def __init__((self, client: LMStudioClient | None = None)) -> None:
+    """Initialize context tester."""
+
+def _log_result((self, log_path: Path, result: ContextTestResult)) -> None:
+    """Append test result to log file."""
 
 def _test_at_context((
         self,
@@ -4323,6 +4327,15 @@ def get_prompts_dir(()) -> Path:
 
 def get_contexts_dir(()) -> Path:
     """Get the directory for contexts."""
+
+
+# File: /Users/Shared/lmstudio/lmstrix/test_lmstudio.py
+# Language: python
+
+import asyncio
+import lmstudio
+
+def test_api(()) -> None:
 
 
 # File: /Users/Shared/lmstudio/lmstrix/tests/__init__.py
