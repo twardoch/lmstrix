@@ -92,7 +92,7 @@ class LmsM(BaseModel):
                                 False,
                             ),  # Handle older JSON files without these fields
                             "error_msg": v.get("error_msg", ""),
-                        }
+                        },
                     )
                     for k, v in data["llms"].items()
                 }

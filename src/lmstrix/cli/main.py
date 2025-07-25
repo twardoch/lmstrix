@@ -97,7 +97,8 @@ class LMStrixCLI:
         for model in models_to_test:
             updated_model = asyncio.run(tester.test_model(model))
             registry.update_model(
-                updated_model.id, updated_model
+                updated_model.id,
+                updated_model,
             )  # Update the model in the registry
             save_model_registry(registry)  # Save after each test
 

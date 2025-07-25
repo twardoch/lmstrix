@@ -252,7 +252,10 @@ class TestContextTester:
 
     @pytest.mark.asyncio
     async def test_optimize_model_integration(
-        self, mock_lmstudio_client, mock_llm, tmp_path
+        self,
+        mock_lmstudio_client,
+        mock_llm,
+        tmp_path,
     ) -> None:
         """Test full model optimization workflow."""
         mock_lmstudio_client.load_model.return_value = mock_llm

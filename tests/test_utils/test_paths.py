@@ -66,12 +66,12 @@ class TestPathUtilities:
 
                 def exists_side_effect(self) -> bool:
                     if str(self) == str(home_dir / ".lmstudio-home-pointer") or str(self) == str(
-                        home_dir / ".cache" / "lm-studio"
+                        home_dir / ".cache" / "lm-studio",
                     ):
                         return False
                     return bool(
                         str(self) == "/Users/Shared/lmstudio"
-                        or str(self) == "/Users/Shared/lmstudio/models"
+                        or str(self) == "/Users/Shared/lmstudio/models",
                     )
 
                 mock_exists.side_effect = exists_side_effect
