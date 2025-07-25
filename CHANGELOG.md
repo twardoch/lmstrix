@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Removed all asyncio dependencies (Issue #204)**
+  - Converted entire codebase from async to synchronous
+  - Now uses the native synchronous `lmstudio` package API directly
+  - Simplified architecture by removing async/await complexity
+  - Implemented signal-based timeout for Unix systems
+  - All methods now return results directly without await
+
 ### Added
 
 - **Enhanced Context Testing Strategy (Issue #201)**

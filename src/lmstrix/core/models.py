@@ -22,10 +22,13 @@ class ContextTestStatus(str, Enum):
 
 
 class Model(BaseModel):
-    """Represents a single LM Studio model with its metadata."""
+    """Represents a model in the registry."""
 
-    id: str = Field(..., description="Unique identifier for the model")
-    path: Path = Field(..., description="Path to the model file")
+    id: str  # Unique identifier, the model's relative path
+    short_id: str | None = Field(
+        default=None, description="Short identifier, path without file extension",
+    )
+    path: str  # Full absolute path to the model file or directory
     size: int = Field(..., description="Size of the model in bytes", alias="size_bytes")
     context_limit: int = Field(
         ...,
@@ -100,10 +103,19 @@ class Model(BaseModel):
         safe_chars = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_")
         return "".join(c if c in safe_chars else "_" for c in self.id)
 
+    def get_short_id(self) -> str:
+        """Get the short_id, computing it from path if not set."""
+        if self.short_id:
+            return self.short_id
+        # Generate short_id from path: filename without extension
+        path_obj = Path(self.path)
+        return path_obj.stem if path_obj.name else self.id
+
     def to_registry_dict(self) -> dict[str, Any]:
         """Convert to dictionary format for registry storage."""
         return {
             "id": self.id,
+            "short_id": self.get_short_id(),  # Always save computed short_id
             "path": str(self.path),
             "size_bytes": self.size,
             "ctx_in": self.context_limit,
@@ -202,8 +214,20 @@ class ModelRegistry:
         logger.info(f"Saved {len(self._models)} models to {self.models_file}")
 
     def get_model(self, model_path: str) -> Model | None:
-        """Get a model by path."""
+        """Get a model by its path."""
         return self._models.get(model_path)
+
+    def find_model(self, identifier: str) -> Model | None:
+        """Find a model by its full ID or short ID."""
+        # First, try to find by full ID
+        for model in self._models.values():
+            if model.id == identifier:
+                return model
+        # If not found, search by short_id
+        for model in self._models.values():
+            if model.get_short_id() == identifier:
+                return model
+        return None
 
     def get_model_by_id(self, model_id: str) -> Model | None:
         """Get a model by ID (backward compatibility)."""
@@ -246,3 +270,8 @@ class ModelRegistry:
     def __len__(self) -> int:
         """Return the number of models in the registry."""
         return len(self._models)
+
+    @property
+    def models(self):
+        """Public property for internal model mapping (path -> Model)."""
+        return self._models

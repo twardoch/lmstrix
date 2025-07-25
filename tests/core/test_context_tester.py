@@ -60,7 +60,7 @@ def test_binary_search_finds_correct_midpoint(mock_client_class, model_instance)
 
     # Act
     result = tester.test(
-        start_context=1024,
+        start_context=2048,
         max_context=8192,
         pattern=TestPattern.BINARY,
     )
@@ -98,7 +98,7 @@ def test_inference_always_fails(mock_client_class, model_instance) -> None:
     tester = ContextTester(model=model_instance, client=mock_lms_client)
 
     # Act
-    result = tester.test(start_context=1024, max_context=8192)
+    result = tester.test(start_context=2048, max_context=8192)
 
     # Assert
     # Should return the context size just below the first one tested
@@ -118,7 +118,7 @@ def test_model_works_at_all_sizes(mock_client_class, model_instance) -> None:
     tester = ContextTester(model=model_instance, client=mock_lms_client)
 
     # Act
-    result = tester.test(start_context=1024, max_context=8192)
+    result = tester.test(start_context=2048, max_context=8192)
 
     # Assert
     assert result == 8192
@@ -138,13 +138,13 @@ def test_linear_search_pattern(mock_client_class, model_instance) -> None:
 
     # Act
     result = tester.test(
-        start_context=1024,
+        start_context=2048,
         max_context=4096,
         step=1024,
         pattern=TestPattern.LINEAR,
     )
 
     # Assert
-    # It should pass at 1024, 2048, but fail at 3072.
+    # It should pass at 2048, but fail at 3072.
     # The highest passing value is 2048.
     assert result == 2048

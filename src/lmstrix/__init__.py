@@ -1,6 +1,5 @@
 """High-level API for LMStrix functionality."""
 
-import asyncio
 from importlib.metadata import PackageNotFoundError, version
 
 from lmstrix.core.context_tester import ContextTester
@@ -32,7 +31,7 @@ class LMStrix:
         >>> lms = LMStrix(verbose=True)
         >>> models = lms.scan()  # Discover all LM Studio models
         >>> lms.test_model(models[0].id)  # Test context limits
-        >>> await lms.infer(models[0].id, "Hello, world!")
+        >>> lms.infer(models[0].id, "Hello, world!")
     """
 
     def __init__(self, verbose: bool = False) -> None:
@@ -107,14 +106,14 @@ class LMStrix:
             raise ValueError(f"Model '{model_id}' not found in the registry.")
 
         tester = ContextTester()
-        updated_model = asyncio.run(tester.test_model(model))
+        updated_model = tester.test_model(model)
 
         registry.update_model(updated_model.id, updated_model)
         save_model_registry(registry)
 
         return updated_model
 
-    async def infer(
+    def infer(
         self,
         model_id: str,
         prompt: str,
@@ -134,7 +133,7 @@ class LMStrix:
         """
         registry = load_model_registry(verbose=self.verbose)
         engine = InferenceEngine(model_registry=registry, verbose=self.verbose)
-        return await engine.infer(
+        return engine.infer(
             model_id=model_id,
             prompt=prompt,
             max_tokens=max_tokens,

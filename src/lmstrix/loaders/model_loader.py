@@ -97,7 +97,7 @@ def scan_and_update_registry(
             logger.debug(f"Updating existing model: {model_path}")
             # Update potentially changed data
             existing_model.id = model_id  # Update ID in case it changed
-            existing_model.path = Path(model_data.get("path", existing_model.path))
+            existing_model.path = model_path  # Ensure path is consistent
             existing_model.size = model_data.get("size_bytes", existing_model.size)
             existing_model.context_limit = model_data.get(
                 "context_length",
@@ -129,11 +129,18 @@ def scan_and_update_registry(
                 existing_model.context_test_status = ContextTestStatus.UNTESTED
                 existing_model.context_test_log = None
                 existing_model.context_test_date = None
+
+            # Update the model in the registry using the correct path
+            registry.update_model(model_path, existing_model)
         else:
             logger.info(f"Discovered new model: {model_path}")
+            model_file_path = Path(model_data.get("path", ""))
+            # Generate short_id: filename without extension
+            short_id = model_file_path.stem if model_file_path.name else model_id
             new_model = Model(
                 id=model_id,
-                path=Path(model_data.get("path", "")),
+                short_id=short_id,
+                path=model_path,
                 size_bytes=model_data.get("size_bytes", 0),
                 ctx_in=model_data.get("context_length", 8192),
                 ctx_out=4096,  # Default output context
@@ -145,6 +152,7 @@ def scan_and_update_registry(
     # Remove models that are no longer present
     registry_paths = {str(model.path) for model in registry.list_models()}
     discovered_paths = {str(Path(model["path"])) for model in discovered_models}
+
     deleted_paths = registry_paths - discovered_paths
     for model_path in deleted_paths:
         logger.info(f"Removing deleted model: {model_path}")

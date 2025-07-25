@@ -51,6 +51,8 @@ dependencies = [
   "tenacity>=8.5.0",
   "tiktoken>=0.5",
   "toml>=0.10",
+  "hydra-core",
+  "omegaconf",
 ]
 dynamic = ["version"]
 
