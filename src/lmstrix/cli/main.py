@@ -77,20 +77,20 @@ class LMStrixCLI:
     def test(
         self,
         model_id: str | None = None,
-        all_models: bool = False,
+        all: bool = False,
         verbose: bool = False,
     ) -> None:
         """Test the context limits for models.
 
         Args:
             model_id: The specific model ID to test.
-            all_models: Flag to test all untested or previously failed models.
+            all: Flag to test all untested or previously failed models.
             verbose: Enable verbose output.
         """
         registry = load_model_registry(verbose=verbose)
         models_to_test = []
 
-        if all_models:
+        if all:
             models_to_test = [
                 m for m in registry.list_models() if m.context_test_status.value != "completed"
             ]
@@ -122,7 +122,8 @@ class LMStrixCLI:
                     f"[green]✓ Test for {model.id} complete. Optimal context: {updated_model.tested_max_context:,}[/green]",
                 )
             else:
-                console.print(f"[red]✗ Test for {model.id} failed. Check logs for details.[/red]")
+                error_msg = getattr(updated_model, "error_msg", "Unknown error")
+                console.print(f"[red]✗ Test for {model.id} failed: {error_msg}[/red]")
 
     def infer(
         self,

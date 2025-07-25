@@ -156,7 +156,7 @@ class ModelRegistry:
                 except Exception as e:
                     logger.error(f"Failed to load model {model_id}: {e}")
 
-            logger.info(f"Loaded {len(self._models)} models from {self.models_file}")
+            logger.info(f"Read {len(self._models)} models from {self.models_file}")
         except Exception as e:
             logger.error(f"Failed to load models: {e}")
 

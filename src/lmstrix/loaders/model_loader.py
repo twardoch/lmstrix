@@ -34,7 +34,7 @@ def load_model_registry(
         return ModelRegistry(models_file=registry_path)
 
     registry = ModelRegistry(models_file=registry_path)
-    logger.info(f"Loaded {len(registry)} models from {registry_path}")
+    logger.info(f"Read {len(registry)} models from {registry_path}")
     return registry
 
 

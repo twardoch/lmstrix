@@ -1,0 +1,118 @@
+We need to make sure that the 'test' CLI operation (trying different context sizes) does not run crazily. We cannot do parallelization, we need to run it patiently, always UNLOAD ALL MODELS before trying to load our model.
+
+Last run of `mstrix test llama-3.2-3b-instruct --verbose` yielded this log:
+
+2025-07-25 03:33:18 [INFO]
+[LM STUDIO SERVER] Success! HTTP server listening on port 1234
+2025-07-25 03:33:18 [WARN]
+[LM STUDIO SERVER] Server accepting connections from the local network. Only use this if you know what you are doing!
+2025-07-25 03:33:18 [INFO]
+2025-07-25 03:33:18 [INFO]
+[LM STUDIO SERVER] Supported endpoints:
+2025-07-25 03:33:18 [INFO]
+[LM STUDIO SERVER] ->	GET http://192.168.0.122:1234/v1/models
+2025-07-25 03:33:18 [INFO]
+[LM STUDIO SERVER] ->	POST http://192.168.0.122:1234/v1/chat/completions
+2025-07-25 03:33:18 [INFO]
+[LM STUDIO SERVER] ->	POST http://192.168.0.122:1234/v1/completions
+2025-07-25 03:33:18 [INFO]
+[LM STUDIO SERVER] ->	POST http://192.168.0.122:1234/v1/embeddings
+2025-07-25 03:33:18 [INFO]
+2025-07-25 03:33:18 [INFO]
+[LM STUDIO SERVER] Logs are saved into /Users/Shared/lmstudio/server-logs
+2025-07-25 03:33:18 [INFO]
+Server started.
+2025-07-25 03:33:18 [INFO]
+Just-in-time model loading active.
+2025-07-25 03:35:43 [INFO]
+[Plugin(lmstudio/js-code-sandbox)] stdout: [Tools Prvdr.] Register with LM Studio
+2025-07-25 03:35:43 [INFO]
+[Plugin(lmstudio/rag-v1)] stdout: [PromptPreprocessor] Register with LM Studio
+2025-07-25 03:36:18 [INFO]
+[Client=83c499a9-d361-4cb8-8236-7fa8c6b8e297][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:36:29 [INFO]
+[Client=83c499a9-d361-4cb8-8236-7fa8c6b8e297][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:36:29 [INFO]
+Client disconnected: Error: read ECONNRESET
+2025-07-25 03:36:59 [INFO]
+[Client=f7333ea4-0e33-4a5b-be51-62338888bc8f][Endpoint=listDownloadedModels] Listing downloaded models
+2025-07-25 03:36:59 [INFO]
+Client disconnected: Error: read ECONNRESET
+2025-07-25 03:37:13 [INFO]
+[Client=2cbd00e0-049f-4d59-a8ec-a6e9ac859f3c][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:16 [INFO]
+[Client=2cbd00e0-049f-4d59-a8ec-a6e9ac859f3c][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:16 [INFO]
+[Client=2cbd00e0-049f-4d59-a8ec-a6e9ac859f3c][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:18 [INFO]
+[Client=2cbd00e0-049f-4d59-a8ec-a6e9ac859f3c][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:18 [INFO]
+[Client=2cbd00e0-049f-4d59-a8ec-a6e9ac859f3c][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:19 [INFO]
+[Client=2cbd00e0-049f-4d59-a8ec-a6e9ac859f3c][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:19 [INFO]
+[Client=2cbd00e0-049f-4d59-a8ec-a6e9ac859f3c][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:24 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:24 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:24 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:25 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:25 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:26 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:26 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:27 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:27 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:28 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:28 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:29 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:29 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:30 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:30 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:31 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:31 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:32 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:32 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:33 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:33 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:34 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:34 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:35 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:35 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:35 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:36 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:36 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:37 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:37 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:38 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:38 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct

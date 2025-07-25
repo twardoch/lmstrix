@@ -1,5 +1,6 @@
 """Context testing functionality for discovering true model limits."""
 
+import asyncio
 import json
 from datetime import datetime
 from pathlib import Path
@@ -86,6 +87,11 @@ class ContextTester:
         logger.debug(f"Testing {model_id} at context size {context_size}")
         llm = None
         try:
+            # Add a small delay to avoid rapid operations
+            import asyncio
+
+            await asyncio.sleep(0.5)
+
             llm = self.client.load_model(model_id, context_len=context_size)
             logger.debug(f"Model {model_id} loaded successfully at {context_size}.")
 
@@ -125,6 +131,8 @@ class ContextTester:
             if llm:
                 llm.unload()
                 logger.debug(f"Model {model_id} unloaded.")
+                # Add delay after unload to ensure clean state
+                await asyncio.sleep(0.5)
 
         self._log_result(log_path, result)
         return result
