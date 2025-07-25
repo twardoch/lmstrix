@@ -12,6 +12,7 @@ from lmstrix.loaders.model_loader import (
     load_model_registry,
     scan_and_update_registry,
 )
+from lmstrix.utils import setup_logging
 
 console = Console()
 
@@ -27,6 +28,9 @@ class LMStrixCLI:
             all: Re-scan all models (clear existing test data).
             verbose: Enable verbose output.
         """
+        # Configure logging based on verbose flag
+        setup_logging(verbose=verbose)
+
         if failed and all:
             console.print("[red]Error: Cannot use --failed and --all together.[/red]")
             return
@@ -38,6 +42,9 @@ class LMStrixCLI:
 
     def list(self, verbose: bool = False) -> None:
         """List all models from the registry with their test status."""
+        # Configure logging based on verbose flag
+        setup_logging(verbose=verbose)
+
         registry = load_model_registry(verbose=verbose)
         models = registry.list_models()
 
@@ -86,6 +93,9 @@ class LMStrixCLI:
             all: Flag to test all untested or previously failed models.
             verbose: Enable verbose output.
         """
+        # Configure logging based on verbose flag
+        setup_logging(verbose=verbose)
+
         registry = load_model_registry(verbose=verbose)
         models_to_test = []
 
@@ -107,7 +117,7 @@ class LMStrixCLI:
             console.print("[red]Error: You must specify a model ID or use the --all flag.[/red]")
             return
 
-        tester = ContextTester()
+        tester = ContextTester(verbose=verbose)
         for model in models_to_test:
             updated_model = asyncio.run(tester.test_model(model, registry=registry))
             # Registry is already updated and saved within test_model,
@@ -142,6 +152,9 @@ class LMStrixCLI:
             temperature: The sampling temperature.
             verbose: Enable verbose output.
         """
+        # Configure logging based on verbose flag
+        setup_logging(verbose=verbose)
+
         registry = load_model_registry(verbose=verbose)
         engine = InferenceEngine(model_registry=registry, verbose=verbose)
 

@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import math
 from datetime import datetime
 from pathlib import Path
 
@@ -71,10 +72,16 @@ class ContextTester:
         test_prompt: The prompt used for testing (default: "Say hello").
     """
 
-    def __init__(self, client: LMStudioClient | None = None) -> None:
-        """Initialize context tester."""
+    def __init__(self, client: LMStudioClient | None = None, verbose: bool = False) -> None:
+        """Initialize context tester.
+
+        Args:
+            client: LMStudioClient instance for model operations.
+            verbose: Enable verbose logging output.
+        """
         self.client = client or LMStudioClient()
         self.test_prompt = "Say hello"
+        self.verbose = verbose
 
     def _log_result(self, log_path: Path, result: ContextTestResult) -> None:
         """Append test result to log file."""
@@ -90,6 +97,12 @@ class ContextTester:
     ) -> ContextTestResult:
         """Test model at a specific context size."""
         logger.debug(f"Testing {model_id} at context size {context_size}")
+
+        if self.verbose:
+            logger.info(
+                f"[Context Test] Loading model '{model_id}' with context size: {context_size:,} tokens",
+            )
+
         llm = None
         try:
             # Add a small delay to avoid rapid operations
@@ -98,12 +111,25 @@ class ContextTester:
             llm = self.client.load_model(model_id, context_len=context_size)
             logger.debug(f"Model {model_id} loaded successfully at {context_size}.")
 
+            if self.verbose:
+                logger.info("[Context Test] ✓ Model loaded successfully, attempting inference...")
+
             response = await self.client.acompletion(
                 llm=llm,
                 prompt=self.test_prompt,
                 max_tokens=10,
                 model_id=model_id,
             )
+
+            if self.verbose:
+                logger.info(
+                    f"[Context Test] ✓ Inference successful! Response length: {len(response.content)} chars",
+                )
+                logger.debug(
+                    f"[Context Test] Response: {response.content[:50]}..."
+                    if len(response.content) > 50
+                    else f"[Context Test] Response: {response.content}",
+                )
 
             result = ContextTestResult(
                 context_size=context_size,
@@ -115,6 +141,11 @@ class ContextTester:
 
         except ModelLoadError as e:
             logger.warning(f"Failed to load {model_id} at context {context_size}: {e}")
+
+            if self.verbose:
+                logger.info(f"[Context Test] ✗ Model failed to load at context {context_size:,}")
+                logger.debug(f"[Context Test] Load error: {e!s}")
+
             result = ContextTestResult(
                 context_size=context_size,
                 load_success=False,
@@ -122,6 +153,11 @@ class ContextTester:
             )
         except Exception as e:
             logger.error(f"Inference failed for {model_id} at context {context_size}: {e}")
+
+            if self.verbose:
+                logger.info(f"[Context Test] ✗ Inference failed at context {context_size:,}")
+                logger.debug(f"[Context Test] Inference error: {e!s}")
+
             result = ContextTestResult(
                 context_size=context_size,
                 load_success=True,
@@ -131,6 +167,8 @@ class ContextTester:
             )
         finally:
             if llm:
+                if self.verbose:
+                    logger.debug("[Context Test] Unloading model...")
                 llm.unload()
                 logger.debug(f"Model {model_id} unloaded.")
                 # Add delay after unload to ensure clean state
@@ -148,6 +186,12 @@ class ContextTester:
     ) -> Model:
         """Run full context test on a model using smart binary search with progress saving."""
         logger.info(f"Starting context test for {model.id}")
+
+        if self.verbose:
+            logger.info(f"[Test Start] Model: {model.id}")
+            logger.info(f"[Test Start] Declared context limit: {model.context_limit:,} tokens")
+            logger.info("[Test Start] Using binary search to find true operational limit")
+
         model.context_test_status = ContextTestStatus.TESTING
         model.context_test_date = datetime.now()
 
@@ -158,8 +202,17 @@ class ContextTester:
         max_context = max_context or model.context_limit
         log_path = get_context_test_log_path(model.id)
 
+        if self.verbose:
+            logger.info(f"[Test Start] Test log will be saved to: {log_path}")
+
         # First, test with small context to ensure model loads
         logger.info(f"Initial test for {model.id} with context size {min_context}")
+
+        if self.verbose:
+            logger.info(
+                f"[Phase 1] Verifying model can load with minimal context ({min_context} tokens)...",
+            )
+
         initial_result = await self._test_at_context(model.id, min_context, log_path)
 
         if not initial_result.load_success:
@@ -186,19 +239,32 @@ class ContextTester:
         # Model works at minimum context - we got a response
         model.last_known_good_context = min_context
         logger.info(
-            f"✓ Model {model.id} works at context {min_context} - got response of length {len(initial_result.response)}"
+            f"✓ Model {model.id} works at context {min_context} - got response of length {len(initial_result.response)}",
         )
+
+        if self.verbose:
+            logger.info("[Phase 1] ✓ Success! Model is operational")
+            logger.info("[Phase 2] Starting binary search for maximum context...")
 
         # Resume from previous test if available
         if model.last_known_good_context and model.last_known_bad_context:
             left = model.last_known_good_context
             right = model.last_known_bad_context - 1
             logger.info(f"Resuming test from previous state: good={left}, bad={right + 1}")
+
+            if self.verbose:
+                logger.info("[Resume] Found previous test data - resuming from checkpoint")
         else:
             left = min_context
             right = max_context
 
         logger.info(f"Testing range for {model.id}: {left} - {right}")
+
+        if self.verbose:
+            logger.info(f"[Binary Search] Search space: {left:,} to {right:,} tokens")
+            logger.info(
+                f"[Binary Search] Estimated iterations: ~{int(math.log2(right - left)) + 1}",
+            )
 
         best_working_context = left  # We know this works
         iteration = 0
@@ -215,6 +281,15 @@ class ContextTester:
                     f"testing context size {mid} (range: {left}-{right})",
                 )
 
+                if self.verbose:
+                    remaining = right - left
+                    progress = ((model.context_limit - remaining) / model.context_limit) * 100
+                    logger.info(f"[Iteration {iteration}] Testing midpoint: {mid:,} tokens")
+                    logger.info(
+                        f"[Iteration {iteration}] Current range: {left:,} - {right:,} ({remaining:,} tokens)",
+                    )
+                    logger.info(f"[Iteration {iteration}] Search progress: ~{progress:.1f}%")
+
                 result = await self._test_at_context(model.id, mid, log_path)
 
                 if result.load_success and result.inference_success:
@@ -223,20 +298,33 @@ class ContextTester:
                     model.last_known_good_context = mid
                     left = mid + 1  # Try for a larger context
                     logger.info(
-                        f"✓ Context size {mid} succeeded (model loaded and responded), searching higher"
+                        f"✓ Context size {mid} succeeded (model loaded and responded), searching higher",
                     )
+
+                    if self.verbose:
+                        logger.info(
+                            f"[Iteration {iteration}] ✓ SUCCESS at {mid:,} tokens - searching for higher limit",
+                        )
                 else:
                     # Model failed to load or inference failed - this is "bad"
                     model.last_known_bad_context = mid
                     right = mid - 1  # This context failed, try smaller
                     if not result.load_success:
                         logger.info(
-                            f"✗ Context size {mid} failed (model didn't load), searching lower"
+                            f"✗ Context size {mid} failed (model didn't load), searching lower",
                         )
+                        if self.verbose:
+                            logger.info(
+                                f"[Iteration {iteration}] ✗ FAILED to load at {mid:,} tokens - searching lower",
+                            )
                     else:
                         logger.info(
-                            f"✗ Context size {mid} failed (inference error), searching lower"
+                            f"✗ Context size {mid} failed (inference error), searching lower",
                         )
+                        if self.verbose:
+                            logger.info(
+                                f"[Iteration {iteration}] ✗ FAILED inference at {mid:,} tokens - searching lower",
+                            )
 
                     # Track loadable_max_context
                     if result.load_success:
@@ -250,6 +338,11 @@ class ContextTester:
                     f"Progress saved: good={model.last_known_good_context}, bad={model.last_known_bad_context}",
                 )
 
+                if self.verbose:
+                    logger.debug(
+                        f"[Progress] Current best working context: {best_working_context:,} tokens",
+                    )
+
             model.tested_max_context = best_working_context
             model.context_test_log = str(log_path)
             model.context_test_status = (
@@ -262,6 +355,17 @@ class ContextTester:
                 f"Context test completed for {model.id}. "
                 f"Optimal working context: {best_working_context}",
             )
+
+            if self.verbose:
+                logger.info("[Test Complete] Final Results:")
+                logger.info(
+                    f"[Test Complete] ✓ Maximum working context: {best_working_context:,} tokens",
+                )
+                logger.info(f"[Test Complete] ✓ Declared limit: {model.context_limit:,} tokens")
+                efficiency = (best_working_context / model.context_limit) * 100
+                logger.info(f"[Test Complete] ✓ Efficiency: {efficiency:.1f}% of declared limit")
+                logger.info(f"[Test Complete] ✓ Total iterations: {iteration}")
+                logger.info(f"[Test Complete] ✓ Test log saved to: {log_path}")
 
         except Exception as e:
             logger.error(f"An unexpected error occurred during context test for {model.id}: {e}")

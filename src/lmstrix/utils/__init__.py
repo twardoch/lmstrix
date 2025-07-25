@@ -1,5 +1,6 @@
 """Utility functions for LMStrix."""
 
+from lmstrix.utils.logging import setup_logging
 from lmstrix.utils.paths import (
     get_context_test_log_path,
     get_context_tests_dir,
@@ -18,4 +19,5 @@ __all__ = [
     "get_lmstrix_data_dir",
     "get_lmstudio_path",
     "get_prompts_dir",
+    "setup_logging",
 ]
