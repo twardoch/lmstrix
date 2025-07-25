@@ -32,10 +32,7 @@ Project Structure:
 │   ├── 📄 README.md
 │   └── 📄 run_all_examples.sh
 ├── 📁 issues
-│   ├── 📄 101.txt
-│   ├── 📄 102.txt
-│   ├── 📄 103.txt
-│   └── 📄 104.txt
+│   └── 📄 106.txt
 ├── 📁 obsolete
 │   ├── 📄 lmsm.json
 │   └── 📄 lmsm.py
@@ -4480,283 +4477,131 @@ echo -e "
 </document>
 
 <document index="38">
-<source>issues/101.txt</source>
+<source>issues/106.txt</source>
 <document_content>
-Shouldn't the code use @ref/llmstudio.txt for much more? We don't want to use inferencing by `litellm`, it's shit. We want to use to use the `lmstudio` package for loading models and also for completion/inferencing.
+We need to make sure that the 'test' CLI operation (trying different context sizes) does not run crazily. We cannot do parallelization, we need to run it patiently, always UNLOAD ALL MODELS before trying to load our model.
+
+Last run of `mstrix test llama-3.2-3b-instruct --verbose` yielded this log:
+
+2025-07-25 03:33:18 [INFO]
+[LM STUDIO SERVER] Success! HTTP server listening on port 1234
+2025-07-25 03:33:18 [WARN]
+[LM STUDIO SERVER] Server accepting connections from the local network. Only use this if you know what you are doing!
+2025-07-25 03:33:18 [INFO]
+2025-07-25 03:33:18 [INFO]
+[LM STUDIO SERVER] Supported endpoints:
+2025-07-25 03:33:18 [INFO]
+[LM STUDIO SERVER] ->	GET http://192.168.0.122:1234/v1/models
+2025-07-25 03:33:18 [INFO]
+[LM STUDIO SERVER] ->	POST http://192.168.0.122:1234/v1/chat/completions
+2025-07-25 03:33:18 [INFO]
+[LM STUDIO SERVER] ->	POST http://192.168.0.122:1234/v1/completions
+2025-07-25 03:33:18 [INFO]
+[LM STUDIO SERVER] ->	POST http://192.168.0.122:1234/v1/embeddings
+2025-07-25 03:33:18 [INFO]
+2025-07-25 03:33:18 [INFO]
+[LM STUDIO SERVER] Logs are saved into /Users/Shared/lmstudio/server-logs
+2025-07-25 03:33:18 [INFO]
+Server started.
+2025-07-25 03:33:18 [INFO]
+Just-in-time model loading active.
+2025-07-25 03:35:43 [INFO]
+[Plugin(lmstudio/js-code-sandbox)] stdout: [Tools Prvdr.] Register with LM Studio
+2025-07-25 03:35:43 [INFO]
+[Plugin(lmstudio/rag-v1)] stdout: [PromptPreprocessor] Register with LM Studio
+2025-07-25 03:36:18 [INFO]
+[Client=83c499a9-d361-4cb8-8236-7fa8c6b8e297][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:36:29 [INFO]
+[Client=83c499a9-d361-4cb8-8236-7fa8c6b8e297][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:36:29 [INFO]
+Client disconnected: Error: read ECONNRESET
+2025-07-25 03:36:59 [INFO]
+[Client=f7333ea4-0e33-4a5b-be51-62338888bc8f][Endpoint=listDownloadedModels] Listing downloaded models
+2025-07-25 03:36:59 [INFO]
+Client disconnected: Error: read ECONNRESET
+2025-07-25 03:37:13 [INFO]
+[Client=2cbd00e0-049f-4d59-a8ec-a6e9ac859f3c][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:16 [INFO]
+[Client=2cbd00e0-049f-4d59-a8ec-a6e9ac859f3c][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:16 [INFO]
+[Client=2cbd00e0-049f-4d59-a8ec-a6e9ac859f3c][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:18 [INFO]
+[Client=2cbd00e0-049f-4d59-a8ec-a6e9ac859f3c][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:18 [INFO]
+[Client=2cbd00e0-049f-4d59-a8ec-a6e9ac859f3c][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:19 [INFO]
+[Client=2cbd00e0-049f-4d59-a8ec-a6e9ac859f3c][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:19 [INFO]
+[Client=2cbd00e0-049f-4d59-a8ec-a6e9ac859f3c][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:24 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:24 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:24 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:25 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:25 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:26 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:26 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:27 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:27 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:28 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:28 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:29 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:29 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:30 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:30 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:31 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:31 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:32 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:32 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:33 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:33 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:34 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:34 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:35 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:35 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:35 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:36 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:36 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:37 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:37 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
+2025-07-25 03:37:38 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-25 03:37:38 [INFO]
+[Client=57b929d9-83b2-4878-9297-6d3fdf9e874e][Endpoint=unloadModel] Unloading model: llama-3.2-3b-instruct
 
 </document_content>
 </document>
 
 <document index="39">
-<source>issues/102.txt</source>
-<document_content>
-```
-$ python -m lmstrix | cat
-NAME
-__main__.py - A CLI for testing and managing LM Studio models.
-
-SYNOPSIS
-__main__.py COMMAND
-
-DESCRIPTION
-A CLI for testing and managing LM Studio models.
-
-COMMANDS
-COMMAND is one of the following:
-
-infer
-Run inference on a specified model.
-
-list
-List all models from the registry with their test status.
-
-scan
-Scan for LM Studio models and update the local registry.
-
-test
-Test the context limits for models.
-```
-
-<objective>
-Now into @examples write functional tests / usage examples for the various functionalities (of both CLI and the Python package), and run them.
-Make sure @examples complement @tests well. Include sensible prompt files and other sensible files in @examples
-</objective>
-
-<task>
-1. Into @PLAN.md describe in detail the objective
-2. Into @TODO.md add the objective as high priority, making sure that it fits with the other tasks
-3. Start implementing tasks!
-</task>
-
-</document_content>
-</document>
-
-<document index="40">
-<source>issues/103.txt</source>
-<document_content>
-Now /report then /cleanup and then /plan the next steps and then /work /work /work
-
-</document_content>
-</document>
-
-<document index="41">
-<source>issues/104.txt</source>
-<document_content>
-
-
-
-NAME
-    __main__.py - A CLI for testing and managing LM Studio models.
-
-SYNOPSIS
-    __main__.py COMMAND
-
-DESCRIPTION
-    A CLI for testing and managing LM Studio models.
-
-COMMANDS
-    COMMAND is one of the following:
-
-     infer
-       Run inference on a specified model.
-
-     list
-       List all models from the registry with their test status.
-
-     scan
-       Scan for LM Studio models and update the local registry.
-
-     test
-       Test the context limits for models.
-(END)...skipping...
-NAME
-    __main__.py - A CLI for testing and managing LM Studio models.
-
-SYNOPSIS
-    __main__.py COMMAND
-
-DESCRIPTION
-    A CLI for testing and managing LM Studio models.
-
-COMMANDS
-    COMMAND is one of the following:
-
-     infer
-       Run inference on a specified model.
-
-     list
-       List all models from the registry with their test status.
-
-     scan
-       Scan for LM Studio models and update the local registry.
-
-     test
-       Test the context limits for models.
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-~
-Othello:lmstudio adam$ lmstrix list
-No models found. Run 'lmstrix scan' to discover models.
-Othello:lmstudio adam$ lmstrix scan
-Model scan complete.
-                                                             LM Studio Models
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳┳┳┳┓
-┃ Model ID                                                                                                                            ┃┃┃┃┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇╇╇╇┩
-│ DownloadedEmbeddingModel(model_key='text-embedding-mxbai-embed-xsmall-v1-i1', display_name='Mxbai Embed Xsmall v1 I1', architectur… │││││
-│ DownloadedEmbeddingModel(model_key='text-embedding-nomic-embed-text-v1.5', display_name='Nomic Embed Text v1.5', architecture='nom… │││││
-│ DownloadedEmbeddingModel(model_key='text-embedding-nomic-embed-text-v2', display_name='Nomic Embed Text v2 MoE', architecture='nom… │││││
-│ DownloadedEmbeddingModel(model_key='text-embedding-qwen3-embedding-0.6b', display_name='Qwen3 Embedding 0.6B', architecture='qwen3… │││││
-│ DownloadedLlm(model_key='amoral-qwen3-14b-i1', display_name='Amoral Qwen3 14B I1', architecture='qwen3', vision=False)              │││││
-│ DownloadedLlm(model_key='bge-small-en-v1.5', display_name='Bge Small En v1.5', architecture='bert', vision=False)                   │││││
-│ DownloadedLlm(model_key='comedy_13b_dpo', display_name='COMEDY 13B DPO', architecture='llama', vision=False)                        │││││
-│ DownloadedLlm(model_key='comicbot_v.2', display_name='Mistral Comedy 3.0 Ckpt 1600', architecture='llama', vision=False)            │││││
-│ DownloadedLlm(model_key='deepscaler-1.5b-preview-mlx', display_name='DeepScaleR 1.5B Preview', architecture='qwen2', vision=False)  │││││
-│ DownloadedLlm(model_key='deepseek-r1-distill-qwen-14b', display_name='DeepSeek R1 Distill Qwen 14B', architecture='qwen2', vision=… │││││
-│ DownloadedLlm(model_key='deepseek-vl2-small', display_name='Deepseek Vl2 Small', architecture='deepseek_vl_v2', vision=True)        │││││
-│ DownloadedLlm(model_key='deepseek/deepseek-r1-0528-qwen3-8b', display_name='Deepseek R1 0528 Qwen3 8B', architecture='qwen3', visi… │││││
-│ DownloadedLlm(model_key='dream-org_dream-v0-instruct-7b', display_name='Dream Org Dream v0 Instruct 7B', architecture='dream', vis… │││││
-│ DownloadedLlm(model_key='google/gemma-3-12b', display_name='Gemma 3 12B', architecture='gemma3', vision=True)                       │││││
-│ DownloadedLlm(model_key='granite-4.0-tiny-preview', display_name='Granite 4.0 Tiny Preview', architecture='granitehybrid', vision=… │││││
-│ DownloadedLlm(model_key='j.a.r.v.i.s-v2.0', display_name='J a R V I S v2.0', architecture='llama', vision=False)                    │││││
-│ DownloadedLlm(model_key='jina-embeddings-v4-text-retrieval@q3_k_m', display_name='Jina Embeddings v4 Retrieval', architecture='qwe… │││││
-│ DownloadedLlm(model_key='jina-embeddings-v4-text-retrieval@q8_0', display_name='Jina Embeddings v4 Retrieval', architecture='qwen2… │││││
-│ DownloadedLlm(model_key='jinaai-readerlm-v2', display_name='Jinaai ReaderLM v2', architecture='qwen2', vision=False)                │││││
-│ DownloadedLlm(model_key='llama-3-8b-instruct-64k', display_name='Llama 3 8B Instruct 64k', architecture='llama', vision=False)      │││││
-│ DownloadedLlm(model_key='llama-3-8b-instruct-gradient-1048k', display_name='Llama 3 8B Instruct Gradient 1048k', architecture='lla… │││││
-│ DownloadedLlm(model_key='llama-3-8b-lexifun-uncensored-v1', display_name='Llama 3 8B LexiFun Uncensored v1', architecture='llama',… │││││
-│ DownloadedLlm(model_key='llama-3-soliloquy-8b-v1.5-64k-i', display_name='Llama 3 Soliloquy 8B v1.5 64k Imat', architecture='llama'… │││││
-│ DownloadedLlm(model_key='llama-3.1-1-million-ctx-deephermes-deep-reasoning-8b', display_name='Llama 3.1 1 Million Ctx DeepHermes D… │││││
-│ DownloadedLlm(model_key='llama-3.1-8b-sarcasm', display_name='Llama 3.1 8B Sarcasm', architecture='llama', vision=False)            │││││
-│ DownloadedLlm(model_key='llama3-8b-darkidol-2.1-uncensored-1048k-iq-imatrix-request', display_name='Llama3 8B DarkIdol 2.1 Uncenso… │││││
-│ DownloadedLlm(model_key='lucy-128k', display_name='Lucy 128k', architecture='qwen3', vision=False)                                  │││││
-│ DownloadedLlm(model_key='megabeam-mistral-7b-512k', display_name='MegaBeam Mistral 7B 512k', architecture='llama', vision=False)    │││││
-│ DownloadedLlm(model_key='meta-llama-3-8b-instruct', display_name='Meta Llama 3 8B Instruct', architecture='llama', vision=False)    │││││
-│ DownloadedLlm(model_key='meta-llama-3-8b-instruct-64k', display_name='Meta Llama 3 8B Instruct 64k', architecture='llama', vision=… │││││
-│ DownloadedLlm(model_key='mistral-7b-sarcasm-scrolls-v2', display_name='Mistral 7B Sarcasm Scrolls v2', architecture='llama', visio… │││││
-│ DownloadedLlm(model_key='mistral-small-24b-instruct-2501-writer-i1', display_name='Mistral Small 24B Instruct 2501 Writer I1', arc… │││││
-│ DownloadedLlm(model_key='mistralai/devstral-small-2507', display_name='Devstral Small 2507', architecture='mistral', vision=False)  │││││
-│ DownloadedLlm(model_key='mistralai/magistral-small', display_name='Magistral Small', architecture='mistral', vision=False)          │││││
-│ DownloadedLlm(model_key='mistralai/mistral-small-3.2', display_name='Mistral Small 3.2', architecture='mistral3', vision=True)      │││││
-│ DownloadedLlm(model_key='mlabonne_qwen3-14b-abliterated', display_name='Mlabonne Qwen3 14B Abliterated', architecture='qwen3', vis… │││││
-│ DownloadedLlm(model_key='nazareai-senior-marketing-strategist', display_name='Unsloth', architecture='llama', vision=False)         │││││
-│ DownloadedLlm(model_key='nomicai-modernbert-embed-base', display_name='Nomicai Modernbert Embed Base', architecture='modernbert', … │││││
-│ DownloadedLlm(model_key='princeton-nlp.llama-3-8b-prolong-512k-instruct', display_name='Princeton Nlp Llama 3 8B ProLong 512k Inst… │││││
-│ DownloadedLlm(model_key='prithivmlmods.llama-chat-summary-3.2-3b', display_name='PrithivMLmods Llama Chat Summary 3.2 3B', archite… │││││
-│ DownloadedLlm(model_key='qwen/qwen2.5-coder-14b', display_name='Qwen2.5 Coder 14B', architecture='qwen2', vision=False)             │││││
-│ DownloadedLlm(model_key='qwen/qwen2.5-vl-7b', display_name='Qwen2.5 Vl 7B', architecture='qwen2vl', vision=True)                    │││││
-│ DownloadedLlm(model_key='qwen2.5-32b-instruct-mlx', display_name='Qwen2.5 32B Instruct', architecture='qwen2', vision=False)        │││││
-│ DownloadedLlm(model_key='qwen3-1.7b-128k-dwq8-mlx', display_name='Qwen3 1.7B 128k Dwq8', architecture='qwen3', vision=False)        │││││
-│ DownloadedLlm(model_key='qwen3-14b-128k', display_name='Qwen3 14B 128K UD', architecture='qwen3', vision=False)                     │││││
-│ DownloadedLlm(model_key='qwen3-8b-128k', display_name='Qwen3 8B 128K UD', architecture='qwen3', vision=False)                       │││││
-│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand-i1@iq1_s', display_name='Qwen3 8B 256k Context 8X Grand I1', architecture=… │││││
-│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand-i1@iq2_m', display_name='Qwen3 8B 256k Context 8X Grand I1', architecture=… │││││
-│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand-i1@iq4_xs', display_name='Qwen3 8B 256k Context 8X Grand I1', architecture… │││││
-│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand-i1@q6_k', display_name='Qwen3 8B 256k Context 8X Grand I1', architecture='… │││││
-│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand@q3_k_m', display_name='Qwen3 8B 256k Context 8X Grand', architecture='qwen… │││││
-│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand@q4_k_m', display_name='Qwen3 8B 256k Context 8X Grand', architecture='qwen… │││││
-│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand@q5_k_m', display_name='Qwen3 8B 256k Context 8X Grand', architecture='qwen… │││││
-│ DownloadedLlm(model_key='qwen3-8b-320k-context-10x-massive', display_name='Qwen3 8B 320k Context 10X Massive', architecture='qwen3… │││││
-│ DownloadedLlm(model_key='qwen3-embedding-0.6b-mxl', display_name='Qwen3 Embedding 0.6B MXL', architecture='qwen3', vision=False)    │││││
-│ DownloadedLlm(model_key='qwensummarizer3.0', display_name='Unsloth', architecture='qwen2', vision=False)                            │││││
-│ DownloadedLlm(model_key='rei-24b-kto', display_name='Rei 24B KTO', architecture='llama', vision=False)                              │││││
-│ DownloadedLlm(model_key='sarcasmll-1b', display_name='SarcasMLL 1B', architecture='llama', vision=False)                            │││││
-│ DownloadedLlm(model_key='smoldocling-256m-preview-mlx', display_name='SmolDocling 256M Preview', architecture='idefics3', vision=T… │││││
-│ DownloadedLlm(model_key='smoothie-qwen3-14b-i1', display_name='Smoothie Qwen3 14B I1', architecture='qwen3', vision=False)          │││││
-│ DownloadedLlm(model_key='summllama3.1-8b', display_name='SummLlama3.1 8B', architecture='llama', vision=False)                      │││││
-│ DownloadedLlm(model_key='uigen-x-8b-mlx', display_name='UIGEN X 8B', architecture='qwen3', vision=False)                            │││││
-│ DownloadedLlm(model_key='ultron-summarizer-1b', display_name='Ultron Summarizer 1B', architecture='llama', vision=False)            │││││
-│ DownloadedLlm(model_key='ultron-summarizer-8b', display_name='Ultron Summarizer 8B', architecture='llama', vision=False)            │││││
-│ DownloadedLlm(model_key='wemake-llama-3-8b-instruct-v41-1048k', display_name='WeMake Llama 3 8B Instruct v41 1048k', architecture=… │││││
-└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┴┴┴┴┘
-Othello:lmstudio adam$ lmstrix list
-                                                             LM Studio Models
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳┳┳┳┓
-┃ Model ID                                                                                                                            ┃┃┃┃┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇╇╇╇┩
-│ DownloadedEmbeddingModel(model_key='text-embedding-mxbai-embed-xsmall-v1-i1', display_name='Mxbai Embed Xsmall v1 I1', architectur… │││││
-│ DownloadedEmbeddingModel(model_key='text-embedding-nomic-embed-text-v1.5', display_name='Nomic Embed Text v1.5', architecture='nom… │││││
-│ DownloadedEmbeddingModel(model_key='text-embedding-nomic-embed-text-v2', display_name='Nomic Embed Text v2 MoE', architecture='nom… │││││
-│ DownloadedEmbeddingModel(model_key='text-embedding-qwen3-embedding-0.6b', display_name='Qwen3 Embedding 0.6B', architecture='qwen3… │││││
-│ DownloadedLlm(model_key='amoral-qwen3-14b-i1', display_name='Amoral Qwen3 14B I1', architecture='qwen3', vision=False)              │││││
-│ DownloadedLlm(model_key='bge-small-en-v1.5', display_name='Bge Small En v1.5', architecture='bert', vision=False)                   │││││
-│ DownloadedLlm(model_key='comedy_13b_dpo', display_name='COMEDY 13B DPO', architecture='llama', vision=False)                        │││││
-│ DownloadedLlm(model_key='comicbot_v.2', display_name='Mistral Comedy 3.0 Ckpt 1600', architecture='llama', vision=False)            │││││
-│ DownloadedLlm(model_key='deepscaler-1.5b-preview-mlx', display_name='DeepScaleR 1.5B Preview', architecture='qwen2', vision=False)  │││││
-│ DownloadedLlm(model_key='deepseek-r1-distill-qwen-14b', display_name='DeepSeek R1 Distill Qwen 14B', architecture='qwen2', vision=… │││││
-│ DownloadedLlm(model_key='deepseek-vl2-small', display_name='Deepseek Vl2 Small', architecture='deepseek_vl_v2', vision=True)        │││││
-│ DownloadedLlm(model_key='deepseek/deepseek-r1-0528-qwen3-8b', display_name='Deepseek R1 0528 Qwen3 8B', architecture='qwen3', visi… │││││
-│ DownloadedLlm(model_key='dream-org_dream-v0-instruct-7b', display_name='Dream Org Dream v0 Instruct 7B', architecture='dream', vis… │││││
-│ DownloadedLlm(model_key='google/gemma-3-12b', display_name='Gemma 3 12B', architecture='gemma3', vision=True)                       │││││
-│ DownloadedLlm(model_key='granite-4.0-tiny-preview', display_name='Granite 4.0 Tiny Preview', architecture='granitehybrid', vision=… │││││
-│ DownloadedLlm(model_key='j.a.r.v.i.s-v2.0', display_name='J a R V I S v2.0', architecture='llama', vision=False)                    │││││
-│ DownloadedLlm(model_key='jina-embeddings-v4-text-retrieval@q3_k_m', display_name='Jina Embeddings v4 Retrieval', architecture='qwe… │││││
-│ DownloadedLlm(model_key='jina-embeddings-v4-text-retrieval@q8_0', display_name='Jina Embeddings v4 Retrieval', architecture='qwen2… │││││
-│ DownloadedLlm(model_key='jinaai-readerlm-v2', display_name='Jinaai ReaderLM v2', architecture='qwen2', vision=False)                │││││
-│ DownloadedLlm(model_key='llama-3-8b-instruct-64k', display_name='Llama 3 8B Instruct 64k', architecture='llama', vision=False)      │││││
-│ DownloadedLlm(model_key='llama-3-8b-instruct-gradient-1048k', display_name='Llama 3 8B Instruct Gradient 1048k', architecture='lla… │││││
-│ DownloadedLlm(model_key='llama-3-8b-lexifun-uncensored-v1', display_name='Llama 3 8B LexiFun Uncensored v1', architecture='llama',… │││││
-│ DownloadedLlm(model_key='llama-3-soliloquy-8b-v1.5-64k-i', display_name='Llama 3 Soliloquy 8B v1.5 64k Imat', architecture='llama'… │││││
-│ DownloadedLlm(model_key='llama-3.1-1-million-ctx-deephermes-deep-reasoning-8b', display_name='Llama 3.1 1 Million Ctx DeepHermes D… │││││
-│ DownloadedLlm(model_key='llama-3.1-8b-sarcasm', display_name='Llama 3.1 8B Sarcasm', architecture='llama', vision=False)            │││││
-│ DownloadedLlm(model_key='llama3-8b-darkidol-2.1-uncensored-1048k-iq-imatrix-request', display_name='Llama3 8B DarkIdol 2.1 Uncenso… │││││
-│ DownloadedLlm(model_key='lucy-128k', display_name='Lucy 128k', architecture='qwen3', vision=False)                                  │││││
-│ DownloadedLlm(model_key='megabeam-mistral-7b-512k', display_name='MegaBeam Mistral 7B 512k', architecture='llama', vision=False)    │││││
-│ DownloadedLlm(model_key='meta-llama-3-8b-instruct', display_name='Meta Llama 3 8B Instruct', architecture='llama', vision=False)    │││││
-│ DownloadedLlm(model_key='meta-llama-3-8b-instruct-64k', display_name='Meta Llama 3 8B Instruct 64k', architecture='llama', vision=… │││││
-│ DownloadedLlm(model_key='mistral-7b-sarcasm-scrolls-v2', display_name='Mistral 7B Sarcasm Scrolls v2', architecture='llama', visio… │││││
-│ DownloadedLlm(model_key='mistral-small-24b-instruct-2501-writer-i1', display_name='Mistral Small 24B Instruct 2501 Writer I1', arc… │││││
-│ DownloadedLlm(model_key='mistralai/devstral-small-2507', display_name='Devstral Small 2507', architecture='mistral', vision=False)  │││││
-│ DownloadedLlm(model_key='mistralai/magistral-small', display_name='Magistral Small', architecture='mistral', vision=False)          │││││
-│ DownloadedLlm(model_key='mistralai/mistral-small-3.2', display_name='Mistral Small 3.2', architecture='mistral3', vision=True)      │││││
-│ DownloadedLlm(model_key='mlabonne_qwen3-14b-abliterated', display_name='Mlabonne Qwen3 14B Abliterated', architecture='qwen3', vis… │││││
-│ DownloadedLlm(model_key='nazareai-senior-marketing-strategist', display_name='Unsloth', architecture='llama', vision=False)         │││││
-│ DownloadedLlm(model_key='nomicai-modernbert-embed-base', display_name='Nomicai Modernbert Embed Base', architecture='modernbert', … │││││
-│ DownloadedLlm(model_key='princeton-nlp.llama-3-8b-prolong-512k-instruct', display_name='Princeton Nlp Llama 3 8B ProLong 512k Inst… │││││
-│ DownloadedLlm(model_key='prithivmlmods.llama-chat-summary-3.2-3b', display_name='PrithivMLmods Llama Chat Summary 3.2 3B', archite… │││││
-│ DownloadedLlm(model_key='qwen/qwen2.5-coder-14b', display_name='Qwen2.5 Coder 14B', architecture='qwen2', vision=False)             │││││
-│ DownloadedLlm(model_key='qwen/qwen2.5-vl-7b', display_name='Qwen2.5 Vl 7B', architecture='qwen2vl', vision=True)                    │││││
-│ DownloadedLlm(model_key='qwen2.5-32b-instruct-mlx', display_name='Qwen2.5 32B Instruct', architecture='qwen2', vision=False)        │││││
-│ DownloadedLlm(model_key='qwen3-1.7b-128k-dwq8-mlx', display_name='Qwen3 1.7B 128k Dwq8', architecture='qwen3', vision=False)        │││││
-│ DownloadedLlm(model_key='qwen3-14b-128k', display_name='Qwen3 14B 128K UD', architecture='qwen3', vision=False)                     │││││
-│ DownloadedLlm(model_key='qwen3-8b-128k', display_name='Qwen3 8B 128K UD', architecture='qwen3', vision=False)                       │││││
-│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand-i1@iq1_s', display_name='Qwen3 8B 256k Context 8X Grand I1', architecture=… │││││
-│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand-i1@iq2_m', display_name='Qwen3 8B 256k Context 8X Grand I1', architecture=… │││││
-│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand-i1@iq4_xs', display_name='Qwen3 8B 256k Context 8X Grand I1', architecture… │││││
-│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand-i1@q6_k', display_name='Qwen3 8B 256k Context 8X Grand I1', architecture='… │││││
-│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand@q3_k_m', display_name='Qwen3 8B 256k Context 8X Grand', architecture='qwen… │││││
-│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand@q4_k_m', display_name='Qwen3 8B 256k Context 8X Grand', architecture='qwen… │││││
-│ DownloadedLlm(model_key='qwen3-8b-256k-context-8x-grand@q5_k_m', display_name='Qwen3 8B 256k Context 8X Grand', architecture='qwen… │││││
-│ DownloadedLlm(model_key='qwen3-8b-320k-context-10x-massive', display_name='Qwen3 8B 320k Context 10X Massive', architecture='qwen3… │││││
-│ DownloadedLlm(model_key='qwen3-embedding-0.6b-mxl', display_name='Qwen3 Embedding 0.6B MXL', architecture='qwen3', vision=False)    │││││
-│ DownloadedLlm(model_key='qwensummarizer3.0', display_name='Unsloth', architecture='qwen2', vision=False)                            │││││
-│ DownloadedLlm(model_key='rei-24b-kto', display_name='Rei 24B KTO', architecture='llama', vision=False)                              │││││
-│ DownloadedLlm(model_key='sarcasmll-1b', display_name='SarcasMLL 1B', architecture='llama', vision=False)                            │││││
-│ DownloadedLlm(model_key='smoldocling-256m-preview-mlx', display_name='SmolDocling 256M Preview', architecture='idefics3', vision=T… │││││
-│ DownloadedLlm(model_key='smoothie-qwen3-14b-i1', display_name='Smoothie Qwen3 14B I1', architecture='qwen3', vision=False)          │││││
-│ DownloadedLlm(model_key='summllama3.1-8b', display_name='SummLlama3.1 8B', architecture='llama', vision=False)                      │││││
-│ DownloadedLlm(model_key='uigen-x-8b-mlx', display_name='UIGEN X 8B', architecture='qwen3', vision=False)                            │││││
-│ DownloadedLlm(model_key='ultron-summarizer-1b', display_name='Ultron Summarizer 1B', architecture='llama', vision=False)            │││││
-│ DownloadedLlm(model_key='ultron-summarizer-8b', display_name='Ultron Summarizer 8B', architecture='llama', vision=False)            │││││
-│ DownloadedLlm(model_key='wemake-llama-3-8b-instruct-v41-1048k', display_name='WeMake Llama 3 8B Instruct v41 1048k', architecture=… │││││
-└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┴┴┴┴┘
-Othello:lmstudio adam$
-</document_content>
-</document>
-
-<document index="42">
 <source>obsolete/lmsm.json</source>
 <document_content>
 {
@@ -4845,7 +4690,7 @@ def list((self, all_rescan: bool = False, failed_rescan: bool = False)) -> None:
     """List all models in LMStudio"""
 
 
-<document index="43">
+<document index="40">
 <source>prompt.txt</source>
 <document_content>
 This is a prompt from a file.
@@ -4853,7 +4698,7 @@ This is a prompt from a file.
 </document_content>
 </document>
 
-<document index="44">
+<document index="41">
 <source>pyproject.toml</source>
 <document_content>
 [build-system]
@@ -5172,7 +5017,7 @@ directory = "htmlcov"
 </document_content>
 </document>
 
-<document index="45">
+<document index="42">
 <source>pytest.ini</source>
 <document_content>
 [pytest]
@@ -5419,7 +5264,7 @@ class LMStrixCLI:
     def test((
         self,
         model_id: str | None = None,
-        all_models: bool = False,
+        all: bool = False,
         verbose: bool = False,
     )) -> None:
         """Test the context limits for models."""
@@ -5442,7 +5287,7 @@ def list((self, verbose: bool = False)) -> None:
 def test((
         self,
         model_id: str | None = None,
-        all_models: bool = False,
+        all: bool = False,
         verbose: bool = False,
     )) -> None:
     """Test the context limits for models."""
@@ -5564,6 +5409,7 @@ from lmstrix.api import LMStudioClient
 from lmstrix.api.exceptions import ModelLoadError
 from lmstrix.core.models import ContextTestStatus, Model
 from lmstrix.utils import get_context_test_log_path
+import asyncio
 
 class ContextTestResult:
     """Result of a context test attempt."""
@@ -6050,7 +5896,7 @@ def save_prompts((
     """Save prompts to a TOML file."""
 
 
-<document index="46">
+<document index="43">
 <source>src/lmstrix/py.typed</source>
 <document_content>
 # This file indicates that the package supports type hints
