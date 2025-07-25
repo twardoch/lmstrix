@@ -1,7 +1,8 @@
 # examples/python/basic_usage.py
 from lmstrix.api.client import LmsClient
 
-def main():
+
+def main() -> None:
     """Demonstrates basic usage of the LMStrix Python API."""
     print("### LMStrix Python API: Basic Usage ###")
 
@@ -9,15 +10,13 @@ def main():
     client = LmsClient()
 
     # 1. Scan for models
-    print("
---- Scanning for models... ---")
+    print("\n--- Scanning for models... ---")
     client.scan_models()
     print("Scan complete.")
 
     # 2. List models
     # The model registry is available as a dictionary.
-    print("
---- Listing models ---")
+    print("\n--- Listing models ---")
     if not client.models:
         print("No models found. Please download a model in LM Studio.")
         return
@@ -27,9 +26,8 @@ def main():
 
     # 3. Get a specific model
     # Use the first model found for this example.
-    model_id = list(client.models.keys())[0]
-    print(f"
---- Selecting model: {model_id} ---")
+    model_id = next(iter(client.models.keys()))
+    print(f"\n--- Selecting model: {model_id} ---")
     model = client.get_model(model_id)
 
     if not model:
@@ -37,8 +35,7 @@ def main():
         return
 
     # 4. Run inference
-    print("
---- Running inference ---")
+    print("\n--- Running inference ---")
     prompt = "What are the three main laws of robotics?"
     print(f"Prompt: {prompt}")
 
@@ -49,8 +46,8 @@ def main():
             print(chunk, end="", flush=True)
         print()
     except Exception as e:
-        print(f"
-An error occurred during inference: {e}")
+        print(f"\nAn error occurred during inference: {e}")
+
 
 if __name__ == "__main__":
     main()

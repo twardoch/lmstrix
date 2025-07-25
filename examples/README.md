@@ -8,7 +8,7 @@ This directory contains a comprehensive set of runnable examples demonstrating t
 2.  **LM Studio Running**: For most examples, you need LM Studio running in the background with a model loaded.
 3.  **Model Downloaded**: You must have at least one model downloaded in LM Studio.
 
-**Note**: Many scripts use a placeholder model identifier like `"phi"`. You may need to edit these scripts to use an identifier that matches a model you have downloaded (e.g., `"gemma"`, `"llama"`). You can see available model identifiers by running `lmstrix list`.
+**Note**: Many scripts use a placeholder model identifier like `"ultron-summarizer-1b"`. You may need to edit these scripts to use an identifier that matches a model you have downloaded (e.g., `"llama-3.2-3b-instruct"`, `"qwen"`). You can see available model identifiers by running `lmstrix list`.
 
 ## How to Run Examples
 

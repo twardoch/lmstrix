@@ -1,0 +1,4 @@
+  File "/Users/Shared/lmstudio/lmstrix/examples/./python/basic_usage.py", line 12
+    print("
+          ^
+SyntaxError: unterminated string literal (detected at line 12)
