@@ -88,8 +88,6 @@ class ContextTester:
         llm = None
         try:
             # Add a small delay to avoid rapid operations
-            import asyncio
-
             await asyncio.sleep(0.5)
 
             llm = self.client.load_model(model_id, context_len=context_size)
@@ -155,12 +153,19 @@ class ContextTester:
 
         left, right = min_context, max_context
         best_working_context = 0
+        iteration = 0
 
         try:
             while left <= right:
                 mid = (left + right) // 2
                 if mid == 0:
                     break
+
+                iteration += 1
+                logger.info(
+                    f"Binary search iteration {iteration} for {model.id}: "
+                    f"testing context size {mid} (range: {left}-{right})",
+                )
 
                 result = await self._test_at_context(model.id, mid, log_path)
 
@@ -171,8 +176,10 @@ class ContextTester:
                 ):
                     best_working_context = mid
                     left = mid + 1  # Try for a larger context
+                    logger.info(f"✓ Context size {mid} succeeded, searching higher")
                 else:
                     right = mid - 1  # This context failed, try smaller
+                    logger.info(f"✗ Context size {mid} failed, searching lower")
 
             model.tested_max_context = best_working_context
             model.context_test_log = str(log_path)
