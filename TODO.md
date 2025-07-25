@@ -4,12 +4,12 @@
 
 ### Release Tasks
 
-- [ ] Create git tag v1.0.0 with release message
+- [x] Create git tag v1.0.30 with release message
 - [ ] Push tag to GitHub repository
-- [ ] Build distribution packages with `python -m build`
-- [ ] Verify wheel and sdist files
+- [x] Build distribution packages with `python -m build`
+- [x] Verify wheel and sdist files
 - [ ] Publish to PyPI using `twine upload dist/*`
 - [ ] Test installation from PyPI: `pip install lmstrix`
 - [ ] Verify all CLI commands work after PyPI install
-- [ ] Create GitHub release from v1.0.0 tag
+- [ ] Create GitHub release from v1.0.30 tag
 - [ ] Write comprehensive release notes for GitHub

@@ -1,9 +1,16 @@
 title: LMStrix
 description: The Unofficial Toolkit for Mastering LM Studio
-theme: just-the-docs
+remote_theme: just-the-docs/just-the-docs
 
 url: https://twardoch.github.io/lmstrix
+
+color_scheme: dark
+
+search_enabled: false
 
 aux_links:
   "LMStrix on GitHub":
     - "https://github.com/twardoch/lmstrix"
+
+plugins:
+  - jekyll-remote-theme
