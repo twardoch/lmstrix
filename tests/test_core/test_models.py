@@ -67,7 +67,7 @@ class TestModel:
                 "context_test_status": ContextTestStatus.COMPLETED,
                 "context_test_date": datetime.now(),
                 "context_test_log": "/path/to/log.json",
-            }
+            },
         )
 
         model = Model(**sample_model_data)
@@ -123,7 +123,7 @@ class TestModel:
                 "context_test_date": test_date,
                 "failed": True,
                 "error_msg": "Test error",
-            }
+            },
         )
 
         model = Model(**sample_model_data)
@@ -242,7 +242,7 @@ class TestModelRegistry:
                 "tested_max_context": 3500,
                 "context_test_status": ContextTestStatus.COMPLETED,
                 "context_test_date": test_date,
-            }
+            },
         )
         model = Model(**sample_model_data)
         registry.update_model("test-model", model)

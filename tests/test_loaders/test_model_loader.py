@@ -174,7 +174,9 @@ class TestModelLoader:
     @patch("lmstrix.loaders.model_loader.LMStudioClient")
     @patch("lmstrix.loaders.model_loader.ModelScanner")
     def test_scan_and_update_models_default_client(
-        self, mock_scanner_class, mock_client_class
+        self,
+        mock_scanner_class,
+        mock_client_class,
     ) -> None:
         """Test scan_and_update_models creates default client if none provided."""
         mock_scanner = Mock()

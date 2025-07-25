@@ -53,7 +53,11 @@ class TestCLIIntegration:
     @patch("lmstrix.utils.paths.get_lmstudio_path")
     @patch("lmstrix.cli.main.LMStudioClient")
     def test_list_models_command(
-        self, mock_client_class, mock_get_path, mock_lmstudio_setup, capsys
+        self,
+        mock_client_class,
+        mock_get_path,
+        mock_lmstudio_setup,
+        capsys,
     ) -> None:
         """Test 'models list' command."""
         lms_path, registry_file = mock_lmstudio_setup
@@ -81,7 +85,11 @@ class TestCLIIntegration:
     @patch("lmstrix.cli.main.LMStudioClient")
     @patch("lmstrix.cli.main.ModelScanner")
     def test_scan_models_command(
-        self, mock_scanner_class, mock_client_class, mock_get_path, mock_lmstudio_setup
+        self,
+        mock_scanner_class,
+        mock_client_class,
+        mock_get_path,
+        mock_lmstudio_setup,
     ) -> None:
         """Test 'models scan' command."""
         lms_path, registry_file = mock_lmstudio_setup
@@ -112,7 +120,10 @@ class TestCLIIntegration:
     @patch("lmstrix.cli.main.LMStudioClient")
     @pytest.mark.asyncio
     async def test_optimize_command(
-        self, mock_client_class, mock_get_path, mock_lmstudio_setup
+        self,
+        mock_client_class,
+        mock_get_path,
+        mock_lmstudio_setup,
     ) -> None:
         """Test 'optimize' command."""
         lms_path, registry_file = mock_lmstudio_setup
@@ -167,7 +178,12 @@ class TestCLIIntegration:
     @patch("lmstrix.cli.main.InferenceEngine")
     @pytest.mark.asyncio
     async def test_infer_with_prompt_file(
-        self, mock_engine_class, mock_load_prompts, mock_get_path, mock_lmstudio_setup, tmp_path
+        self,
+        mock_engine_class,
+        mock_load_prompts,
+        mock_get_path,
+        mock_lmstudio_setup,
+        tmp_path,
     ) -> None:
         """Test 'infer' command with prompt file."""
         lms_path, registry_file = mock_lmstudio_setup
