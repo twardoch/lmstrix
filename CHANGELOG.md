@@ -5,6 +5,46 @@ All notable changes to the LMStrix project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.28] - 2025-07-25
+
+### Added
+
+- **GitHub Pages Documentation Site**
+  - Created comprehensive documentation site structure under `docs/`
+  - Added Jekyll configuration with custom theme and navigation
+  - Created documentation pages: installation, usage, API reference, how-it-works
+  - Set up automatic changelog integration with documentation
+  - Added responsive design and syntax highlighting
+
+- **Example Improvements**
+  - Added example output logging to `examples.log.txt` and `examples.err.txt`
+  - Enhanced error handling in example scripts
+  - Added more detailed comments in Python examples
+
+### Fixed
+
+- **Client Compatibility**
+  - Fixed attribute access issues in `api/client.py` for embedding models
+  - Added proper handling for different model types (LLMs vs Embeddings)
+  - Improved error messages for unsupported model types
+
+- **Context Testing Robustness**
+  - Enhanced context size detection with better error handling
+  - Improved inference validation logic
+  - Added fallback mechanisms for edge cases
+
+### Changed
+
+- **CLI Enhancements**
+  - Improved output formatting for model listings
+  - Better progress indicators during testing
+  - More informative error messages
+
+- **Documentation Updates**
+  - Updated README with clearer examples
+  - Enhanced API documentation with more details
+  - Added troubleshooting section
+
 ## [1.0.23] - 2025-07-25
 
 ### Added
