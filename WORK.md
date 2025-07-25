@@ -1,6 +1,102 @@
 # Work Progress
 
-## Current Work Session - Issue #107 Enhanced Verbose Output
+## Current Work Session - Sort Options for List Command
+
+### Added Sort Options to `lmstrix list`
+- Added `--sort` parameter with options: `id`, `idd`, `ctx`, `ctxd`, `dtx`, `dtxd`, `size`, `sized`
+- `d` suffix means descending order (e.g., `idd` sorts by ID descending)
+- Default sort is by `id` (ascending)
+- Sort options:
+  - `id`/`idd`: Sort by model ID alphabetically
+  - `ctx`/`ctxd`: Sort by tested context size (models without tested context treated as 0)
+  - `dtx`/`dtxd`: Sort by declared context limit
+  - `size`/`sized`: Sort by model file size
+- Invalid sort options show error message and fall back to default
+
+### Implementation Details
+- Modified `list()` method in `src/lmstrix/cli/main.py`
+- Added sort parameter parsing and reverse flag detection
+- Implemented sorting logic for each option
+- Maintained backward compatibility (default behavior unchanged)
+
+## Completed Work Session - Issue #201 Enhanced Context Testing Strategy
+
+### Overview
+Implemented a safer and more efficient context testing strategy that:
+1. Prevents system crashes from attempting very large context sizes
+2. Optimizes multi-model testing to minimize repeated loading/unloading
+3. Provides better progress visibility with tabular output
+
+### Summary of Changes
+
+1. **CLI Enhancement**:
+   - Added `--threshold` parameter to `lmstrix test` command (default: 102,400)
+   - Prevents system crashes by limiting maximum test size
+   
+2. **Algorithm Improvements**:
+   - New test sequence: 1024 → min(threshold, declared_max)
+   - If success and below declared max: increment by 10,240 until failure
+   - If failure: binary search between last good and failed size
+   - Clear phase indicators for better user feedback
+   
+3. **Batch Testing Optimization**:
+   - Created `test_all_models()` method for efficient multi-model testing
+   - Models sorted by declared context size to minimize loading
+   - Pass-based approach: all models tested at each size before moving up
+   - Failed models excluded from subsequent passes
+   
+4. **Output Improvements**:
+   - Rich table output for `--all` flag showing results and efficiency
+   - Pass-based progress indicators during testing
+   - Final summary with success/failure counts
+   
+5. **Documentation Updates**:
+   - Updated usage.md with --threshold examples
+   - Updated how-it-works.md with new algorithm explanation
+   - Added changelog entry for v1.1 features
+
+### Completed Tasks
+
+1. **Add --threshold parameter to CLI** ✓
+   - Added parameter with default value: 102,400 tokens
+   - Controls maximum initial test size
+   - Prevents crashes from testing 1M+ context sizes
+   - Passed to test_model as max_context parameter
+
+2. **Refactor testing algorithm** ✓
+   - Implemented new test sequence: 1024 → min(threshold, declared_max)
+   - If success and threshold < declared_max: increment by 10,240
+   - If failure: binary search downwards
+   - Progress saved after each test
+   - Clear phase indicators (Phase 1-4)
+
+3. **Implement batch testing for --all** ✓
+   - Created test_all_models() method
+   - Models sorted by declared context (ascending)
+   - Pass-based testing minimizes loading overhead
+   - Failed models excluded from subsequent passes
+   - Progress persisted between passes
+
+4. **Improve output format** ✓
+   - Added Rich table output for --all flag
+   - Shows: Model, Status, Optimal Context, Declared Limit, Efficiency
+   - Pass-based progress indicators
+   - Final summary statistics
+
+### Next Steps
+
+1. **Testing**: The implementation is complete and ready for testing with actual models
+2. **Version Bump**: Consider bumping version to v1.1.0 for this significant feature addition
+3. **Release**: After testing, create a new release with the enhanced testing strategy
+
+### Implementation Order
+1. First: Add --threshold parameter to CLI
+2. Second: Refactor test_model() for new algorithm
+3. Third: Create test_all_models() for batch testing
+4. Fourth: Update output formatting
+5. Finally: Update tests and documentation
+
+## Previous Work Session - Issue #107 Enhanced Verbose Output
 
 ### Completed Tasks
 
@@ -50,68 +146,3 @@
    - Special [Context Test], [Phase 1/2], [Binary Search], [Iteration N], and [Test Complete] prefixes
    - Shows token counts with thousand separators
    - Reports efficiency metrics at completion
-
-## Previous Work Session - Issue #106 Improvements
-
-### Completed Tasks
-
-1. **Fixed Terminology Issues** (Issue #105) ✓
-   - Changed "Loaded X models" to "Read X models" in log messages
-   - Updated both models.py and model_loader.py
-   - Avoids confusion with LM Studio's model loading functionality
-
-2. **Improved Error Messages** ✓
-   - Replaced generic "Check logs for details" with specific error messages
-   - Now shows actual error: e.g., "Failed: Model not found"
-   - Much more helpful for debugging
-
-3. **Fixed Rapid Load/Unload Issues** (Issue #106) ✓
-   - Added 0.5s delays before loading and after unloading models
-   - Prevents rapid cycling that was causing connection resets
-   - Added better logging to show binary search progress
-
-4. **Implemented Smart Context Testing** (Issue #106) ✓
-   - Changed from "2+2=" test to "Say hello" for better reliability
-   - Start with small context (128) to verify model loads
-   - Extended Model data structure to track:
-     - last_known_good_context
-     - last_known_bad_context
-   - Test can now resume from previous state if interrupted
-   - Progress is saved after each test iteration
-
-5. **Enhanced Binary Search Algorithm** ✓
-   - First tests with minimal context to ensure model loads
-   - If previous test was interrupted, resumes from last known state
-   - Saves progress to JSON after each test
-   - Tracks both working context and loadable context separately
-
-### Technical Changes
-
-1. **Model.py Changes**:
-   - Added `last_known_good_context` field
-   - Added `last_known_bad_context` field
-   - Updated `to_registry_dict()` to include new fields
-
-2. **ContextTester Changes**:
-   - Changed test prompt from "2+2=" to "Say hello"
-   - Changed validation to check if "hello" is in response (case-insensitive)
-   - Complete rewrite of `test_model()` method:
-     - Accepts registry parameter for saving progress
-     - Starts with context 128 instead of 2048
-     - Saves after each test iteration
-     - Can resume from previous test state
-
-3. **CLI Changes**:
-   - Updated to pass registry to test_model()
-   - Shows specific error messages instead of generic ones
-
-### Next Steps
-
-The verbose output enhancement requested in Issue #107 has been implemented. The `lmstrix test` command with `--verbose` flag now provides:
-- Detailed progress information during context testing
-- Clear phase indicators
-- Model loading/unloading status
-- Binary search iterations with progress percentages
-- Final efficiency metrics
-
-The code is ready for testing with actual models.

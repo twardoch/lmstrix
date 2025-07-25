@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Enhanced Context Testing Strategy (Issue #201)**
+  - Added `--threshold` parameter to test command (default: 102,400 tokens)
+  - Prevents system crashes by limiting initial test size
+  - New incremental testing algorithm: test at 1024, then threshold, then increment by 10,240
+  - Optimized batch testing for `--all` flag with pass-based approach
+  - Models sorted by declared context size to minimize loading/unloading
+  - Rich table output showing test results with efficiency percentages
+
 - **Smart Context Testing with Progress Saving**
   - Context tests now start with small context (32) to verify model loads
   - Added fields to track last known good/bad context sizes

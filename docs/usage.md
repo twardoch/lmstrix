@@ -32,7 +32,20 @@ lmstrix test "model-id-here"
 
 # Test all models that haven't been tested yet
 lmstrix test --all
+
+# Test with a custom threshold (default: 102,400 tokens)
+# This prevents system crashes by limiting the maximum initial test size
+lmstrix test "model-id-here" --threshold 51200
+
+# Test all models with a lower threshold for safety
+lmstrix test --all --threshold 32768
 ```
+
+**New in v1.1**: The `--threshold` parameter (default: 102,400 tokens) prevents system crashes when testing models with very large declared context sizes. The testing algorithm now:
+1. Tests at 1,024 tokens to verify the model loads
+2. Tests at min(threshold, declared_max)
+3. If successful and below declared max, increments by 10,240 tokens
+4. If failed, performs binary search to find the exact limit
 
 For more details on how this works, see the [How It Works](./how-it-works.md) page.
 

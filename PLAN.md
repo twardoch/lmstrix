@@ -1,10 +1,10 @@
-# LMStrix Development Plan - v1.0 Release
+# LMStrix Development Plan - v1.1 Release
 
 ## 1. Project Vision & Status
 
 **Vision**: Deliver a reliable, installable tool that solves the critical problem of models in LM Studio declaring false context limits. The tool provides automated discovery of true operational context limits.
 
-**Current Status**: The project has reached feature completion with v1.0.28. All core functionality, testing, documentation, and examples are complete. The only remaining tasks are the final release steps.
+**Current Status**: Working on Issue #201 - Enhanced context testing strategy to prevent system crashes and optimize multi-model testing.
 
 ## 2. Completed Phases
 
@@ -29,9 +29,40 @@
 - ✓ GitHub Pages documentation site
 - ✓ Changelog maintenance
 
-## 3. Phase 4: Package & Release (IN PROGRESS)
+## 3. Phase 4: Enhanced Context Testing (IN PROGRESS)
 
-**Goal**: Release LMStrix v1.0.0 to PyPI for public availability.
+**Goal**: Implement safer and more efficient context testing strategy per Issue #201.
+
+### 3.1. Implementation Tasks
+
+1. **Add --threshold Parameter**
+   - Add to CLI test command with default 102,400
+   - Controls maximum initial test size to prevent crashes
+   - Use min(threshold, declared_max) for second test
+
+2. **New Testing Algorithm**
+   - Test at 1024 first
+   - Then test at min(threshold, declared_max)
+   - If success and threshold > declared_max: increment by 10,240
+   - If failure: binary search downwards
+   - Save progress after each test
+
+3. **Multi-Model Testing (--all flag)**
+   - Sort models by declared context size (ascending)
+   - Test in passes to minimize loading/unloading
+   - Pass 1: Test all at 1024, exclude failures
+   - Pass 2+: Continue with remaining models
+   - Track and persist progress between passes
+
+4. **Improved Output**
+   - Replace primitive output with Rich tables
+   - Show one row per model test
+   - Include: Model ID, Context Size, Result, Duration
+   - No live updates, just append rows
+
+## 4. Phase 5: Package & Release (PENDING)
+
+**Goal**: Release LMStrix v1.1.0 to PyPI with enhanced testing capabilities.
 
 ### 3.1. Release Steps
 

@@ -82,7 +82,6 @@ def scan_and_update_registry(
     logger.info("Scanning for LM Studio models...")
     try:
         discovered_models = client.list_models()
-        discovered_ids = {model["id"] for model in discovered_models}
         logger.info(f"Found {len(discovered_models)} models in LM Studio.")
     except Exception as e:
         logger.error(f"Failed to scan for models: {e}")
@@ -91,11 +90,13 @@ def scan_and_update_registry(
     # Update existing models and add new ones
     for model_data in discovered_models:
         model_id = model_data["id"]
-        existing_model = registry.get_model(model_id)
+        model_path = str(Path(model_data.get("path", "")))
+        existing_model = registry.get_model(model_path)
 
         if existing_model:
-            logger.debug(f"Updating existing model: {model_id}")
+            logger.debug(f"Updating existing model: {model_path}")
             # Update potentially changed data
+            existing_model.id = model_id  # Update ID in case it changed
             existing_model.path = Path(model_data.get("path", existing_model.path))
             existing_model.size = model_data.get("size_bytes", existing_model.size)
             existing_model.context_limit = model_data.get(
@@ -114,7 +115,7 @@ def scan_and_update_registry(
             # Handle rescan options
             if rescan_all:
                 # Clear all test data
-                logger.info(f"Clearing test data for {model_id} (--all flag)")
+                logger.info(f"Clearing test data for {model_path} (--all flag)")
                 existing_model.tested_max_context = None
                 existing_model.loadable_max_context = None
                 existing_model.context_test_status = ContextTestStatus.UNTESTED
@@ -122,14 +123,14 @@ def scan_and_update_registry(
                 existing_model.context_test_date = None
             elif rescan_failed and existing_model.context_test_status == ContextTestStatus.FAILED:
                 # Clear test data only for failed models
-                logger.info(f"Clearing test data for failed model {model_id} (--failed flag)")
+                logger.info(f"Clearing test data for failed model {model_path} (--failed flag)")
                 existing_model.tested_max_context = None
                 existing_model.loadable_max_context = None
                 existing_model.context_test_status = ContextTestStatus.UNTESTED
                 existing_model.context_test_log = None
                 existing_model.context_test_date = None
         else:
-            logger.info(f"Discovered new model: {model_id}")
+            logger.info(f"Discovered new model: {model_path}")
             new_model = Model(
                 id=model_id,
                 path=Path(model_data.get("path", "")),
@@ -139,14 +140,15 @@ def scan_and_update_registry(
                 has_tools=model_data.get("has_tools", False),
                 has_vision=model_data.get("has_vision", False),
             )
-            registry.update_model(model_id, new_model)
+            registry.update_model(model_path, new_model)
 
     # Remove models that are no longer present
-    registry_ids = {model.id for model in registry.list_models()}
-    deleted_ids = registry_ids - discovered_ids
-    for model_id in deleted_ids:
-        logger.info(f"Removing deleted model: {model_id}")
-        registry.remove_model(model_id)
+    registry_paths = {str(model.path) for model in registry.list_models()}
+    discovered_paths = {str(Path(model["path"])) for model in discovered_models}
+    deleted_paths = registry_paths - discovered_paths
+    for model_path in deleted_paths:
+        logger.info(f"Removing deleted model: {model_path}")
+        registry.remove_model(model_path)
 
     # Save the updated registry
     save_model_registry(registry)
