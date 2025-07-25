@@ -91,6 +91,7 @@ class ContextOptimizer:
                 prompt=test_prompt,
                 max_tokens=50,
                 temperature=0.1,
+                model_id=model_id,
             )
 
             # Unload the model after testing

@@ -73,17 +73,38 @@ class LMStudioClient:
         prompt: str,
         temperature: float = 0.7,
         max_tokens: int = -1,  # -1 for unlimited
+        model_id: str | None = None,  # Pass model_id separately since llm object may not have it
+        **kwargs: Any,
     ) -> CompletionResponse:
         """Make an async completion request to a loaded LM Studio model."""
         try:
-            response = await llm.complete(prompt, temperature=temperature, max_tokens=max_tokens)
-            # Assuming the response object has a similar structure to the previous one
-            # This might need adjustment based on the actual response from lmstudio.llm.complete
+            # Build options dict based on lmstudio API
+            options = {}
+            if temperature != 0.7:  # Only set if not default
+                options["temperature"] = temperature
+            if max_tokens > 0:  # Only set if specified
+                options["max_tokens"] = max_tokens
+
+            # Add any additional kwargs to options
+            options.update(kwargs)
+
+            # The lmstudio complete method is synchronous, not async
+            # Call complete with options if any, otherwise just prompt
+            response = llm.complete(prompt, options) if options else llm.complete(prompt)
+
+            # Parse the response - could be PredictionResult or string
+            if hasattr(response, "content"):
+                content = response.content
+            elif hasattr(response, "text"):
+                content = response.text
+            else:
+                content = str(response)
+
             return CompletionResponse(
-                content=response["choices"][0]["text"],
-                model=llm.model_id,  # Or however the model id is stored
-                usage=response.get("usage", {}),
-                finish_reason=response.get("finish_reason"),
+                content=content,
+                model=model_id or "unknown",
+                usage={},  # lmstudio doesn't provide usage stats in the same way
+                finish_reason="stop",
             )
         except Exception as e:
-            raise InferenceError(llm.model_id, f"Inference failed: {e}") from e
+            raise InferenceError(model_id or "unknown", f"Inference failed: {e}") from e

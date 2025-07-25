@@ -74,6 +74,7 @@ class InferenceEngine:
                 prompt=prompt,
                 max_tokens=max_tokens,
                 temperature=temperature,
+                model_id=model_id,
                 **kwargs,
             )
 
