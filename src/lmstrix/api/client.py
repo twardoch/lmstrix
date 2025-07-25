@@ -103,7 +103,7 @@ class LMStudioClient:
             # Pass maxTokens to prevent models from generating indefinitely
             config = {"maxTokens": max_tokens if max_tokens > 0 else 100}
             logger.debug(f"Calling llm.complete with config: {config}, prompt: {prompt[:50]}...")
-            
+
             # Direct synchronous call - no threading or async
             response = llm.complete(prompt, config=config)
 
