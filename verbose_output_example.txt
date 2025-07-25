@@ -1,0 +1,54 @@
+# Example Verbose Output for `lmstrix test llama-3.2-3b-instruct --verbose`
+
+When the model is properly loaded in LM Studio, you would see output like this:
+
+04:30:00 | INFO     | Starting context test for llama-3.2-3b-instruct
+04:30:00 | INFO     | [Test Start] Model: llama-3.2-3b-instruct
+04:30:00 | INFO     | [Test Start] Declared context limit: 131,072 tokens
+04:30:00 | INFO     | [Test Start] Using binary search to find true operational limit
+04:30:00 | INFO     | [Test Start] Test log will be saved to: /Users/Shared/lmstudio/.lmstrix/context_tests/llama-3.2-3b-instruct.jsonl
+04:30:00 | INFO     | Initial test for llama-3.2-3b-instruct with context size 128
+04:30:00 | INFO     | [Phase 1] Verifying model can load with minimal context (128 tokens)...
+04:30:00 | INFO     | [Context Test] Loading model 'llama-3.2-3b-instruct' with context size: 128 tokens
+04:30:01 | DEBUG    | Model llama-3.2-3b-instruct loaded successfully at 128.
+04:30:01 | INFO     | [Context Test] ✓ Model loaded successfully, attempting inference...
+04:30:02 | INFO     | [Context Test] ✓ Inference successful! Response length: 12 chars
+04:30:02 | DEBUG    | [Context Test] Response: Hello! How c...
+04:30:02 | INFO     | ✓ Model llama-3.2-3b-instruct works at context 128 - got response of length 12
+04:30:02 | INFO     | [Phase 1] ✓ Success! Model is operational
+04:30:02 | INFO     | [Phase 2] Starting binary search for maximum context...
+04:30:02 | INFO     | Testing range for llama-3.2-3b-instruct: 128 - 131072
+04:30:02 | INFO     | [Binary Search] Search space: 128 to 131,072 tokens
+04:30:02 | INFO     | [Binary Search] Estimated iterations: ~17
+04:30:02 | INFO     | Binary search iteration 1 for llama-3.2-3b-instruct: testing context size 65600 (range: 128-131072)
+04:30:02 | INFO     | [Iteration 1] Testing midpoint: 65,600 tokens
+04:30:02 | INFO     | [Iteration 1] Current range: 128 - 131,072 (130,944 tokens)
+04:30:02 | INFO     | [Iteration 1] Search progress: ~0.1%
+04:30:02 | INFO     | [Context Test] Loading model 'llama-3.2-3b-instruct' with context size: 65,600 tokens
+04:30:04 | INFO     | [Context Test] ✓ Model loaded successfully, attempting inference...
+04:30:05 | INFO     | [Context Test] ✓ Inference successful! Response length: 14 chars
+04:30:05 | INFO     | ✓ Context size 65600 succeeded (model loaded and responded), searching higher
+04:30:05 | INFO     | [Iteration 1] ✓ SUCCESS at 65,600 tokens - searching for higher limit
+04:30:05 | DEBUG    | Progress saved: good=65600, bad=None
+04:30:05 | DEBUG    | [Progress] Current best working context: 65,600 tokens
+04:30:05 | INFO     | Binary search iteration 2 for llama-3.2-3b-instruct: testing context size 98336 (range: 65601-131072)
+04:30:05 | INFO     | [Iteration 2] Testing midpoint: 98,336 tokens
+04:30:05 | INFO     | [Iteration 2] Current range: 65,601 - 131,072 (65,471 tokens)
+04:30:05 | INFO     | [Iteration 2] Search progress: ~50.0%
+04:30:05 | INFO     | [Context Test] Loading model 'llama-3.2-3b-instruct' with context size: 98,336 tokens
+04:30:07 | INFO     | [Context Test] ✗ Model failed to load at context 98,336
+04:30:07 | DEBUG    | [Context Test] Load error: Failed to allocate memory for context
+04:30:07 | INFO     | ✗ Context size 98336 failed (model didn't load), searching lower
+04:30:07 | INFO     | [Iteration 2] ✗ FAILED to load at 98,336 tokens - searching lower
+04:30:07 | DEBUG    | Progress saved: good=65600, bad=98336
+...
+(continues with binary search iterations)
+...
+04:30:45 | INFO     | Context test completed for llama-3.2-3b-instruct. Optimal working context: 89640
+04:30:45 | INFO     | [Test Complete] Final Results:
+04:30:45 | INFO     | [Test Complete] ✓ Maximum working context: 89,640 tokens
+04:30:45 | INFO     | [Test Complete] ✓ Declared limit: 131,072 tokens
+04:30:45 | INFO     | [Test Complete] ✓ Efficiency: 68.4% of declared limit
+04:30:45 | INFO     | [Test Complete] ✓ Total iterations: 15
+04:30:45 | INFO     | [Test Complete] ✓ Test log saved to: /Users/Shared/lmstudio/.lmstrix/context_tests/llama-3.2-3b-instruct.jsonl
+✓ Test for llama-3.2-3b-instruct complete. Optimal context: 89,640

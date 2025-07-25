@@ -54,15 +54,22 @@ class LMStrixCLI:
             )
             return
 
-        table = Table(title="LM Studio Models")
-        table.add_column("Model ID", style="cyan", no_wrap=True)
-        table.add_column("Size (GB)", style="magenta")
-        table.add_column("Declared Ctx", style="yellow")
-        table.add_column("Tested Ctx", style="green")
-        table.add_column("Status", style="blue")
+        table = Table(title="LM Studio Models", show_lines=False)
+        table.add_column("Model ID", style="cyan", no_wrap=False, width=40)
+        table.add_column("Size\n(GB)", style="magenta", width=8)
+        table.add_column("Declared\nCtx", style="yellow", width=10)
+        table.add_column("Tested\nCtx", style="green", width=10)
+        table.add_column("Last\nGood", style="green", width=10)
+        table.add_column("Last\nBad", style="red", width=10)
+        table.add_column("Status", style="blue", width=12)
 
         for model in sorted(models, key=lambda m: m.id):
             tested_ctx = f"{model.tested_max_context:,}" if model.tested_max_context else "-"
+            last_good = (
+                f"{model.last_known_good_context:,}" if model.last_known_good_context else "-"
+            )
+            last_bad = f"{model.last_known_bad_context:,}" if model.last_known_bad_context else "-"
+
             status_map = {
                 "untested": "[dim]Untested[/dim]",
                 "testing": "[yellow]Testing...[/yellow]",
@@ -76,6 +83,8 @@ class LMStrixCLI:
                 f"{model.size / (1024**3):.2f}" if model.size else "N/A",
                 f"{model.context_limit:,}",
                 tested_ctx,
+                last_good,
+                last_bad,
                 status,
             )
         console.print(table)

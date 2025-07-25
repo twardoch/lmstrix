@@ -104,11 +104,13 @@ class ContextTester:
             )
 
         llm = None
+        model_loaded = False
         try:
             # Add a small delay to avoid rapid operations
             await asyncio.sleep(0.5)
 
             llm = self.client.load_model(model_id, context_len=context_size)
+            model_loaded = True
             logger.debug(f"Model {model_id} loaded successfully at {context_size}.")
 
             if self.verbose:
@@ -146,6 +148,13 @@ class ContextTester:
                 logger.info(f"[Context Test] ✗ Model failed to load at context {context_size:,}")
                 logger.debug(f"[Context Test] Load error: {e!s}")
 
+                # Check if it's a "model not found" error
+                if "noModelMatchingQuery" in str(e):
+                    logger.info(f"[Context Test] ⚠️  Model '{model_id}' is not loaded in LM Studio")
+                    logger.info(
+                        "[Context Test] ⚠️  Please load the model in LM Studio first before testing"
+                    )
+
             result = ContextTestResult(
                 context_size=context_size,
                 load_success=False,
@@ -166,13 +175,16 @@ class ContextTester:
                 error=str(e),
             )
         finally:
-            if llm:
-                if self.verbose:
-                    logger.debug("[Context Test] Unloading model...")
-                llm.unload()
-                logger.debug(f"Model {model_id} unloaded.")
-                # Add delay after unload to ensure clean state
-                await asyncio.sleep(0.5)
+            if llm and model_loaded:
+                try:
+                    if self.verbose:
+                        logger.debug("[Context Test] Unloading model...")
+                    llm.unload()
+                    logger.debug(f"Model {model_id} unloaded.")
+                    # Add delay after unload to ensure clean state
+                    await asyncio.sleep(0.5)
+                except Exception as e:
+                    logger.warning(f"Failed to unload model: {e}")
 
         self._log_result(log_path, result)
         return result
@@ -198,6 +210,10 @@ class ContextTester:
         # Load registry if not provided
         if registry is None:
             registry = load_model_registry()
+
+        # Save the initial testing status
+        registry.update_model(model.id, model)
+        save_model_registry(registry)
 
         max_context = max_context or model.context_limit
         log_path = get_context_test_log_path(model.id)
