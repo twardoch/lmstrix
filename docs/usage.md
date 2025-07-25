@@ -35,6 +35,8 @@ lmstrix test "model-id-here"
 lmstrix test --all
 ```
 
+For more details on how this works, see the [How It Works](./how-it-works.md) page.
+
 ### Running Inference
 
 You can run inference directly from the command line.

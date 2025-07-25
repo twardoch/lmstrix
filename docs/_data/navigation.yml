@@ -1,0 +1,12 @@
+- title: Home
+  url: /
+- title: Installation
+  url: /installation
+- title: Usage
+  url: /usage
+- title: API Reference
+  url: /api
+- title: How It Works
+  url: /how-it-works
+- title: Changelog
+  url: /changelog
