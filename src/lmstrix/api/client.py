@@ -44,7 +44,9 @@ class LMStudioClient:
                     "path": info.path,
                     "size_bytes": getattr(info, "size_bytes", getattr(info, "sizeBytes", 0)),
                     "context_length": getattr(
-                        info, "max_context_length", getattr(info, "maxContextLength", 8192)
+                        info,
+                        "max_context_length",
+                        getattr(info, "maxContextLength", 8192),
                     ),
                     "display_name": getattr(info, "display_name", getattr(info, "displayName", "")),
                     "architecture": info.architecture,

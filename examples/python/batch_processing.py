@@ -43,7 +43,7 @@ def main() -> None:
         else:
             print(
                 f"\nSkipping already tested model: {model.id} "
-                f"(Max context: {model.max_context_tested})"
+                f"(Max context: {model.max_context_tested})",
             )
 
     # Save results to disk

@@ -5,6 +5,33 @@ All notable changes to the LMStrix project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.23] - 2025-07-25
+
+### Added
+
+- Implemented comprehensive `test_binary_search_logic` test function with edge cases:
+  - Model that works at all sizes
+  - Model that never works  
+  - Model that loads but never passes inference
+  - Model that works up to a specific context size
+  - Model that never loads
+
+### Fixed
+
+- Fixed syntax errors in Python example files:
+  - `examples/python/batch_processing.py` - Fixed unterminated string literals
+  - `examples/python/custom_inference.py` - Fixed similar syntax issues
+- Improved code quality by fixing linting issues:
+  - Updated file operations to use `Path.open()` instead of `open()` (PTH123)
+  - Added proper exception chaining with `from e` (B904)
+  - Fixed shadowing of Python builtin `all` by renaming to `all_models` (A002)
+- Updated `api/client.py` to handle different attribute names for LLMs vs Embeddings
+
+### Changed
+
+- All mypy type checking now passes without errors
+- Package builds successfully as v1.0.23
+
 ## [1.0.21] - 2025-07-25
 
 ### Fixed

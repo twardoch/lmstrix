@@ -37,7 +37,16 @@ This gives you a reliable, empirical measurement of the model's true capabilitie
 ## Installation
 
 ```bash
-uv pip install --system lmstrix
+# Using pip
+pip install lmstrix
+
+# Using uv (recommended)
+uv pip install lmstrix
+
+# For development
+git clone https://github.com/twardoch/lmstrix
+cd lmstrix
+pip install -e .
 ```
 
 ## Quick Start
@@ -45,17 +54,27 @@ uv pip install --system lmstrix
 ### Command-Line Interface (CLI)
 
 ```bash
-# Discover the optimal context window for a model
-lmstrix optimize "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf"
+# First, scan for available models in LM Studio
+lmstrix scan
 
-# List all available models with their detected context limits
-lmstrix models list
+# List all models with their test status
+lmstrix list
 
-# Scan for any new models you've added to LM Studio
-lmstrix models scan
+# Test the context limit for a specific model
+lmstrix test "model-id-here"
 
-# Run inference using a prompt template
-lmstrix infer --model "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf" --prompt "greeting"
+# Test all untested models
+lmstrix test --all
+
+# Run inference on a model
+lmstrix infer "Your prompt here" --model "model-id" --max-tokens 150
+
+# Run inference with a prompt file
+lmstrix infer "@prompts.toml:greeting" --model "model-id"
+
+# Enable verbose output for debugging
+lmstrix scan --verbose
+lmstrix test "model-id" --verbose
 ```
 
 ### Python API
@@ -66,34 +85,55 @@ from lmstrix import LMStrix
 
 async def main():
     # Initialize the client
-    client = LMStrix()
-
-    # Optimize the context window for a specific model
-    print("Optimizing context, this may take a moment...")
-    optimization = await client.optimize_context("Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf")
-    print(f"Optimal context found: {optimization.optimal_size} tokens")
-    print("-" * 20)
-
-    # List all models and their properties
-    print("Available Models:")
-    models = await client.list_models()
+    lms = LMStrix()
+    
+    # Scan for available models
+    await lms.scan_models()
+    
+    # List all models
+    models = await lms.list_models()
     for model in models:
-        limit = model.context_limit or "Not yet optimized"
-        print(f"- {model.id}: {limit} tokens")
-    print("-" * 20)
-
-    # Run inference with a template
-    print("Running inference...")
-    result = await client.infer(
-        model_id="Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
-        prompt_template="Summarize this text: {text}",
-        context={"text": "Your long document goes here..."}
-    )
-    print("Inference Result:")
-    print(result.content)
+        print(f"Model: {model.id}")
+        print(f"  Context limit: {model.context_limit:,} tokens")
+        print(f"  Tested limit: {model.tested_max_context or 'Not tested'}")
+        print(f"  Status: {model.context_test_status}")
+    
+    # Test a specific model's context limits
+    model_id = models[0].id if models else None
+    if model_id:
+        print(f"\nTesting context limits for {model_id}...")
+        result = await lms.test_model(model_id)
+        print(f"Optimal context: {result.tested_max_context} tokens")
+        print(f"Test status: {result.context_test_status}")
+    
+    # Run inference
+    if model_id:
+        response = await lms.infer(
+            prompt="What is the meaning of life?",
+            model_id=model_id,
+            max_tokens=100
+        )
+        print(f"\nInference result:\n{response.content}")
 
 if __name__ == "__main__":
     asyncio.run(main())
+```
+
+### Batch Processing Example
+
+```python
+from lmstrix.api.client import LMStudioClient
+from lmstrix.core.scanner import ModelScanner
+
+# Process multiple models
+client = LMStudioClient()
+scanner = ModelScanner(client)
+
+# Scan and test all models
+for model in scanner.scan():
+    if not model.tested_max_context:
+        print(f"Testing {model.id}...")
+        # Testing happens automatically via CLI or API
 ```
 
 ## Architecture
@@ -106,18 +146,44 @@ LMStrix is designed with a clean, modular architecture:
 - **`cli/`**: Implements the command-line interface.
 - **`utils/`**: Shared utilities and helper functions.
 
+## How Context Testing Works
+
+LMStrix uses an innovative binary search algorithm to find the true operational context limit of each model:
+
+1. **Initial Range**: Starts with the model's declared context size as the upper bound
+2. **Binary Search**: Tests the model with progressively refined context sizes
+3. **Validation**: Each test sends a simple prompt ("2+2=") padded with filler text to reach the target context size
+4. **Result Verification**: Only marks a context size as "working" if the model returns the correct answer ("4")
+5. **Optimization**: Finds the maximum context size that reliably works on your hardware
+
+This process typically takes 30-60 seconds per model and saves the results for future use.
+
 ## Development
 
 ```bash
-# Install in editable mode for development
-pip install -e .
+# Clone the repository
+git clone https://github.com/twardoch/lmstrix
+cd lmstrix
+
+# Install in development mode with all dependencies
+pip install -e ".[dev]"
 
 # Run the test suite
 pytest
 
-# Format and lint the codebase
+# Run with coverage
+pytest --cov=src/lmstrix --cov-report=html
+
+# Format code
+black .
 ruff format .
+
+# Lint code
 ruff check .
+mypy src/lmstrix
+
+# Build the package
+python -m build
 ```
 
 ## License
@@ -128,6 +194,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Contributions are highly welcome! Please feel free to submit pull requests or file issues on our GitHub repository.
 
+## Requirements
+
+- Python 3.10 or higher
+- LM Studio installed and running locally
+- At least one model downloaded in LM Studio
+
 ## Support
 
-For bugs, feature requests, or general questions, please [file an issue](https://github.com/yourusername/lmstrix/issues) on our GitHub repository.
+For bugs, feature requests, or general questions, please [file an issue](https://github.com/twardoch/lmstrix/issues) on our GitHub repository.
