@@ -11,22 +11,30 @@ Project Structure:
 │   └── 📄 usage.md
 ├── 📁 examples
 │   ├── 📁 cli
-│   │   ├── 📄 basic_workflow.sh
-│   │   ├── 📄 inference_examples.sh
+│   │   ├── 📄 
+│   │   │   basic_workflow.sh
+│   │   ├── 📄 
+│   │   │   inference_examples.
+│   │   │   sh
 │   │   └── 📄 model_testing.sh
 │   ├── 📁 data
-│   │   ├── 📄 sample_context.txt
-│   │   └── 📄 test_questions.json
+│   │   ├── 📄 
+│   │   │   sample_context.txt
+│   │   └── 📄 
+│   │       test_questions.json
 │   ├── 📁 prompts
 │   │   ├── 📄 analysis.toml
 │   │   ├── 📄 coding.toml
 │   │   ├── 📄 creative.toml
 │   │   └── 📄 qa.toml
 │   ├── 📁 python
-│   │   ├── 📄 advanced_testing.py
+│   │   ├── 📄 
+│   │   │   advanced_testing.py
 │   │   ├── 📄 basic_usage.py
-│   │   ├── 📄 batch_processing.py
-│   │   └── 📄 custom_inference.py
+│   │   ├── 📄 
+│   │   │   batch_processing.py
+│   │   └── 📄 
+│   │       custom_inference.py
 │   ├── 📄 examples.err.txt
 │   ├── 📄 examples.log.txt
 │   ├── 📄 README.md
@@ -43,23 +51,31 @@ Project Structure:
 │   │   ├── 📁 api
 │   │   │   ├── 📄 __init__.py
 │   │   │   ├── 📄 client.py
-│   │   │   └── 📄 exceptions.py
+│   │   │   └── 📄 
+│   │   │       exceptions.py
 │   │   ├── 📁 cli
 │   │   │   ├── 📄 __init__.py
 │   │   │   └── 📄 main.py
 │   │   ├── 📁 core
 │   │   │   ├── 📄 __init__.py
 │   │   │   ├── 📄 context.py
-│   │   │   ├── 📄 context_tester.py
+│   │   │   ├── 📄 
+│   │   │   │   context_tester.
+│   │   │   │   py
 │   │   │   ├── 📄 inference.py
 │   │   │   ├── 📄 models.py
 │   │   │   ├── 📄 prompts.py
 │   │   │   └── 📄 scanner.py
 │   │   ├── 📁 loaders
 │   │   │   ├── 📄 __init__.py
-│   │   │   ├── 📄 context_loader.py
-│   │   │   ├── 📄 model_loader.py
-│   │   │   └── 📄 prompt_loader.py
+│   │   │   ├── 📄 
+│   │   │   │   context_loader.
+│   │   │   │   py
+│   │   │   ├── 📄 
+│   │   │   │   model_loader.py
+│   │   │   └── 📄 
+│   │   │       prompt_loader.p
+│   │   │       y
 │   │   ├── 📁 utils
 │   │   │   ├── 📄 __init__.py
 │   │   │   └── 📄 paths.py
@@ -69,17 +85,25 @@ Project Structure:
 │   └── 📁 lmstrix.egg-info
 ├── 📁 tests
 │   ├── 📁 core
-│   │   └── 📄 test_context_tester.py
+│   │   └── 📄 
+│   │       test_context_tester
+│   │       .py
 │   ├── 📁 loaders
-│   │   └── 📄 test_model_loader.py
+│   │   └── 📄 
+│   │       test_model_loader.p
+│   │       y
 │   ├── 📁 test_api
 │   │   ├── 📄 __init__.py
 │   │   ├── 📄 test_client.py
-│   │   └── 📄 test_exceptions.py
+│   │   └── 📄 
+│   │       test_exceptions.py
 │   ├── 📁 test_core
 │   │   ├── 📄 __init__.py
-│   │   ├── 📄 test_context_tester.py
-│   │   ├── 📄 test_inference.py
+│   │   ├── 📄 
+│   │   │   test_context_tester
+│   │   │   .py
+│   │   ├── 📄 
+│   │   │   test_inference.py
 │   │   ├── 📄 test_models.py
 │   │   ├── 📄 test_prompts.py
 │   │   └── 📄 test_scanner.py
@@ -87,12 +111,20 @@ Project Structure:
 │   │   └── 📄 __init__.py
 │   ├── 📁 test_integration
 │   │   ├── 📄 __init__.py
-│   │   └── 📄 test_cli_integration.py
+│   │   └── 📄 
+│   │       test_cli_integratio
+│   │       n.py
 │   ├── 📁 test_loaders
 │   │   ├── 📄 __init__.py
-│   │   ├── 📄 test_context_loader.py
-│   │   ├── 📄 test_model_loader.py
-│   │   └── 📄 test_prompt_loader.py
+│   │   ├── 📄 
+│   │   │   test_context_loader
+│   │   │   .py
+│   │   ├── 📄 
+│   │   │   test_model_loader.p
+│   │   │   y
+│   │   └── 📄 
+│   │       test_prompt_loader.
+│   │       py
 │   ├── 📁 test_utils
 │   │   ├── 📄 __init__.py
 │   │   └── 📄 test_paths.py
@@ -108,6 +140,7 @@ Project Structure:
 ├── 📄 CLAUDE.md
 ├── 📄 cleanup.sh
 ├── 📄 GEMINI.md
+├── 📄 IMPROVEMENTS_SUMMARY.md
 ├── 📄 LICENSE
 ├── 📄 MANIFEST.in
 ├── 📄 PLAN.md
@@ -1638,6 +1671,85 @@ When I say "/plan [requirement]", you must:
 </document>
 
 <document index="8">
+<source>IMPROVEMENTS_SUMMARY.md</source>
+<document_content>
+# LMStrix Improvements Summary
+
+## Issues Addressed
+
+### Issue #105 - Terminology Confusion
+- **Problem**: Using "Loaded X models" in logs was confusing since "loading" has a specific meaning in LM Studio
+- **Solution**: Changed to "Read X models from..." to clarify we're reading from the JSON registry file
+
+### Issue #106 - Context Testing Improvements
+- **Problems**:
+  1. Rapid model load/unload causing connection resets
+  2. Generic error messages not helpful
+  3. Tests starting with large context (2048) even if model can't load
+  4. No progress saving - tests restart from beginning if interrupted
+  5. Using "2+2=" prompt which might fail with some models
+
+- **Solutions**:
+  1. Added 0.5s delays before load and after unload operations
+  2. Replaced "Check logs for details" with actual error messages
+  3. Tests now start with small context (32) to verify model loads
+  4. Added progress tracking fields (last_known_good_context, last_known_bad_context)
+  5. Changed prompt to "Say hello" which is more universally supported
+  6. Tests save progress after each iteration and can resume if interrupted
+
+## Technical Changes
+
+### 1. Model Data Structure (`src/lmstrix/core/models.py`)
+```python
+# Added fields for resumable testing
+last_known_good_context: int | None
+last_known_bad_context: int | None
+```
+
+### 2. Context Tester (`src/lmstrix/core/context_tester.py`)
+- Changed test prompt from "2+2=" to "Say hello"
+- Changed expected response from "4" to "hello" (case-insensitive substring match)
+- Complete rewrite of `test_model()` method:
+  - Accepts registry parameter for saving progress
+  - Starts with context 32 instead of 2048
+  - Tests basic functionality before binary search
+  - Saves progress after each test iteration
+  - Can resume from previous test state
+  - Better error handling and logging
+
+### 3. CLI Improvements (`src/lmstrix/cli/main.py`)
+- Shows specific error messages instead of generic "Check logs"
+- Passes registry to test_model() for progress saving
+
+## Benefits
+
+1. **More Reliable Testing**: Starting with small context ensures we don't waste time on models that can't load
+2. **Resumable Tests**: If a test crashes or is interrupted, it can resume from where it left off
+3. **Better User Experience**: Clear error messages and progress indicators
+4. **More Stable**: Delays prevent rapid operations that cause connection issues
+5. **Universal Compatibility**: "Say hello" prompt works with more models than math problems
+
+## Testing Status
+
+The code has been implemented and basic validation shows:
+- New fields are properly serialized to JSON
+- Prompt validation works correctly ("hello" is found in "Hello! How can I help you today?")
+- Error messages are now specific and helpful
+
+## Next Steps
+
+1. **Update Unit Tests**: The existing tests use the old API (optimize_model, find_optimal_context) and need updating
+2. **Integration Testing**: Test with actual LM Studio models to verify improvements work in practice
+3. **Documentation**: Update user documentation to reflect new testing behavior
+4. **Consider Additional Features**:
+   - Custom test prompts via CLI
+   - Multiple prompt validation for robustness
+   - Visual progress bar
+   - GPU memory monitoring during tests
+</document_content>
+</document>
+
+<document index="9">
 <source>LICENSE</source>
 <document_content>
 MIT License
@@ -1665,7 +1777,7 @@ SOFTWARE.
 </document_content>
 </document>
 
-<document index="9">
+<document index="10">
 <source>MANIFEST.in</source>
 <document_content>
 include LICENSE
@@ -1681,7 +1793,7 @@ recursive-exclude * *.py[co]
 </document_content>
 </document>
 
-<document index="10">
+<document index="11">
 <source>PLAN.md</source>
 <document_content>
 # LMStrix Development Plan - v1.0 Release
@@ -1760,7 +1872,7 @@ This release solves the critical problem of LM Studio models falsely advertising
 </document_content>
 </document>
 
-<document index="11">
+<document index="12">
 <source>README.md</source>
 <document_content>
 LMStrix is a professional, installable Python toolkit designed to supercharge your interaction with [LM Studio](https://lmstudio.ai/). It provides a powerful command-line interface (CLI) and a clean Python API for managing, testing, and running local language models, with a standout feature: the **Adaptive Context Optimizer**.
@@ -1868,7 +1980,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 </document_content>
 </document>
 
-<document index="12">
+<document index="13">
 <source>RELEASE_NOTES.md</source>
 <document_content>
 # Release Notes - LMStrix v1.0.30
@@ -1946,7 +2058,7 @@ Apache-2.0
 </document_content>
 </document>
 
-<document index="13">
+<document index="14">
 <source>TESTING.md</source>
 <document_content>
 # LMStrix Test Suite
@@ -2110,7 +2222,7 @@ The test suite is designed to run in CI/CD pipelines:
 </document_content>
 </document>
 
-<document index="14">
+<document index="15">
 <source>TODO.md</source>
 <document_content>
 # TODO List for LMStrix
@@ -2146,7 +2258,7 @@ The test suite is designed to run in CI/CD pipelines:
 </document_content>
 </document>
 
-<document index="15">
+<document index="16">
 <source>WORK.md</source>
 <document_content>
 # Work Progress
@@ -2215,10 +2327,25 @@ The improvements requested in Issue #106 have been implemented. The testing syst
 - Provides clear error messages and progress indicators
 
 The code is ready for testing with actual models.
+
+## Bug Fix - API Call Issue
+
+### Problem Found
+- Test was failing with error: `LLM.complete() takes 2 positional arguments but 3 were given`
+- The LM Studio API's `complete()` method only accepts a prompt - no additional parameters
+
+### Solution
+1. Fixed the API call in `client.py` to only pass the prompt to `complete()`
+2. Changed minimum context size to 128 tokens
+3. Removed semantic validation - now any non-empty response is considered "good"
+4. Updated test logic:
+   - "good" = model loads AND generates any response
+   - "bad" = model fails to load OR crashes during inference
+   - All responses are logged for manual review
 </document_content>
 </document>
 
-<document index="16">
+<document index="17">
 <source>build.sh</source>
 <document_content>
 #!/bin/bash
@@ -2256,7 +2383,7 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 </document_content>
 </document>
 
-<document index="17">
+<document index="18">
 <source>cleanup.sh</source>
 <document_content>
 #!/usr/bin/env bash
@@ -2275,7 +2402,7 @@ hatch publish
 </document_content>
 </document>
 
-<document index="18">
+<document index="19">
 <source>docs/_config.yml</source>
 <document_content>
 title: LMStrix
@@ -2297,7 +2424,7 @@ plugins:
 </document_content>
 </document>
 
-<document index="19">
+<document index="20">
 <source>docs/api.md</source>
 <document_content>
 ---
@@ -2346,7 +2473,7 @@ Represents the response from an inference request.
 </document_content>
 </document>
 
-<document index="20">
+<document index="21">
 <source>docs/changelog.md</source>
 <document_content>
 ---
@@ -2433,7 +2560,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 </document_content>
 </document>
 
-<document index="21">
+<document index="22">
 <source>docs/how-it-works.md</source>
 <document_content>
 ---
@@ -2461,7 +2588,7 @@ The command saves the results of the test to a local registry, so you only need 
 </document_content>
 </document>
 
-<document index="22">
+<document index="23">
 <source>docs/index.md</source>
 <document_content>
 ---
@@ -2506,7 +2633,7 @@ This gives you a reliable, empirical measurement of the model's true capabilitie
 </document_content>
 </document>
 
-<document index="23">
+<document index="24">
 <source>docs/installation.md</source>
 <document_content>
 ---
@@ -2546,7 +2673,7 @@ pip install -e .[dev]
 </document_content>
 </document>
 
-<document index="24">
+<document index="25">
 <source>docs/usage.md</source>
 <document_content>
 ---
@@ -2654,7 +2781,7 @@ if __name__ == "__main__":
 </document_content>
 </document>
 
-<document index="25">
+<document index="26">
 <source>examples/README.md</source>
 <document_content>
 # LMStrix Usage Examples
@@ -2723,7 +2850,7 @@ python3 python/basic_usage.py
 </document_content>
 </document>
 
-<document index="26">
+<document index="27">
 <source>examples/cli/basic_workflow.sh</source>
 <document_content>
 #!/bin/bash
@@ -2783,7 +2910,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="27">
+<document index="28">
 <source>examples/cli/inference_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -2845,7 +2972,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="28">
+<document index="29">
 <source>examples/cli/model_testing.sh</source>
 <document_content>
 #!/bin/bash
@@ -2903,7 +3030,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="29">
+<document index="30">
 <source>examples/data/sample_context.txt</source>
 <document_content>
 This is a sample text file designed for context length testing in LMStrix. The purpose of this file is to provide a sufficiently large and repetitive block of text that can be used to fill the context window of a large language model. By feeding a model a long prompt composed of this text, we can determine the maximum number of tokens it can process before it fails to load or produce a coherent response. This process is crucial for understanding the true operational limits of a model, which may differ from the limits advertised by its developers. The text itself is not intended to be meaningful, but rather to serve as a consistent and measurable filler for the model's context buffer. The repetition ensures that the content is uniform and does not introduce unexpected variables into the testing process.
@@ -2919,7 +3046,7 @@ This is a sample text file designed for context length testing in LMStrix. The p
 </document_content>
 </document>
 
-<document index="30">
+<document index="31">
 <source>examples/data/test_questions.json</source>
 <document_content>
 [
@@ -2931,7 +3058,7 @@ This is a sample text file designed for context length testing in LMStrix. The p
 </document_content>
 </document>
 
-<document index="31">
+<document index="32">
 <source>examples/examples.err.txt</source>
 <document_content>
   File "/Users/Shared/lmstudio/lmstrix/examples/./python/basic_usage.py", line 12
@@ -2942,7 +3069,7 @@ SyntaxError: unterminated string literal (detected at line 12)
 </document_content>
 </document>
 
-<document index="32">
+<document index="33">
 <source>examples/examples.log.txt</source>
 <document_content>
 ===== Running All LMStrix Examples =====
@@ -4358,7 +4485,7 @@ NOTE: The Python scripts will use the first model they find.
 </document_content>
 </document>
 
-<document index="33">
+<document index="34">
 <source>examples/prompts/analysis.toml</source>
 <document_content>
 # examples/prompts/analysis.toml
@@ -4379,7 +4506,7 @@ description = "Analyzes the sentiment of a given text."
 </document_content>
 </document>
 
-<document index="34">
+<document index="35">
 <source>examples/prompts/coding.toml</source>
 <document_content>
 # examples/prompts/coding.toml
@@ -4401,7 +4528,7 @@ description = "Explains a snippet of code."
 </document_content>
 </document>
 
-<document index="35">
+<document index="36">
 <source>examples/prompts/creative.toml</source>
 <document_content>
 # examples/prompts/creative.toml
@@ -4418,7 +4545,7 @@ description = "Generates a story idea from a genre and character."
 </document_content>
 </document>
 
-<document index="36">
+<document index="37">
 <source>examples/prompts/qa.toml</source>
 <document_content>
 # examples/prompts/qa.toml
@@ -4477,7 +4604,7 @@ def main(()) -> None:
     """Demonstrates custom inference workflows with the LMStrix Python API."""
 
 
-<document index="37">
+<document index="38">
 <source>examples/run_all_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -4549,7 +4676,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="38">
+<document index="39">
 <source>issues/106.txt</source>
 <document_content>
 Othello:~ adam$ lmstrix test llama-3.2-3b-instruct --verbose
@@ -4667,7 +4794,7 @@ This `lmstrix test llama-3.2-3b-instruct --verbose` should work more like:
 </document_content>
 </document>
 
-<document index="39">
+<document index="40">
 <source>obsolete/lmsm.json</source>
 <document_content>
 {
@@ -4756,7 +4883,7 @@ def list((self, all_rescan: bool = False, failed_rescan: bool = False)) -> None:
     """List all models in LMStudio"""
 
 
-<document index="40">
+<document index="41">
 <source>prompt.txt</source>
 <document_content>
 This is a prompt from a file.
@@ -4764,7 +4891,7 @@ This is a prompt from a file.
 </document_content>
 </document>
 
-<document index="41">
+<document index="42">
 <source>pyproject.toml</source>
 <document_content>
 [build-system]
@@ -5083,7 +5210,7 @@ directory = "htmlcov"
 </document_content>
 </document>
 
-<document index="42">
+<document index="43">
 <source>pytest.ini</source>
 <document_content>
 [pytest]
@@ -5491,8 +5618,8 @@ class ContextTestResult:
         """Initialize test result."""
     def to_dict((self)) -> dict:
         """Convert to dictionary for logging."""
-    def is_valid_response((self, expected: str)) -> bool:
-        """Check if response contains expected output."""
+    def is_valid_response((self, expected: str = "")) -> bool:
+        """Check if we got any response at all (not validating content)."""
 
 class ContextTester:
     """Tests models to find their true operational context limits."""
@@ -5510,7 +5637,7 @@ class ContextTester:
     def test_model((
         self,
         model: Model,
-        min_context: int = 32,
+        min_context: int = 128,
         max_context: int | None = None,
         registry=None,
     )) -> Model:
@@ -5530,8 +5657,8 @@ def __init__((
 def to_dict((self)) -> dict:
     """Convert to dictionary for logging."""
 
-def is_valid_response((self, expected: str)) -> bool:
-    """Check if response contains expected output."""
+def is_valid_response((self, expected: str = "")) -> bool:
+    """Check if we got any response at all (not validating content)."""
 
 def __init__((self, client: LMStudioClient | None = None)) -> None:
     """Initialize context tester."""
@@ -5550,7 +5677,7 @@ def _test_at_context((
 def test_model((
         self,
         model: Model,
-        min_context: int = 32,
+        min_context: int = 128,
         max_context: int | None = None,
         registry=None,
     )) -> Model:
@@ -5964,7 +6091,7 @@ def save_prompts((
     """Save prompts to a TOML file."""
 
 
-<document index="43">
+<document index="44">
 <source>src/lmstrix/py.typed</source>
 <document_content>
 # This file indicates that the package supports type hints

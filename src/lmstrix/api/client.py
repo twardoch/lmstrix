@@ -78,19 +78,9 @@ class LMStudioClient:
     ) -> CompletionResponse:
         """Make an async completion request to a loaded LM Studio model."""
         try:
-            # Build options dict based on lmstudio API
-            options = {}
-            if temperature != 0.7:  # Only set if not default
-                options["temperature"] = temperature
-            if max_tokens > 0:  # Only set if specified
-                options["max_tokens"] = max_tokens
-
-            # Add any additional kwargs to options
-            options.update(kwargs)
-
-            # The lmstudio complete method is synchronous, not async
-            # Call complete with options if any, otherwise just prompt
-            response = llm.complete(prompt, options) if options else llm.complete(prompt)
+            # LM Studio's complete() method only accepts the prompt
+            # It doesn't support temperature, max_tokens, or other options
+            response = llm.complete(prompt)
 
             # Parse the response - could be PredictionResult or string
             if hasattr(response, "content"):
