@@ -10,6 +10,7 @@ from loguru import logger
 from lmstrix.api import LMStudioClient
 from lmstrix.api.exceptions import ModelLoadError
 from lmstrix.core.models import ContextTestStatus, Model
+from lmstrix.loaders.model_loader import load_model_registry, save_model_registry
 from lmstrix.utils import get_context_test_log_path
 
 
@@ -47,29 +48,30 @@ class ContextTestResult:
         }
 
     def is_valid_response(self, expected: str) -> bool:
-        """Check if response matches expected output."""
-        return self.response.strip() == expected.strip()
+        """Check if response contains expected output."""
+        # For "hello" response, check if it's present (case-insensitive)
+        return expected.lower() in self.response.lower()
 
 
 class ContextTester:
     """Tests models to find their true operational context limits.
 
-    Uses a binary search algorithm to efficiently discover the maximum context
-    size that a model can reliably handle. The test sends a simple mathematical
-    prompt ("2+2=") padded with filler text to reach various context sizes,
-    and validates that the model returns the correct answer ("4").
+    Uses a smart binary search algorithm to efficiently discover the maximum context
+    size that a model can reliably handle. The test starts with a small context (32)
+    to verify the model loads, then searches for the maximum working context.
+    Progress is saved after each test to allow resuming if interrupted.
 
     Attributes:
         client: LMStudioClient instance for model operations.
-        test_prompt: The prompt used for testing (default: "2+2=").
-        expected_response: The expected response (default: "4").
+        test_prompt: The prompt used for testing (default: "Say hello").
+        expected_response: The expected response (default: "hello").
     """
 
     def __init__(self, client: LMStudioClient | None = None) -> None:
         """Initialize context tester."""
         self.client = client or LMStudioClient()
-        self.test_prompt = "2+2="
-        self.expected_response = "4"
+        self.test_prompt = "Say hello"
+        self.expected_response = "hello"
 
     def _log_result(self, log_path: Path, result: ContextTestResult) -> None:
         """Append test result to log file."""
@@ -138,27 +140,72 @@ class ContextTester:
     async def test_model(
         self,
         model: Model,
-        min_context: int = 2048,
+        min_context: int = 32,
         max_context: int | None = None,
+        registry=None,
     ) -> Model:
-        """Run full context test on a model using binary search."""
+        """Run full context test on a model using smart binary search with progress saving."""
         logger.info(f"Starting context test for {model.id}")
         model.context_test_status = ContextTestStatus.TESTING
         model.context_test_date = datetime.now()
 
+        # Load registry if not provided
+        if registry is None:
+            registry = load_model_registry()
+
         max_context = max_context or model.context_limit
         log_path = get_context_test_log_path(model.id)
 
-        logger.info(f"Testing range for {model.id}: {min_context} - {max_context}")
+        # First, test with small context to ensure model loads
+        logger.info(f"Initial test for {model.id} with context size {min_context}")
+        initial_result = await self._test_at_context(model.id, min_context, log_path)
 
-        left, right = min_context, max_context
-        best_working_context = 0
+        if not initial_result.load_success:
+            logger.error(f"Model {model.id} failed to load even with minimum context {min_context}")
+            model.context_test_status = ContextTestStatus.FAILED
+            model.error_msg = f"Failed to load with context {min_context}: {initial_result.error}"
+            model.last_known_bad_context = min_context
+            # Save progress
+            registry.update_model(model.id, model)
+            save_model_registry(registry)
+            return model
+
+        if not (
+            initial_result.inference_success
+            and initial_result.is_valid_response(self.expected_response)
+        ):
+            logger.error(f"Model {model.id} loaded but inference failed at context {min_context}")
+            model.context_test_status = ContextTestStatus.FAILED
+            model.error_msg = f"Inference failed at context {min_context}"
+            model.loadable_max_context = min_context
+            model.last_known_bad_context = min_context
+            # Save progress
+            registry.update_model(model.id, model)
+            save_model_registry(registry)
+            return model
+
+        # Model works at minimum context
+        model.last_known_good_context = min_context
+        logger.info(f"✓ Model {model.id} works at context {min_context}")
+
+        # Resume from previous test if available
+        if model.last_known_good_context and model.last_known_bad_context:
+            left = model.last_known_good_context
+            right = model.last_known_bad_context - 1
+            logger.info(f"Resuming test from previous state: good={left}, bad={right + 1}")
+        else:
+            left = min_context
+            right = max_context
+
+        logger.info(f"Testing range for {model.id}: {left} - {right}")
+
+        best_working_context = left  # We know this works
         iteration = 0
 
         try:
             while left <= right:
                 mid = (left + right) // 2
-                if mid == 0:
+                if mid in (0, best_working_context):
                     break
 
                 iteration += 1
@@ -175,11 +222,25 @@ class ContextTester:
                     and result.is_valid_response(self.expected_response)
                 ):
                     best_working_context = mid
+                    model.last_known_good_context = mid
                     left = mid + 1  # Try for a larger context
                     logger.info(f"✓ Context size {mid} succeeded, searching higher")
                 else:
+                    model.last_known_bad_context = mid
                     right = mid - 1  # This context failed, try smaller
                     logger.info(f"✗ Context size {mid} failed, searching lower")
+
+                    # Track loadable_max_context
+                    if result.load_success:
+                        model.loadable_max_context = max(model.loadable_max_context or 0, mid)
+
+                # Save progress after each test
+                model.tested_max_context = best_working_context
+                registry.update_model(model.id, model)
+                save_model_registry(registry)
+                logger.debug(
+                    f"Progress saved: good={model.last_known_good_context}, bad={model.last_known_bad_context}",
+                )
 
             model.tested_max_context = best_working_context
             model.context_test_log = str(log_path)
@@ -198,5 +259,9 @@ class ContextTester:
             logger.error(f"An unexpected error occurred during context test for {model.id}: {e}")
             model.context_test_status = ContextTestStatus.FAILED
             model.error_msg = str(e)
+
+        # Final save
+        registry.update_model(model.id, model)
+        save_model_registry(registry)
 
         return model
