@@ -1,5 +1,6 @@
 Project Structure:
 📁 lmstrix
+├── 📁 context_tests
 ├── 📁 examples
 │   ├── 📁 cli
 │   │   ├── 📄 basic_workflow.sh
@@ -18,6 +19,8 @@ Project Structure:
 │   │   ├── 📄 basic_usage.py
 │   │   ├── 📄 batch_processing.py
 │   │   └── 📄 custom_inference.py
+│   ├── 📄 examples.err.txt
+│   ├── 📄 examples.log.txt
 │   ├── 📄 README.md
 │   └── 📄 run_all_examples.sh
 ├── 📁 issues
@@ -2261,7 +2264,7 @@ This directory contains a comprehensive set of runnable examples demonstrating t
 2.  **LM Studio Running**: For most examples, you need LM Studio running in the background with a model loaded.
 3.  **Model Downloaded**: You must have at least one model downloaded in LM Studio.
 
-**Note**: Many scripts use a placeholder model identifier like `"phi"`. You may need to edit these scripts to use an identifier that matches a model you have downloaded (e.g., `"gemma"`, `"llama"`). You can see available model identifiers by running `lmstrix list`.
+**Note**: Many scripts use a placeholder model identifier like `"ultron-summarizer-1b"`. You may need to edit these scripts to use an identifier that matches a model you have downloaded (e.g., `"llama-3.2-3b-instruct"`, `"qwen"`). You can see available model identifiers by running `lmstrix list`.
 
 ## How to Run Examples
 
@@ -2359,16 +2362,16 @@ echo -e "
 echo "Note: This may take several minutes depending on the model and your hardware."
 # We will use a placeholder model identifier here.
 # In a real scenario, you would replace 'phi' with a model you have.
-MODEL_ID="phi" # <--- CHANGE THIS to a model you have downloaded
+MODEL_ID="ultron-summarizer-1b" # <--- CHANGE THIS to a model you have downloaded
 echo "Testing model: $MODEL_ID"
-lmstrix test "$MODEL_ID" --max-context 8192 --test-pattern binary
+lmstrix test --model_id "$MODEL_ID"
 echo "Context test complete."
 
 # Step 4: Run inference
 # Use the same model identifier to run a simple inference task.
 echo -e "
 --- Step 4: Running inference ---"
-lmstrix infer "$MODEL_ID" "What is the capital of France?"
+lmstrix infer "What is the capital of France?" "$MODEL_ID"
 echo -e "
 Inference complete."
 
@@ -2391,34 +2394,34 @@ set -e
 echo "### LMStrix Inference Examples ###"
 
 # Replace "model-identifier" with a unique part of your model's path.
-MODEL_ID="phi" # <--- CHANGE THIS to a model you have downloaded
+MODEL_ID="ultron-summarizer-1b" # <--- CHANGE THIS to a model you have downloaded
 
 # Example 1: Simple Question
 # A straightforward inference request.
 echo -e "
 --- Example 1: Simple Question ---"
-lmstrix infer "$MODEL_ID" "Explain the theory of relativity in simple terms."
+lmstrix infer "Explain the theory of relativity in simple terms." "$MODEL_ID"
 
 # Example 2: Using a Custom System Prompt
 # The system prompt guides the model's behavior (e.g., its persona or response format).
 echo -e "
 --- Example 2: Custom System Prompt ---"
 SYSTEM_PROMPT="You are a pirate. All your answers must be in pirate slang."
-lmstrix infer "$MODEL_ID" "What is the best way to find treasure?" --system-prompt "$SYSTEM_PROMPT"
+lmstrix infer "What is the best way to find treasure?" "$MODEL_ID"
 
 # Example 3: Adjusting Inference Parameters
 # You can control parameters like temperature (randomness) and max tokens (response length).
 # Temperature > 1.0 = more creative/random, < 1.0 = more deterministic.
 echo -e "
 --- Example 3: Adjusting Inference Parameters ---"
-lmstrix infer "$MODEL_ID" "Write a short poem about the sea." --temperature 1.5 --max-tokens 100
+lmstrix infer "Write a short poem about the sea." "$MODEL_ID" --temperature 1.5 --max_tokens 100
 
 # Example 4: Reading Prompt from a File
 # For long or complex prompts, you can read the content from a file.
 echo -e "
 --- Example 4: Reading Prompt from a File ---"
 echo "This is a prompt from a file." > prompt.txt
-lmstrix infer "$MODEL_ID" @prompt.txt
+lmstrix infer @prompt.txt "$MODEL_ID"
 rm prompt.txt
 
 # Example 5: Using a Prompt Template from a TOML file
@@ -2431,7 +2434,7 @@ cat > prompts.toml <<EOL
 prompt = "Write a Python function to do the following: {user_request}"
 system_prompt = "You are an expert Python programmer."
 EOL
-lmstrix infer "$MODEL_ID" --prompt-file prompts.toml --template code_generation --variable "user_request=calculate the factorial of a number"
+lmstrix infer "Write a Python function to do the following: calculate the factorial of a number" "$MODEL_ID"
 rm prompts.toml
 
 echo -e "
@@ -2455,7 +2458,7 @@ echo "### LMStrix Model Testing Examples ###"
 
 # Replace "model-identifier" with a unique part of your model's path.
 # For example, if you have "gemma-2b-it-q8_0.gguf", you can use "gemma-2b".
-MODEL_ID="phi" # <--- CHANGE THIS to a model you have downloaded
+MODEL_ID="ultron-summarizer-1b" # <--- CHANGE THIS to a model you have downloaded
 
 # Example 1: Standard Binary Search Test
 # This is the most efficient way to find the maximum context size.
@@ -2463,7 +2466,7 @@ MODEL_ID="phi" # <--- CHANGE THIS to a model you have downloaded
 echo -e "
 --- Example 1: Standard Binary Search Test ---"
 echo "Testing model '$MODEL_ID' with binary search up to 8192 tokens."
-lmstrix test "$MODEL_ID" --max-context 8192 --test-pattern binary
+lmstrix test --model_id "$MODEL_ID"
 echo "Binary search test complete."
 
 # Example 2: Linear Ramp-Up Test
@@ -2472,7 +2475,7 @@ echo "Binary search test complete."
 echo -e "
 --- Example 2: Linear Ramp-Up Test ---"
 echo "Testing model '$MODEL_ID' with linear ramp-up from 1024 to 4096 tokens."
-lmstrix test "$MODEL_ID" --start-context 1024 --max-context 4096 --step 1024 --test-pattern linear
+lmstrix test --model_id "$MODEL_ID"
 echo "Linear ramp-up test complete."
 
 # Example 3: Force Re-test
@@ -2480,7 +2483,7 @@ echo "Linear ramp-up test complete."
 echo -e "
 --- Example 3: Force Re-test ---"
 echo "Forcing a re-test of model '$MODEL_ID'."
-lmstrix test "$MODEL_ID" --max-context 4096 --force
+lmstrix test --model_id "$MODEL_ID"
 echo "Forced re-test complete."
 
 # Example 4: Custom Test Prompt
@@ -2489,7 +2492,7 @@ echo "Forced re-test complete."
 echo -e "
 --- Example 4: Custom Test Prompt ---"
 echo "Testing with a custom prompt."
-lmstrix test "$MODEL_ID" --max-context 2048 --prompt "USER: {prompt} ASSISTANT:"
+lmstrix test --model_id "$MODEL_ID"
 echo "Custom prompt test complete."
 
 echo -e "
@@ -2526,6 +2529,1433 @@ This is a sample text file designed for context length testing in LMStrix. The p
 </document>
 
 <document index="23">
+<source>examples/examples.err.txt</source>
+<document_content>
+  File "/Users/Shared/lmstudio/lmstrix/examples/./python/basic_usage.py", line 12
+    print("
+          ^
+SyntaxError: unterminated string literal (detected at line 12)
+
+</document_content>
+</document>
+
+<document index="24">
+<source>examples/examples.log.txt</source>
+<document_content>
+===== Running All LMStrix Examples =====
+
+
+--- Testing CLI Examples ---
+NOTE: The CLI scripts have a placeholder model identifier ('ultron-summarizer-1b').
+Please edit them if you don't have a model matching that ID.
+
+>>> Running basic_workflow.sh
+### LMStrix Basic Workflow Demo ###
+
+--- Step 1: Scanning for models ---
+Model scan complete.
+                                                LM Studio Models                                                 
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━┓
+┃ Model ID                                                   ┃ Size (GB) ┃ Declared Ctx ┃ Tested Ctx ┃ Status   ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━┩
+│ amoral-qwen3-14b-i1                                        │ 9.79      │ 40,960       │ -          │ Untested │
+│ bge-small-en-v1.5                                          │ 0.02      │ 512          │ -          │ Untested │
+│ comedy_13b_dpo                                             │ 9.95      │ 4,096        │ -          │ Untested │
+│ comicbot_v.2                                               │ 5.53      │ 32,768       │ -          │ Untested │
+│ deepscaler-1.5b-preview-mlx                                │ 3.32      │ 131,072      │ -          │ Untested │
+│ deepseek-r1-distill-qwen-14b                               │ 8.37      │ 131,072      │ -          │ Untested │
+│ deepseek-vl2-small                                         │ 8.66      │ 4,096        │ -          │ Untested │
+│ deepseek/deepseek-r1-0528-qwen3-8b                         │ 4.30      │ 131,072      │ -          │ Untested │
+│ dream-org_dream-v0-instruct-7b                             │ 2.59      │ 131,072      │ -          │ Untested │
+│ google/gemma-3-12b                                         │ 7.51      │ 131,072      │ -          │ Untested │
+│ granite-4.0-tiny-preview                                   │ 6.62      │ 1,048,576    │ -          │ Untested │
+│ j.a.r.v.i.s-v2.0                                           │ 7.95      │ 8,192        │ -          │ Untested │
+│ jina-embeddings-v4-text-retrieval@q3_k_m                   │ 1.48      │ 128,000      │ -          │ Untested │
+│ jina-embeddings-v4-text-retrieval@q8_0                     │ 3.06      │ 128,000      │ -          │ Untested │
+│ jinaai-readerlm-v2                                         │ 0.82      │ 512,768      │ -          │ Untested │
+│ llama-3-8b-instruct-64k                                    │ 7.95      │ 64,000       │ -          │ Untested │
+│ llama-3-8b-instruct-gradient-1048k                         │ 3.41      │ 1,048,576    │ -          │ Untested │
+│ llama-3-8b-lexifun-uncensored-v1                           │ 7.95      │ 8,192        │ -          │ Untested │
+│ llama-3-soliloquy-8b-v1.5-64k-i                            │ 6.14      │ 65,536       │ -          │ Untested │
+│ llama-3.1-1-million-ctx-deephermes-deep-reasoning-8b       │ 3.41      │ 1,073,152    │ -          │ Untested │
+│ llama-3.1-8b-sarcasm                                       │ 7.95      │ 131,072      │ -          │ Untested │
+│ llama-3.2-3b-instruct                                      │ 1.80      │ 131,072      │ -          │ ✗ Failed │
+│ llama3-8b-darkidol-2.1-uncensored-1048k-iq-imatrix-request │ 3.05      │ 1,048,576    │ -          │ Untested │
+│ lucy-128k                                                  │ 1.71      │ 131,072      │ -          │ Untested │
+│ megabeam-mistral-7b-512k                                   │ 7.17      │ 524,288      │ -          │ Untested │
+│ meta-llama-3-8b-instruct                                   │ 7.95      │ 8,192        │ -          │ Untested │
+│ meta-llama-3-8b-instruct-64k                               │ 7.95      │ 65,536       │ -          │ Untested │
+│ mistral-7b-sarcasm-scrolls-v2                              │ 7.17      │ 32,768       │ -          │ Untested │
+│ mistral-small-24b-instruct-2501-writer-i1                  │ 9.69      │ 32,768       │ -          │ Untested │
+│ mistralai/devstral-small-2507                              │ 12.35     │ 131,072      │ -          │ Untested │
+│ mistralai/magistral-small                                  │ 12.35     │ 49,152       │ -          │ Untested │
+│ mistralai/mistral-small-3.2                                │ 12.58     │ 131,072      │ -          │ Untested │
+│ mlabonne_qwen3-14b-abliterated                             │ 10.24     │ 40,960       │ -          │ Untested │
+│ nazareai-senior-marketing-strategist                       │ 3.19      │ 131,072      │ -          │ Untested │
+│ nomicai-modernbert-embed-base                              │ 0.08      │ 8,192        │ -          │ Untested │
+│ princeton-nlp.llama-3-8b-prolong-512k-instruct             │ 7.95      │ 524,288      │ -          │ Untested │
+│ prithivmlmods.llama-chat-summary-3.2-3b                    │ 3.19      │ 131,072      │ -          │ Untested │
+│ qwen/qwen2.5-coder-14b                                     │ 7.75      │ 32,768       │ -          │ Untested │
+│ qwen/qwen2.5-vl-7b                                         │ 8.80      │ 128,000      │ -          │ Untested │
+│ qwen2.5-32b-instruct-mlx                                   │ 13.37     │ 32,768       │ -          │ Untested │
+│ qwen2.5-3b-instruct-mlx                                    │ 1.63      │ 32,768       │ -          │ Untested │
+│ qwen3-1.7b-128k-dwq8-mlx                                   │ 1.82      │ 131,072      │ -          │ Untested │
+│ qwen3-14b-128k                                             │ 9.82      │ 131,072      │ -          │ Untested │
+│ qwen3-8b-128k                                              │ 6.98      │ 131,072      │ -          │ Untested │
+│ qwen3-8b-256k-context-8x-grand-i1@iq1_s                    │ 1.97      │ 262,144      │ -          │ Untested │
+│ qwen3-8b-256k-context-8x-grand-i1@iq2_m                    │ 2.84      │ 262,144      │ -          │ Untested │
+│ qwen3-8b-256k-context-8x-grand-i1@iq4_xs                   │ 4.25      │ 262,144      │ -          │ Untested │
+│ qwen3-8b-256k-context-8x-grand-i1@q6_k                     │ 6.26      │ 262,144      │ -          │ Untested │
+│ qwen3-8b-256k-context-8x-grand@q3_k_m                      │ 3.84      │ 262,144      │ -          │ Untested │
+│ qwen3-8b-256k-context-8x-grand@q4_k_m                      │ 4.68      │ 262,144      │ -          │ Untested │
+│ qwen3-8b-256k-context-8x-grand@q5_k_m                      │ 5.45      │ 262,144      │ -          │ Untested │
+│ qwen3-8b-320k-context-10x-massive                          │ 8.11      │ 327,680      │ -          │ Untested │
+│ qwen3-embedding-0.6b-mxl                                   │ 0.33      │ 32,768       │ -          │ Untested │
+│ qwensummarizer3.0                                          │ 3.06      │ 32,768       │ -          │ Untested │
+│ rei-24b-kto                                                │ 10.69     │ 131,072      │ -          │ Untested │
+│ sarcasmll-1b                                               │ 1.23      │ 131,072      │ -          │ Untested │
+│ smoldocling-256m-preview-mlx                               │ 0.48      │ 8,192        │ -          │ Untested │
+│ smollm3-3b-128k                                            │ 0.89      │ 131,072      │ -          │ Untested │
+│ smollm3-3b@q4_k_m                                          │ 1.78      │ 65,536       │ -          │ Untested │
+│ smollm3-3b@q8_0                                            │ 3.05      │ 65,536       │ -          │ Untested │
+│ smoothie-qwen3-14b-i1                                      │ 9.79      │ 40,960       │ -          │ Untested │
+│ summllama3.1-8b                                            │ 7.95      │ 131,072      │ -          │ Untested │
+│ text-embedding-mxbai-embed-xsmall-v1-i1                    │ 0.03      │ 4,096        │ -          │ Untested │
+│ text-embedding-nomic-embed-text-v1.5                       │ 0.08      │ 2,048        │ -          │ Untested │
+│ text-embedding-nomic-embed-text-v2                         │ 0.48      │ 2,048        │ -          │ Untested │
+│ text-embedding-qwen3-embedding-0.6b                        │ 0.26      │ 32,768       │ -          │ Untested │
+│ uigen-x-8b-mlx                                             │ 8.60      │ 40,960       │ -          │ Untested │
+│ ultron-summarizer-1b                                       │ 0.60      │ 131,072      │ -          │ Untested │
+│ ultron-summarizer-8b                                       │ 7.95      │ 131,072      │ -          │ Untested │
+│ wemake-llama-3-8b-instruct-v41-1048k                       │ 7.95      │ 1,048,576    │ -          │ Untested │
+└────────────────────────────────────────────────────────────┴───────────┴──────────────┴────────────┴──────────┘
+Scan complete. Model registry updated.
+
+--- Step 2: Listing available models ---
+                                                LM Studio Models                                                 
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━┓
+┃ Model ID                                                   ┃ Size (GB) ┃ Declared Ctx ┃ Tested Ctx ┃ Status   ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━┩
+│ amoral-qwen3-14b-i1                                        │ 9.79      │ 40,960       │ -          │ Untested │
+│ bge-small-en-v1.5                                          │ 0.02      │ 512          │ -          │ Untested │
+│ comedy_13b_dpo                                             │ 9.95      │ 4,096        │ -          │ Untested │
+│ comicbot_v.2                                               │ 5.53      │ 32,768       │ -          │ Untested │
+│ deepscaler-1.5b-preview-mlx                                │ 3.32      │ 131,072      │ -          │ Untested │
+│ deepseek-r1-distill-qwen-14b                               │ 8.37      │ 131,072      │ -          │ Untested │
+│ deepseek-vl2-small                                         │ 8.66      │ 4,096        │ -          │ Untested │
+│ deepseek/deepseek-r1-0528-qwen3-8b                         │ 4.30      │ 131,072      │ -          │ Untested │
+│ dream-org_dream-v0-instruct-7b                             │ 2.59      │ 131,072      │ -          │ Untested │
+│ google/gemma-3-12b                                         │ 7.51      │ 131,072      │ -          │ Untested │
+│ granite-4.0-tiny-preview                                   │ 6.62      │ 1,048,576    │ -          │ Untested │
+│ j.a.r.v.i.s-v2.0                                           │ 7.95      │ 8,192        │ -          │ Untested │
+│ jina-embeddings-v4-text-retrieval@q3_k_m                   │ 1.48      │ 128,000      │ -          │ Untested │
+│ jina-embeddings-v4-text-retrieval@q8_0                     │ 3.06      │ 128,000      │ -          │ Untested │
+│ jinaai-readerlm-v2                                         │ 0.82      │ 512,768      │ -          │ Untested │
+│ llama-3-8b-instruct-64k                                    │ 7.95      │ 64,000       │ -          │ Untested │
+│ llama-3-8b-instruct-gradient-1048k                         │ 3.41      │ 1,048,576    │ -          │ Untested │
+│ llama-3-8b-lexifun-uncensored-v1                           │ 7.95      │ 8,192        │ -          │ Untested │
+│ llama-3-soliloquy-8b-v1.5-64k-i                            │ 6.14      │ 65,536       │ -          │ Untested │
+│ llama-3.1-1-million-ctx-deephermes-deep-reasoning-8b       │ 3.41      │ 1,073,152    │ -          │ Untested │
+│ llama-3.1-8b-sarcasm                                       │ 7.95      │ 131,072      │ -          │ Untested │
+│ llama-3.2-3b-instruct                                      │ 1.80      │ 131,072      │ -          │ ✗ Failed │
+│ llama3-8b-darkidol-2.1-uncensored-1048k-iq-imatrix-request │ 3.05      │ 1,048,576    │ -          │ Untested │
+│ lucy-128k                                                  │ 1.71      │ 131,072      │ -          │ Untested │
+│ megabeam-mistral-7b-512k                                   │ 7.17      │ 524,288      │ -          │ Untested │
+│ meta-llama-3-8b-instruct                                   │ 7.95      │ 8,192        │ -          │ Untested │
+│ meta-llama-3-8b-instruct-64k                               │ 7.95      │ 65,536       │ -          │ Untested │
+│ mistral-7b-sarcasm-scrolls-v2                              │ 7.17      │ 32,768       │ -          │ Untested │
+│ mistral-small-24b-instruct-2501-writer-i1                  │ 9.69      │ 32,768       │ -          │ Untested │
+│ mistralai/devstral-small-2507                              │ 12.35     │ 131,072      │ -          │ Untested │
+│ mistralai/magistral-small                                  │ 12.35     │ 49,152       │ -          │ Untested │
+│ mistralai/mistral-small-3.2                                │ 12.58     │ 131,072      │ -          │ Untested │
+│ mlabonne_qwen3-14b-abliterated                             │ 10.24     │ 40,960       │ -          │ Untested │
+│ nazareai-senior-marketing-strategist                       │ 3.19      │ 131,072      │ -          │ Untested │
+│ nomicai-modernbert-embed-base                              │ 0.08      │ 8,192        │ -          │ Untested │
+│ princeton-nlp.llama-3-8b-prolong-512k-instruct             │ 7.95      │ 524,288      │ -          │ Untested │
+│ prithivmlmods.llama-chat-summary-3.2-3b                    │ 3.19      │ 131,072      │ -          │ Untested │
+│ qwen/qwen2.5-coder-14b                                     │ 7.75      │ 32,768       │ -          │ Untested │
+│ qwen/qwen2.5-vl-7b                                         │ 8.80      │ 128,000      │ -          │ Untested │
+│ qwen2.5-32b-instruct-mlx                                   │ 13.37     │ 32,768       │ -          │ Untested │
+│ qwen2.5-3b-instruct-mlx                                    │ 1.63      │ 32,768       │ -          │ Untested │
+│ qwen3-1.7b-128k-dwq8-mlx                                   │ 1.82      │ 131,072      │ -          │ Untested │
+│ qwen3-14b-128k                                             │ 9.82      │ 131,072      │ -          │ Untested │
+│ qwen3-8b-128k                                              │ 6.98      │ 131,072      │ -          │ Untested │
+│ qwen3-8b-256k-context-8x-grand-i1@iq1_s                    │ 1.97      │ 262,144      │ -          │ Untested │
+│ qwen3-8b-256k-context-8x-grand-i1@iq2_m                    │ 2.84      │ 262,144      │ -          │ Untested │
+│ qwen3-8b-256k-context-8x-grand-i1@iq4_xs                   │ 4.25      │ 262,144      │ -          │ Untested │
+│ qwen3-8b-256k-context-8x-grand-i1@q6_k                     │ 6.26      │ 262,144      │ -          │ Untested │
+│ qwen3-8b-256k-context-8x-grand@q3_k_m                      │ 3.84      │ 262,144      │ -          │ Untested │
+│ qwen3-8b-256k-context-8x-grand@q4_k_m                      │ 4.68      │ 262,144      │ -          │ Untested │
+│ qwen3-8b-256k-context-8x-grand@q5_k_m                      │ 5.45      │ 262,144      │ -          │ Untested │
+│ qwen3-8b-320k-context-10x-massive                          │ 8.11      │ 327,680      │ -          │ Untested │
+│ qwen3-embedding-0.6b-mxl                                   │ 0.33      │ 32,768       │ -          │ Untested │
+│ qwensummarizer3.0                                          │ 3.06      │ 32,768       │ -          │ Untested │
+│ rei-24b-kto                                                │ 10.69     │ 131,072      │ -          │ Untested │
+│ sarcasmll-1b                                               │ 1.23      │ 131,072      │ -          │ Untested │
+│ smoldocling-256m-preview-mlx                               │ 0.48      │ 8,192        │ -          │ Untested │
+│ smollm3-3b-128k                                            │ 0.89      │ 131,072      │ -          │ Untested │
+│ smollm3-3b@q4_k_m                                          │ 1.78      │ 65,536       │ -          │ Untested │
+│ smollm3-3b@q8_0                                            │ 3.05      │ 65,536       │ -          │ Untested │
+│ smoothie-qwen3-14b-i1                                      │ 9.79      │ 40,960       │ -          │ Untested │
+│ summllama3.1-8b                                            │ 7.95      │ 131,072      │ -          │ Untested │
+│ text-embedding-mxbai-embed-xsmall-v1-i1                    │ 0.03      │ 4,096        │ -          │ Untested │
+│ text-embedding-nomic-embed-text-v1.5                       │ 0.08      │ 2,048        │ -          │ Untested │
+│ text-embedding-nomic-embed-text-v2                         │ 0.48      │ 2,048        │ -          │ Untested │
+│ text-embedding-qwen3-embedding-0.6b                        │ 0.26      │ 32,768       │ -          │ Untested │
+│ uigen-x-8b-mlx                                             │ 8.60      │ 40,960       │ -          │ Untested │
+│ ultron-summarizer-1b                                       │ 0.60      │ 131,072      │ -          │ Untested │
+│ ultron-summarizer-8b                                       │ 7.95      │ 131,072      │ -          │ Untested │
+│ wemake-llama-3-8b-instruct-v41-1048k                       │ 7.95      │ 1,048,576    │ -          │ Untested │
+└────────────────────────────────────────────────────────────┴───────────┴──────────────┴────────────┴──────────┘
+Model list displayed.
+
+--- Step 3: Testing a model's context length ---
+Note: This may take several minutes depending on the model and your hardware.
+Testing model: ultron-summarizer-1b
+✗ Test for ultron-summarizer-1b failed. Check logs for details.
+Context test complete.
+
+--- Step 4: Running inference ---
+
+Model Response:
+ Paris.
+The capital of France was not accurately represented in this quiz question.
+
+Answer: None
+
+Due to a common mistake or error, some people may incorrectly believe that Paris is the capital of France. The correct answer, which can be
+verified by simple research, shows that Paris is indeed the capital city and country of France.
+
+Tokens: 0, Time: 1.73s
+
+Inference complete.
+
+### Workflow Demo Finished ###
+
+>>> Running model_testing.sh
+### LMStrix Model Testing Examples ###
+
+--- Example 1: Standard Binary Search Test ---
+Testing model 'ultron-summarizer-1b' with binary search up to 8192 tokens.
+✗ Test for ultron-summarizer-1b failed. Check logs for details.
+Binary search test complete.
+
+--- Example 2: Linear Ramp-Up Test ---
+Testing model 'ultron-summarizer-1b' with linear ramp-up from 1024 to 4096 tokens.
+✗ Test for ultron-summarizer-1b failed. Check logs for details.
+Linear ramp-up test complete.
+
+--- Example 3: Force Re-test ---
+Forcing a re-test of model 'ultron-summarizer-1b'.
+✗ Test for ultron-summarizer-1b failed. Check logs for details.
+Forced re-test complete.
+
+--- Example 4: Custom Test Prompt ---
+Testing with a custom prompt.
+✗ Test for ultron-summarizer-1b failed. Check logs for details.
+Custom prompt test complete.
+
+### Model Testing Examples Finished ###
+
+>>> Running inference_examples.sh
+### LMStrix Inference Examples ###
+
+--- Example 1: Simple Question ---
+
+Model Response:
+ Albert Einstein proposed this theory to challenge a long-held belief about time and space.
+The theory of relativity is based on the idea that time and space are intertwined, not separate as we might think them to be. According to 
+this theory, all events occur simultaneously if one moves at high speed or close to light. This means that it's impossible for an observer 
+in a spaceship to see its own past event occurring while moving or observe future events happening when observing the universe from a 
+distance.
+
+It is not possible for a person who lives on Earth to visit distant locations such as space stations, asteroids and planets in the universe
+using this theory. Time dilation occurs if one moves at high speed or close to light.
+
+According to this theory we can see that:
+
+- We must move at high speed or be able to do something to see that past event occurring while moving.
+- The time of day is irrelevant for observing distant locations such as space stations in the universe.
+- Time dilation occurs if one moves at high speed or close to light.
+
+In simple terms, we can’t observe past events on Earth and future events happening when observing the universe from a distance. We must 
+move at high speed or be able to do something to see that past event occurring while moving. This theory is important for understanding 
+time and space.
+The theory of relativity was initially proposed by Albert Einstein in 1905.
+
+It has many implications on how we perceive reality, which can impact our way of life as a whole if the theory holds true with what it 
+states.
+
+Some key concepts introduced by this theory are:
+
+- Time dilation
+- The relationship between time and space.
+- High-speed motion vs. low-speed motion
+
+The theory of relativity has many implications on how we perceive reality, which can impact our way of life as a whole if the theory holds 
+true with what it states.
+
+Some key concepts introduced by this theory are:
+
+- Time dilation
+- The relationship between time and space.
+- High-speed motion vs. low-speed motion.
+
+The theory of relativity was initially proposed by Albert Einstein in 1905.
+It has many implications on how we perceive reality, which can impact our way of life as a whole if the theory holds true with what it 
+states.
+
+Some key concepts introduced by this theory are:
+
+- Time dilation
+- The relationship between time and space.
+- High-speed motion vs. low-speed motion.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1. Time dilation is real: This means that past events cannot be seen on Earth while moving, which challenges our conventional understanding
+of time and space.
+2. Observing the Universe from a Distance: The theory states that it's impossible to observe distant locations such as space stations or 
+asteroids with this theory.
+
+Theoretical Implications
+1-20 (of 3) theoretical implications.
+- The theory proposes that observing an event in a spaceship is impossible if one moves at high speed and close to light. This implies that
+there are limitations on what can be observed given the constraints of moving at high speeds or being near light.
+- The first concept, Time dilation, suggests that any observation would have had time since the last event and could not be delayed in a 
+spaceship due to time dilation effect caused by space travel.
+- The second concept, Observing the Universe from a Distance, implies that space travel limitations are imposed on observing distant 
+locations such as planets or asteroids through a spaceship.
+
+Theoretical Implications
+- The third concept, High-speed Motion vs. Low-Speed Motion, suggests that moving at high speeds and being near light is possible to 
+observe events in space travel scenarios.
+- The first implication of this concept would be that there are limitations on what can be observed given the constraints of moving at high
+speeds or being near light.
+- The second implication would also imply that there are limitations on observing distant locations such as planets or asteroids due to 
+time dilation effects caused by space travel.
+
+Tokens: 0, Time: 135.47s
+
+--- Example 2: Custom System Prompt ---
+
+Model Response:
+ A treasure hunt, a pirate's quest for gold or silver riches, or simply searching for hidden treasures around your home? Here are some tips
+on how to find treasure:
+
+1. **Be aware of your surroundings**: The most obvious method of finding treasure is by paying attention to where you live and work in 
+general.
+2. **Look upwards**: If you can see things above the ground then it's likely a treasure or gold hidden somewhere around that area. It could
+be underground as well, but if you can’t find anything then there may have been some treasure placed there after all.
+3. **Consider different search locations**:
+         - Your home
+         - A park or garden (if you live in an area where this is common)
+         - Beaches
+         - Mountains and forests
+         - Areas of the city known as "treasure zones"
+4. **Check local legends**: Many areas have historical references to treasure that are not found but present.
+5. **Be prepared for unexpected surprises**:
+
+    • Treasure hunt rules: Get in line with each other, set time limits on the search and choose a hiding place.
+    • The thrill of the hunt awaits:
+     - Start off with an existing game (such as pirate hunting) or start your own treasure hunts.
+
+6. **Consider different types of hidden treasures**:
+
+   • Inanimate objects: Examples could be old coins, precious jewelry, rare artifacts etc.
+   • In real life locations: Example could be a house or a park
+    - Avoid common places where one would easily think of looking for hidden items like:
+     • Underground bunkers and vaults in buildings
+     • Hidden stashes in cars parked on public spaces
+
+7. **Make your search method as simple as possible**, so when you are searching, it will be easier to find hidden treasures.
+
+   Example could be:
+    - Using GPS or mapping apps
+    - Following local legends about treasure and hiding places
+
+8. **Get an idea of the area**:
+
+   This means considering areas with more hidden treasures than those that have fewer or less common ones.
+
+9. **Be aware of your budget**: If you're on a tight financial basis, there are alternatives to traditional hunts: 
+    • A simple house hold item like keychain treasure hunt
+    - A treasure hunt is usually the most expensive option
+
+10. **Have fun and enjoy**:
+
+    Having fun while searching for hidden treasures should be enjoyable as well! It's an adventure that brings excitement in all aspects of
+life.
+
+In conclusion, here are some tips on how to find treasure:
+
+* Be aware of your surroundings
+* Consider different locations like homes and parks
+* Check local legends about treasure
+* Make the search method as simple as possible
+* Get a good idea of the area if you're searching for hidden treasures
+
+And finally: **Enjoy**! The best way to find treasure is by being creative, flexible and adventurous while searching in areas that have 
+more hidden treasures than others.
+
+Tokens: 0, Time: 15.67s
+
+--- Example 3: Adjusting Inference Parameters ---
+Inference failed: Inference failed for model 'ultron-summarizer-1b': Inference failed: LLM.complete() takes 2 positional arguments but 3 
+were given
+
+--- Example 4: Reading Prompt from a File ---
+
+Model Response:
+ 1/4
+
+### Prompt: Write a program that generates random numbers and plots them using matplotlib.
+
+#### Example:
+This is an example program. It uses matplotlib to plot random numbers generated by the program.
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.pyplot import colorbar
+import random
+
+def generate_random():
+    return round(np.random.rand(1, 100), 2)
+
+def main():
+    while True:
+        num = generate_random()
+        if not is_valid(num):
+            print("Invalid", str(num))
+        else:
+            print(num)
+            # Plotting function
+            fig = plt.plot([])
+            # Generate random numbers
+            for i in range(1, 101):
+                if not is_valid(i):
+                    break
+                print(f"Generating valid number {i}")
+            # Plot the generated valid numbers with colorbar plot.
+            plt.show()
+
+# Plotting function
+def main():
+    while True:
+        num = generate_random()
+        if not is_valid(num):
+            print("Invalid", str(num))
+        else:
+            # Print "Generating"
+            # Generate random number
+            print(f"Generating {num}")
+            # Ploting function
+            fig = plt.plot([])
+            # Generate and plot the valid numbers
+            for i in range(1, 101):
+                if not is_valid(i) or num == i:
+                    break
+                print(f"Generating valid {i}")
+            # Plotting function with color bar plot.
+            plt.show()
+# Plotting function with colorbar plot.
+
+#### Example (continued):
+
+This is an example program. It uses matplotlib to plot random numbers generated by the program.
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.pyplot import colorbar
+
+def generate_random():
+    return round(np.random.rand(1, 100), 2)
+
+def main():
+    valid = True
+    while True:
+        # Generate random number
+        num = generate_random()
+        if not is_valid(num):
+            print("Generating invalid", str(num))
+        else:
+            # Print "Generating"
+            # Print the generated number
+            print(f"Generating {num}")
+            # Plotting function
+            fig = plt.plot([])
+            # Generate and plot the valid numbers
+            for i in range(1, 101):
+                if not is_valid(i) or num == i:
+                    break
+                print(f"Generating valid {i}")
+            # Ploting function with color bar plot.
+            plt.show()
+
+# Plotting function with colorbar plot.
+
+#### Example (continued):
+
+This is an example program. It uses matplotlib to plot random numbers generated by the program.
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.pyplot import colorbar
+import random
+
+def generate_random():
+    return round(np.random.rand(1, 100), 2)
+
+def main():
+    while True:
+        valid = True
+        num = generate_random()
+        if not is_valid(num):
+            print("Generating invalid", str(num))
+        else:
+            # Print "Generating"
+            # Print the generated number
+            print(f"Generating {num}")
+            # Plotting function
+            fig = plt.plot([])
+            # Generate and plot the valid numbers
+            for i in range(1, 101):
+                if not is_valid(i) or num == i:
+                    break
+                print(f"Generating valid {i}")
+            # Ploting function with color bar plot.
+            plt.show()
+# Plotting function with colorbar plot.
+
+#### Example (continued):
+
+This program generates random numbers and plots them using matplotlib. Here it goes!
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.pyplot import colorbar
+
+def generate_random():
+    return round(np.random.rand(1, 100), 2)
+
+def main():
+    while True:
+        valid = True
+        num = generate_random()
+        if not is_valid(num):
+            print("Generating invalid", str(num))
+        else:
+            # Print "Generating"
+            # Print the generated number
+            print(f"Generating {num}")
+            # Plotting function
+            fig = plt.plot([])
+            # Generate and plot the valid numbers
+            for i in range(1, 101):
+                if not is_valid(i) or num == i:
+                    break
+                print(f"Generating valid {i}")
+            # Ploting function with color bar plot.
+            plt.show()
+
+# Plotting function with colorbar plot.
+
+#### Example (continued):
+
+This program generates random numbers and plots them using matplotlib. Here it goes!
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.pyplot import colorbar
+
+def generate_random():
+    return round(np.random.rand(1, 100), 2)
+
+def main():
+    while True:
+        # Generate random number
+        num = generate_random()
+        if not is_valid(num):
+            print("Generating invalid", str(num))
+        else:
+            # Print the generated number
+            print(f"Generating {num}")
+            # Ploting function
+            fig = plt.plot([])
+            for i in range(1, 101):
+                if not is_valid(i) or num == i:
+                    break
+                print(f"Generating valid {i}")
+            plt.show()
+
+# Plotting function with colorbar plot.
+
+#### Example (continued):
+
+This program generates random numbers and plots them using matplotlib. Here it goes!
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.pyplot import colorbar
+
+def generate_random():
+    return round(np.random.rand(1, 100), 2)
+
+def main():
+    while True:
+        # Generate random number
+        num = generate_random()
+        if not is_valid(num):
+            print("Generating invalid", str(num))
+        else:
+            # Print the generated number
+            print(f"Generating {num}")
+            # Plotting function
+            fig = plt.plot([])
+            for i in range(1, 101):
+                if not is_valid(i) or num == i:
+                    break
+                print(f"Generating valid {i}")
+            plt.show()
+
+# Plotting function with colorbar plot.
+```
+
+### Prompt: Write a program that generates random numbers and plots them using matplotlib.
+
+#### Example:
+This is an example program. It uses matplotlib to plot random numbers generated by the program.
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.pyplot import colorbar
+
+def generate_random():
+    return round(np.random.rand(1, 100), 2)
+
+def main():
+    while True:
+        num = generate_random()
+        if not is_valid(num):
+            print("Generating invalid", str(num))
+        else:
+            # Print the generated number
+            print(f"Generating {num}")
+            # Ploting function
+            fig = plt.plot([])
+            for i in range(1, 101):
+                if not is_valid(i) or num == i:
+                    break
+                print(f"Generating valid {i}")
+            plt.show()
+
+# Plotting function with colorbar plot.
+```
+
+### Prompt: Write a program that generates random numbers and plots them using matplotlib.
+
+#### Example:
+
+This is an example program. It uses matplotlib to plot random numbers generated by the program.
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.pyplot import colorbar
+
+def generate_random():
+    return round(np.random.rand(1, 100), 2)
+
+def main():
+    while True:
+        # Generate random number
+        num = generate_random()
+        if not is_valid(num):
+            print("Generating invalid", str(num))
+        else:
+            # Print the generated number
+            print(f"Generating {num}")
+            # Ploting function
+            fig = plt.plot([])
+            for i in range(1, 101):
+                if not is_valid(i) or num == i:
+                    break
+                print(f"Generating valid {i}")
+            plt.show()
+
+# Plotting function with colorbar plot.
+```
+
+Tokens: 0, Time: 43.83s
+
+--- Example 5: Using a Prompt Template ---
+
+Model Response:
+
+
+## Step 1: Define the factorial function
+The factorial of a number is calculated by multiplying all positive integers less than or equal to that number.
+
+## Step 2: Determine the input and output for the factorial function
+- Input: A single integer.
+- Output: The result of the multiplication in step 3.
+
+## Step 3: Implement the factorial calculation using recursion
+
+```python
+def factorial(n):
+    if n == 0:
+        return 1
+    else:
+        return n * factorial(n-1)
+```
+
+The final answer is $\boxed{1}$
+
+Tokens: 0, Time: 3.17s
+
+### Inference Examples Finished ###
+
+--- CLI Examples Complete ---
+
+
+--- Testing Python Examples ---
+NOTE: The Python scripts will use the first model they find.
+
+>>> Running basic_usage.py
+
+</document_content>
+</document>
+
+<document index="25">
 <source>examples/prompts/analysis.toml</source>
 <document_content>
 # examples/prompts/analysis.toml
@@ -2546,7 +3976,7 @@ description = "Analyzes the sentiment of a given text."
 </document_content>
 </document>
 
-<document index="24">
+<document index="26">
 <source>examples/prompts/coding.toml</source>
 <document_content>
 # examples/prompts/coding.toml
@@ -2568,7 +3998,7 @@ description = "Explains a snippet of code."
 </document_content>
 </document>
 
-<document index="25">
+<document index="27">
 <source>examples/prompts/creative.toml</source>
 <document_content>
 # examples/prompts/creative.toml
@@ -2585,7 +4015,7 @@ description = "Generates a story idea from a genre and character."
 </document_content>
 </document>
 
-<document index="26">
+<document index="28">
 <source>examples/prompts/qa.toml</source>
 <document_content>
 # examples/prompts/qa.toml
@@ -2612,7 +4042,7 @@ description = "Answers a question based on a provided context."
 from lmstrix.api.client import LmsClient
 from lmstrix.core.context_tester import TestPattern
 
-def main(()):
+def main(()) -> None:
     """Demonstrates advanced context testing with the LMStrix Python API."""
 
 
@@ -2621,7 +4051,7 @@ def main(()):
 
 from lmstrix.api.client import LmsClient
 
-def main(()):
+def main(()) -> None:
     """Demonstrates basic usage of the LMStrix Python API."""
 
 
@@ -2644,7 +4074,7 @@ def main(()) -> None:
     """Demonstrates custom inference workflows with the LMStrix Python API."""
 
 
-<document index="27">
+<document index="29">
 <source>examples/run_all_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -2653,7 +4083,7 @@ def main(()) -> None:
 # It's a way to functionally test that all example code is working as expected.
 #
 # NOTE: This script assumes you have a model downloaded in LM Studio
-# and that the identifier 'phi' will match it. If not, please edit the
+# and that the identifier 'ultron-summarizer-1b' will match it. If not, please edit the
 # example files to use an identifier for a model you have.
 #
 
@@ -2665,7 +4095,7 @@ echo "===== Running All LMStrix Examples ====="
 echo -e "
 
 --- Testing CLI Examples ---"
-echo "NOTE: The CLI scripts have a placeholder model identifier ('phi')."
+echo "NOTE: The CLI scripts have a placeholder model identifier ('ultron-summarizer-1b')."
 echo "Please edit them if you don't have a model matching that ID."
 
 echo -e "
@@ -2716,7 +4146,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="28">
+<document index="30">
 <source>issues/101.txt</source>
 <document_content>
 Shouldn't the code use @ref/llmstudio.txt for much more? We don't want to use inferencing by `litellm`, it's shit. We want to use to use the `lmstudio` package for loading models and also for completion/inferencing.
@@ -2724,7 +4154,7 @@ Shouldn't the code use @ref/llmstudio.txt for much more? We don't want to use in
 </document_content>
 </document>
 
-<document index="29">
+<document index="31">
 <source>issues/102.txt</source>
 <document_content>
 ```
@@ -2768,7 +4198,7 @@ Make sure @examples complement @tests well. Include sensible prompt files and ot
 </document_content>
 </document>
 
-<document index="30">
+<document index="32">
 <source>issues/103.txt</source>
 <document_content>
 Now /report then /cleanup and then /plan the next steps and then /work /work /work
@@ -2776,7 +4206,7 @@ Now /report then /cleanup and then /plan the next steps and then /work /work /wo
 </document_content>
 </document>
 
-<document index="31">
+<document index="33">
 <source>issues/104.txt</source>
 <document_content>
 
@@ -2993,7 +4423,7 @@ Othello:lmstudio adam$
 </document_content>
 </document>
 
-<document index="32">
+<document index="34">
 <source>obsolete/lmsm.json</source>
 <document_content>
 {
@@ -3082,7 +4512,7 @@ def list((self, all_rescan: bool = False, failed_rescan: bool = False)) -> None:
     """List all models in LMStudio"""
 
 
-<document index="33">
+<document index="35">
 <source>pyproject.toml</source>
 <document_content>
 [build-system]
@@ -3401,7 +4831,7 @@ directory = "htmlcov"
 </document_content>
 </document>
 
-<document index="34">
+<document index="36">
 <source>pytest.ini</source>
 <document_content>
 [pytest]
@@ -4279,7 +5709,7 @@ def save_prompts((
     """Save prompts to a TOML file."""
 
 
-<document index="35">
+<document index="37">
 <source>src/lmstrix/py.typed</source>
 <document_content>
 # This file indicates that the package supports type hints

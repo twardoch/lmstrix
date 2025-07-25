@@ -4,7 +4,7 @@
 # It's a way to functionally test that all example code is working as expected.
 #
 # NOTE: This script assumes you have a model downloaded in LM Studio
-# and that the identifier 'phi' will match it. If not, please edit the
+# and that the identifier 'ultron-summarizer-1b' will match it. If not, please edit the
 # example files to use an identifier for a model you have.
 #
 
@@ -16,7 +16,7 @@ echo "===== Running All LMStrix Examples ====="
 echo -e "
 
 --- Testing CLI Examples ---"
-echo "NOTE: The CLI scripts have a placeholder model identifier ('phi')."
+echo "NOTE: The CLI scripts have a placeholder model identifier ('ultron-summarizer-1b')."
 echo "Please edit them if you don't have a model matching that ID."
 
 echo -e "

@@ -37,16 +37,16 @@ echo -e "
 echo "Note: This may take several minutes depending on the model and your hardware."
 # We will use a placeholder model identifier here.
 # In a real scenario, you would replace 'phi' with a model you have.
-MODEL_ID="phi" # <--- CHANGE THIS to a model you have downloaded
+MODEL_ID="ultron-summarizer-1b" # <--- CHANGE THIS to a model you have downloaded
 echo "Testing model: $MODEL_ID"
-lmstrix test "$MODEL_ID" --max-context 8192 --test-pattern binary
+lmstrix test --model_id "$MODEL_ID"
 echo "Context test complete."
 
 # Step 4: Run inference
 # Use the same model identifier to run a simple inference task.
 echo -e "
 --- Step 4: Running inference ---"
-lmstrix infer "$MODEL_ID" "What is the capital of France?"
+lmstrix infer "What is the capital of France?" "$MODEL_ID"
 echo -e "
 Inference complete."
 
