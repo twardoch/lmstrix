@@ -2,6 +2,7 @@
 
 import json
 from datetime import datetime
+from typing import NoReturn
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
@@ -319,3 +320,95 @@ class TestContextTester:
         assert updated_model.loadable_max_context is None
 
         mock_registry.update_model.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_binary_search_logic(self, mock_lmstudio_client, mock_llm) -> None:
+        """Test binary search algorithm with various edge cases."""
+        mock_lmstudio_client.load_model.return_value = mock_llm
+
+        # Test Case 1: Model works at all sizes
+        async def always_works(llm, prompt, **kwargs):
+            return Mock(content="4")
+
+        mock_lmstudio_client.acompletion = AsyncMock(side_effect=always_works)
+        tester = ContextTester(mock_lmstudio_client)
+
+        model = Model(
+            id="test-model-1",
+            path="/path/to/model.gguf",
+            size_bytes=1000000,
+            ctx_in=8192,
+        )
+
+        optimal, loadable, log = await tester.find_optimal_context(model)
+        assert optimal >= 7000  # Should find close to max
+        assert loadable == 8192
+
+        # Test Case 2: Model never works
+        async def never_works(llm, prompt, **kwargs) -> NoReturn:
+            raise InferenceError("test-model", "Always fails")
+
+        mock_lmstudio_client.acompletion = AsyncMock(side_effect=never_works)
+
+        model2 = Model(
+            id="test-model-2",
+            path="/path/to/model2.gguf",
+            size_bytes=1000000,
+            ctx_in=8192,
+        )
+
+        optimal2, loadable2, log2 = await tester.find_optimal_context(model2)
+        assert optimal2 == 0  # Should return 0 when nothing works
+        assert loadable2 == 8192
+
+        # Test Case 3: Model loads but never passes inference
+        mock_lmstudio_client.load_model.return_value = mock_llm
+
+        async def loads_but_fails_inference(llm, prompt, **kwargs):
+            return Mock(content="wrong answer")  # Never returns "4"
+
+        mock_lmstudio_client.acompletion = AsyncMock(side_effect=loads_but_fails_inference)
+
+        model3 = Model(
+            id="test-model-3",
+            path="/path/to/model3.gguf",
+            size_bytes=1000000,
+            ctx_in=8192,
+        )
+
+        optimal3, loadable3, log3 = await tester.find_optimal_context(model3)
+        assert optimal3 == 0  # Should return 0 when no valid responses
+        assert loadable3 == 8192
+
+        # Test Case 4: Model works up to exactly 2048
+        async def works_up_to_2048(llm, prompt, **kwargs):
+            if len(prompt) <= 2048:
+                return Mock(content="4")
+            raise InferenceError("test-model", "Too long")
+
+        mock_lmstudio_client.acompletion = AsyncMock(side_effect=works_up_to_2048)
+
+        model4 = Model(
+            id="test-model-4",
+            path="/path/to/model4.gguf",
+            size_bytes=1000000,
+            ctx_in=8192,
+        )
+
+        optimal4, loadable4, log4 = await tester.find_optimal_context(model4)
+        assert 1800 <= optimal4 <= 2048  # Should find close to 2048
+        assert loadable4 > optimal4
+
+        # Test Case 5: Model that never loads
+        mock_lmstudio_client.load_model.side_effect = ModelLoadError("test-model", "Cannot load")
+
+        model5 = Model(
+            id="test-model-5",
+            path="/path/to/model5.gguf",
+            size_bytes=1000000,
+            ctx_in=8192,
+        )
+
+        optimal5, loadable5, log5 = await tester.find_optimal_context(model5)
+        assert optimal5 == 0
+        assert loadable5 == 0  # Cannot load at any size

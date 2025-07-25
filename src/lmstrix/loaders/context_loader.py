@@ -45,25 +45,24 @@ def load_context(
     # Read the file
     try:
         content = path.read_text(encoding=encoding)
-
-        # Log statistics
-        size_bytes = len(content.encode(encoding))
-        size_mb = size_bytes / (1024 * 1024)
-        line_count = content.count("\n") + 1
-
-        logger.info(
-            f"Loaded context from {path}: {size_bytes:,} bytes ({size_mb:.2f} MB), "
-            f"{line_count:,} lines",
-        )
-
-        return content
-
     except Exception as e:
         raise ConfigurationError(
             "context_file",
             f"Failed to read context file: {e}",
             {"path": str(path), "encoding": encoding, "error": str(e)},
-        )
+        ) from e
+
+    # Log statistics
+    size_bytes = len(content.encode(encoding))
+    size_mb = size_bytes / (1024 * 1024)
+    line_count = content.count("\n") + 1
+
+    logger.info(
+        f"Loaded context from {path}: {size_bytes:,} bytes ({size_mb:.2f} MB), "
+        f"{line_count:,} lines",
+    )
+
+    return content
 
 
 def load_multiple_contexts(
