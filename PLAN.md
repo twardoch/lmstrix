@@ -4,7 +4,7 @@
 
 **Vision**: Deliver a reliable, installable tool that solves the critical problem of models in LM Studio declaring false context limits. The tool provides automated discovery of true operational context limits.
 
-**Current Status**: Working on Issue #201 - Enhanced context testing strategy to prevent system crashes and optimize multi-model testing.
+**Current Status**: Core CLI enhancements completed. Primary focus on Issue #201 - Enhanced context testing strategy implementation to prevent system crashes and optimize multi-model testing performance.
 
 ## 2. Completed Phases
 
@@ -29,45 +29,58 @@
 - ✓ GitHub Pages documentation site
 - ✓ Changelog maintenance
 
-## 3. Phase 4: Enhanced Context Testing (IN PROGRESS)
+### Phase 3.5: CLI Enhancements (COMPLETED)
+- ✓ Issue #204: Removed all asyncio dependencies, now fully synchronous
+- ✓ Added `--sort` option to `test --all` command matching list command functionality
+- ✓ Added `--ctx` option to work with `test --all` for batch testing at specific context sizes
+- ✓ Added `--show` option to `list` command with multiple output formats (id, path, json)
+- ✓ All show formats respect the sort option for flexible data export
+- ✓ Enhanced model field updates during --ctx testing with proper persistence
+
+## 3. Phase 4: Enhanced Context Testing (LARGELY COMPLETED)
 
 **Goal**: Implement safer and more efficient context testing strategy per Issue #201.
 
-### 3.1. Implementation Tasks
+### 3.1. Implementation Status
 
-1. **Add --threshold Parameter**
-   - Add to CLI test command with default 102,400
-   - Controls maximum initial test size to prevent crashes
-   - Use min(threshold, declared_max) for second test
+✅ **--threshold Parameter (COMPLETED)**
+   - ✓ Added to CLI test command with default 102,400
+   - ✓ Controls maximum initial test size to prevent crashes
+   - ✓ Integrated with min(threshold, declared_max) logic
 
-2. **New Testing Algorithm**
-   - Test at 1024 first
-   - Then test at min(threshold, declared_max)
-   - If success and threshold > declared_max: increment by 10,240
-   - If failure: binary search downwards
-   - Save progress after each test
+✅ **Multi-Model Testing Infrastructure (COMPLETED)**
+   - ✓ `test_all_models()` method implemented in ContextTester
+   - ✓ Pass-based testing approach for efficiency
+   - ✓ Progress persistence between model tests
+   - ✓ Rich table output showing test results with efficiency percentages
 
-3. **Multi-Model Testing (--all flag)**
-   - Sort models by declared context size (ascending)
-   - Test in passes to minimize loading/unloading
-   - Pass 1: Test all at 1024, exclude failures
-   - Pass 2+: Continue with remaining models
-   - Track and persist progress between passes
+✅ **Output Improvements (COMPLETED)**
+   - ✓ Rich tables for final results summary
+   - ✓ Model ID, Status, Optimal Context, Declared Limit, Efficiency columns
+   - ✓ Clean progress indicators during batch testing
 
-4. **Improved Output**
-   - Replace primitive output with Rich tables
-   - Show one row per model test
-   - Include: Model ID, Context Size, Result, Duration
-   - No live updates, just append rows
+🔄 **Remaining Tasks for Full Issue #201 Implementation**
+   - [ ] Review and optimize the incremental testing algorithm (currently uses threshold-based approach)
+   - [ ] Validate that binary search logic handles edge cases efficiently
+   - [ ] Add performance benchmarking to measure testing efficiency improvements
+   - [ ] Update documentation to reflect the enhanced testing strategy
 
-## 4. Phase 5: Package & Release (PENDING)
+## 4. Phase 5: Package & Release (READY)
 
-**Goal**: Release LMStrix v1.1.0 to PyPI with enhanced testing capabilities.
+**Goal**: Release LMStrix v1.1.0 to PyPI with enhanced CLI features and testing capabilities.
 
-### 3.1. Release Steps
+### 4.1. Pre-Release Checklist
+   - ✓ Core functionality stable and tested
+   - ✓ CLI enhancements completed (--sort, --ctx, --show)
+   - ✓ Asyncio removal completed (Issue #204)
+   - ✓ Enhanced context testing largely implemented (Issue #201)
+   - [ ] Final validation testing with real models
+   - [ ] Documentation updates for new features
+
+### 4.2. Release Steps
 
 1. **Git Tag Creation**
-   - Create annotated tag `v1.0.0` with release message
+   - Create annotated tag `v1.1.0` with release message highlighting CLI enhancements
    - Push tag to GitHub repository
 
 2. **Package Building**
@@ -76,29 +89,53 @@
 
 3. **PyPI Publication**
    - Use `twine upload dist/*` to publish to PyPI
-   - Ensure package metadata is correct
+   - Ensure package metadata reflects v1.1.0
 
 4. **Post-Release Verification**
    - Test installation: `pip install lmstrix`
-   - Verify all CLI commands work
+   - Verify all CLI commands work, especially new --sort, --ctx, --show options
    - Test Python API imports
 
 5. **GitHub Release**
-   - Create GitHub release from v1.0.0 tag
+   - Create GitHub release from v1.1.0 tag
    - Include comprehensive release notes
-   - Highlight key features and improvements
+   - Highlight CLI enhancements and performance improvements
 
-### 3.2. Release Notes Summary
+### 4.3. Release Notes Summary
 
-**LMStrix v1.0.0 - Initial Release**
+**LMStrix v1.1.0 - Enhanced CLI & Performance Release**
 
-Key Features:
-- Automatic discovery of true model context limits
-- Binary search algorithm for efficient testing
-- Native integration with LM Studio
-- Beautiful CLI with rich formatting
-- Comprehensive Python API
-- Persistent model registry
-- Detailed logging and progress tracking
+Major Enhancements:
+- **Enhanced CLI Functionality**: Added --sort, --ctx, and --show options for flexible model management
+- **Full Synchronous Architecture**: Removed all asyncio dependencies for improved reliability
+- **Optimized Context Testing**: Enhanced testing strategy with threshold controls and batch processing
+- **Flexible Data Export**: Multiple output formats (id, path, json) with sorting support
+- **Improved Safety**: Better context limit validation and crash prevention
 
-This release solves the critical problem of LM Studio models falsely advertising higher context limits than they can actually handle, saving users time and preventing runtime failures.
+This release significantly improves usability and performance while maintaining the core value proposition of discovering true model context limits.
+
+## 5. Future Phases (Post v1.1.0)
+
+### Phase 6: Performance & Monitoring
+- [ ] Add performance benchmarking suite for context testing efficiency
+- [ ] Implement progress bars for long-running context tests
+- [ ] Add GPU memory monitoring during tests
+- [ ] Create performance regression testing
+
+### Phase 7: Advanced Features
+- [ ] Support for custom test prompts via CLI argument
+- [ ] Multi-prompt testing for more robust validation
+- [ ] Document type-specific testing (code, prose, technical content)
+- [ ] Integration with external model registries
+
+### Phase 8: Ecosystem Integration
+- [ ] Plugin system for custom testing strategies
+- [ ] Integration with popular ML workflow tools
+- [ ] REST API for programmatic access
+- [ ] Docker containerization for isolated testing
+
+### Phase 9: Enterprise Features
+- [ ] Batch model management across multiple LM Studio instances
+- [ ] Team collaboration features for shared model registries
+- [ ] Advanced reporting and analytics
+- [ ] Integration with CI/CD pipelines

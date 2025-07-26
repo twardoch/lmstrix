@@ -95,3 +95,5 @@ var/
 venv.bak/
 venv/
 wheels/
+llms.txt
+CLEANUP.txt

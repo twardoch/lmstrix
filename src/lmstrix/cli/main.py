@@ -183,10 +183,10 @@ class LMStrixCLI:
 
                 if not models_to_test:
                     console.print(
-                        "[yellow]No models to test at the specified context size.[/yellow]"
+                        "[yellow]No models to test at the specified context size.[/yellow]",
                     )
                     console.print(
-                        "[dim]Models may already be tested or context exceeds their limits.[/dim]"
+                        "[dim]Models may already be tested or context exceeds their limits.[/dim]",
                     )
                     return
                 console.print(f"Testing {len(models_to_test)} models at context size {ctx:,}...")
@@ -197,7 +197,7 @@ class LMStrixCLI:
                 ]
                 if not models_to_test:
                     console.print(
-                        "[green]All models have already been successfully tested.[/green]"
+                        "[green]All models have already been successfully tested.[/green]",
                     )
                     return
                 console.print(f"Testing {len(models_to_test)} models...")
@@ -210,11 +210,15 @@ class LMStrixCLI:
                 models_to_test = sorted(models_to_test, key=lambda m: m.id, reverse=reverse)
             elif sort_key in ("ctx", "ctxd"):
                 models_to_test = sorted(
-                    models_to_test, key=lambda m: m.tested_max_context or 0, reverse=reverse
+                    models_to_test,
+                    key=lambda m: m.tested_max_context or 0,
+                    reverse=reverse,
                 )
             elif sort_key in ("dtx", "dtxd"):
                 models_to_test = sorted(
-                    models_to_test, key=lambda m: m.context_limit, reverse=reverse
+                    models_to_test,
+                    key=lambda m: m.context_limit,
+                    reverse=reverse,
                 )
             elif sort_key in ("size", "sized"):
                 models_to_test = sorted(models_to_test, key=lambda m: m.size, reverse=reverse)
