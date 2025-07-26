@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Enhanced CLI Features**
+  - Added `--sort` option to `lmstrix test --all` command with same sort options as list (id, ctx, dtx, size, etc.)
+  - Added `--ctx` option to `lmstrix test --all` for testing all untested models at a specific context size
+  - Added `--show` option to `lmstrix list` with three output formats:
+    - `id`: Plain newline-delimited list of model IDs
+    - `path`: Newline-delimited list of relative paths (same as id currently)
+    - `json`: Full JSON array from the registry
+  - All `--show` formats respect the `--sort` option for flexible output
+
+- **CLI Improvements**
+  - Modified `--ctx` to work with `--all` flag for batch testing at specific context sizes
+  - `test --all --ctx` filters models based on context limits and safety checks
+  - Added proper status updates and persistence when using `--ctx` for single model tests
+  - Fixed model field updates (tested_max_context, last_known_good_context) during --ctx testing
+
 ### Changed
 
 - **Removed all asyncio dependencies (Issue #204)**
