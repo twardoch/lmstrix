@@ -127,12 +127,26 @@ class ContextTester:
         model_path: str,
         context_size: int,
         log_path: Path,
+        model: Model | None = None,
     ) -> ContextTestResult:
         """Test model at a specific context size with retry logic for timeouts."""
         logger.debug(f"Testing {model_path} at context size {context_size}")
 
         # Always print progress for context testing
         print(f"  → Testing context size: {context_size:,} tokens...")
+
+        # Check if we're approaching last_known_bad_context
+        if model and model.last_known_bad_context:
+            percentage_of_bad = (context_size / model.last_known_bad_context) * 100
+            if percentage_of_bad >= 80:
+                logger.warning(
+                    f"Context size {context_size:,} is {percentage_of_bad:.0f}% of "
+                    f"last known bad context ({model.last_known_bad_context:,})",
+                )
+                if percentage_of_bad >= 90:
+                    print(
+                        f"  ⚠️  WARNING: Testing at {percentage_of_bad:.0f}% of last known bad context!",
+                    )
 
         # Log the attempt before loading the model
         self._log_to_main_log(model_path, context_size, "ATTEMPT")
@@ -356,6 +370,17 @@ class ContextTester:
         save_model_registry(registry)
 
         max_context = max_context or model.context_limit
+
+        # Respect last_known_bad_context if it exists
+        if model.last_known_bad_context:
+            safe_max_context = int(model.last_known_bad_context * 0.9)
+            if max_context >= model.last_known_bad_context:
+                logger.warning(
+                    f"Requested max_context ({max_context:,}) is at or above last known bad context "
+                    f"({model.last_known_bad_context:,}). Limiting to {safe_max_context:,} (90% of last bad).",
+                )
+                max_context = safe_max_context
+
         log_path = get_context_test_log_path(model.id)
 
         if self.verbose:
@@ -370,7 +395,7 @@ class ContextTester:
                 f"[Phase 1] Verifying model can load with minimal context ({min_context} tokens)...",
             )
 
-        initial_result = self._test_at_context(model.id, min_context, log_path)
+        initial_result = self._test_at_context(model.id, min_context, log_path, model)
 
         if not initial_result.load_success:
             logger.error(f"Model {model.id} failed to load even with minimum context {min_context}")
@@ -412,7 +437,7 @@ class ContextTester:
             logger.info(f"[Phase 2] Declared limit: {declared_limit:,} tokens")
             logger.info(f"[Phase 2] Using min(threshold, declared_limit) = {test_context:,}")
 
-        threshold_result = self._test_at_context(model.id, test_context, log_path)
+        threshold_result = self._test_at_context(model.id, test_context, log_path, model)
 
         if threshold_result.load_success and threshold_result.inference_success:
             # Threshold test passed
@@ -446,12 +471,21 @@ class ContextTester:
                     next_context = int(current_context * 1.1)
 
                 next_context = min(next_context, declared_limit)
+
+                # Also respect last_known_bad_context
+                if model.last_known_bad_context:
+                    safe_next_context = int(model.last_known_bad_context * 0.9)
+                    if next_context >= model.last_known_bad_context:
+                        next_context = safe_next_context
+                        logger.info(
+                            f"Limiting next_context to {safe_next_context:,} (90% of last bad {model.last_known_bad_context:,})",
+                        )
                 print(f"  → Testing context size: {next_context:,} tokens...")
 
                 if self.verbose:
                     logger.info(f"[Phase 3] Testing at {next_context:,} tokens...")
 
-                result = self._test_at_context(model.id, next_context, log_path)
+                result = self._test_at_context(model.id, next_context, log_path, model)
 
                 if result.load_success and result.inference_success:
                     # Still working, update and continue
@@ -544,7 +578,7 @@ class ContextTester:
                     )
                     logger.info(f"[Iteration {iteration}] Search progress: ~{progress:.1f}%")
 
-                result = self._test_at_context(model.id, mid, log_path)
+                result = self._test_at_context(model.id, mid, log_path, model)
 
                 # Check for timeout
                 is_timeout = "timed out" in str(result.error).lower()
@@ -772,7 +806,7 @@ class ContextTester:
             save_model_registry(registry)
 
             # Test at min context
-            result = self._test_at_context(model.id, min_context, log_path)
+            result = self._test_at_context(model.id, min_context, log_path, model)
 
             if not result.load_success or not result.inference_success:
                 # Model failed at minimum context
@@ -830,6 +864,16 @@ class ContextTester:
                 # Ensure we don't exceed the declared limit
                 next_context = min(next_context, model.context_limit)
 
+                # Also respect last_known_bad_context
+                if model.last_known_bad_context:
+                    safe_next_context = int(model.last_known_bad_context * 0.9)
+                    if next_context >= model.last_known_bad_context:
+                        next_context = safe_next_context
+                        logger.info(
+                            f"Model {model_id}: Limiting next_context to {safe_next_context:,} "
+                            f"(90% of last bad {model.last_known_bad_context:,})",
+                        )
+
                 # Only add if there's room to grow
                 if next_context > model.last_known_good_context:
                     next_contexts[model_id] = next_context
@@ -852,7 +896,7 @@ class ContextTester:
                 time.sleep(3.0)
 
                 log_path = get_context_test_log_path(model.id)
-                result = self._test_at_context(model.id, test_context, log_path)
+                result = self._test_at_context(model.id, test_context, log_path, model)
 
                 if result.load_success and result.inference_success:
                     # Success - update model

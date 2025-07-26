@@ -169,6 +169,17 @@ class LMStrixCLI:
                 )
                 return
 
+            # Check against last_known_bad_context
+            if model.last_known_bad_context and ctx >= model.last_known_bad_context:
+                max_safe_context = int(model.last_known_bad_context * 0.9)
+                console.print(
+                    f"[red]Error: Specified context ({ctx:,}) is at or above the last known bad context ({model.last_known_bad_context:,}).[/red]",
+                )
+                console.print(
+                    f"[yellow]The maximum safe context to test is {max_safe_context:,} (90% of last bad).[/yellow]",
+                )
+                return
+
             console.print(
                 f"\n[bold cyan]Testing model: {model.id} at specific context: {ctx:,}[/bold cyan]",
             )
@@ -183,7 +194,7 @@ class LMStrixCLI:
             save_model_registry(registry)
 
             # Test at specific context
-            result = tester._test_at_context(model.id, ctx, log_path)
+            result = tester._test_at_context(model.id, ctx, log_path, model)
 
             if result.load_success and result.inference_success:
                 console.print(f"[green]✓ Test successful at context {ctx:,}[/green]")

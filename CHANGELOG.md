@@ -18,6 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Context Size Safety Validation**
+  - Added validation to prevent testing at or above `last_known_bad_context`
+  - CLI `--ctx` parameter now checks against `last_known_bad_context` and limits to 90% of last bad
+  - Automatic testing algorithms now respect `last_known_bad_context` during iterations
+  - Added warning messages when context size approaches 80% or 90% of last known bad context
+  - Prevents system crashes by avoiding previously failed context sizes
+
 - **Enhanced Context Testing Strategy (Issue #201)**
   - Added `--threshold` parameter to test command (default: 102,400 tokens)
   - Prevents system crashes by limiting initial test size
