@@ -15230,7 +15230,11 @@ class ContextTester:
     def _log_result((self, log_path: Path, result: ContextTestResult)) -> None:
         """Append test result to log file."""
     def _log_to_main_log((
-        self, model_id: str, context_size: int, event_type: str, details: str = "",
+        self,
+        model_id: str,
+        context_size: int,
+        event_type: str,
+        details: str = "",
     )) -> None:
         """Log attempt or solution to the main lmstrix.log.txt file."""
     def _test_at_context((
@@ -15280,7 +15284,11 @@ def _log_result((self, log_path: Path, result: ContextTestResult)) -> None:
     """Append test result to log file."""
 
 def _log_to_main_log((
-        self, model_id: str, context_size: int, event_type: str, details: str = "",
+        self,
+        model_id: str,
+        context_size: int,
+        event_type: str,
+        details: str = "",
     )) -> None:
     """Log attempt or solution to the main lmstrix.log.txt file."""
 
