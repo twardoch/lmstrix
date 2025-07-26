@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENT_INSTRUCTIONS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI agents when working with code in this repository.
 
 ## 1. Commands
 
@@ -291,4 +291,3 @@ When I say "/plan [requirement]", you must:
 - `/report` - Update documentation and clean up completed tasks
 - `/work` - Enter continuous work mode to implement plans
 - You may use these commands autonomously when appropriate
-

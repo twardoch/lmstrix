@@ -271,6 +271,8 @@ testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = [
   "-ra",
+  "-v",
+  "--tb=short",
   "--strict-markers",
   "--strict-config",
   "--cov-branch",
@@ -286,6 +288,7 @@ markers = [
   "integration: marks tests as integration tests",
   "unit: marks tests as unit tests",
 ]
+
 
 [tool.coverage.run]
 branch = true

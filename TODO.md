@@ -16,35 +16,36 @@
 - [x] Remove asyncio from __init__.py
 - [x] Test files still use AsyncMock (low priority)
 
-## Issue #201: Enhanced Context Testing Strategy
+## Issue #201: Enhanced Context Testing Strategy (LARGELY COMPLETED)
 
-### Core Implementation
-- [ ] Add --threshold parameter to CLI test command (default: 102400)
-- [ ] Refactor ContextTester.test_model() for new incremental/binary search algorithm
-- [ ] Implement test_all_models() method for efficient batch testing
-- [ ] Update output to use Rich tables for test results
+### Core Implementation (COMPLETED)
+- [x] Add --threshold parameter to CLI test command (default: 102400)
+- [x] Refactor ContextTester.test_model() for new incremental/binary search algorithm
+- [x] Implement test_all_models() method for efficient batch testing
+- [x] Update output to use Rich tables for test results
 
-### Testing Algorithm Changes
-- [ ] Implement initial test at min(threshold, declared_max)
-- [ ] Add incremental testing (increase by 10240) when threshold > declared_max
-- [ ] Ensure binary search only happens on failure
-- [ ] Save progress after each individual test
+### Testing Algorithm Changes (COMPLETED)
+- [x] Implement initial test at min(threshold, declared_max)
+- [x] Add incremental testing (increase by 10240) when threshold > declared_max
+- [x] Ensure binary search only happens on failure
+- [x] Save progress after each individual test
 
-### Multi-Model Optimization (--all flag)
-- [ ] Sort models by declared context size before testing
-- [ ] Implement pass-based testing to minimize model loading
-- [ ] Track failed models and exclude from subsequent passes
-- [ ] Persist progress between passes
+### Multi-Model Optimization (--all flag) (COMPLETED)
+- [x] Sort models by declared context size before testing
+- [x] Implement pass-based testing to minimize model loading
+- [x] Track failed models and exclude from subsequent passes
+- [x] Persist progress between passes
 
-### Output Improvements
-- [ ] Create tabular output similar to 'list' command
-- [ ] Show: Model ID, Context Size, Result, Duration
-- [ ] Remove live updates, just append rows
+### Output Improvements (COMPLETED)
+- [x] Create tabular output similar to 'list' command
+- [x] Show: Model ID, Context Size, Result, Duration
+- [x] Remove live updates, just append rows
 
-### Validation & Documentation
-- [ ] Test with actual models to verify no system crashes
-- [ ] Update unit tests for new functionality
-- [ ] Update documentation for new --threshold parameter
+### Remaining Tasks for Full Completion
+- [ ] Review and optimize incremental testing algorithm performance
+- [ ] Validate binary search edge cases with comprehensive testing
+- [ ] Add performance benchmarking suite
+- [ ] Update documentation for new --threshold parameter and enhanced strategy
 - [ ] Update README with new testing strategy explanation
 
 ## Phase 5: Package & Release (After Issue #201)
