@@ -7,6 +7,7 @@ from lmstrix.utils.paths import (
     get_contexts_dir,
     get_default_models_file,
     get_lmstrix_data_dir,
+    get_lmstrix_log_path,
     get_lmstudio_path,
     get_prompts_dir,
 )
@@ -17,6 +18,7 @@ __all__ = [
     "get_contexts_dir",
     "get_default_models_file",
     "get_lmstrix_data_dir",
+    "get_lmstrix_log_path",
     "get_lmstudio_path",
     "get_prompts_dir",
     "setup_logging",

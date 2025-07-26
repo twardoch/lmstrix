@@ -1,16 +1,20 @@
 """Command-line interface for LMStrix."""
 
+from datetime import datetime
+
 import fire
 from rich.console import Console
 from rich.table import Table
 
 from lmstrix.core.context_tester import ContextTester
 from lmstrix.core.inference import InferenceEngine
+from lmstrix.core.models import ContextTestStatus
 from lmstrix.loaders.model_loader import (
     load_model_registry,
+    save_model_registry,
     scan_and_update_registry,
 )
-from lmstrix.utils import setup_logging
+from lmstrix.utils import get_context_test_log_path, setup_logging
 
 console = Console()
 
@@ -113,6 +117,7 @@ class LMStrixCLI:
         model_id: str | None = None,
         all: bool = False,
         threshold: int = 102400,
+        ctx: int | None = None,
         verbose: bool = False,
     ) -> None:
         """Test the context limits for models.
@@ -122,6 +127,7 @@ class LMStrixCLI:
             all: Flag to test all untested or previously failed models.
             threshold: Maximum context size for initial testing (default: 102400).
                       Prevents system crashes from very large contexts.
+            ctx: Test only this specific context value (skips if > declared context).
             verbose: Enable verbose output.
         """
         # Configure logging based on verbose flag
@@ -149,6 +155,45 @@ class LMStrixCLI:
             return
 
         tester = ContextTester(verbose=verbose)
+
+        # If --ctx is specified, use it for specific context testing
+        if ctx is not None:
+            if all:
+                console.print("[red]Error: Cannot use --ctx with --all flag.[/red]")
+                return
+
+            model = models_to_test[0]
+            if ctx > model.context_limit:
+                console.print(
+                    f"[yellow]Warning: Specified context ({ctx:,}) exceeds model's declared limit ({model.context_limit:,}). Skipping test.[/yellow]",
+                )
+                return
+
+            console.print(
+                f"\n[bold cyan]Testing model: {model.id} at specific context: {ctx:,}[/bold cyan]",
+            )
+            console.print(f"[dim]Declared context limit: {model.context_limit:,} tokens[/dim]")
+
+            log_path = get_context_test_log_path(model.id)
+
+            # Update model status
+            model.context_test_status = ContextTestStatus.TESTING
+            model.context_test_date = datetime.now()
+            registry.update_model(model.id, model)
+            save_model_registry(registry)
+
+            # Test at specific context
+            result = tester._test_at_context(model.id, ctx, log_path)
+
+            if result.load_success and result.inference_success:
+                console.print(f"[green]✓ Test successful at context {ctx:,}[/green]")
+                console.print(f"[dim]Response length: {len(result.response)} chars[/dim]")
+            else:
+                error_type = "load" if not result.load_success else "inference"
+                console.print(f"[red]✗ Test failed at context {ctx:,} ({error_type} failed)[/red]")
+                console.print(f"[dim]Error: {result.error}[/dim]")
+
+            return
 
         if all:
             # Use the optimized batch testing for multiple models

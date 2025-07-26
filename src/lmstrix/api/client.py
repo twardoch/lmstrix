@@ -65,7 +65,8 @@ class LMStudioClient:
             if unload_all:
                 self.unload_all_models()
             # Use Any type for config to avoid type checking issues
-            config: Any = {"context_length": context_len}
+            # Use camelCase for config keys as expected by lmstudio SDK
+            config: Any = {"contextLength": context_len}
             return lmstudio.llm(model_path, config=config)
         except Exception as e:
             raise ModelLoadError(model_path, f"Failed to load model: {e}") from e
@@ -74,7 +75,8 @@ class LMStudioClient:
         """Load a model with a specific context length using model ID (backward compatibility)."""
         try:
             # Use Any type for config to avoid type checking issues
-            config: Any = {"context_length": context_len}
+            # Use camelCase for config keys as expected by lmstudio SDK
+            config: Any = {"contextLength": context_len}
             return lmstudio.llm(model_id, config=config)
         except Exception as e:
             raise ModelLoadError(model_id, f"Failed to load model: {e}") from e
@@ -100,7 +102,7 @@ class LMStudioClient:
         """Make a completion request to a loaded LM Studio model."""
         try:
             # LM Studio's complete() method accepts a config dict
-            # Pass maxTokens to prevent models from generating indefinitely
+            # Pass maxTokens (camelCase) to prevent models from generating indefinitely
             config = {"maxTokens": max_tokens if max_tokens > 0 else 100}
             logger.debug(f"Calling llm.complete with config: {config}, prompt: {prompt[:50]}...")
 

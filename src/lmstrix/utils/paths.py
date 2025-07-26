@@ -137,3 +137,13 @@ def get_contexts_dir() -> Path:
         contexts_dir.mkdir(parents=True, exist_ok=True)
 
     return contexts_dir
+
+
+def get_lmstrix_log_path() -> Path:
+    """Get the path to the lmstrix.log.txt file.
+
+    Returns:
+        Path to the lmstrix.log.txt file in the LMStudio folder.
+    """
+    lms_path = get_lmstudio_path()
+    return lms_path / "lmstrix.log.txt"
