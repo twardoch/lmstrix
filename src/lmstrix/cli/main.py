@@ -1,5 +1,7 @@
 """Command-line interface for LMStrix."""
 
+import json
+import time
 from datetime import datetime
 
 import fire
@@ -42,11 +44,12 @@ class LMStrixCLI:
         console.print("[green]Model scan complete.[/green]")
         self.list()
 
-    def list(self, sort: str = "id", verbose: bool = False) -> None:
+    def list(self, sort: str = "id", show: str | None = None, verbose: bool = False) -> None:
         """List all models from the registry with their test status.
 
         Args:
             sort: Sort order. Options: id, idd, ctx, ctxd, dtx, dtxd, size, sized (d = descending).
+            show: Output format. Options: id (plain IDs), path (relative paths), json (JSON array).
             verbose: Enable verbose output.
         """
         # Configure logging based on verbose flag
@@ -77,8 +80,31 @@ class LMStrixCLI:
             console.print(f"[red]Invalid sort option: {sort}. Using default (id).[/red]")
             sorted_models = sorted(models, key=lambda m: m.id)
 
+        # Handle different show formats
+        if show:
+            if show == "id":
+                # Plain newline-delimited list of model IDs
+                for model in sorted_models:
+                    print(model.id)
+            elif show == "path":
+                # Newline-delimited list of relative paths
+                for model in sorted_models:
+                    # Model.id is already the relative path
+                    print(model.id)
+            elif show == "json":
+                # JSON array of models (matching registry format)
+                models_dict = []
+                for model in sorted_models:
+                    model_data = model.model_dump(by_alias=True, mode="json")
+                    models_dict.append(model_data)
+                print(json.dumps(models_dict, indent=2))
+            else:
+                console.print(f"[red]Invalid show option: {show}. Options: id, path, json.[/red]")
+                return
+            return
+
         table = Table(title="LM Studio Models", show_lines=False)
-        table.add_column("Model ID", style="cyan", no_wrap=False, width=40)
+        table.add_column("Model ID", style="cyan", no_wrap=True)
         table.add_column("Size\n(GB)", style="magenta", width=8)
         table.add_column("Declared\nCtx", style="yellow", width=10)
         table.add_column("Tested\nCtx", style="green", width=10)
@@ -118,6 +144,7 @@ class LMStrixCLI:
         all: bool = False,
         threshold: int = 102400,
         ctx: int | None = None,
+        sort: str = "id",
         verbose: bool = False,
     ) -> None:
         """Test the context limits for models.
@@ -128,6 +155,7 @@ class LMStrixCLI:
             threshold: Maximum context size for initial testing (default: 102400).
                       Prevents system crashes from very large contexts.
             ctx: Test only this specific context value (skips if > declared context).
+            sort: Sort order for --all. Options: id, idd, ctx, ctxd, dtx, dtxd, size, sized (d = descending).
             verbose: Enable verbose output.
         """
         # Configure logging based on verbose flag
@@ -137,13 +165,62 @@ class LMStrixCLI:
         models_to_test = []
 
         if all:
-            models_to_test = [
-                m for m in registry.list_models() if m.context_test_status.value != "completed"
-            ]
-            if not models_to_test:
-                console.print("[green]All models have already been successfully tested.[/green]")
-                return
-            console.print(f"Testing {len(models_to_test)} models...")
+            # Get all models that need testing based on --ctx option
+            if ctx is not None:
+                # With --ctx, test all models except those already tested (completed status)
+                models_to_test = []
+                for m in registry.list_models():
+                    # Skip if already tested
+                    if m.context_test_status.value == "completed":
+                        continue
+                    # Skip if ctx exceeds declared limit
+                    if ctx > m.context_limit:
+                        continue
+                    # Skip if ctx is at or above last known bad context
+                    if m.last_known_bad_context and ctx >= m.last_known_bad_context:
+                        continue
+                    models_to_test.append(m)
+
+                if not models_to_test:
+                    console.print(
+                        "[yellow]No models to test at the specified context size.[/yellow]"
+                    )
+                    console.print(
+                        "[dim]Models may already be tested or context exceeds their limits.[/dim]"
+                    )
+                    return
+                console.print(f"Testing {len(models_to_test)} models at context size {ctx:,}...")
+            else:
+                # Normal --all behavior: test untested or failed models
+                models_to_test = [
+                    m for m in registry.list_models() if m.context_test_status.value != "completed"
+                ]
+                if not models_to_test:
+                    console.print(
+                        "[green]All models have already been successfully tested.[/green]"
+                    )
+                    return
+                console.print(f"Testing {len(models_to_test)} models...")
+
+            # Apply sorting
+            sort_key = sort.lower()
+            reverse = sort_key.endswith("d") and len(sort_key) > 1
+
+            if sort_key in ("id", "idd"):
+                models_to_test = sorted(models_to_test, key=lambda m: m.id, reverse=reverse)
+            elif sort_key in ("ctx", "ctxd"):
+                models_to_test = sorted(
+                    models_to_test, key=lambda m: m.tested_max_context or 0, reverse=reverse
+                )
+            elif sort_key in ("dtx", "dtxd"):
+                models_to_test = sorted(
+                    models_to_test, key=lambda m: m.context_limit, reverse=reverse
+                )
+            elif sort_key in ("size", "sized"):
+                models_to_test = sorted(models_to_test, key=lambda m: m.size, reverse=reverse)
+            else:
+                console.print(f"[red]Invalid sort option: {sort}. Using default (id).[/red]")
+                models_to_test = sorted(models_to_test, key=lambda m: m.id)
         elif model_id:
             model = registry.find_model(model_id)
             if not model:
@@ -157,11 +234,7 @@ class LMStrixCLI:
         tester = ContextTester(verbose=verbose)
 
         # If --ctx is specified, use it for specific context testing
-        if ctx is not None:
-            if all:
-                console.print("[red]Error: Cannot use --ctx with --all flag.[/red]")
-                return
-
+        if ctx is not None and not all:
             model = models_to_test[0]
             if ctx > model.context_limit:
                 console.print(
@@ -171,12 +244,12 @@ class LMStrixCLI:
 
             # Check against last_known_bad_context
             if model.last_known_bad_context and ctx >= model.last_known_bad_context:
-                max_safe_context = int(model.last_known_bad_context * 0.9)
+                max_safe_context = int(model.last_known_bad_context * 0.75)
                 console.print(
                     f"[red]Error: Specified context ({ctx:,}) is at or above the last known bad context ({model.last_known_bad_context:,}).[/red]",
                 )
                 console.print(
-                    f"[yellow]The maximum safe context to test is {max_safe_context:,} (90% of last bad).[/yellow]",
+                    f"[yellow]The maximum safe context to test is {max_safe_context:,} (75% of last bad).[/yellow]",
                 )
                 return
 
@@ -194,30 +267,103 @@ class LMStrixCLI:
             save_model_registry(registry)
 
             # Test at specific context
-            result = tester._test_at_context(model.id, ctx, log_path, model)
+            result = tester._test_at_context(model.id, ctx, log_path, model, registry)
 
             if result.load_success and result.inference_success:
                 console.print(f"[green]✓ Test successful at context {ctx:,}[/green]")
                 console.print(f"[dim]Response length: {len(result.response)} chars[/dim]")
+
+                # Update model with successful test results
+                model.last_known_good_context = ctx
+                # Update tested_max_context if this is larger than previous
+                if not model.tested_max_context or ctx > model.tested_max_context:
+                    model.tested_max_context = ctx
+                # Mark as completed since we successfully tested at this context
+                model.context_test_status = ContextTestStatus.COMPLETED
+                model.context_test_date = datetime.now()
+
+                # Save the updated model
+                registry.update_model(model.id, model)
+                save_model_registry(registry)
             else:
                 error_type = "load" if not result.load_success else "inference"
                 console.print(f"[red]✗ Test failed at context {ctx:,} ({error_type} failed)[/red]")
                 console.print(f"[dim]Error: {result.error}[/dim]")
 
+                # Update model with failed test results
+                model.last_known_bad_context = ctx
+                model.context_test_status = ContextTestStatus.FAILED
+                model.context_test_date = datetime.now()
+
+                # Save the updated model
+                registry.update_model(model.id, model)
+                save_model_registry(registry)
+
             return
 
         if all:
-            # Use the optimized batch testing for multiple models
-            console.print(
-                f"[bold]Starting optimized batch testing for {len(models_to_test)} models[/bold]",
-            )
-            console.print(f"[dim]Threshold: {threshold:,} tokens[/dim]\n")
+            if ctx is not None:
+                # Test all models at a specific context size
+                console.print(
+                    f"[bold]Testing {len(models_to_test)} models at context size {ctx:,}[/bold]\n",
+                )
 
-            updated_models = tester.test_all_models(
-                models_to_test,
-                threshold=threshold,
-                registry=registry,
-            )
+                updated_models = []
+                for i, model in enumerate(models_to_test, 1):
+                    print(f"[{i}/{len(models_to_test)}] Testing {model.id}...")
+
+                    # Add delay between models
+                    if i > 1:
+                        print("  ⏳ Waiting 3 seconds before next model (resource cleanup)...")
+                        time.sleep(3.0)
+
+                    log_path = get_context_test_log_path(model.id)
+
+                    # Update model status
+                    model.context_test_status = ContextTestStatus.TESTING
+                    model.context_test_date = datetime.now()
+                    registry.update_model(model.id, model)
+                    save_model_registry(registry)
+
+                    # Test at specific context
+                    result = tester._test_at_context(model.id, ctx, log_path, model, registry)
+
+                    if result.load_success and result.inference_success:
+                        console.print(f"  ✓ Success at context {ctx:,}")
+
+                        # Update model with successful test results
+                        model.last_known_good_context = ctx
+                        # Update tested_max_context if this is larger than previous
+                        if not model.tested_max_context or ctx > model.tested_max_context:
+                            model.tested_max_context = ctx
+                        # Don't mark as completed since we only tested one context
+                        model.context_test_status = ContextTestStatus.TESTING
+                    else:
+                        error_type = "load" if not result.load_success else "inference"
+                        console.print(f"  ✗ Failed at context {ctx:,} ({error_type} failed)")
+
+                        # Update model with failed test results
+                        model.last_known_bad_context = ctx
+                        model.context_test_status = ContextTestStatus.FAILED
+
+                    model.context_test_date = datetime.now()
+
+                    # Save the updated model
+                    registry.update_model(model.id, model)
+                    save_model_registry(registry)
+                    updated_models.append(model)
+            else:
+                # Use the optimized batch testing for multiple models
+                console.print(
+                    f"[bold]Starting optimized batch testing for {len(models_to_test)} models[/bold]",
+                )
+                console.print(f"[dim]Threshold: {threshold:,} tokens[/dim]\n")
+
+                updated_models = tester.test_all_models(
+                    models_to_test,
+                    threshold=threshold,
+                    registry=registry,
+                )
 
             # Print final summary table
             print(f"\n{'=' * 60}")
@@ -225,7 +371,7 @@ class LMStrixCLI:
             print(f"{'=' * 60}\n")
 
             table = Table(show_header=True, header_style="bold cyan")
-            table.add_column("Model", style="cyan", width=40)
+            table.add_column("Model", style="cyan", no_wrap=True)
             table.add_column("Status", style="green")
             table.add_column("Optimal Context", justify="right")
             table.add_column("Declared Limit", justify="right")

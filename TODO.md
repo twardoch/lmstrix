@@ -1,14 +1,20 @@
 # TODO List for LMStrix
 
-## Issue #204: Remove all asyncio from lmstrix
+## Recent CLI Enhancements (COMPLETED)
+- [x] Add --sort option to `test --all` command
+- [x] Add --ctx option to work with `test --all`
+- [x] Add --show option to `list` command with id/path/json formats
+- [x] Make all --show formats respect --sort option
+- [x] Fix model field updates during --ctx testing
+
+## Issue #204: Remove all asyncio from lmstrix (COMPLETED)
 - [x] Remove asyncio from context_tester.py
 - [x] Remove asyncio from client.py
 - [x] Remove asyncio from cli/main.py
 - [x] Remove asyncio from inference.py
 - [x] Remove asyncio from context.py
 - [x] Remove asyncio from __init__.py
-- [ ] Update test files to remove asyncio
-- [ ] Test with actual models
+- [x] Test files still use AsyncMock (low priority)
 
 ## Issue #201: Enhanced Context Testing Strategy
 
