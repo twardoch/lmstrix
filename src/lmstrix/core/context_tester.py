@@ -95,7 +95,11 @@ class ContextTester:
             f.write(json.dumps(result.to_dict()) + "\n")
 
     def _log_to_main_log(
-        self, model_id: str, context_size: int, event_type: str, details: str = "",
+        self,
+        model_id: str,
+        context_size: int,
+        event_type: str,
+        details: str = "",
     ) -> None:
         """Log attempt or solution to the main lmstrix.log.txt file.
 
