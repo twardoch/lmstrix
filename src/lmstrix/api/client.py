@@ -66,7 +66,7 @@ class LMStudioClient:
                 self.unload_all_models()
             # Use Any type for config to avoid type checking issues
             # Use camelCase for config keys as expected by lmstudio SDK
-            config: Any = {"contextLength": context_len}
+            config: Any = {"contextLength": context_len, "flashAttention": True}
             return lmstudio.llm(model_path, config=config)
         except Exception as e:
             raise ModelLoadError(model_path, f"Failed to load model: {e}") from e
