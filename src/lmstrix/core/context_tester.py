@@ -12,7 +12,7 @@ from lmstrix.api import LMStudioClient
 from lmstrix.api.exceptions import ModelLoadError
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 from lmstrix.loaders.model_loader import load_model_registry, save_model_registry
-from lmstrix.utils import get_context_test_log_path
+from lmstrix.utils import get_context_test_log_path, get_lmstrix_log_path
 
 
 class ContextTestResult:
@@ -94,6 +94,30 @@ class ContextTester:
         with log_path.open("a") as f:
             f.write(json.dumps(result.to_dict()) + "\n")
 
+    def _log_to_main_log(
+        self, model_id: str, context_size: int, event_type: str, details: str = "",
+    ) -> None:
+        """Log attempt or solution to the main lmstrix.log.txt file.
+
+        Args:
+            model_id: The model being tested
+            context_size: The context size being tested
+            event_type: Either "ATTEMPT" or "SOLUTION"
+            details: Additional details (e.g., success/failure, response length)
+        """
+        log_path = get_lmstrix_log_path()
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_entry = f"[{timestamp}] {event_type}: model={model_id}, context={context_size:,}"
+        if details:
+            log_entry += f", {details}"
+        log_entry += "\n"
+
+        try:
+            with log_path.open("a") as f:
+                f.write(log_entry)
+        except Exception as e:
+            logger.warning(f"Failed to write to main log: {e}")
+
     def _test_at_context(
         self,
         model_path: str,
@@ -105,6 +129,9 @@ class ContextTester:
 
         # Always print progress for context testing
         print(f"  → Testing context size: {context_size:,} tokens...")
+
+        # Log the attempt before loading the model
+        self._log_to_main_log(model_path, context_size, "ATTEMPT")
 
         for attempt in range(self.max_retries + 1):  # +1 for initial attempt
             if attempt > 0:
@@ -161,6 +188,14 @@ class ContextTester:
                     response=response.content,
                 )
 
+                # Log the successful solution
+                self._log_to_main_log(
+                    model_path,
+                    context_size,
+                    "SOLUTION",
+                    f"success=True, response_length={len(response.content)}",
+                )
+
                 # Success - log and return
                 self._log_result(log_path, result)
                 return result
@@ -188,6 +223,15 @@ class ContextTester:
                     load_success=False,
                     error=str(e),
                 )
+
+                # Log the failed solution
+                self._log_to_main_log(
+                    model_path,
+                    context_size,
+                    "SOLUTION",
+                    f"success=False, load_failed=True, error={str(e)[:50]}",
+                )
+
                 self._log_result(log_path, result)
                 return result  # Don't retry load errors
 
@@ -226,6 +270,15 @@ class ContextTester:
                     prompt=self.test_prompt,
                     error=str(e),
                 )
+
+                # Log the failed inference
+                self._log_to_main_log(
+                    model_path,
+                    context_size,
+                    "SOLUTION",
+                    f"success=False, inference_failed=True, error={str(e)[:50]}",
+                )
+
                 self._log_result(log_path, result)
                 return result
 
@@ -247,6 +300,15 @@ class ContextTester:
             load_success=False,
             error="All retry attempts failed",
         )
+
+        # Log the failed attempt
+        self._log_to_main_log(
+            model_path,
+            context_size,
+            "SOLUTION",
+            "success=False, all_retries_failed=True",
+        )
+
         self._log_result(log_path, result)
         return result
 
@@ -364,16 +426,22 @@ class ContextTester:
                 save_model_registry(registry)
                 return model
             # Threshold < declared limit, try incremental increases
-            print("\nPhase 3: Testing higher contexts (increment by 10,240)...")
+            print("\nPhase 3: Testing higher contexts...")
             if self.verbose:
                 logger.info("[Phase 3] Threshold test passed, testing higher contexts...")
-                logger.info(f"[Phase 3] Will increment by 10,240 tokens up to {declared_limit:,}")
+                logger.info(f"[Phase 3] Will use progressive strategy up to {declared_limit:,}")
 
             current_context = test_context
-            increment = 10240
 
             while current_context < declared_limit:
-                next_context = min(current_context + increment, declared_limit)
+                # Use the same strategy as batch testing:
+                # Double until threshold, then add 10%
+                if current_context < max_context:  # max_context is the threshold
+                    next_context = current_context * 2
+                else:
+                    next_context = int(current_context * 1.1)
+
+                next_context = min(next_context, declared_limit)
                 print(f"  → Testing context size: {next_context:,} tokens...")
 
                 if self.verbose:
@@ -621,14 +689,36 @@ class ContextTester:
             # Check if model has model_type field indicating it's an embedding model
             return bool(hasattr(model, "model_type") and model.model_type == "embedding")
 
-        llm_models = [m for m in models if not is_embedding_model(m)]
+        # Filter out embedding models and already completed models
+        llm_models = []
+        skipped_completed = 0
+        for m in models:
+            if is_embedding_model(m):
+                continue
+            # Skip if already completed and at declared limit
+            if (
+                m.context_test_status == ContextTestStatus.COMPLETED
+                and m.tested_max_context
+                and m.tested_max_context >= m.context_limit
+            ):
+                skipped_completed += 1
+                logger.info(
+                    f"Skipping {m.id} - already tested to declared limit ({m.tested_max_context:,} tokens)",
+                )
+                continue
+            llm_models.append(m)
 
-        if len(llm_models) != len(models):
-            excluded_count = len(models) - len(llm_models)
+        if len(models) - len(llm_models) - skipped_completed > 0:
+            excluded_count = len(models) - len(llm_models) - skipped_completed
             logger.info(f"Excluded {excluded_count} embedding models from context testing")
 
+        if skipped_completed > 0:
+            logger.info(f"Skipped {skipped_completed} already completed models")
+
         if not llm_models:
-            logger.warning("No LLM models found for testing (only embedding models)")
+            logger.warning(
+                "No models need testing (all are either embedding models or already completed)",
+            )
             return []
 
         # Load registry if not provided
@@ -654,6 +744,15 @@ class ContextTester:
                 continue
 
             print(f"[{i}/{len(sorted_models)}] Testing {model.id}...")
+
+            # Check if model has already been tested at a higher context
+            if model.last_known_good_context and model.last_known_good_context >= min_context:
+                print(
+                    f"  ⏭️  Skipping - already tested successfully at {model.last_known_good_context:,} tokens",
+                )
+                # Keep the model active for higher context testing
+                updated_models.append(model)
+                continue
 
             # Add delay to prevent rapid model switching in batch mode
             if i > 1:  # Skip delay for first model
@@ -707,24 +806,29 @@ class ContextTester:
         while active_models and current_context < max(
             m.context_limit for m in active_models.values()
         ):
-            # Determine next context size
-            # For pass 2, use threshold; for later passes, increment
-            if pass_num == 2:
-                # Pass 2: Test at threshold
-                next_contexts = {}
-                for model_id, model in active_models.items():
-                    next_contexts[model_id] = min(threshold, model.context_limit)
-            else:
-                # Later passes: Increment by 10240 or to declared limit
-                next_contexts = {}
-                for model_id, model in active_models.items():
-                    if model.last_known_good_context >= model.context_limit:
-                        # Already at declared limit
-                        continue
-                    next_contexts[model_id] = min(
-                        model.last_known_good_context + 10240,
-                        model.context_limit,
-                    )
+            # Determine next context size using new strategy:
+            # - Double until we exceed threshold
+            # - Then add 10% each time
+            next_contexts = {}
+            for model_id, model in active_models.items():
+                if model.last_known_good_context >= model.context_limit:
+                    # Already at declared limit
+                    continue
+
+                # Determine next context size based on threshold
+                if model.last_known_good_context < threshold:
+                    # Below threshold: double the context
+                    next_context = model.last_known_good_context * 2
+                else:
+                    # Above threshold: add 10%
+                    next_context = int(model.last_known_good_context * 1.1)
+
+                # Ensure we don't exceed the declared limit
+                next_context = min(next_context, model.context_limit)
+
+                # Only add if there's room to grow
+                if next_context > model.last_known_good_context:
+                    next_contexts[model_id] = next_context
 
             if not next_contexts:
                 break

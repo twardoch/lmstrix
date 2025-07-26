@@ -37,7 +37,9 @@ Project Structure:
 │   ├── 📄 203.txt
 │   ├── 📄 204.txt
 │   ├── 📄 205.txt
-│   └── 📄 206.txt
+│   ├── 📄 206.txt
+│   ├── 📄 207.txt
+│   └── 📄 208.txt
 ├── 📁 obsolete
 │   ├── 📄 llama-cli.sh
 │   ├── 📄 lmsm.json
@@ -5276,13 +5278,107 @@ KeyboardInterrupt
 </document>
 
 <document index="45">
+<source>issues/207.txt</source>
+<document_content>
+WHen I do:
+
+
+```
+Othello:~ adam$ lmstrix list --sort dtx
+```
+
+I get: 
+
+```
+                                                     LM Studio Models
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃                                          ┃ Size     ┃ Declared   ┃ Tested     ┃ Last       ┃ Last       ┃              ┃
+┃ Model ID                                 ┃ (GB)     ┃ Ctx        ┃ Ctx        ┃ Good       ┃ Bad        ┃ Status       ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━━┩
+│ text-embedding-nomic-embed-text-v2       │ 0.48     │ 2,048      │ -          │ -          │ -          │ Untested     │
+│ text-embedding-nomic-embed-text-v1.5     │ 0.08     │ 2,048      │ -          │ -          │ -          │ Untested     │
+│ comedy_13b_dpo                           │ 9.95     │ 4,096      │ 4,096      │ 4,096      │ -          │ ✓ Tested     │
+│ text-embedding-mxbai-embed-xsmall-v1-i1  │ 0.03     │ 4,096      │ -          │ -          │ -          │ Untested     │
+│ j.a.r.v.i.s-v2.0                         │ 7.95     │ 8,192      │ 8,192      │ 8,192      │ -          │ ✓ Tested     │
+│ meta-llama-3-8b-instruct                 │ 7.95     │ 8,192      │ 8,192      │ 8,192      │ -          │ ✓ Tested     │
+│ text-embedding-qwen3-embedding-0.6b      │ 0.26     │ 32,768     │ -          │ -          │ -          │ Untested     │
+│ qwensummarizer3.0                        │ 3.06     │ 32,768     │ 32,768     │ 32,768     │ -          │ ✓ Tested     │
+│ mistral-small-24b-instruct-2501-writer-… │ 9.69     │ 32,768     │ 32,768     │ 32,768     │ -          │ ✓ Tested     │
+│ comicbot_v.2                             │ 5.53     │ 32,768     │ 32,768     │ 32,768     │ -          │ ✓ Tested     │
+│ mistral-7b-sarcasm-scrolls-v2            │ 7.17     │ 32,768     │ 32,768     │ 32,768     │ -          │ ✓ Tested     │
+│ mlabonne_qwen3-14b-abliterated           │ 10.24    │ 40,960     │ 40,960     │ 40,960     │ -          │ ✓ Tested     │
+│ smoothie-qwen3-14b-i1                    │ 9.79     │ 40,960     │ 40,960     │ 40,960     │ -          │ ✓ Tested     │
+│ llama-3-8b-instruct-64k                  │ 7.95     │ 64,000     │ 2,048      │ 2,048      │ 64,000     │ ✓ Tested     │
+│ llama-3-soliloquy-8b-v1.5-64k-i          │ 6.14     │ 65,536     │ 2,048      │ 2,048      │ 65,536     │ ✓ Tested     │
+│ smollm3-3b@q4_k_m                        │ 1.78     │ 65,536     │ 65,536     │ 65,536     │ -          │ ✓ Tested     │
+│ smollm3-3b@q8_0                          │ 3.05     │ 65,536     │ 65,536     │ 65,536     │ -          │ ✓ Tested     │
+│ meta-llama-3-8b-instruct-64k             │ 7.95     │ 65,536     │ 2,048      │ 2,048      │ 65,536     │ ✓ Tested     │
+│ jina-embeddings-v4-text-retrieval@q3_k_m │ 1.48     │ 128,000    │ -          │ -          │ -          │ Untested     │
+│ jina-embeddings-v4-text-retrieval@q8_0   │ 3.06     │ 128,000    │ -          │ -          │ -          │ Untested     │
+│ qwen/qwen2.5-vl-7b                       │ 8.80     │ 128,000    │ 102,400    │ 102,400    │ -          │ Testing...   │
+│ prithivmlmods.llama-chat-summary-3.2-3b  │ 3.19     │ 131,072    │ 102,400    │ 102,400    │ -          │ Testing...   │
+│ lucy-128k                                │ 1.71     │ 131,072    │ 102,400    │ 102,400    │ -          │ Testing...   │
+│ dream-org_dream-v0-instruct-7b           │ 2.59     │ 131,072    │ 102,400    │ 102,400    │ -          │ Testing...   │
+│ llama-3.2-3b-instruct                    │ 1.80     │ 131,072    │ 2,048      │ 2,048      │ 102,400    │ ✓ Tested     │
+│ deepseek-r1-distill-qwen-14b             │ 8.37     │ 131,072    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ llama-3.1-8b-sarcasm@q3_k_l              │ 4.03     │ 131,072    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ llama-3.1-8b-sarcasm@q4_k_s              │ 4.37     │ 131,072    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ llama-3.1-8b-sarcasm@q5_k_s              │ 5.21     │ 131,072    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ llama-3.1-8b-sarcasm@q6_k                │ 6.14     │ 131,072    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ llama-3.1-8b-sarcasm@q8_0                │ 7.95     │ 131,072    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ qwen2.5-microsoft-nextcoder-brainstorm2… │ 7.79     │ 131,072    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ rei-24b-kto                              │ 10.69    │ 131,072    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ sarcasmll-1b                             │ 1.23     │ 131,072    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ ultron-summarizer-1b                     │ 0.60     │ 131,072    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ ultron-summarizer-8b                     │ 7.95     │ 131,072    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ nazareai-senior-marketing-strategist     │ 3.19     │ 131,072    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ qwen3-14b-128k                           │ 9.82     │ 131,072    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ qwen3-8b-128k                            │ 6.98     │ 131,072    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ smollm3-3b-128k                          │ 0.89     │ 131,072    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ summllama3.1-8b                          │ 7.95     │ 131,072    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ qwen3-8b-256k-context-8x-grand@q3_k_m    │ 3.84     │ 262,144    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ qwen3-8b-256k-context-8x-grand@q4_k_m    │ 4.68     │ 262,144    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ qwen3-8b-256k-context-8x-grand@q5_k_m    │ 5.45     │ 262,144    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ qwen3-8b-256k-context-8x-grand-i1@iq1_s  │ 1.97     │ 262,144    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ qwen3-8b-256k-context-8x-grand-i1@iq2_m  │ 2.84     │ 262,144    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ qwen3-8b-256k-context-8x-grand-i1@iq4_xs │ 4.25     │ 262,144    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ qwen3-8b-256k-context-8x-grand-i1@q6_k   │ 6.26     │ 262,144    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ qwen3-8b-320k-context-10x-massive        │ 8.11     │ 327,680    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ princeton-nlp.llama-3-8b-prolong-512k-i… │ 7.95     │ 524,288    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ megabeam-mistral-7b-512k                 │ 7.17     │ 524,288    │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ ward-12b-model_stock-i1                  │ 7.93     │ 1,024,000  │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ llama3-8b-darkidol-2.1-uncensored-1048k… │ 3.05     │ 1,048,576  │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ llama-3-8b-instruct-gradient-1048k       │ 3.41     │ 1,048,576  │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ wemake-llama-3-8b-instruct-v41-1048k     │ 7.95     │ 1,048,576  │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ granite-4.0-tiny-preview                 │ 6.62     │ 1,048,576  │ 2,048      │ 2,048      │ -          │ Testing...   │
+│ llama-3.1-1-million-ctx-deephermes-deep… │ 3.41     │ 1,073,152  │ 2,048      │ 2,048      │ -          │ Testing...   │
+└──────────────────────────────────────────┴──────────┴────────────┴────────────┴────────────┴────────────┴──────────────┘
+Othello:~ adam$
+```
+
+Double-check and analyze the code and make sure that: 
+
+- When we do "test", the tool MUST write a simple log of ATTEMPTS and SOLUTIONS for each context size and model. The log should be written as simple lines in the LMStudio folder as `lmstrix.log.txt`
+- When we do "test", the tool must RESUME the testing (skip the combinations that have actually been tested)
+
+</document_content>
+</document>
+
+<document index="46">
+<source>issues/208.txt</source>
+<document_content>
+When we do "lmstrix test", the tool MUST write a simple log of ATTEMPTS (before loading the model) and SOLUTIONS (after an inference has been done) — for each context size and model. The log should be written as simple lines in the LMStudio folder as `lmstrix.log.txt`. It currently does not. 
+</document_content>
+</document>
+
+<document index="47">
 <source>obsolete/llama-cli.sh</source>
 <document_content>
 llama-cli -m "mradermacher/llama-3.1-8b-sarcasm-GGUF/llama-3.1-8b-sarcasm.Q8_0.gguf" -fa -c 5000 -p "Capital of Poland? In one word: "
 </document_content>
 </document>
 
-<document index="46">
+<document index="48">
 <source>obsolete/lmsm.json</source>
 <document_content>
 {
@@ -5371,7 +5467,7 @@ def list((self, all_rescan: bool = False, failed_rescan: bool = False)) -> None:
     """List all models in LMStudio"""
 
 
-<document index="47">
+<document index="49">
 <source>obsolete/lodels.err.txt</source>
 <document_content>
 D Found local API server at ws://127.0.0.1:41343
@@ -6824,7 +6920,7 @@ I To set a custom identifier, use the --identifier <identifier> option.
 </document_content>
 </document>
 
-<document index="48">
+<document index="50">
 <source>obsolete/lodels.log.txt</source>
 <document_content>
 [?25l[s[2K
@@ -14355,7 +14451,7 @@ I To set a custom identifier, use the --identifier <identifier> option.
 </document_content>
 </document>
 
-<document index="49">
+<document index="51">
 <source>obsolete/lodels.sh</source>
 <document_content>
 #!/usr/bin/env bash
@@ -14368,7 +14464,7 @@ done
 </document_content>
 </document>
 
-<document index="50">
+<document index="52">
 <source>prompt.txt</source>
 <document_content>
 This is a prompt from a file.
@@ -14376,7 +14472,7 @@ This is a prompt from a file.
 </document_content>
 </document>
 
-<document index="51">
+<document index="53">
 <source>pyproject.toml</source>
 <document_content>
 [build-system]
@@ -14697,7 +14793,7 @@ directory = "htmlcov"
 </document_content>
 </document>
 
-<document index="52">
+<document index="54">
 <source>pytest.ini</source>
 <document_content>
 [pytest]
@@ -14934,16 +15030,19 @@ def __init__((self, config_name: str, reason: str, details: dict | None = None))
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py
 # Language: python
 
+from datetime import datetime
 import fire
 from rich.console import Console
 from rich.table import Table
 from lmstrix.core.context_tester import ContextTester
 from lmstrix.core.inference import InferenceEngine
+from lmstrix.core.models import ContextTestStatus
 from lmstrix.loaders.model_loader import (
     load_model_registry,
+    save_model_registry,
     scan_and_update_registry,
 )
-from lmstrix.utils import setup_logging
+from lmstrix.utils import get_context_test_log_path, setup_logging
 
 class LMStrixCLI:
     """A CLI for testing and managing LM Studio models."""
@@ -14956,6 +15055,7 @@ class LMStrixCLI:
         model_id: str | None = None,
         all: bool = False,
         threshold: int = 102400,
+        ctx: int | None = None,
         verbose: bool = False,
     )) -> None:
         """Test the context limits for models."""
@@ -14980,6 +15080,7 @@ def test((
         model_id: str | None = None,
         all: bool = False,
         threshold: int = 102400,
+        ctx: int | None = None,
         verbose: bool = False,
     )) -> None:
     """Test the context limits for models."""
@@ -15103,7 +15204,7 @@ from lmstrix.api import LMStudioClient
 from lmstrix.api.exceptions import ModelLoadError
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 from lmstrix.loaders.model_loader import load_model_registry, save_model_registry
-from lmstrix.utils import get_context_test_log_path
+from lmstrix.utils import get_context_test_log_path, get_lmstrix_log_path
 
 class ContextTestResult:
     """Result of a context test attempt."""
@@ -15128,6 +15229,10 @@ class ContextTester:
         """Initialize context tester."""
     def _log_result((self, log_path: Path, result: ContextTestResult)) -> None:
         """Append test result to log file."""
+    def _log_to_main_log((
+        self, model_id: str, context_size: int, event_type: str, details: str = "",
+    )) -> None:
+        """Log attempt or solution to the main lmstrix.log.txt file."""
     def _test_at_context((
         self,
         model_path: str,
@@ -15173,6 +15278,11 @@ def __init__((self, client: LMStudioClient | None = None, verbose: bool = False)
 
 def _log_result((self, log_path: Path, result: ContextTestResult)) -> None:
     """Append test result to log file."""
+
+def _log_to_main_log((
+        self, model_id: str, context_size: int, event_type: str, details: str = "",
+    )) -> None:
+    """Log attempt or solution to the main lmstrix.log.txt file."""
 
 def _test_at_context((
         self,
@@ -15642,7 +15752,7 @@ def save_prompts((
     """Save prompts to a TOML file."""
 
 
-<document index="53">
+<document index="55">
 <source>src/lmstrix/py.typed</source>
 <document_content>
 # This file indicates that the package supports type hints
@@ -15660,6 +15770,7 @@ from lmstrix.utils.paths import (
     get_contexts_dir,
     get_default_models_file,
     get_lmstrix_data_dir,
+    get_lmstrix_log_path,
     get_lmstudio_path,
     get_prompts_dir,
 )
@@ -15701,6 +15812,9 @@ def get_prompts_dir(()) -> Path:
 
 def get_contexts_dir(()) -> Path:
     """Get the directory for contexts."""
+
+def get_lmstrix_log_path(()) -> Path:
+    """Get the path to the lmstrix.log.txt file."""
 
 
 # File: /Users/Shared/lmstudio/lmstrix/test_lmstudio.py
@@ -16742,7 +16856,7 @@ def test_get_default_models_file_path((mock_get_lmstudio_path)) -> None:
     """ Ensures the models file path is correctly constructed inside the LM Studio dir...."""
 
 
-<document index="54">
+<document index="56">
 <source>verbose_output_example.txt</source>
 <document_content>
 # Example Verbose Output for `lmstrix test llama-3.2-3b-instruct --verbose`

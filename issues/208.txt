@@ -1,0 +1,1 @@
+When we do "lmstrix test", the tool MUST write a simple log of ATTEMPTS (before loading the model) and SOLUTIONS (after an inference has been done) — for each context size and model. The log should be written as simple lines in the LMStudio folder as `lmstrix.log.txt`. It currently does not. 
