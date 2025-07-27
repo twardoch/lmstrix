@@ -7,7 +7,7 @@ from loguru import logger
 from pydantic import BaseModel, Field
 
 from lmstrix.api.client import LMStudioClient
-from lmstrix.api.exceptions import ModelNotFoundError
+from lmstrix.api.exceptions import InferenceError, ModelLoadError, ModelNotFoundError
 from lmstrix.core.models import ModelRegistry
 
 

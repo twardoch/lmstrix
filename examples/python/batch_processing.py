@@ -2,6 +2,7 @@
 import time
 
 from lmstrix.api.client import LmsClient
+from lmstrix.api.exceptions import InferenceError, ModelLoadError
 
 
 def main() -> None:
@@ -38,7 +39,7 @@ def main() -> None:
                     f"Max context: {result}. "
                     f"Time taken: {end_time - start_time:.2f}s",
                 )
-            except Exception as e:
+            except (ModelLoadError, InferenceError) as e:
                 print(f"Could not test model {model.id}. Error: {e}")
         else:
             print(

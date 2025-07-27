@@ -53,16 +53,60 @@ class TestLMStudioClient:
     @patch("lmstrix.api.client.lmstudio")
     def test_list_models_success(self: "TestLMStudioClient", mock_lmstudio: Mock) -> None:
         """Test successful list_models call."""
-        mock_models = [
-            {"id": "model1", "size_bytes": 1000},
-            {"id": "model2", "size_bytes": 2000},
-        ]
-        mock_lmstudio.list_downloaded_models.return_value = mock_models
+        mock_model_info1 = Mock(
+            model_key="model1",
+            path="/path/to/model1",
+            size_bytes=1000,
+            max_context_length=4096,
+            display_name="Model One",
+            architecture="llama",
+            trainedForToolUse=False,
+            vision=False,
+            type="llm",
+        )
+        mock_model_info2 = Mock(
+            model_key="model2",
+            path="/path/to/model2",
+            size_bytes=2000,
+            max_context_length=8192,
+            display_name="Model Two",
+            architecture="mistral",
+            trainedForToolUse=True,
+            vision=False,
+            type="llm",
+        )
+        mock_model1 = Mock(info=mock_model_info1)
+        mock_model2 = Mock(info=mock_model_info2)
+        mock_lmstudio.list_downloaded_models.return_value = [mock_model1, mock_model2]
 
         client = LMStudioClient()
         result = client.list_models()
 
-        assert result == mock_models
+        expected_result = [
+            {
+                "id": "model1",
+                "path": "/path/to/model1",
+                "size_bytes": 1000,
+                "context_length": 4096,
+                "display_name": "Model One",
+                "architecture": "llama",
+                "has_tools": False,
+                "has_vision": False,
+                "model_type": "llm",
+            },
+            {
+                "id": "model2",
+                "path": "/path/to/model2",
+                "size_bytes": 2000,
+                "context_length": 8192,
+                "display_name": "Model Two",
+                "architecture": "mistral",
+                "has_tools": True,
+                "has_vision": True,
+                "model_type": "llm",
+            },
+        ]
+        assert result == expected_result
         mock_lmstudio.list_downloaded_models.assert_called_once()
 
     @patch("lmstrix.api.client.lmstudio")
@@ -89,7 +133,7 @@ class TestLMStudioClient:
         assert result == mock_llm
         mock_lmstudio.llm.assert_called_once_with(
             "test-model",
-            config={"context_length": 4096},
+            config={"contextLength": 4096, "flashAttention": True},
         )
 
     @patch("lmstrix.api.client.lmstudio")
@@ -141,7 +185,7 @@ class TestLMStudioClient:
 
         client = LMStudioClient()
         with pytest.raises(InferenceError) as exc_info:
-            await client.acompletion(mock_llm, "test prompt")
+            client.completion(mock_llm, "test prompt")
 
         assert "test-model" in str(exc_info.value)
         assert "Inference failed" in str(exc_info.value)
@@ -156,7 +200,7 @@ class TestLMStudioClient:
         mock_llm.complete = AsyncMock(return_value=mock_completion_response)
 
         client = LMStudioClient()
-        await client.acompletion(mock_llm, "Hello")
+        await client.completion(mock_llm, "Hello")
 
         mock_llm.complete.assert_called_once_with(
             "Hello",

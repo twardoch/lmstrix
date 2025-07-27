@@ -11,7 +11,9 @@ class TestModelScanner:
 
     @patch("lmstrix.core.scanner.get_lmstudio_path")
     def test_scanner_initialization(
-        self: "TestModelScanner", mock_get_path: Mock, tmp_path: Path
+        self: "TestModelScanner",
+        mock_get_path: Mock,
+        tmp_path: Path,
     ) -> None:
         """Test scanner initialization."""
         mock_lms_path = tmp_path / "lmstudio"
@@ -151,7 +153,9 @@ class TestModelScanner:
 
     @patch("lmstrix.core.scanner.get_lmstudio_path")
     def test_sync_with_registry(
-        self: "TestModelScanner", mock_get_path: Mock, tmp_path: Path
+        self: "TestModelScanner",
+        mock_get_path: Mock,
+        tmp_path: Path,
     ) -> None:
         """Test syncing scanned models with registry."""
         # Set up mock LM Studio directory

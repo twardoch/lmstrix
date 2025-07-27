@@ -38,7 +38,8 @@ class TestPathUtilities:
         assert result == lms_path
 
     def test_get_lmstudio_path_fallback_locations(
-        self: "TestPathUtilities", tmp_path: Path
+        self: "TestPathUtilities",
+        tmp_path: Path,
     ) -> None:
         """Test fallback to common LM Studio locations."""
         home_dir = tmp_path / "home"

@@ -10,7 +10,7 @@ from rich.table import Table
 
 from lmstrix.core.context_tester import ContextTester
 from lmstrix.core.inference import InferenceEngine
-from lmstrix.core.models import ContextTestStatus
+from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 from lmstrix.loaders.model_loader import (
     load_model_registry,
     save_model_registry,
@@ -22,12 +22,14 @@ console = Console()
 
 
 def _get_models_to_test(
-    registry: "ModelRegistry",
+    registry: ModelRegistry,
     test_all: bool,
     ctx: int | None,
     model_id: str | None,
-) -> list["Model"]:
+) -> list[Model]:
     """Filter and return a list of models to be tested."""
+    tester = ContextTester()  # Create a temporary tester for _is_embedding_model
+
     if not test_all:
         if not model_id:
             console.print("[red]Error: You must specify a model ID or use the --all flag.[/red]")
@@ -36,11 +38,23 @@ def _get_models_to_test(
         if not model:
             console.print(f"[red]Error: Model '{model_id}' not found in registry.[/red]")
             return []
+        if tester._is_embedding_model(model):
+            console.print(
+                f"[red]Error: Model '{model_id}' is an embedding model and cannot be tested as an LLM.[/red]",
+            )
+            return []
         return [model]
 
-    if ctx is not None:
-        models_to_test = []
-        for m in registry.list_models():
+    all_models = registry.list_models()
+    models_to_test = []
+    skipped_embedding = 0
+
+    for m in all_models:
+        if tester._is_embedding_model(m):
+            skipped_embedding += 1
+            continue
+
+        if ctx is not None:
             if m.context_test_status.value == "completed":
                 continue
             if ctx > m.context_limit:
@@ -48,27 +62,30 @@ def _get_models_to_test(
             if m.last_known_bad_context and ctx >= m.last_known_bad_context:
                 continue
             models_to_test.append(m)
+        elif m.context_test_status.value != "completed":
+            models_to_test.append(m)
 
-        if not models_to_test:
+    if skipped_embedding > 0:
+        console.print(
+            f"[yellow]Excluded {skipped_embedding} embedding models from testing.[/yellow]",
+        )
+
+    if not models_to_test:
+        if ctx is not None:
             console.print(
-                "[yellow]No models to test at the specified context size.[/yellow]",
+                "[yellow]No LLM models found to test at the specified context size.[/yellow]",
             )
             console.print(
                 "[dim]Models may already be tested or context exceeds their limits.[/dim]",
             )
-        return models_to_test
-
-    models_to_test = [
-        m for m in registry.list_models() if m.context_test_status.value != "completed"
-    ]
-    if not models_to_test:
-        console.print(
-            "[green]All models have already been successfully tested.[/green]",
-        )
+        else:
+            console.print(
+                "[green]All LLM models have already been successfully tested.[/green]",
+            )
     return models_to_test
 
 
-def _sort_models(models: list["Model"], sort_by: str) -> list["Model"]:
+def _sort_models(models: list[Model], sort_by: str) -> list[Model]:
     """Sort a list of models based on a given key."""
     sort_key = sort_by.lower()
     reverse = sort_key.endswith("d") and len(sort_key) > 1
@@ -88,10 +105,10 @@ def _sort_models(models: list["Model"], sort_by: str) -> list["Model"]:
 
 
 def _test_single_model(
-    tester: "ContextTester",
-    model: "Model",
+    tester: ContextTester,
+    model: Model,
     ctx: int,
-    registry: "ModelRegistry",
+    registry: ModelRegistry,
 ) -> None:
     """Test a single model at a specific context size."""
     if ctx > model.context_limit:
@@ -144,11 +161,11 @@ def _test_single_model(
 
 
 def _test_all_models_at_ctx(
-    tester: "ContextTester",
-    models_to_test: list["Model"],
+    tester: ContextTester,
+    models_to_test: list[Model],
     ctx: int,
-    registry: "ModelRegistry",
-) -> list["Model"]:
+    registry: ModelRegistry,
+) -> list[Model]:
     """Test all models at a specific context size."""
     console.print(
         f"[bold]Testing {len(models_to_test)} models at context size {ctx:,}[/bold]\n",
@@ -192,11 +209,11 @@ def _test_all_models_at_ctx(
 
 
 def _test_all_models_optimized(
-    tester: "ContextTester",
-    models_to_test: list["Model"],
+    tester: ContextTester,
+    models_to_test: list[Model],
     threshold: int,
-    registry: "ModelRegistry",
-) -> list["Model"]:
+    registry: ModelRegistry,
+) -> list[Model]:
     """Run optimized batch testing for multiple models."""
     console.print(
         f"[bold]Starting optimized batch testing for {len(models_to_test)} models[/bold]",
@@ -210,7 +227,7 @@ def _test_all_models_optimized(
     )
 
 
-def _print_final_results(updated_models: list["Model"]) -> None:
+def _print_final_results(updated_models: list[Model]) -> None:
     """Print the final results table."""
     print(f"\n{'=' * 60}")
     print("Final Results:")
@@ -365,7 +382,7 @@ class LMStrixCLI:
         self,
         model_id: str | None = None,
         test_all: bool = False,
-        threshold: int = 102400,
+        threshold: int = 31744,
         ctx: int | None = None,
         sort: str = "id",
         verbose: bool = False,
@@ -384,11 +401,23 @@ class LMStrixCLI:
         setup_logging(verbose=verbose)
         registry = load_model_registry(verbose=verbose)
 
+        if test_all and model_id:
+            console.print("[red]Error: Cannot use --all and specify a model ID together.[/red]")
+            return
+
         models_to_test = _get_models_to_test(registry, test_all, ctx, model_id)
         if not models_to_test:
             return
 
         if test_all:
+            # Filter out embedding models for --all flag
+            tester = ContextTester(verbose=verbose)
+            models_to_test = tester._filter_models_for_testing(models_to_test)
+            if not models_to_test:
+                console.print(
+                    "[yellow]No LLM models found to test after filtering embedding models.[/yellow]",
+                )
+                return
             models_to_test = _sort_models(models_to_test, sort)
 
         tester = ContextTester(verbose=verbose)

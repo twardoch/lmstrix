@@ -279,6 +279,7 @@ filterwarnings = [
   "error",
   "ignore::DeprecationWarning",
   "ignore::PendingDeprecationWarning",
+  "ignore:Benchmarks are automatically disabled",
 ]
 asyncio_mode = "auto"
 markers = [

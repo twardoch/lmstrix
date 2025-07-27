@@ -5,6 +5,7 @@ from pathlib import Path
 from loguru import logger
 
 from lmstrix.api.client import LMStudioClient
+from lmstrix.api.exceptions import APIConnectionError
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 from lmstrix.utils.paths import get_default_models_file
 

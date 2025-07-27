@@ -1,5 +1,6 @@
 # examples/python/basic_usage.py
 from lmstrix.api.client import LmsClient
+from lmstrix.api.exceptions import InferenceError, ModelLoadError
 
 
 def main() -> None:
@@ -45,7 +46,7 @@ def main() -> None:
         for chunk in response_generator:
             print(chunk, end="", flush=True)
         print()
-    except Exception as e:
+    except (ModelLoadError, InferenceError) as e:
         print(f"\nAn error occurred during inference: {e}")
 
 

@@ -127,71 +127,64 @@ class TestModelLoader:
         assert "model1" in data["llms"]
 
     @patch("lmstrix.loaders.model_loader.LMStudioClient")
-    @patch("lmstrix.loaders.model_loader.ModelScanner")
+    @patch("lmstrix.loaders.model_loader.load_model_registry")
+    @patch("lmstrix.loaders.model_loader.save_model_registry")
     def test_scan_and_update_models(
         self: "TestModelLoader",
-        mock_scanner_class: Mock,
+        mock_save_registry: Mock,
+        mock_load_registry: Mock,
         mock_client_class: Mock,
         tmp_path: Path,
     ) -> None:
         """Test scanning and updating models."""
         # Set up mocks
         mock_client = Mock()
+        mock_client.list_models.return_value = [
+            {
+                "id": "new-model",
+                "path": "/path/to/new-model.gguf",
+                "size_bytes": 2000000,
+                "context_length": 8192,
+            },
+        ]
         mock_client_class.return_value = mock_client
-
-        mock_scanner = Mock()
-        mock_scanner_class.return_value = mock_scanner
-
-        # Mock scan results
-        new_model = Model(
-            id="new-model",
-            path="/path/to/new-model.gguf",
-            size_bytes=2000000,
-            ctx_in=8192,
-        )
-        removed_model = Model(
-            id="removed-model",
-            path="/path/to/removed.gguf",
-            size_bytes=1000000,
-            ctx_in=4096,
-        )
-
-        mock_scanner.sync_with_registry.return_value = ([new_model], [removed_model])
 
         # Create a registry
         registry_file = tmp_path / "models.json"
         registry = ModelRegistry(models_file=registry_file)
+        mock_load_registry.return_value = registry
 
         # Run scan
-        scan_and_update_registry(
+        updated_registry = scan_and_update_registry(
             rescan_failed=False,
             rescan_all=False,
             verbose=True,
         )
 
-        assert len(new_models) == 1
-        assert new_models[0].id == "new-model"
-        assert len(removed_models) == 1
-        assert removed_models[0].id == "removed-model"
+        assert len(updated_registry) == 1
+        assert updated_registry.get_model("/path/to/new-model.gguf") is not None
+        assert updated_registry.get_model("/path/to/new-model.gguf").id == "new-model"
 
-        # Verify scanner was called correctly
-        mock_scanner.sync_with_registry.assert_called_once_with(registry)
+        # Verify client was called correctly
+        mock_client.list_models.assert_called_once()
+        mock_save_registry.assert_called_once_with(updated_registry)
 
     @patch("lmstrix.loaders.model_loader.LMStudioClient")
-    @patch("lmstrix.loaders.model_loader.ModelScanner")
+    @patch("lmstrix.loaders.model_loader.load_model_registry")
     def test_scan_and_update_models_default_client(
         self: "TestModelLoader",
-        mock_scanner_class: Mock,
+        mock_load_registry: Mock,
         mock_client_class: Mock,
     ) -> None:
         """Test scan_and_update_models creates default client if none provided."""
-        mock_scanner = Mock()
-        mock_scanner_class.return_value = mock_scanner
-        mock_scanner.sync_with_registry.return_value = ([], [])
+        mock_client = Mock()
+        mock_client.list_models.return_value = []
+        mock_client_class.return_value = mock_client
 
-        registry = Mock()
+        registry = ModelRegistry()
+        mock_load_registry.return_value = registry
 
-        scan_and_update_models(registry=registry)
+        scan_and_update_registry()
 
         # Verify client was created
         mock_client_class.assert_called_once_with(verbose=False)

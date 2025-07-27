@@ -282,7 +282,7 @@ class LmsM(BaseModel):
                     current_processing = ""
                     live.update(render_table())
 
-                except Exception as e:
+                except RuntimeError as e:
                     error_msg = str(e)
                     failed_models.append((model_key, error_msg))
 
