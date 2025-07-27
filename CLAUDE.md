@@ -29,43 +29,45 @@ LMStrix is a Python toolkit for managing and testing LM Studio models with autom
 
 ### 2.1. Key Components
 
-1. **API Layer** (`src/lmstrix/api/`)
-   - `client.py`: Async client for LM Studio server API with retry logic
-   - `exceptions.py`: Custom exception hierarchy for better error handling
+1.  **API Layer** (`src/lmstrix/api/`)
+    -   `client.py`: Async client for LM Studio server API with retry logic using `tenacity`.
+    -   `exceptions.py`: Custom exception hierarchy for better error handling.
 
-2. **Core Engine** (`src/lmstrix/core/`)
-   - `context_tester.py`: Binary search algorithm to find optimal context window size
-   - `inference.py`: Two-phase prompt templating system (structure + content)
-   - `models.py`: Model registry with persistence for tracking tested context limits
-   - `scanner.py`: Discovers and catalogs available LM Studio models
-   - `prompts.py`: Prompt resolution and template management
+2.  **Core Engine** (`src/lmstrix/core/`)
+    -   `context_tester.py`: Binary search algorithm to find optimal context window size, with `rich` progress bar integration.
+    -   `inference.py`: Handles the inference process, including prompt building.
+    -   `models.py`: Model registry with persistence for tracking tested context limits.
+    -   `scanner.py`: Discovers and catalogs available LM Studio models.
+    -   `prompts.py`: Prompt resolution and template management.
+    -   `context.py`: Manages context, including prompt templates and token counting using `tiktoken`.
 
-3. **Loaders** (`src/lmstrix/loaders/`)
-   - `model_loader.py`: Manages model registry persistence (JSON)
-   - `prompt_loader.py`: Loads prompt templates from TOML files
-   - `context_loader.py`: Loads context data from text files
+3.  **Loaders** (`src/lmstrix/loaders/`)
+    -   `model_loader.py`: Manages model registry persistence (JSON).
+    -   `prompt_loader.py`: Loads prompt templates from TOML files.
+    -   `context_loader.py`: Loads context data from text files.
 
-4. **CLI** (`src/lmstrix/cli/`)
-   - `main.py`: Fire-based CLI with commands: `scan`, `list`, `optimize`, `infer`
-   - Uses Rich for beautiful terminal output
+4.  **CLI** (`src/lmstrix/cli/`)
+    -   `main.py`: `fire`-based CLI with commands: `scan`, `list`, `test`, `infer`.
+    -   Uses `rich` for beautiful terminal output.
 
 ### 2.2. Critical Design Patterns
 
-- **Async-First**: All API operations use async/await for high performance
-- **Retry Logic**: Uses tenacity for automatic retries with exponential backoff
-- **Model Registry**: Persists discovered models and their tested limits to JSON
-- **Two-Phase Prompts**: Separates prompt template structure from runtime context
-- **Binary Search**: Efficiently finds maximum context window through targeted testing
+-   **Async-First**: All API operations use `async/await` for high performance.
+-   **Retry Logic**: Uses `tenacity` for automatic retries with exponential backoff.
+-   **Model Registry**: Persists discovered models and their tested limits to JSON.
+-   **Two-Phase Prompts**: Separates prompt template structure from runtime context.
+-   **Binary Search**: Efficiently finds maximum context window through targeted testing.
 
 ### 2.3. Dependencies
 
-- `lmstudio>=1.4.1`: Official LM Studio Python SDK
-- `httpx`: Async HTTP client
-- `pydantic`: Data validation and models
-- `fire`: CLI framework
-- `rich`: Terminal formatting
-- `tenacity`: Retry logic
-- `tiktoken`: Token counting
+-   `lmstudio-python`: Official LM Studio Python SDK.
+-   `httpx`: Async HTTP client.
+-   `pydantic`: Data validation and models.
+-   `fire`: CLI framework.
+-   `rich`: Terminal formatting.
+-   `tenacity`: Retry logic.
+-   `tiktoken`: Token counting.
+-   `loguru`: Logging.
 
 # Software Development Rules
 

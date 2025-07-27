@@ -64,7 +64,7 @@ def main() -> None:
             for chunk in response_stream:
                 print(chunk, end="", flush=True)
             print()
-        except Exception as e:
+        except (RuntimeError, ValueError, ConnectionError) as e:
             print(f"Could not run inference on model {model.id}. Error: {e}")
 
 

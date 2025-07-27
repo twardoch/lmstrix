@@ -7,8 +7,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 from _pytest.capture import CaptureFixture
 
-from lmstrix.cli.main import LMStrixCLI as CLI
-from lmstrix.cli.main import main
+from lmstrix.cli.main import LMStrixCLI, main
 from lmstrix.core.inference import InferenceResult
 from lmstrix.core.models import Model
 from lmstrix.core.prompts import ResolvedPrompt
@@ -71,7 +70,7 @@ class TestCLIIntegration:
         # Mock Fire to call the method directly
         with patch("fire.Fire"):
             # Call the list method directly
-            cli = CLI(verbose=False)
+            cli = LMStrixCLI(verbose=False)
             cli.models.list()
 
         # Check output
@@ -108,7 +107,7 @@ class TestCLIIntegration:
         mock_scanner.sync_with_registry.return_value = ([new_model], [])
 
         # Create CLI and execute scan
-        cli = CLI(verbose=False)
+        cli = LMStrixCLI(verbose=False)
         cli.models.scan()
 
         # Verify scanner was called
@@ -147,7 +146,7 @@ class TestCLIIntegration:
             mock_tester.optimize_model = AsyncMock(return_value=optimized_model)
 
             # Create CLI and call optimize
-            cli = CLI(verbose=False)
+            cli = LMStrixCLI(verbose=False)
 
             # Need to run async method
             await cli.optimize("test-model-2")
@@ -166,7 +165,7 @@ class TestCLIIntegration:
         lms_path, registry_file = mock_lmstudio_setup
         mock_get_path.return_value = lms_path
 
-        cli = CLI(verbose=False)
+        cli = LMStrixCLI(verbose=False)
 
         # Should show error for missing prompt
         with pytest.raises(SystemExit):
@@ -213,7 +212,7 @@ class TestCLIIntegration:
         mock_engine.infer = AsyncMock(return_value=mock_result)
 
         # Run inference
-        cli = CLI(verbose=False)
+        cli = LMStrixCLI(verbose=False)
 
         await cli.infer(
             model="test-model-1",

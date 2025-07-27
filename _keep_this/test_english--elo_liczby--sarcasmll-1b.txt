@@ -1,0 +1,13 @@
+[ERROR: RPC error: 
+
+  No model found that fits the query.
+
+  Additional information from server:
+    {
+      "code": "generic.noModelMatchingQuery",
+      "loadedModelsSample": [],
+      "query": {
+        "identifier": "sarcasmll-1b"
+      },
+      "totalLoadedModels": 0
+    }]
