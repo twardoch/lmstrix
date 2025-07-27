@@ -11,7 +11,7 @@ from loguru import logger
 from lmstrix.api import LMStudioClient
 from lmstrix.api.exceptions import InferenceError, ModelLoadError
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
-from lmstrix.loaders.model_loader import load_model_registry, save_model_registry
+from lmstrix.loaders.model_loader import load_model_registry
 from lmstrix.utils import get_context_test_log_path, get_lmstrix_log_path
 
 
@@ -144,8 +144,7 @@ class ContextTester:
             model.last_known_bad_context = context_size
             # Save this pessimistic state if registry provided
             if registry:
-                registry.update_model(model.id, model)
-                save_model_registry(registry)
+                registry.update_model_by_id(model)
                 logger.debug(f"Pessimistically set last_known_bad_context to {context_size}")
 
         # Check if we're approaching previous last_known_bad_context
@@ -231,8 +230,7 @@ class ContextTester:
                     model.last_known_bad_context = previous_last_bad
                     # Save the restored state if registry provided
                     if registry:
-                        registry.update_model(model.id, model)
-                        save_model_registry(registry)
+                        registry.update_model_by_id(model)
                         logger.debug(f"Restored last_known_bad_context to {previous_last_bad}")
 
                 # Success - log and return
@@ -374,8 +372,7 @@ class ContextTester:
             model.context_test_status = ContextTestStatus.FAILED
             model.error_msg = f"Failed to load with context {min_context}: {initial_result.error}"
             model.last_known_bad_context = min_context
-            registry.update_model(model.id, model)
-            save_model_registry(registry)
+            registry.update_model_by_id(model)
             return None
 
         if not initial_result.inference_success:
@@ -384,8 +381,7 @@ class ContextTester:
             model.error_msg = f"Inference failed at context {min_context}: {initial_result.error}"
             model.loadable_max_context = min_context
             model.last_known_bad_context = min_context
-            registry.update_model(model.id, model)
-            save_model_registry(registry)
+            registry.update_model_by_id(model)
             return None
 
         model.last_known_good_context = min_context
@@ -469,8 +465,7 @@ class ContextTester:
                 model.last_known_good_context = next_context
                 model.tested_max_context = next_context
                 current_context = next_context
-                registry.update_model(model.id, model)
-                save_model_registry(registry)
+                registry.update_model_by_id(model)
 
                 if next_context >= model.context_limit:
                     model.context_test_status = ContextTestStatus.COMPLETED
@@ -585,8 +580,7 @@ class ContextTester:
                     model.loadable_max_context = max(model.loadable_max_context or 0, mid)
 
             model.tested_max_context = best_working_context
-            registry.update_model(model.id, model)
-            save_model_registry(registry)
+            registry.update_model_by_id(model)
             logger.debug(
                 f"Progress saved: good={model.last_known_good_context}, bad={model.last_known_bad_context}",
             )
@@ -691,8 +685,7 @@ class ContextTester:
 
             model.context_test_status = ContextTestStatus.TESTING
             model.context_test_date = datetime.now()
-            registry.update_model(model.id, model)
-            save_model_registry(registry)
+            registry.update_model_by_id(model)
 
             result = self._test_at_context(model.id, min_context, log_path, model, registry)
 
@@ -711,8 +704,7 @@ class ContextTester:
                 model.tested_max_context = min_context
                 print(f"  ✓ Success at {min_context:,} tokens")
 
-            registry.update_model(model.id, model)
-            save_model_registry(registry)
+            registry.update_model_by_id(model)
             updated_models.append(model)
 
         return active_models, updated_models
@@ -790,8 +782,7 @@ class ContextTester:
                     models_to_remove.append(model_id)
                     print(f"  ✗ Failed at {test_context:,} tokens - found limit")
 
-                registry.update_model(model.id, model)
-                save_model_registry(registry)
+                registry.update_model_by_id(model)
 
             for model_id in models_to_remove:
                 del active_models[model_id]
@@ -819,8 +810,7 @@ class ContextTester:
         if registry is None:
             registry = load_model_registry()
 
-        registry.update_model(model.id, model)
-        save_model_registry(registry)
+        registry.update_model_by_id(model)
 
         max_context = max_context or model.context_limit
 
@@ -851,8 +841,7 @@ class ContextTester:
                     f"✓ Model {model.id} works at declared limit {threshold_result.context_size:,}!",
                 )
                 print("  ✓ Success! Model works at declared limit.")
-                registry.update_model(model.id, model)
-                save_model_registry(registry)
+                registry.update_model_by_id(model)
                 return model
 
             self._perform_incremental_test(model, threshold_result.context_size, log_path, registry)
@@ -865,8 +854,7 @@ class ContextTester:
                 registry,
             )
 
-        registry.update_model(model.id, model)
-        save_model_registry(registry)
+        registry.update_model_by_id(model)
 
         return model
 
