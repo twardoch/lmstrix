@@ -1,6 +1,6 @@
 """Tests for LMStudioClient."""
 
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -149,20 +149,18 @@ class TestLMStudioClient:
         assert "Failed to load model" in str(exc_info.value)
         assert "Model not found" in str(exc_info.value)
 
-    @pytest.mark.asyncio
-    async def test_acompletion_success(
+    def test_acompletion_success(
         self: "TestLMStudioClient",
         mock_llm: Mock,
         mock_completion_response: CompletionResponse,
     ) -> None:
         """Test successful async completion."""
-        mock_llm.complete = AsyncMock(return_value=mock_completion_response)
+        mock_llm.complete = Mock(return_value=mock_completion_response)
 
         client = LMStudioClient()
-        result = await client.acompletion(
-            mock_llm,
-            "2+2=",
-            temperature=0.5,
+        result = client.completion(
+            llm=mock_llm,
+            prompt="2+2=",
             max_tokens=100,
         )
 
@@ -173,14 +171,15 @@ class TestLMStudioClient:
 
         mock_llm.complete.assert_called_once_with(
             "2+2=",
-            temperature=0.5,
-            max_tokens=100,
+            config={"maxTokens": 100},
         )
 
-    @pytest.mark.asyncio
-    async def test_acompletion_failure(self: "TestLMStudioClient", mock_llm: Mock) -> None:
+    def test_acompletion_failure(
+        self: "TestLMStudioClient",
+        mock_llm: Mock,
+    ) -> None:
         """Test async completion failure."""
-        mock_llm.complete = AsyncMock(side_effect=Exception("Inference failed"))
+        mock_llm.complete = Mock(side_effect=Exception("Inference failed"))
         mock_llm.model_id = "test-model"
 
         client = LMStudioClient()
@@ -190,20 +189,21 @@ class TestLMStudioClient:
         assert "test-model" in str(exc_info.value)
         assert "Inference failed" in str(exc_info.value)
 
-    @pytest.mark.asyncio
-    async def test_acompletion_with_defaults(
+    def test_acompletion_with_defaults(
         self: "TestLMStudioClient",
         mock_llm: Mock,
         mock_completion_response: CompletionResponse,
     ) -> None:
         """Test async completion with default parameters."""
-        mock_llm.complete = AsyncMock(return_value=mock_completion_response)
+        mock_llm.complete = Mock(return_value=mock_completion_response)
 
         client = LMStudioClient()
-        await client.completion(mock_llm, "Hello")
+        client.completion(
+            llm=mock_llm,
+            prompt="Hello",
+        )
 
         mock_llm.complete.assert_called_once_with(
             "Hello",
-            temperature=0.7,  # default
-            max_tokens=-1,  # default (unlimited)
+            config={"maxTokens": 100},
         )

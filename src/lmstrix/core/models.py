@@ -256,7 +256,7 @@ class ModelRegistry:
                         )
                     except ValueError:
                         logger.warning(
-                            f"Invalid context_test_status for {model_key}, resetting to untested"
+                            f"Invalid context_test_status for {model_key}, resetting to untested",
                         )
                         model_info["context_test_status"] = ContextTestStatus.UNTESTED
 
@@ -321,9 +321,11 @@ class ModelRegistry:
 
                     # Parse datetime
                     if model_info.get("context_test_date"):
-                        model_info["context_test_date"] = datetime.fromisoformat(
-                            model_info["context_test_date"],
-                        )
+                        if isinstance(model_info["context_test_date"], str):
+                            model_info["context_test_date"] = datetime.fromisoformat(
+                                model_info["context_test_date"],
+                            )
+                        # If it's already a datetime object, leave it as is
 
                     model = Model(**model_info)
 
@@ -404,7 +406,7 @@ class ModelRegistry:
 
         if invalid_models:
             logger.error(
-                f"Cannot save registry: {len(invalid_models)} models failed integrity check"
+                f"Cannot save registry: {len(invalid_models)} models failed integrity check",
             )
             for model_path in invalid_models:
                 logger.error(f"  Invalid model: {model_path}")

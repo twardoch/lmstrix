@@ -13,7 +13,6 @@ from lmstrix.core.inference import InferenceEngine
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 from lmstrix.loaders.model_loader import (
     load_model_registry,
-    save_model_registry,
     scan_and_update_registry,
 )
 from lmstrix.utils import get_context_test_log_path, setup_logging
@@ -136,8 +135,7 @@ def _test_single_model(
 
     model.context_test_status = ContextTestStatus.TESTING
     model.context_test_date = datetime.now()
-    registry.update_model(model.id, model)
-    save_model_registry(registry)
+    registry.update_model_by_id(model)
 
     result = tester._test_at_context(model.id, ctx, log_path, model, registry)
 
@@ -156,8 +154,7 @@ def _test_single_model(
         model.context_test_status = ContextTestStatus.FAILED
 
     model.context_test_date = datetime.now()
-    registry.update_model(model.id, model)
-    save_model_registry(registry)
+    registry.update_model_by_id(model)
 
 
 def _test_all_models_at_ctx(
@@ -183,8 +180,7 @@ def _test_all_models_at_ctx(
 
         model.context_test_status = ContextTestStatus.TESTING
         model.context_test_date = datetime.now()
-        registry.update_model(model.id, model)
-        save_model_registry(registry)
+        registry.update_model_by_id(model)
 
         result = tester._test_at_context(model.id, ctx, log_path, model, registry)
 
@@ -201,8 +197,7 @@ def _test_all_models_at_ctx(
             model.context_test_status = ContextTestStatus.FAILED
 
         model.context_test_date = datetime.now()
-        registry.update_model(model.id, model)
-        save_model_registry(registry)
+        registry.update_model_by_id(model)
         updated_models.append(model)
 
     return updated_models
@@ -279,9 +274,33 @@ class LMStrixCLI:
             console.print("[red]Error: Cannot use --failed and --all together.[/red]")
             return
 
-        with console.status("Scanning for models..."):
-            scan_and_update_registry(rescan_failed=failed, rescan_all=scan_all, verbose=verbose)
-        console.print("[green]Model scan complete.[/green]")
+        try:
+            with console.status("Scanning for models..."):
+                registry = scan_and_update_registry(
+                    rescan_failed=failed,
+                    rescan_all=scan_all,
+                    verbose=verbose,
+                )
+
+            console.print("[green]✓ Model scan complete.[/green]")
+
+            # Show summary of what was found
+            models = registry.list_models()
+            if models:
+                console.print(f"[blue]Found {len(models)} models in registry[/blue]")
+            else:
+                console.print(
+                    "[yellow]No models found. Make sure LM Studio is running "
+                    "and has models downloaded.[/yellow]",
+                )
+
+        except Exception as e:
+            console.print(f"[red]✗ Scan failed: {e}[/red]")
+            console.print("[yellow]Check that LM Studio is running and accessible.[/yellow]")
+            if verbose:
+                console.print(f"[dim]Error details: {e}[/dim]")
+            return
+
         self.list()
 
     def list(self, sort: str = "id", show: str | None = None, verbose: bool = False) -> None:
@@ -498,6 +517,93 @@ class LMStrixCLI:
             )
         else:
             console.print(f"[red]Inference failed: {result.error}[/red]")
+
+    def health(self, verbose: bool = False) -> None:
+        """Check database health and backup status.
+
+        Args:
+            verbose: Enable verbose output.
+        """
+        setup_logging(verbose=verbose)
+
+        import json
+
+        from lmstrix.utils.paths import get_default_models_file
+
+        models_file = get_default_models_file()
+        console.print("[blue]Database Health Check[/blue]")
+        console.print(f"Registry file: {models_file}")
+
+        # Check if registry exists
+        if not models_file.exists():
+            console.print("[red]✗ Registry file not found[/red]")
+            return
+
+        console.print("[green]✓ Registry file exists[/green]")
+
+        # Check if registry is valid JSON
+        try:
+            with open(models_file) as f:
+                json.load(f)
+            console.print("[green]✓ Registry file is valid JSON[/green]")
+        except json.JSONDecodeError as e:
+            console.print(f"[red]✗ Registry file is corrupted: {e}[/red]")
+
+        # Load with validation
+        try:
+            registry = load_model_registry(verbose=verbose)
+            model_count = len(registry)
+            console.print(f"[green]✓ Successfully loaded {model_count} models[/green]")
+
+            # Check for validation issues
+            invalid_models = []
+            for model_path, model in registry.models.items():
+                if not model.validate_integrity():
+                    invalid_models.append(model_path)
+
+            if invalid_models:
+                console.print(
+                    f"[yellow]⚠ Found {len(invalid_models)} models with integrity issues[/yellow]",
+                )
+                if verbose:
+                    for model_path in invalid_models:
+                        console.print(f"  - {model_path}")
+            else:
+                console.print("[green]✓ All models pass integrity checks[/green]")
+
+        except Exception as e:
+            console.print(f"[red]✗ Failed to load registry: {e}[/red]")
+
+        # Check backup files
+        backup_pattern = f"{models_file.stem}.backup_*"
+        backup_files = list(models_file.parent.glob(backup_pattern))
+
+        if backup_files:
+            backup_files.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+            console.print(f"[blue]Found {len(backup_files)} backup files:[/blue]")
+
+            for _i, backup_file in enumerate(backup_files[:5]):  # Show latest 5
+                from datetime import datetime
+
+                mtime = datetime.fromtimestamp(backup_file.stat().st_mtime)
+                size_kb = backup_file.stat().st_size // 1024
+
+                # Test if backup is valid
+                try:
+                    with open(backup_file) as f:
+                        json.load(f)
+                    status = "[green]✓[/green]"
+                except:
+                    status = "[red]✗[/red]"
+
+                console.print(
+                    f"  {status} {backup_file.name} ({size_kb}KB, {mtime.strftime('%Y-%m-%d %H:%M')})",
+                )
+
+            if len(backup_files) > 5:
+                console.print(f"  ... and {len(backup_files) - 5} more")
+        else:
+            console.print("[yellow]No backup files found[/yellow]")
 
 
 def main() -> None:
