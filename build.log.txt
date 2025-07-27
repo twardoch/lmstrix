@@ -1,0 +1,1256 @@
+Running linter and formatter...
+cmd [1] | ruff check .
+_keep_this/elo_liczby.py:16:1: ERA001 Found commented-out code
+   |
+14 | # ]
+15 | # ///
+16 | # this_file: _keep_this/elo_liczby.py
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ERA001
+17 |
+18 | """
+   |
+   = help: Remove commented-out code
+
+_keep_this/elo_liczby.py:45:5: PLR0911 Too many return statements (9 > 6)
+   |
+45 | def process_text_with_model(
+   |     ^^^^^^^^^^^^^^^^^^^^^^^ PLR0911
+46 |     input_file: str,
+47 |     model_id: str | None = None,
+   |
+
+_keep_this/elo_liczby.py:45:5: PLR0912 Too many branches (24 > 12)
+   |
+45 | def process_text_with_model(
+   |     ^^^^^^^^^^^^^^^^^^^^^^^ PLR0912
+46 |     input_file: str,
+47 |     model_id: str | None = None,
+   |
+
+_keep_this/elo_liczby.py:45:5: PLR0915 Too many statements (78 > 50)
+   |
+45 | def process_text_with_model(
+   |     ^^^^^^^^^^^^^^^^^^^^^^^ PLR0915
+46 |     input_file: str,
+47 |     model_id: str | None = None,
+   |
+
+_keep_this/elo_liczby.py:148:94: COM812 [*] Trailing comma missing
+    |
+146 |         if verbose:
+147 |             console.print(
+148 |                 f"[dim]Input: {paragraph[:100]}{'...' if len(paragraph) > 100 else ''}[/dim]"
+    |                                                                                              ^ COM812
+149 |             )
+    |
+    = help: Add trailing comma
+
+_keep_this/elo_liczby.py:164:35: F541 [*] f-string without any placeholders
+    |
+162 |                 results.append(result.response.strip())
+163 |                 if verbose:
+164 |                     console.print(f"[green]✓ Success[/green]")
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+165 |             else:
+166 |                 console.print(f"[red]✗ Failed: {result.error}[/red]")
+    |
+    = help: Remove extraneous `f` prefix
+
+_keep_this/elo_liczby.py:169:16: BLE001 Do not catch blind exception: `Exception`
+    |
+167 |                 results.append(f"[ERROR: {result.error or 'Unknown error'}]")
+168 |
+169 |         except Exception as e:
+    |                ^^^^^^^^^ BLE001
+170 |             console.print(f"[red]✗ Exception: {e}[/red]")
+171 |             results.append(f"[ERROR: {e}]")
+    |
+
+_keep_this/elo_liczby.py:188:12: BLE001 Do not catch blind exception: `Exception`
+    |
+186 |         console.print(f"[green]✓ Output saved to: {output_path}[/green]")
+187 |         return str(output_path)
+188 |     except Exception as e:
+    |            ^^^^^^^^^ BLE001
+189 |         console.print(f"[red]Error writing output file: {e}[/red]")
+190 |         return ""
+    |
+
+_keep_this/lmsm.py:5:1: ERA001 Found commented-out code
+  |
+3 | # dependencies = ["lmstudio", "pydantic", "rich", "fire"]
+4 | # ///
+5 | # this_file: lmsm.py
+  | ^^^^^^^^^^^^^^^^^^^^ ERA001
+6 |
+7 | import json
+  |
+  = help: Remove commented-out code
+
+_keep_this/lmsm.py:166:9: PLR0912 Too many branches (13 > 12)
+    |
+164 |         return table
+165 |
+166 |     def update_from_lmstudio(
+    |         ^^^^^^^^^^^^^^^^^^^^ PLR0912
+167 |         self,
+168 |         all_rescan: bool = False,
+    |
+
+_keep_this/lmsm.py:166:9: PLR0915 Too many statements (56 > 50)
+    |
+164 |         return table
+165 |
+166 |     def update_from_lmstudio(
+    |         ^^^^^^^^^^^^^^^^^^^^ PLR0915
+167 |         self,
+168 |         all_rescan: bool = False,
+    |
+
+_keep_this/model_load_tester.py:15:1: ERA001 Found commented-out code
+   |
+13 | # ]
+14 | # ///
+15 | # this_file: _keep_this/model_load_tester.py
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ERA001
+16 |
+17 | """
+   |
+   = help: Remove commented-out code
+
+_keep_this/model_load_tester.py:27:20: F401 [*] `typing.Any` imported but unused
+   |
+25 | import traceback
+26 | from pathlib import Path
+27 | from typing import Any
+   |                    ^^^ F401
+28 |
+29 | import fire
+   |
+   = help: Remove unused import: `typing.Any`
+
+_keep_this/model_load_tester.py:46:9: ANN204 Missing return type annotation for special method `__init__`
+   |
+44 |     """Test different ways to load and run inference on LM Studio models."""
+45 |
+46 |     def __init__(self, verbose: bool = False):
+   |         ^^^^^^^^ ANN204
+47 |         """Initialize the tester."""
+48 |         self.verbose = verbose
+   |
+   = help: Add return type annotation: `None`
+
+_keep_this/model_load_tester.py:101:32: BLE001 Do not catch blind exception: `Exception`
+    |
+ 99 |                             if value is not None:
+100 |                                 console.print(f"  {attr}: {value}")
+101 |                         except Exception as e:
+    |                                ^^^^^^^^^ BLE001
+102 |                             console.print(f"  {attr}: [red]Error: {e}[/red]")
+    |
+
+_keep_this/model_load_tester.py:104:16: BLE001 Do not catch blind exception: `Exception`
+    |
+102 |                             console.print(f"  {attr}: [red]Error: {e}[/red]")
+103 |
+104 |         except Exception as e:
+    |                ^^^^^^^^^ BLE001
+105 |             console.print(f"[red]Error listing LM Studio models: {e}[/red]")
+106 |             console.print(f"[red]Traceback: {traceback.format_exc()}[/red]")
+    |
+
+_keep_this/model_load_tester.py:109:23: F541 [*] f-string without any placeholders
+    |
+108 |         # 2. LMStrix registry models
+109 |         console.print(f"\n[bold]2. LMStrix Registry Models:[/bold]")
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+110 |         try:
+111 |             registry = load_model_registry(verbose=self.verbose)
+    |
+    = help: Remove extraneous `f` prefix
+
+_keep_this/model_load_tester.py:128:16: BLE001 Do not catch blind exception: `Exception`
+    |
+126 |                     console.print(f"\n[dim]... and {len(models) - 5} more models[/dim]")
+127 |
+128 |         except Exception as e:
+    |                ^^^^^^^^^ BLE001
+129 |             console.print(f"[red]Error loading LMStrix registry: {e}[/red]")
+130 |             console.print(f"[red]Traceback: {traceback.format_exc()}[/red]")
+    |
+
+_keep_this/model_load_tester.py:132:9: PLR0912 Too many branches (16 > 12)
+    |
+130 |             console.print(f"[red]Traceback: {traceback.format_exc()}[/red]")
+131 |
+132 |     def test_model_loading_methods(self, test_model_index: int = 0) -> None:
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^ PLR0912
+133 |         """Test different methods to load a specific model."""
+134 |         console.print(f"[bold cyan]🧪 TESTING MODEL LOADING METHODS[/bold cyan]\n")
+    |
+
+_keep_this/model_load_tester.py:132:9: PLR0915 Too many statements (53 > 50)
+    |
+130 |             console.print(f"[red]Traceback: {traceback.format_exc()}[/red]")
+131 |
+132 |     def test_model_loading_methods(self, test_model_index: int = 0) -> None:
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^ PLR0915
+133 |         """Test different methods to load a specific model."""
+134 |         console.print(f"[bold cyan]🧪 TESTING MODEL LOADING METHODS[/bold cyan]\n")
+    |
+
+_keep_this/model_load_tester.py:134:23: F541 [*] f-string without any placeholders
+    |
+132 |     def test_model_loading_methods(self, test_model_index: int = 0) -> None:
+133 |         """Test different methods to load a specific model."""
+134 |         console.print(f"[bold cyan]🧪 TESTING MODEL LOADING METHODS[/bold cyan]\n")
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+135 |
+136 |         try:
+    |
+    = help: Remove extraneous `f` prefix
+
+_keep_this/model_load_tester.py:144:110: COM812 [*] Trailing comma missing
+    |
+142 |             if test_model_index >= len(models):
+143 |                 console.print(
+144 |                     f"[red]Model index {test_model_index} out of range. Available: 0-{len(models) - 1}[/red]"
+    |                                                                                                              ^ COM812
+145 |                 )
+146 |                 return
+    |
+    = help: Add trailing comma
+
+_keep_this/model_load_tester.py:152:118: COM812 [*] Trailing comma missing
+    |
+151 |             console.print(
+152 |                 f"[green]Testing with model {test_model_index}: {getattr(info, 'display_name', 'Unknown')}[/green]\n"
+    |                                                                                                                      ^ COM812
+153 |             )
+    |
+    = help: Add trailing comma
+
+_keep_this/model_load_tester.py:165:17: E722 Do not use bare `except`
+    |
+163 |                     if value:
+164 |                         identifiers[attr] = str(value)
+165 |                 except:
+    |                 ^^^^^^ E722
+166 |                     pass
+    |
+
+_keep_this/model_load_tester.py:165:17: S110 `try`-`except`-`pass` detected, consider logging the exception
+    |
+163 |                       if value:
+164 |                           identifiers[attr] = str(value)
+165 | /                 except:
+166 | |                     pass
+    | |________________________^ S110
+167 |
+168 |               console.print(f"[cyan]Available identifiers:[/cyan]")
+    |
+
+_keep_this/model_load_tester.py:168:27: F541 [*] f-string without any placeholders
+    |
+166 |                     pass
+167 |
+168 |             console.print(f"[cyan]Available identifiers:[/cyan]")
+    |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+169 |             for key, value in identifiers.items():
+170 |                 console.print(f"  {key}: {value}")
+    |
+    = help: Remove extraneous `f` prefix
+
+_keep_this/model_load_tester.py:179:86: COM812 [*] Trailing comma missing
+    |
+177 |                     "lmstudio.llm(model_key)",
+178 |                     lambda: lmstudio.llm(
+179 |                         identifiers.get("model_key", identifiers.get("modelKey", ""))
+    |                                                                                      ^ COM812
+180 |                     ),
+181 |                 ),
+    |
+    = help: Add trailing comma
+
+_keep_this/model_load_tester.py:186:92: COM812 [*] Trailing comma missing
+    |
+184 |                     "lmstudio.llm(display_name)",
+185 |                     lambda: lmstudio.llm(
+186 |                         identifiers.get("display_name", identifiers.get("displayName", ""))
+    |                                                                                            ^ COM812
+187 |                     ),
+188 |                 ),
+    |
+    = help: Add trailing comma
+
+_keep_this/model_load_tester.py:205:97: COM812 [*] Trailing comma missing
+    |
+203 |                             result = llm.completion("Hello, respond with just 'Hi!'")
+204 |                             console.print(
+205 |                                 f"  Inference test: [green]✓ '{result.content.strip()}'[/green]"
+    |                                                                                                 ^ COM812
+206 |                             )
+207 |                         except Exception as e:
+    |
+    = help: Add trailing comma
+
+_keep_this/model_load_tester.py:207:32: BLE001 Do not catch blind exception: `Exception`
+    |
+205 |                                 f"  Inference test: [green]✓ '{result.content.strip()}'[/green]"
+206 |                             )
+207 |                         except Exception as e:
+    |                                ^^^^^^^^^ BLE001
+208 |                             console.print(f"  Inference test: [red]✗ {e}[/red]")
+    |
+
+_keep_this/model_load_tester.py:211:25: SIM105 Use `contextlib.suppress(BaseException)` instead of `try`-`except`-`pass`
+    |
+210 |                           # Unload the model
+211 | /                         try:
+212 | |                             llm.unload()
+213 | |                         except:
+214 | |                             pass
+    | |________________________________^ SIM105
+215 |                       else:
+216 |                           console.print(f"[red]✗ {method_name} returned None[/red]")
+    |
+    = help: Replace with `contextlib.suppress(BaseException)`
+
+_keep_this/model_load_tester.py:213:25: E722 Do not use bare `except`
+    |
+211 |                         try:
+212 |                             llm.unload()
+213 |                         except:
+    |                         ^^^^^^ E722
+214 |                             pass
+215 |                     else:
+    |
+
+_keep_this/model_load_tester.py:213:25: S110 `try`-`except`-`pass` detected, consider logging the exception
+    |
+211 |                           try:
+212 |                               llm.unload()
+213 | /                         except:
+214 | |                             pass
+    | |________________________________^ S110
+215 |                       else:
+216 |                           console.print(f"[red]✗ {method_name} returned None[/red]")
+    |
+
+_keep_this/model_load_tester.py:218:24: BLE001 Do not catch blind exception: `Exception`
+    |
+216 |                         console.print(f"[red]✗ {method_name} returned None[/red]")
+217 |
+218 |                 except Exception as e:
+    |                        ^^^^^^^^^ BLE001
+219 |                     console.print(f"[red]✗ {method_name} failed: {e}[/red]")
+    |
+
+_keep_this/model_load_tester.py:224:27: F541 [*] f-string without any placeholders
+    |
+223 |             # Summary
+224 |             console.print(f"[bold cyan]Summary:[/bold cyan]")
+    |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+225 |             if successful_methods:
+226 |                 console.print(f"[green]✓ {len(successful_methods)} methods succeeded:[/green]")
+    |
+    = help: Remove extraneous `f` prefix
+
+_keep_this/model_load_tester.py:232:16: BLE001 Do not catch blind exception: `Exception`
+    |
+230 |                 console.print("[red]✗ No methods succeeded[/red]")
+231 |
+232 |         except Exception as e:
+    |                ^^^^^^^^^ BLE001
+233 |             console.print(f"[red]Error in model loading test: {e}[/red]")
+234 |             console.print(f"[red]Traceback: {traceback.format_exc()}[/red]")
+    |
+
+_keep_this/model_load_tester.py:238:23: F541 [*] f-string without any placeholders
+    |
+236 |     def test_registry_to_lmstudio_mapping(self) -> None:
+237 |         """Test mapping between LMStrix registry models and LM Studio models."""
+238 |         console.print(f"[bold cyan]🔗 TESTING REGISTRY TO LM STUDIO MAPPING[/bold cyan]\n")
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+239 |
+240 |         try:
+    |
+    = help: Remove extraneous `f` prefix
+
+_keep_this/model_load_tester.py:279:87: COM812 [*] Trailing comma missing
+    |
+277 |                         # Try loading with the matched identifier
+278 |                         identifier = getattr(
+279 |                             lms_match, "model_key", getattr(lms_match, "modelKey", "")
+    |                                                                                       ^ COM812
+280 |                         )
+281 |                         if identifier:
+    |
+    = help: Add trailing comma
+
+_keep_this/model_load_tester.py:290:28: BLE001 Do not catch blind exception: `Exception`
+    |
+288 |                         else:
+289 |                             load_status = "[yellow]? No identifier[/yellow]"
+290 |                     except Exception as e:
+    |                            ^^^^^^^^^ BLE001
+291 |                         load_status = f"[red]✗ {str(e)[:30]}[/red]"
+292 |                 else:
+    |
+
+_keep_this/model_load_tester.py:307:16: BLE001 Do not catch blind exception: `Exception`
+    |
+305 |             console.print(table)
+306 |
+307 |         except Exception as e:
+    |                ^^^^^^^^^ BLE001
+308 |             console.print(f"[red]Error in mapping test: {e}[/red]")
+309 |             console.print(f"[red]Traceback: {traceback.format_exc()}[/red]")
+    |
+
+_keep_this/model_load_tester.py:311:9: PLR0915 Too many statements (55 > 50)
+    |
+309 |             console.print(f"[red]Traceback: {traceback.format_exc()}[/red]")
+310 |
+311 |     def find_optimal_loading_strategy(self) -> None:
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PLR0915
+312 |         """Find the optimal strategy for loading models that works across different identifier types."""
+313 |         console.print(f"[bold cyan]🎯 FINDING OPTIMAL LOADING STRATEGY[/bold cyan]\n")
+    |
+
+_keep_this/model_load_tester.py:313:23: F541 [*] f-string without any placeholders
+    |
+311 |     def find_optimal_loading_strategy(self) -> None:
+312 |         """Find the optimal strategy for loading models that works across different identifier types."""
+313 |         console.print(f"[bold cyan]🎯 FINDING OPTIMAL LOADING STRATEGY[/bold cyan]\n")
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+314 |
+315 |         try:
+    |
+    = help: Remove extraneous `f` prefix
+
+_keep_this/model_load_tester.py:322:17: ANN202 Missing return type annotation for private function `strategy_model_key`
+    |
+321 |             # Strategy 1: Use model_key/modelKey directly
+322 |             def strategy_model_key(reg_model):
+    |                 ^^^^^^^^^^^^^^^^^^ ANN202
+323 |                 for lms_model in lms_models:
+324 |                     info = lms_model.info
+    |
+    = help: Add return type annotation
+
+_keep_this/model_load_tester.py:322:36: ANN001 Missing type annotation for function argument `reg_model`
+    |
+321 |             # Strategy 1: Use model_key/modelKey directly
+322 |             def strategy_model_key(reg_model):
+    |                                    ^^^^^^^^^ ANN001
+323 |                 for lms_model in lms_models:
+324 |                     info = lms_model.info
+    |
+
+_keep_this/model_load_tester.py:331:59: COM812 [*] Trailing comma missing
+    |
+329 |                             config={
+330 |                                 "contextLength": reg_model.tested_max_context
+331 |                                 or reg_model.context_limit
+    |                                                           ^ COM812
+332 |                             },
+333 |                         )
+    |
+    = help: Add trailing comma
+
+_keep_this/model_load_tester.py:337:17: ANN202 Missing return type annotation for private function `strategy_path_match`
+    |
+336 |             # Strategy 2: Use path matching
+337 |             def strategy_path_match(reg_model):
+    |                 ^^^^^^^^^^^^^^^^^^^ ANN202
+338 |                 for lms_model in lms_models:
+339 |                     info = lms_model.info
+    |
+    = help: Add return type annotation
+
+_keep_this/model_load_tester.py:337:37: ANN001 Missing type annotation for function argument `reg_model`
+    |
+336 |             # Strategy 2: Use path matching
+337 |             def strategy_path_match(reg_model):
+    |                                     ^^^^^^^^^ ANN001
+338 |                 for lms_model in lms_models:
+339 |                     info = lms_model.info
+    |
+
+_keep_this/model_load_tester.py:347:63: COM812 [*] Trailing comma missing
+    |
+345 | …                         config={
+346 | …                             "contextLength": reg_model.tested_max_context
+347 | …                             or reg_model.context_limit
+    |                                                         ^ COM812
+348 | …                         },
+349 | …                     )
+    |
+    = help: Add trailing comma
+
+_keep_this/model_load_tester.py:353:17: ANN202 Missing return type annotation for private function `strategy_short_id_match`
+    |
+352 |             # Strategy 3: Use short_id matching with display_name
+353 |             def strategy_short_id_match(reg_model):
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^ ANN202
+354 |                 short_id = reg_model.get_short_id()
+355 |                 for lms_model in lms_models:
+    |
+    = help: Add return type annotation
+
+_keep_this/model_load_tester.py:353:41: ANN001 Missing type annotation for function argument `reg_model`
+    |
+352 |             # Strategy 3: Use short_id matching with display_name
+353 |             def strategy_short_id_match(reg_model):
+    |                                         ^^^^^^^^^ ANN001
+354 |                 short_id = reg_model.get_short_id()
+355 |                 for lms_model in lms_models:
+    |
+
+_keep_this/model_load_tester.py:365:63: COM812 [*] Trailing comma missing
+    |
+363 | …                         config={
+364 | …                             "contextLength": reg_model.tested_max_context
+365 | …                             or reg_model.context_limit
+    |                                                         ^ COM812
+366 | …                         },
+367 | …                     )
+    |
+    = help: Add trailing comma
+
+_keep_this/model_load_tester.py:397:79: COM812 [*] Trailing comma missing
+    |
+395 | …                     else:
+396 | …                         results[strategy_name]["errors"].append(
+397 | …                             f"{reg_model.get_short_id()}: No response"
+    |                                                                         ^ COM812
+398 | …                         )
+399 | …                         console.print(f"  ✗ {reg_model.get_short_id()}: No response")
+    |
+    = help: Add trailing comma
+
+_keep_this/model_load_tester.py:403:75: COM812 [*] Trailing comma missing
+    |
+401 |                         else:
+402 |                             results[strategy_name]["errors"].append(
+403 |                                 f"{reg_model.get_short_id()}: Load failed"
+    |                                                                           ^ COM812
+404 |                             )
+405 |                             console.print(f"  ✗ {reg_model.get_short_id()}: Load failed")
+    |
+    = help: Add trailing comma
+
+_keep_this/model_load_tester.py:406:28: BLE001 Do not catch blind exception: `Exception`
+    |
+404 |                             )
+405 |                             console.print(f"  ✗ {reg_model.get_short_id()}: Load failed")
+406 |                     except Exception as e:
+    |                            ^^^^^^^^^ BLE001
+407 |                         results[strategy_name]["errors"].append(f"{reg_model.get_short_id()}: {e}")
+408 |                         console.print(f"  ✗ {reg_model.get_short_id()}: {e}")
+    |
+
+_keep_this/model_load_tester.py:419:113: COM812 [*] Trailing comma missing
+    |
+417 |                 )
+418 |                 console.print(
+419 |                     f"[cyan]{strategy_name}:[/cyan] {result['success']}/{result['total']} ({success_rate:.1f}%)"
+    |                                                                                                                 ^ COM812
+420 |                 )
+    |
+    = help: Add trailing comma
+
+_keep_this/model_load_tester.py:427:16: BLE001 Do not catch blind exception: `Exception`
+    |
+425 |                         console.print(f"    - {error}")
+426 |
+427 |         except Exception as e:
+    |                ^^^^^^^^^ BLE001
+428 |             console.print(f"[red]Error in strategy testing: {e}[/red]")
+429 |             console.print(f"[red]Traceback: {traceback.format_exc()}[/red]")
+    |
+
+_keep_this/model_load_tester.py:447:5: ANN201 Missing return type annotation for public function `main`
+    |
+447 | def main():
+    |     ^^^^ ANN201
+448 |     """Main entry point."""
+449 |     fire.Fire(ModelLoadTester)
+    |
+    = help: Add return type annotation: `None`
+
+src/lmstrix/api/client.py:91:21: SIM109 Use `model_id in (lms_model_key, display_name)` instead of multiple equality comparisons
+   |
+89 |                   # Match by model_key, display_name, or if model_id appears in path
+90 |                   if (
+91 | /                     model_id == lms_model_key
+92 | |                     or model_id == display_name
+93 | |                     or model_id in str(getattr(info, "path", ""))
+   | |_________________________________________________________________^ SIM109
+94 |                   ):
+95 |                       model_key = lms_model_key
+   |
+   = help: Replace with `model_id in (lms_model_key, display_name)`
+
+src/lmstrix/api/client.py:91:21: PLR1714 Consider merging multiple comparisons: `model_id in (lms_model_key, display_name)`. Use a `set` if the elements are hashable.
+   |
+89 |                   # Match by model_key, display_name, or if model_id appears in path
+90 |                   if (
+91 | /                     model_id == lms_model_key
+92 | |                     or model_id == display_name
+93 | |                     or model_id in str(getattr(info, "path", ""))
+   | |_________________________________________________________________^ PLR1714
+94 |                   ):
+95 |                       model_key = lms_model_key
+   |
+   = help: Merge multiple comparisons
+
+src/lmstrix/api/client.py:117:13: E722 Do not use bare `except`
+    |
+115 |                     f"Failed to load model '{model_id}'. Available models: {available_models[:5]}"
+116 |                 )
+117 |             except:
+    |             ^^^^^^ E722
+118 |                 error_msg = f"Failed to load model '{model_id}': {e}"
+119 |             raise ModelLoadError(model_id, error_msg) from e
+    |
+
+src/lmstrix/api/client.py:136:11: ARG002 Unused method argument: `kwargs`
+    |
+134 |         temperature: float = 0.7,  # Temperature for generation
+135 |         model_id: str | None = None,  # Pass model_id separately
+136 |         **kwargs: Any,  # Accept additional parameters
+    |           ^^^^^^ ARG002
+137 |     ) -> CompletionResponse:
+138 |         """Make a completion request to a loaded LM Studio model."""
+    |
+
+src/lmstrix/api/client.py:159:13: RET506 [*] Unnecessary `elif` after `raise` statement
+    |
+157 |                     f"Model memory/cache error - model may need to be reloaded: {e}",
+158 |                 ) from e
+159 |             elif "model not found" in error_message or "no model loaded" in error_message:
+    |             ^^^^ RET506
+160 |                 logger.warning(f"Model {model_id} not found or unloaded: {e}")
+161 |                 raise ModelLoadError(
+    |
+    = help: Remove unnecessary `elif`
+
+src/lmstrix/api/client.py:162:84: COM812 [*] Trailing comma missing
+    |
+160 |                 logger.warning(f"Model {model_id} not found or unloaded: {e}")
+161 |                 raise ModelLoadError(
+162 |                     model_id or "unknown", f"Model not available in LM Studio: {e}"
+    |                                                                                    ^ COM812
+163 |                 ) from e
+164 |             else:
+    |
+    = help: Add trailing comma
+
+src/lmstrix/cli/main.py:25:5: PLR0912 Too many branches (17 > 12)
+   |
+25 | def _get_models_to_test(
+   |     ^^^^^^^^^^^^^^^^^^^ PLR0912
+26 |     registry: ModelRegistry,
+27 |     test_all: bool,
+   |
+
+src/lmstrix/cli/main.py:83:9: PLR5501 [*] Use `elif` instead of `else` then `if`, to reduce indentation
+   |
+81 |                   "[dim]Models may already be tested or context exceeds their limits.[/dim]",
+82 |               )
+83 | /         else:
+84 | |             if reset:
+   | |____________^ PLR5501
+85 |                   console.print(
+86 |                       "[yellow]No models found to test (check model availability).[/yellow]",
+   |
+   = help: Convert to `elif`
+
+src/lmstrix/cli/main.py:314:9: PLR0912 Too many branches (15 > 12)
+    |
+312 |         self.list()
+313 |
+314 |     def list(self, sort: str = "id", show: str | None = None, verbose: bool = False) -> None:
+    |         ^^^^ PLR0912
+315 |         """List all models from the registry with their test status.
+    |
+
+src/lmstrix/cli/main.py:408:9: PLR0912 Too many branches (13 > 12)
+    |
+406 |         console.print(table)
+407 |
+408 |     def test(
+    |         ^^^^ PLR0912
+409 |         self,
+410 |         model_id: str | None = None,
+    |
+
+src/lmstrix/cli/main.py:411:9: A002 Function argument `all` is shadowing a Python builtin
+    |
+409 |         self,
+410 |         model_id: str | None = None,
+411 |         all: bool = False,
+    |         ^^^ A002
+412 |         reset: bool = False,
+413 |         threshold: int = 31744,
+    |
+
+src/lmstrix/cli/main.py:415:9: ARG002 Unused method argument: `sort`
+    |
+413 |         threshold: int = 31744,
+414 |         ctx: int | None = None,
+415 |         sort: str = "id",
+    |         ^^^^ ARG002
+416 |         verbose: bool = False,
+417 |     ) -> None:
+    |
+
+src/lmstrix/cli/main.py:475:98: COM812 [*] Trailing comma missing
+    |
+473 |             )
+474 |             console.print(
+475 |                 "[cyan]Sorting models by optimal testing order (size + context priority).[/cyan]"
+    |                                                                                                  ^ COM812
+476 |             )
+    |
+    = help: Add trailing comma
+
+src/lmstrix/cli/main.py:557:9: PLR0912 Too many branches (14 > 12)
+    |
+555 |             console.print(f"[red]Inference failed: {result.error}[/red]")
+556 |
+557 |     def health(self, verbose: bool = False) -> None:
+    |         ^^^^^^ PLR0912
+558 |         """Check database health and backup status.
+    |
+
+src/lmstrix/core/context_tester.py:130:9: PLR0912 Too many branches (32 > 12)
+    |
+128 |             logger.warning(f"Failed to write to main log: {e}")
+129 |
+130 |     def _test_at_context(
+    |         ^^^^^^^^^^^^^^^^ PLR0912
+131 |         self: Self,
+132 |         model_path: str,
+    |
+
+src/lmstrix/core/context_tester.py:130:9: PLR0915 Too many statements (123 > 50)
+    |
+128 |             logger.warning(f"Failed to write to main log: {e}")
+129 |
+130 |     def _test_at_context(
+    |         ^^^^^^^^^^^^^^^^ PLR0915
+131 |         self: Self,
+132 |         model_path: str,
+    |
+
+src/lmstrix/core/context_tester.py:233:17: F841 Local variable `response` is assigned to but never used
+    |
+232 |                 # Create a combined response object for logging
+233 |                 response = response_1  # Use first response for compatibility
+    |                 ^^^^^^^^ F841
+234 |
+235 |                 if self.verbose:
+    |
+    = help: Remove assignment to unused variable `response`
+
+src/lmstrix/core/context_tester.py:287:17: TRY300 Consider moving this statement to an `else` block
+    |
+285 |                 # Success - log and return
+286 |                 self._log_result(log_path, result)
+287 |                 return result
+    |                 ^^^^^^^^^^^^^ TRY300
+288 |
+289 |             except ModelLoadError as e:
+    |
+
+src/lmstrix/core/context_tester.py:324:21: B025 try-except block with duplicate exception `ModelLoadError`
+    |
+322 |                 return result  # Don't retry load errors
+323 |
+324 |             except (ModelLoadError, InferenceError) as e:
+    |                     ^^^^^^^^^^^^^^ B025
+325 |                 is_timeout = "timed out" in str(e).lower()
+326 |                 is_memory_cache_error = any(
+    |
+
+src/lmstrix/core/context_tester.py:350:70: COM812 [*] Trailing comma missing
+    |
+348 |                     logger.warning(
+349 |                         f"Memory/cache error for {model_path}: {e}. "
+350 |                         "Model may need to be reloaded in LM Studio."
+    |                                                                      ^ COM812
+351 |                     )
+352 |                     if self.verbose:
+    |
+    = help: Add trailing comma
+
+src/lmstrix/core/context_tester.py:354:29: F541 [*] f-string without any placeholders
+    |
+352 |                     if self.verbose:
+353 |                         logger.info(
+354 |                             f"[Context Test] 🧠 Model memory/cache corrupted, skipping to avoid crashes"
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+355 |                         )
+    |
+    = help: Remove extraneous `f` prefix
+
+src/lmstrix/core/context_tester.py:354:104: COM812 [*] Trailing comma missing
+    |
+352 |                     if self.verbose:
+353 |                         logger.info(
+354 |                             f"[Context Test] 🧠 Model memory/cache corrupted, skipping to avoid crashes"
+    |                                                                                                         ^ COM812
+355 |                         )
+    |
+    = help: Add trailing comma
+
+src/lmstrix/core/context_tester.py:362:28: BLE001 Do not catch blind exception: `Exception`
+    |
+360 |                             llm.unload()
+361 |                             logger.debug(f"Unloaded model {model_path} after memory error")
+362 |                     except Exception as unload_error:
+    |                            ^^^^^^^^^ BLE001
+363 |                         logger.debug(f"Failed to unload model after memory error: {unload_error}")
+    |
+
+src/lmstrix/core/context_tester.py:398:83: COM812 [*] Trailing comma missing
+    |
+396 |                     logger.warning(
+397 |                         f"OOM error for {model_path} at {context_size:,} tokens. "
+398 |                         f"Consider testing at {reduced_context:,} tokens instead."
+    |                                                                                   ^ COM812
+399 |                     )
+400 |                     if self.verbose:
+    |
+    = help: Add trailing comma
+
+src/lmstrix/core/context_tester.py:402:106: COM812 [*] Trailing comma missing
+    |
+400 |                     if self.verbose:
+401 |                         logger.info(
+402 |                             f"[Context Test] 🧠 Memory error detected, suggest {reduced_context:,} tokens"
+    |                                                                                                           ^ COM812
+403 |                         )
+    |
+    = help: Add trailing comma
+
+src/lmstrix/core/context_tester.py:602:9: PLR0912 Too many branches (18 > 12)
+    |
+600 |                 return
+601 |
+602 |     def _perform_binary_search(
+    |         ^^^^^^^^^^^^^^^^^^^^^^ PLR0912
+603 |         self: Self,
+604 |         model: Model,
+    |
+
+src/lmstrix/core/context_tester.py:602:9: PLR0915 Too many statements (74 > 50)
+    |
+600 |                 return
+601 |
+602 |     def _perform_binary_search(
+    |         ^^^^^^^^^^^^^^^^^^^^^^ PLR0915
+603 |         self: Self,
+604 |         model: Model,
+    |
+
+src/lmstrix/core/context_tester.py:832:9: PLR0912 Too many branches (15 > 12)
+    |
+830 |         return active_models, updated_models
+831 |
+832 |     def _perform_subsequent_passes(
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^ PLR0912
+833 |         self: Self,
+834 |         active_models: dict[str, Model],
+    |
+
+src/lmstrix/core/inference.py:10:36: F401 [*] `lmstrix.api.exceptions.InferenceError` imported but unused
+   |
+ 9 | from lmstrix.api.client import LMStudioClient
+10 | from lmstrix.api.exceptions import InferenceError, ModelLoadError, ModelNotFoundError
+   |                                    ^^^^^^^^^^^^^^ F401
+11 | from lmstrix.core.models import ModelRegistry
+   |
+   = help: Remove unused import
+
+src/lmstrix/core/inference.py:10:52: F401 [*] `lmstrix.api.exceptions.ModelLoadError` imported but unused
+   |
+ 9 | from lmstrix.api.client import LMStudioClient
+10 | from lmstrix.api.exceptions import InferenceError, ModelLoadError, ModelNotFoundError
+   |                                                    ^^^^^^^^^^^^^^ F401
+11 | from lmstrix.core.models import ModelRegistry
+   |
+   = help: Remove unused import
+
+src/lmstrix/core/inference.py:72:1: W293 [*] Blank line contains whitespace
+   |
+70 |                 model_id=model_id,
+71 |             )
+72 |             
+   | ^^^^^^^^^^^^ W293
+73 |             test_1_pass = "96" in response_1.content
+   |
+   = help: Remove whitespace from blank line
+
+src/lmstrix/core/inference.py:74:1: W293 [*] Blank line contains whitespace
+   |
+73 |             test_1_pass = "96" in response_1.content
+74 |             
+   | ^^^^^^^^^^^^ W293
+75 |             # Test 2: Simple arithmetic
+76 |             test_prompt_2 = "2+3="
+   |
+   = help: Remove whitespace from blank line
+
+src/lmstrix/core/inference.py:84:1: W293 [*] Blank line contains whitespace
+   |
+82 |                 model_id=model_id,
+83 |             )
+84 |             
+   | ^^^^^^^^^^^^ W293
+85 |             test_2_pass = "5" in response_2.content
+   |
+   = help: Remove whitespace from blank line
+
+src/lmstrix/core/inference.py:86:1: W293 [*] Blank line contains whitespace
+   |
+85 |             test_2_pass = "5" in response_2.content
+86 |             
+   | ^^^^^^^^^^^^ W293
+87 |             # Success if ANY test passes
+88 |             success = test_1_pass or test_2_pass
+   |
+   = help: Remove whitespace from blank line
+
+src/lmstrix/core/inference.py:89:1: W293 [*] Blank line contains whitespace
+   |
+87 |             # Success if ANY test passes
+88 |             success = test_1_pass or test_2_pass
+89 |             
+   | ^^^^^^^^^^^^ W293
+90 |             test1_status = '✓' if test_1_pass else '✗'
+91 |             test2_status = '✓' if test_2_pass else '✗'
+   |
+   = help: Remove whitespace from blank line
+
+src/lmstrix/core/inference.py:90:28: Q000 [*] Single quotes found but double quotes preferred
+   |
+88 |             success = test_1_pass or test_2_pass
+89 |             
+90 |             test1_status = '✓' if test_1_pass else '✗'
+   |                            ^^^ Q000
+91 |             test2_status = '✓' if test_2_pass else '✗'
+92 |             combined_response = (
+   |
+   = help: Replace single quotes with double quotes
+
+src/lmstrix/core/inference.py:90:52: Q000 [*] Single quotes found but double quotes preferred
+   |
+88 |             success = test_1_pass or test_2_pass
+89 |             
+90 |             test1_status = '✓' if test_1_pass else '✗'
+   |                                                    ^^^ Q000
+91 |             test2_status = '✓' if test_2_pass else '✗'
+92 |             combined_response = (
+   |
+   = help: Replace single quotes with double quotes
+
+src/lmstrix/core/inference.py:91:28: Q000 [*] Single quotes found but double quotes preferred
+   |
+90 |             test1_status = '✓' if test_1_pass else '✗'
+91 |             test2_status = '✓' if test_2_pass else '✗'
+   |                            ^^^ Q000
+92 |             combined_response = (
+93 |                 f"Test1: '{response_1.content.strip()}' ({test1_status}), "
+   |
+   = help: Replace single quotes with double quotes
+
+src/lmstrix/core/inference.py:91:52: Q000 [*] Single quotes found but double quotes preferred
+   |
+90 |             test1_status = '✓' if test_1_pass else '✗'
+91 |             test2_status = '✓' if test_2_pass else '✗'
+   |                                                    ^^^ Q000
+92 |             combined_response = (
+93 |                 f"Test1: '{response_1.content.strip()}' ({test1_status}), "
+   |
+   = help: Replace single quotes with double quotes
+
+src/lmstrix/core/inference.py:96:1: W293 [*] Blank line contains whitespace
+   |
+94 |                 f"Test2: '{response_2.content.strip()}' ({test2_status})"
+95 |             )
+96 |             
+   | ^^^^^^^^^^^^ W293
+97 |             return success, combined_response
+   |
+   = help: Remove whitespace from blank line
+
+src/lmstrix/core/inference.py:97:13: TRY300 Consider moving this statement to an `else` block
+   |
+95 |             )
+96 |             
+97 |             return success, combined_response
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TRY300
+98 |
+99 |         except Exception as e:
+   |
+
+src/lmstrix/core/inference.py:99:16: BLE001 Do not catch blind exception: `Exception`
+    |
+ 97 |             return success, combined_response
+ 98 |
+ 99 |         except Exception as e:
+    |                ^^^^^^^^^ BLE001
+100 |             return False, str(e)
+101 |         finally:
+    |
+
+src/lmstrix/core/inference.py:107:24: BLE001 Do not catch blind exception: `Exception`
+    |
+105 |                     llm.unload()
+106 |                     logger.debug(f"Successfully unloaded model {model_id}")
+107 |                 except Exception as unload_e:
+    |                        ^^^^^^^^^ BLE001
+108 |                     logger.warning(f"Failed to unload model {model_id}: {unload_e}")
+    |
+
+src/lmstrix/core/inference.py:124:98: COM812 [*] Trailing comma missing
+    |
+123 |         logger.info(
+124 |             f"Testing inference capability for {model_id} starting at {current_context:,} tokens"
+    |                                                                                                  ^ COM812
+125 |         )
+    |
+    = help: Add trailing comma
+
+src/lmstrix/core/inference.py:136:13: RET505 [*] Unnecessary `else` after `return` statement
+    |
+134 |                 logger.info(f"Test response: '{result}'")
+135 |                 return current_context
+136 |             else:
+    |             ^^^^ RET505
+137 |                 is_oom_error = any(
+138 |                     phrase in result.lower()
+    |
+    = help: Remove unnecessary `else`
+
+src/lmstrix/core/inference.py:159:9: PLR0915 Too many statements (52 > 50)
+    |
+157 |         return 0
+158 |
+159 |     def infer(
+    |         ^^^^^ PLR0915
+160 |         self,
+161 |         model_id: str,
+    |
+
+src/lmstrix/core/inference.py:205:16: BLE001 Do not catch blind exception: `Exception`
+    |
+203 |             )
+204 |
+205 |         except Exception as e:
+    |                ^^^^^^^^^ BLE001
+206 |             error_str = str(e)
+207 |             is_oom_error = any(
+    |
+
+src/lmstrix/core/inference.py:220:93: COM812 [*] Trailing comma missing
+    |
+218 |             if is_oom_error:
+219 |                 logger.warning(
+220 |                     f"OOM error during inference for {model_id}, finding working context..."
+    |                                                                                             ^ COM812
+221 |                 )
+    |
+    = help: Add trailing comma
+
+src/lmstrix/core/inference.py:238:46: F541 [*] f-string without any placeholders
+    |
+236 | …                     try:
+237 | …                         llm.unload()
+238 | …                         logger.debug(f"Unloaded previous model instance")
+    |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ F541
+239 | …                     except:
+240 | …                         pass
+    |
+    = help: Remove extraneous `f` prefix
+
+src/lmstrix/core/inference.py:239:29: E722 Do not use bare `except`
+    |
+237 | …                         llm.unload()
+238 | …                         logger.debug(f"Unloaded previous model instance")
+239 | …                     except:
+    |                       ^^^^^^ E722
+240 | …                         pass
+    |
+
+src/lmstrix/core/inference.py:239:29: S110 `try`-`except`-`pass` detected, consider logging the exception
+    |
+237 |                                   llm.unload()
+238 |                                   logger.debug(f"Unloaded previous model instance")
+239 | /                             except:
+240 | |                                 pass
+    | |____________________________________^ S110
+241 |                           
+242 |                           llm = self.client.load_model_by_id(model.id, context_len=working_context)
+    |
+
+src/lmstrix/core/inference.py:241:1: W293 [*] Blank line contains whitespace
+    |
+239 |                             except:
+240 |                                 pass
+241 |                         
+    | ^^^^^^^^^^^^^^^^^^^^^^^^ W293
+242 |                         llm = self.client.load_model_by_id(model.id, context_len=working_context)
+243 |                         response = self.client.completion(
+    |
+    = help: Remove whitespace from blank line
+
+src/lmstrix/core/inference.py:264:28: BLE001 Do not catch blind exception: `Exception`
+    |
+262 |                         )
+263 |
+264 |                     except Exception as retry_e:
+    |                            ^^^^^^^^^ BLE001
+265 |                         logger.error(f"Even with reduced context, inference failed: {retry_e}")
+266 |                         error_str = str(retry_e)
+    |
+
+src/lmstrix/core/models.py:181:13: TRY300 Consider moving this statement to an `else` block
+    |
+180 |             # Size should be reasonable
+181 |             return not self.size < 0
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^ TRY300
+182 |         except (AttributeError, TypeError, ValueError):
+183 |             return False
+    |
+
+src/lmstrix/core/models.py:211:13: TRY300 Consider moving this statement to an `else` block
+    |
+209 |             shutil.copy2(self.models_file, backup_path)
+210 |             logger.info(f"Created backup: {backup_path}")
+211 |             return backup_path
+    |             ^^^^^^^^^^^^^^^^^^ TRY300
+212 |         except OSError as e:
+213 |             logger.error(f"Failed to create backup: {e}")
+    |
+
+src/lmstrix/core/models.py:238:19: TRY003 Avoid specifying long messages outside the exception class
+    |
+236 |         """Validate and sanitize registry data before use."""
+237 |         if not isinstance(data, dict):
+238 |             raise RegistryValidationError("Registry data must be a dictionary")
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TRY003
+239 |
+240 |         # Ensure required structure
+    |
+
+src/lmstrix/core/models.py:245:19: TRY003 Avoid specifying long messages outside the exception class
+    |
+244 |         if not isinstance(data["llms"], dict):
+245 |             raise RegistryValidationError("'llms' section must be a dictionary")
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TRY003
+246 |
+247 |         # Validate each model entry
+    |
+
+src/lmstrix/core/models.py:331:61: COM812 [*] Trailing comma missing
+    |
+329 |                     # Parse datetime
+330 |                     if model_info.get("context_test_date") and isinstance(
+331 |                         model_info["context_test_date"], str
+    |                                                             ^ COM812
+332 |                     ):
+333 |                         model_info["context_test_date"] = datetime.fromisoformat(
+    |
+    = help: Add trailing comma
+
+src/lmstrix/core/models.py:399:17: TRY300 Consider moving this statement to an `else` block
+    |
+397 |                 # Reload from the recovered file
+398 |                 self.load()
+399 |                 return
+    |                 ^^^^^^ TRY300
+400 |
+401 |             except (json.JSONDecodeError, OSError, ModelRegistryError) as e:
+    |
+
+src/lmstrix/core/models.py:457:27: TRY003 Avoid specifying long messages outside the exception class
+    |
+455 |                     json.loads(temp_file.read_text())
+456 |                 except json.JSONDecodeError as e:
+457 |                     raise ModelRegistryError(f"Generated JSON is invalid: {e}") from e
+    |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TRY003
+458 |
+459 |                 temp_file.rename(self.models_file)
+    |
+
+src/lmstrix/loaders/model_loader.py:64:9: TRY300 Consider moving this statement to an `else` block
+   |
+62 |     try:
+63 |         registry.save()
+64 |         return save_path
+   |         ^^^^^^^^^^^^^^^^ TRY300
+65 |     except ModelRegistryError as e:
+66 |         logger.error(f"Failed to save registry due to validation errors: {e}")
+   |
+
+src/lmstrix/loaders/model_loader.py:70:5: PLR0911 Too many return statements (8 > 6)
+   |
+70 | def _validate_discovered_model(model_data: dict) -> bool:
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^ PLR0911
+71 |     """Validate that discovered model data is reasonable before processing."""
+72 |     try:
+   |
+
+src/lmstrix/loaders/model_loader.py:106:9: TRY300 Consider moving this statement to an `else` block
+    |
+104 |             return False
+105 |
+106 |         return True
+    |         ^^^^^^^^^^^ TRY300
+107 |
+108 |     except (KeyError, TypeError, ValueError) as e:
+    |
+
+src/lmstrix/loaders/model_loader.py:175:9: TRY300 Consider moving this statement to an `else` block
+    |
+173 |             return None
+174 |
+175 |         return new_model
+    |         ^^^^^^^^^^^^^^^^ TRY300
+176 |
+177 |     except (KeyError, ValueError, TypeError, ModelRegistryError) as e:
+    |
+
+src/lmstrix/loaders/model_loader.py:195:5: PLR0912 Too many branches (17 > 12)
+    |
+195 | def scan_and_update_registry(
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^ PLR0912
+196 |     rescan_failed: bool = False,
+197 |     rescan_all: bool = False,
+    |
+
+src/lmstrix/loaders/model_loader.py:195:5: PLR0915 Too many statements (55 > 50)
+    |
+195 | def scan_and_update_registry(
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^ PLR0915
+196 |     rescan_failed: bool = False,
+197 |     rescan_all: bool = False,
+    |
+
+src/lmstrix/loaders/model_loader.py:340:9: TRY300 Consider moving this statement to an `else` block
+    |
+338 |         registry.update_model(str(model.path), model)
+339 |         logger.info(f"Successfully reset test data for {model.id}")
+340 |         return True
+    |         ^^^^^^^^^^^ TRY300
+341 |
+342 |     except (ModelRegistryError, ValueError) as e:
+    |
+
+Found 124 errors.
+[*] 48 fixable with the `--fix` option (6 hidden fixes can be enabled with the `--unsafe-fixes` option).

@@ -105,7 +105,7 @@ def _validate_discovered_model(model_data: dict) -> bool:
 
         return True
 
-    except Exception as e:
+    except (KeyError, TypeError, ValueError) as e:
         logger.warning(f"Error validating model data: {e}")
         return False
 
@@ -174,7 +174,7 @@ def _add_new_model(model_data: dict) -> Model | None:
 
         return new_model
 
-    except Exception as e:
+    except (KeyError, ValueError, TypeError, ModelRegistryError) as e:
         logger.error(f"Failed to create model from data {model_data.get('id', 'unknown')}: {e}")
         return None
 
@@ -273,7 +273,7 @@ def scan_and_update_registry(
                 else:
                     errors_encountered += 1
 
-        except Exception as e:
+        except (KeyError, ValueError, TypeError, ModelRegistryError) as e:
             logger.error(f"Error processing model {model_data.get('id', 'unknown')}: {e}")
             errors_encountered += 1
             continue
@@ -339,6 +339,6 @@ def reset_test_data(
         logger.info(f"Successfully reset test data for {model.id}")
         return True
 
-    except Exception as e:
+    except (ModelRegistryError, ValueError) as e:
         logger.error(f"Failed to reset test data for {model_identifier}: {e}")
         return False

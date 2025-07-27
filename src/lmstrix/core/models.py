@@ -10,6 +10,13 @@ from typing import Any
 from loguru import logger
 from pydantic import BaseModel, Field, ValidationError, field_validator
 
+from lmstrix.api.exceptions import (
+    InvalidContextLimitError,
+    InvalidModelCountError,
+    InvalidModelError,
+    InvalidModelSizeError,
+    RegistryValidationError,
+)
 from lmstrix.utils.paths import get_default_models_file
 
 
@@ -100,9 +107,9 @@ class Model(BaseModel):
     def validate_context_limit(cls, v: Any) -> int:
         """Validate context limit is reasonable."""
         if not isinstance(v, int) or v <= 0:
-            raise ValueError("Context limit must be a positive integer")
+            raise InvalidContextLimitError(v)
         if v > 10_000_000:  # 10M tokens seems unreasonable
-            raise ValueError(f"Context limit {v} seems unreasonably large")
+            raise InvalidContextLimitError(v)
         return v
 
     @field_validator("size")
@@ -110,7 +117,7 @@ class Model(BaseModel):
     def validate_size(cls, v: Any) -> int:
         """Validate model size is reasonable."""
         if not isinstance(v, int) or v < 0:
-            raise ValueError("Model size must be a non-negative integer")
+            raise InvalidModelSizeError(v)
         return v
 
     def sanitized_path(self) -> str:
@@ -172,7 +179,7 @@ class Model(BaseModel):
 
             # Size should be reasonable
             return not self.size < 0
-        except Exception:
+        except (AttributeError, TypeError, ValueError):
             return False
 
 
@@ -228,14 +235,14 @@ class ModelRegistry:
     def _validate_registry_data(self, data: dict) -> dict:
         """Validate and sanitize registry data before use."""
         if not isinstance(data, dict):
-            raise ModelRegistryError("Registry data must be a dictionary")
+            raise RegistryValidationError("Registry data must be a dictionary")
 
         # Ensure required structure
         if "llms" not in data:
             data["llms"] = {}
 
         if not isinstance(data["llms"], dict):
-            raise ModelRegistryError("'llms' section must be a dictionary")
+            raise RegistryValidationError("'llms' section must be a dictionary")
 
         # Validate each model entry
         valid_models = {}
@@ -320,11 +327,13 @@ class ModelRegistry:
                         )
 
                     # Parse datetime
-                    if model_info.get("context_test_date"):
-                        if isinstance(model_info["context_test_date"], str):
-                            model_info["context_test_date"] = datetime.fromisoformat(
-                                model_info["context_test_date"],
-                            )
+                    if model_info.get("context_test_date") and isinstance(
+                        model_info["context_test_date"],
+                        str,
+                    ):
+                        model_info["context_test_date"] = datetime.fromisoformat(
+                            model_info["context_test_date"],
+                        )
                         # If it's already a datetime object, leave it as is
 
                     model = Model(**model_info)
@@ -390,7 +399,7 @@ class ModelRegistry:
                 self.load()
                 return
 
-            except Exception as e:
+            except (json.JSONDecodeError, OSError, ModelRegistryError) as e:
                 logger.warning(f"Backup {backup_file} is also corrupted: {e}")
                 continue
 
@@ -410,7 +419,7 @@ class ModelRegistry:
             )
             for model_path in invalid_models:
                 logger.error(f"  Invalid model: {model_path}")
-            raise ModelRegistryError(f"Registry contains {len(invalid_models)} invalid models")
+            raise InvalidModelCountError(len(invalid_models))
 
         # Create backup before saving
         backup_path = self._create_backup()
@@ -446,7 +455,7 @@ class ModelRegistry:
                 try:
                     json.loads(temp_file.read_text())
                 except json.JSONDecodeError as e:
-                    raise ModelRegistryError(f"Generated JSON is invalid: {e}")
+                    raise ModelRegistryError(f"Generated JSON is invalid: {e}") from e
 
                 temp_file.rename(self.models_file)
                 logger.info(f"Saved {len(self._models)} models to {self.models_file}")
@@ -500,7 +509,7 @@ class ModelRegistry:
         """Update a model in the registry with validation."""
         # Validate the model before updating
         if not model.validate_integrity():
-            raise ModelRegistryError(f"Model {model_path} failed integrity check")
+            raise InvalidModelError(model_path)
 
         self._models[model_path] = model
         self.save()
@@ -509,7 +518,7 @@ class ModelRegistry:
         """Update a model by ID with validation."""
         # Validate the model before updating
         if not model.validate_integrity():
-            raise ModelRegistryError(f"Model {model.id} failed integrity check")
+            raise InvalidModelError(model.id)
 
         # Find existing model by ID and update it
         model_path = str(model.path)

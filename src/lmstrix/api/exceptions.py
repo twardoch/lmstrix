@@ -96,3 +96,60 @@ class LMStudioInstallationNotFoundError(LMStrixError):
             "Please ensure LM Studio is installed and has been run at least once."
         )
         super().__init__(message)
+
+
+class ValidationError(LMStrixError):
+    """Raised when data validation fails."""
+
+    def __init__(self, field: str, value: any, reason: str) -> None:
+        """Initialize the exception."""
+        message = f"Validation failed for {field}={value}: {reason}"
+        super().__init__(message)
+        self.field = field
+        self.value = value
+        self.reason = reason
+
+
+class InvalidContextLimitError(ValidationError):
+    """Raised when context limit is invalid."""
+
+    def __init__(self, value: int) -> None:
+        """Initialize the exception."""
+        reason = "must be a positive integer" if value <= 0 else f"{value} seems unreasonably large"
+        super().__init__("context_limit", value, reason)
+
+
+class InvalidModelSizeError(ValidationError):
+    """Raised when model size is invalid."""
+
+    def __init__(self, value: int) -> None:
+        """Initialize the exception."""
+        super().__init__("model_size", value, "must be a non-negative integer")
+
+
+class RegistryValidationError(LMStrixError):
+    """Raised when registry validation fails."""
+
+    def __init__(self, reason: str) -> None:
+        """Initialize the exception."""
+        super().__init__(f"Registry validation failed: {reason}")
+
+
+class InvalidModelError(LMStrixError):
+    """Raised when a model fails integrity check."""
+
+    def __init__(self, model_id: str) -> None:
+        """Initialize the exception."""
+        super().__init__(f"Model {model_id} failed integrity check")
+
+
+class InvalidModelCountError(RegistryValidationError):
+    """Raised when registry contains invalid models."""
+
+    def __init__(self, count: int) -> None:
+        """Initialize the exception."""
+        super().__init__(f"Registry contains {count} invalid models")
+
+
+class ModelRegistryError(LMStrixError):
+    """Raised when there's an error with the model registry."""

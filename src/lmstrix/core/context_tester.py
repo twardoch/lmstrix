@@ -6,12 +6,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import ClassVar, Self
 
+from lmstudio import LMStudioModelNotFoundError
 from loguru import logger
 
 from lmstrix.api import LMStudioClient
 from lmstrix.api.exceptions import InferenceError, ModelLoadError
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
-from lmstrix.loaders.model_loader import load_model_registry
+from lmstrix.loaders.model_loader import load_model_registry, save_model_registry
 from lmstrix.utils import get_context_test_log_path, get_lmstrix_log_path
 
 
@@ -83,6 +84,10 @@ class ContextTester:
             verbose: Enable verbose logging output.
         """
         self.client = client or LMStudioClient()
+        # Enhanced dual testing prompts
+        self.test_prompt_1 = "Write 'ninety-six' as a number using only digits"
+        self.test_prompt_2 = "2+3="
+        # Keep legacy for backward compatibility
         self.test_prompt = "Say hello"
         self.verbose = verbose
         self.inference_timeout = 90.0  # Increased to 90 seconds for better reliability
@@ -144,7 +149,8 @@ class ContextTester:
             model.last_known_bad_context = context_size
             # Save this pessimistic state if registry provided
             if registry:
-                registry.update_model_by_id(model)
+                registry.update_model(model.id, model)
+                save_model_registry(registry)
                 logger.debug(f"Pessimistically set last_known_bad_context to {context_size}")
 
         # Check if we're approaching previous last_known_bad_context
@@ -190,39 +196,81 @@ class ContextTester:
                         "[Context Test] ✓ Model loaded successfully, attempting inference...",
                     )
 
-                response = self.client.completion(
+                # Enhanced dual testing system
+                # Test 1: Number words to digits
+                response_1 = self.client.completion(
                     llm=llm,
-                    prompt=self.test_prompt,
+                    prompt=self.test_prompt_1,
                     max_tokens=10,
+                    temperature=0.1,
                     model_id=model_path,
                 )
 
+                test_1_pass = "96" in response_1.content
+
+                # Test 2: Simple arithmetic
+                response_2 = self.client.completion(
+                    llm=llm,
+                    prompt=self.test_prompt_2,
+                    max_tokens=10,
+                    temperature=0.1,
+                    model_id=model_path,
+                )
+
+                test_2_pass = "5" in response_2.content
+
+                # Success if ANY test passes
+                inference_success = test_1_pass or test_2_pass
+
+                test_1_status = "✓" if test_1_pass else "✗"
+                test_2_status = "✓" if test_2_pass else "✗"
+                combined_response = (
+                    f"Test1: '{response_1.content.strip()}' ({test_1_status}), "
+                    f"Test2: '{response_2.content.strip()}' ({test_2_status})"
+                )
+
+                # Create a combined response object for logging
+
                 if self.verbose:
                     logger.info(
-                        f"[Context Test] ✓ Inference successful! Response length: {len(response.content)} chars",
+                        f"[Context Test] ✓ Dual test result: {combined_response}",
                     )
                     logger.debug(
-                        (
-                            f"[Context Test] Response: {response.content[:50]}..."
-                            if len(response.content) > 50
-                            else f"[Context Test] Response: {response.content}"
-                        ),
+                        f"[Context Test] Inference success: {inference_success}",
                     )
 
                 result = ContextTestResult(
                     context_size=context_size,
                     load_success=True,
-                    inference_success=True,
-                    prompt=self.test_prompt,
-                    response=response.content,
+                    inference_success=inference_success,
+                    prompt=f"{self.test_prompt_1} | {self.test_prompt_2}",
+                    response=combined_response,
                 )
 
-                # Log the successful solution
+                # Log the result based on inference success
+                if inference_success:
+                    print(f"  ✓ Context test passed at {context_size:,} tokens")
+                    print(f"    {combined_response}")
+                    self._log_to_main_log(
+                        model_path,
+                        context_size,
+                        "SOLUTION",
+                    )
+                else:
+                    print(f"  ✗ Context test failed at {context_size:,} tokens")
+                    print(f"    {combined_response}")
+                    self._log_to_main_log(
+                        model_path,
+                        context_size,
+                        "INFERENCE_FAILED",
+                    )
+
+                # Log response details for both cases
                 self._log_to_main_log(
                     model_path,
                     context_size,
-                    "SOLUTION",
-                    f"success=True, response_length={len(response.content)}",
+                    "RESPONSE_DETAILS",
+                    f"success={inference_success}, response='{combined_response}'",
                 )
 
                 # Success - restore previous last_known_bad_context
@@ -274,6 +322,61 @@ class ContextTester:
 
             except (ModelLoadError, InferenceError) as e:
                 is_timeout = "timed out" in str(e).lower()
+                is_memory_cache_error = any(
+                    phrase in str(e).lower()
+                    for phrase in [
+                        "llama_memory is null",
+                        "unable to reuse from cache",
+                        "memory/cache error",
+                        "model memory/cache issues",
+                    ]
+                )
+                is_oom_error = any(
+                    phrase in str(e).lower()
+                    for phrase in [
+                        "insufficient memory",
+                        "out of memory",
+                        "oom",
+                        "metal error",
+                        "cuda out of memory",
+                    ]
+                )
+
+                if is_memory_cache_error:
+                    # Handle memory/cache errors - these usually require model reload
+                    logger.warning(
+                        f"Memory/cache error for {model_path}: {e}. "
+                        "Model may need to be reloaded in LM Studio.",
+                    )
+                    if self.verbose:
+                        logger.info(
+                            "[Context Test] 🧠 Model memory/cache corrupted, skipping to avoid crashes",
+                        )
+
+                    # Try to unload the model to clean up state
+                    try:
+                        if model_loaded and llm:
+                            llm.unload()
+                            logger.debug(f"Unloaded model {model_path} after memory error")
+                    except Exception as unload_error:
+                        logger.debug(f"Failed to unload model after memory error: {unload_error}")
+
+                    # Don't retry memory/cache errors - they usually persist
+                    result = ContextTestResult(
+                        context_size=context_size,
+                        load_success=True,
+                        inference_success=False,
+                        prompt=f"{self.test_prompt_1} | {self.test_prompt_2}",
+                        error=f"Memory/cache error (model needs reload): {str(e)[:100]}",
+                    )
+                    self._log_to_main_log(
+                        model_path,
+                        context_size,
+                        "MEMORY_CACHE_ERROR",
+                        f"Model has corrupted memory/cache state: {str(e)[:50]}",
+                    )
+                    self._log_result(log_path, result)
+                    return result  # Don't retry memory/cache errors
 
                 if is_timeout and attempt < self.max_retries:
                     # This is a timeout and we have retries left
@@ -285,6 +388,18 @@ class ContextTester:
                             f"[Context Test] ⏱️  Timeout on attempt {attempt + 1}, retrying...",
                         )
                     continue  # Try again
+
+                if is_oom_error:
+                    # Handle OOM error with context reduction suggestion
+                    reduced_context = int(context_size * 0.9)  # 10% reduction
+                    logger.warning(
+                        f"OOM error for {model_path} at {context_size:,} tokens. "
+                        f"Consider testing at {reduced_context:,} tokens instead.",
+                    )
+                    if self.verbose:
+                        logger.info(
+                            f"[Context Test] 🧠 Memory error detected, suggest {reduced_context:,} tokens",
+                        )
 
                 # Final failure or non-timeout error
                 logger.error(f"Inference failed for {model_path} at context {context_size}: {e}")
@@ -328,7 +443,7 @@ class ContextTester:
                         logger.debug(f"Model {model_path} unloaded.")
                         # Add delay after unload to ensure clean state
                         time.sleep(0.5)
-                    except (TypeError, AttributeError) as e:
+                    except (TypeError, AttributeError, LMStudioModelNotFoundError) as e:
                         logger.warning(f"Failed to unload model: {e}")
 
         # This should not be reached, but just in case
@@ -372,7 +487,8 @@ class ContextTester:
             model.context_test_status = ContextTestStatus.FAILED
             model.error_msg = f"Failed to load with context {min_context}: {initial_result.error}"
             model.last_known_bad_context = min_context
-            registry.update_model_by_id(model)
+            registry.update_model(model.id, model)
+            save_model_registry(registry)
             return None
 
         if not initial_result.inference_success:
@@ -381,7 +497,8 @@ class ContextTester:
             model.error_msg = f"Inference failed at context {min_context}: {initial_result.error}"
             model.loadable_max_context = min_context
             model.last_known_bad_context = min_context
-            registry.update_model_by_id(model)
+            registry.update_model(model.id, model)
+            save_model_registry(registry)
             return None
 
         model.last_known_good_context = min_context
@@ -580,7 +697,8 @@ class ContextTester:
                     model.loadable_max_context = max(model.loadable_max_context or 0, mid)
 
             model.tested_max_context = best_working_context
-            registry.update_model_by_id(model)
+            registry.update_model(model.id, model)
+            save_model_registry(registry)
             logger.debug(
                 f"Progress saved: good={model.last_known_good_context}, bad={model.last_known_bad_context}",
             )
@@ -685,7 +803,8 @@ class ContextTester:
 
             model.context_test_status = ContextTestStatus.TESTING
             model.context_test_date = datetime.now()
-            registry.update_model_by_id(model)
+            registry.update_model(model.id, model)
+            save_model_registry(registry)
 
             result = self._test_at_context(model.id, min_context, log_path, model, registry)
 
@@ -882,7 +1001,8 @@ class ContextTester:
         if registry is None:
             registry = load_model_registry()
 
-        sorted_models = sorted(llm_models, key=lambda m: m.context_limit)
+        # Use the models in the order they were provided (CLI handles sorting)
+        sorted_models = llm_models
         logger.info(f"Testing {len(sorted_models)} models in optimized pass-based approach")
 
         active_models, updated_models = self._perform_pass_one_testing(

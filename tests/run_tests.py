@@ -20,7 +20,7 @@ def run_tests() -> int:
         "tests/",
     ]
 
-    result = subprocess.run(cmd, check=True)
+    result = subprocess.run(cmd, check=True)  # noqa: S603
 
     if result.returncode == 0:
         print("\n✅ All tests passed!")

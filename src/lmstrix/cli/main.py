@@ -8,6 +8,7 @@ import fire
 from rich.console import Console
 from rich.table import Table
 
+from lmstrix.api.exceptions import APIConnectionError, ModelRegistryError
 from lmstrix.core.context_tester import ContextTester
 from lmstrix.core.inference import InferenceEngine
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
@@ -16,6 +17,7 @@ from lmstrix.loaders.model_loader import (
     scan_and_update_registry,
 )
 from lmstrix.utils import get_context_test_log_path, setup_logging
+from lmstrix.utils.paths import get_default_models_file
 
 console = Console()
 
@@ -25,6 +27,7 @@ def _get_models_to_test(
     test_all: bool,
     ctx: int | None,
     model_id: str | None,
+    reset: bool = False,
 ) -> list[Model]:
     """Filter and return a list of models to be tested."""
     tester = ContextTester()  # Create a temporary tester for _is_embedding_model
@@ -54,14 +57,14 @@ def _get_models_to_test(
             continue
 
         if ctx is not None:
-            if m.context_test_status.value == "completed":
+            if not reset and m.context_test_status.value == "completed":
                 continue
             if ctx > m.context_limit:
                 continue
-            if m.last_known_bad_context and ctx >= m.last_known_bad_context:
+            if not reset and m.last_known_bad_context and ctx >= m.last_known_bad_context:
                 continue
             models_to_test.append(m)
-        elif m.context_test_status.value != "completed":
+        elif reset or m.context_test_status.value != "completed":
             models_to_test.append(m)
 
     if skipped_embedding > 0:
@@ -76,6 +79,10 @@ def _get_models_to_test(
             )
             console.print(
                 "[dim]Models may already be tested or context exceeds their limits.[/dim]",
+            )
+        elif reset:
+            console.print(
+                "[yellow]No models found to test (check model availability).[/yellow]",
             )
         else:
             console.print(
@@ -259,7 +266,7 @@ def _print_final_results(updated_models: list[Model]) -> None:
 class LMStrixCLI:
     """A CLI for testing and managing LM Studio models."""
 
-    def scan(self, failed: bool = False, scan_all: bool = False, verbose: bool = False) -> None:
+    def scan(self, failed: bool = False, reset: bool = False, verbose: bool = False) -> None:
         """Scan for LM Studio models and update the local registry.
 
         Args:
@@ -270,7 +277,7 @@ class LMStrixCLI:
         # Configure logging based on verbose flag
         setup_logging(verbose=verbose)
 
-        if failed and scan_all:
+        if failed and reset:
             console.print("[red]Error: Cannot use --failed and --all together.[/red]")
             return
 
@@ -278,7 +285,7 @@ class LMStrixCLI:
             with console.status("Scanning for models..."):
                 registry = scan_and_update_registry(
                     rescan_failed=failed,
-                    rescan_all=scan_all,
+                    rereset=reset,
                     verbose=verbose,
                 )
 
@@ -294,7 +301,7 @@ class LMStrixCLI:
                     "and has models downloaded.[/yellow]",
                 )
 
-        except Exception as e:
+        except (APIConnectionError, ModelRegistryError, OSError) as e:
             console.print(f"[red]✗ Scan failed: {e}[/red]")
             console.print("[yellow]Check that LM Studio is running and accessible.[/yellow]")
             if verbose:
@@ -400,7 +407,8 @@ class LMStrixCLI:
     def test(
         self,
         model_id: str | None = None,
-        test_all: bool = False,
+        all: bool = False,
+        reset: bool = False,
         threshold: int = 31744,
         ctx: int | None = None,
         sort: str = "id",
@@ -410,25 +418,44 @@ class LMStrixCLI:
 
         Args:
             model_id: The specific model ID to test.
-            test_all: Flag to test all untested or previously failed models.
-            threshold: Maximum context size for initial testing (default: 102400).
+            all: Test all untested or previously failed models.
+            reset: Re-test all models, including those already tested.
+            threshold: Maximum context size for initial testing (default: 31744).
                       Prevents system crashes from very large contexts.
             ctx: Test only this specific context value (skips if > declared context).
-            sort: Sort order for --all. Options: id, idd, ctx, ctxd, dtx, dtxd, size, sized (d = descending).
+            sort: Sort order (only used for single model tests). --all always sorts by size.
             verbose: Enable verbose output.
         """
         setup_logging(verbose=verbose)
         registry = load_model_registry(verbose=verbose)
 
-        if test_all and model_id:
+        # Handle both --all and --test_all flags
+        test_all_models = all
+
+        if test_all_models and model_id:
             console.print("[red]Error: Cannot use --all and specify a model ID together.[/red]")
             return
 
-        models_to_test = _get_models_to_test(registry, test_all, ctx, model_id)
+        models_to_test = _get_models_to_test(registry, test_all_models, ctx, model_id, reset)
         if not models_to_test:
             return
 
-        if test_all:
+        # If reset flag is used, clear test results for all models being tested
+        if reset:
+            console.print("[yellow]Resetting test results for selected models...[/yellow]")
+            for model in models_to_test:
+                model.context_test_status = ContextTestStatus.UNTESTED
+                model.tested_max_context = None
+                model.last_known_good_context = None
+                model.last_known_bad_context = None
+                model.loadable_max_context = None
+                model.context_test_date = None
+                model.context_test_log = None
+                registry.update_model_by_id(model)
+            registry.save()
+            console.print(f"[green]Reset {len(models_to_test)} models for re-testing.[/green]")
+
+        if test_all_models:
             # Filter out embedding models for --all flag
             tester = ContextTester(verbose=verbose)
             models_to_test = tester._filter_models_for_testing(models_to_test)
@@ -437,19 +464,27 @@ class LMStrixCLI:
                     "[yellow]No LLM models found to test after filtering embedding models.[/yellow]",
                 )
                 return
-            models_to_test = _sort_models(models_to_test, sort)
+            # Custom sorting for optimal testing: size_bytes + context_limit*100000
+            # This prioritizes smaller models first, then lower context within similar sizes
+            models_to_test = sorted(
+                models_to_test,
+                key=lambda m: m.size + (m.context_limit * 100_000),
+            )
+            console.print(
+                "[cyan]Sorting models by optimal testing order (size + context priority).[/cyan]",
+            )
 
         tester = ContextTester(verbose=verbose)
 
         if ctx is not None:
-            if test_all:
+            if test_all_models:
                 updated_models = _test_all_models_at_ctx(tester, models_to_test, ctx, registry)
                 _print_final_results(updated_models)
             else:
                 _test_single_model(tester, models_to_test[0], ctx, registry)
             return
 
-        if test_all:
+        if test_all_models:
             updated_models = _test_all_models_optimized(tester, models_to_test, threshold, registry)
             _print_final_results(updated_models)
         else:
@@ -526,10 +561,6 @@ class LMStrixCLI:
         """
         setup_logging(verbose=verbose)
 
-        import json
-
-        from lmstrix.utils.paths import get_default_models_file
-
         models_file = get_default_models_file()
         console.print("[blue]Database Health Check[/blue]")
         console.print(f"Registry file: {models_file}")
@@ -543,7 +574,7 @@ class LMStrixCLI:
 
         # Check if registry is valid JSON
         try:
-            with open(models_file) as f:
+            with models_file.open() as f:
                 json.load(f)
             console.print("[green]✓ Registry file is valid JSON[/green]")
         except json.JSONDecodeError as e:
@@ -571,7 +602,7 @@ class LMStrixCLI:
             else:
                 console.print("[green]✓ All models pass integrity checks[/green]")
 
-        except Exception as e:
+        except (ModelRegistryError, OSError, json.JSONDecodeError) as e:
             console.print(f"[red]✗ Failed to load registry: {e}[/red]")
 
         # Check backup files
@@ -583,17 +614,15 @@ class LMStrixCLI:
             console.print(f"[blue]Found {len(backup_files)} backup files:[/blue]")
 
             for _i, backup_file in enumerate(backup_files[:5]):  # Show latest 5
-                from datetime import datetime
-
                 mtime = datetime.fromtimestamp(backup_file.stat().st_mtime)
                 size_kb = backup_file.stat().st_size // 1024
 
                 # Test if backup is valid
                 try:
-                    with open(backup_file) as f:
+                    with backup_file.open() as f:
                         json.load(f)
                     status = "[green]✓[/green]"
-                except:
+                except json.JSONDecodeError:
                     status = "[red]✗[/red]"
 
                 console.print(
