@@ -6,7 +6,7 @@ from pathlib import Path
 from loguru import logger
 from pydantic import BaseModel, Field
 
-from lmstrix.api.client import LMStudioClient
+from lmstrix.api.exceptions import InferenceError, ModelLoadError
 from lmstrix.core.models import Model
 
 
@@ -30,11 +30,13 @@ class ContextOptimizer:
 
     def __init__(
         self,
-        client: LMStudioClient | None = None,
+        client: "LMStudioClient | None" = None,
         cache_file: Path | None = None,
         verbose: bool = False,
     ) -> None:
         """Initialize the context optimizer."""
+        from lmstrix.api.client import LMStudioClient
+
         self.client = client or LMStudioClient(verbose=verbose)
         self.cache_file = cache_file or Path("context_cache.json")
         self.verbose = verbose
@@ -51,7 +53,7 @@ class ContextOptimizer:
             try:
                 data = json.loads(self.cache_file.read_text())
                 return data if isinstance(data, dict) else {}
-            except Exception as e:
+            except (OSError, json.JSONDecodeError) as e:
                 logger.warning(f"Failed to load cache: {e}")
         return {}
 
@@ -59,7 +61,7 @@ class ContextOptimizer:
         """Save optimization results to cache."""
         try:
             self.cache_file.write_text(json.dumps(self._cache, indent=2))
-        except Exception as e:
+        except OSError as e:
             logger.warning(f"Failed to save cache: {e}")
 
     def _generate_test_prompt(self, size: int) -> str:
@@ -99,7 +101,7 @@ class ContextOptimizer:
                 llm.unload()
 
             return bool(response.content), ""
-        except Exception as e:
+        except (ModelLoadError, InferenceError) as e:
             return False, str(e)
 
     def find_optimal_context(

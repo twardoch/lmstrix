@@ -1,20 +1,21 @@
 """Tests for model loader functionality."""
 
 import json
+from pathlib import Path
 from unittest.mock import Mock, patch
 
 from lmstrix.core.models import Model, ModelRegistry
 from lmstrix.loaders.model_loader import (
     load_model_registry,
     save_model_registry,
-    scan_and_update_models,
+    scan_and_update_registry,
 )
 
 
 class TestModelLoader:
     """Test model loading functions."""
 
-    def test_load_model_registry_default_path(self, tmp_path) -> None:
+    def test_load_model_registry_default_path(self: "TestModelLoader", tmp_path: Path) -> None:
         """Test loading registry with default path."""
         # Create a test registry file
         registry_file = tmp_path / "models_registry.json"
@@ -43,7 +44,7 @@ class TestModelLoader:
             assert len(registry) == 1
             assert registry.get_model("test-model") is not None
 
-    def test_load_model_registry_custom_path(self, tmp_path) -> None:
+    def test_load_model_registry_custom_path(self: "TestModelLoader", tmp_path: Path) -> None:
         """Test loading registry with custom path."""
         # Create a test registry file
         custom_file = tmp_path / "custom_models.json"
@@ -64,7 +65,7 @@ class TestModelLoader:
         assert len(registry) == 1
         assert registry.get_model("model1") is not None
 
-    def test_load_model_registry_nonexistent_file(self, tmp_path) -> None:
+    def test_load_model_registry_nonexistent_file(self: "TestModelLoader", tmp_path: Path) -> None:
         """Test loading registry when file doesn't exist."""
         nonexistent = tmp_path / "does_not_exist.json"
 
@@ -74,7 +75,7 @@ class TestModelLoader:
         assert len(registry) == 0
         assert registry.models_file == nonexistent
 
-    def test_save_model_registry_default_path(self, tmp_path) -> None:
+    def test_save_model_registry_default_path(self: "TestModelLoader", tmp_path: Path) -> None:
         """Test saving registry with default path."""
         registry_file = tmp_path / "models_registry.json"
 
@@ -99,7 +100,7 @@ class TestModelLoader:
         assert "llms" in data
         assert "test-model" in data["llms"]
 
-    def test_save_model_registry_custom_path(self, tmp_path) -> None:
+    def test_save_model_registry_custom_path(self: "TestModelLoader", tmp_path: Path) -> None:
         """Test saving registry to custom path."""
         original_file = tmp_path / "original.json"
         custom_file = tmp_path / "custom.json"
@@ -127,7 +128,12 @@ class TestModelLoader:
 
     @patch("lmstrix.loaders.model_loader.LMStudioClient")
     @patch("lmstrix.loaders.model_loader.ModelScanner")
-    def test_scan_and_update_models(self, mock_scanner_class, mock_client_class, tmp_path) -> None:
+    def test_scan_and_update_models(
+        self: "TestModelLoader",
+        mock_scanner_class: Mock,
+        mock_client_class: Mock,
+        tmp_path: Path,
+    ) -> None:
         """Test scanning and updating models."""
         # Set up mocks
         mock_client = Mock()
@@ -157,9 +163,9 @@ class TestModelLoader:
         registry = ModelRegistry(models_file=registry_file)
 
         # Run scan
-        new_models, removed_models = scan_and_update_models(
-            registry=registry,
-            client=mock_client,
+        scan_and_update_registry(
+            rescan_failed=False,
+            rescan_all=False,
             verbose=True,
         )
 
@@ -174,9 +180,9 @@ class TestModelLoader:
     @patch("lmstrix.loaders.model_loader.LMStudioClient")
     @patch("lmstrix.loaders.model_loader.ModelScanner")
     def test_scan_and_update_models_default_client(
-        self,
-        mock_scanner_class,
-        mock_client_class,
+        self: "TestModelLoader",
+        mock_scanner_class: Mock,
+        mock_client_class: Mock,
     ) -> None:
         """Test scan_and_update_models creates default client if none provided."""
         mock_scanner = Mock()

@@ -30,6 +30,7 @@ Project Structure:
 │   │   ├── 📄 creative.toml
 │   │   └── 📄 qa.toml
 │   ├── 📁 python
+│   │   ├── 📄 __init__.py
 │   │   ├── 📄 advanced_testing.py
 │   │   ├── 📄 basic_usage.py
 │   │   ├── 📄 batch_processing.py
@@ -19527,716 +19528,168 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 <document index="21">
 <source>cleanup.log.txt</source>
 <document_content>
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/context_loader.py,line=129,col=12,endLine=129,endColumn=21::src/lmstrix/loaders/context_loader.py:129:12: BLE001 Do not catch blind exception: `Exception`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=58,col=13,endLine=58,endColumn=26::src/lmstrix/api/client.py:58:13: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=89,col=16,endLine=89,endColumn=25::src/lmstrix/api/client.py:89:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=96,col=9,endLine=96,endColumn=20::src/lmstrix/api/client.py:96:9: ARG002 Unused method argument: `temperature`
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=99,col=9,endLine=99,endColumn=16::src/lmstrix/api/client.py:99:9: ARG002 Unused method argument: `timeout`
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=100,col=11,endLine=100,endColumn=17::src/lmstrix/api/client.py:100:11: ARG002 Unused method argument: `kwargs`
-::error title=Ruff (TRY301),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=123,col=17,endLine=126,endColumn=18::src/lmstrix/api/client.py:123:17: TRY301 Abstract `raise` to an inner function
-::error title=Ruff (B904),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=138,col=17,endLine=141,endColumn=18::src/lmstrix/api/client.py:138:17: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=59,col=5,endLine=59,endColumn=29::src/lmstrix/loaders/model_loader.py:59:5: PLR0915 Too many statements (52 > 50)
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=86,col=12,endLine=86,endColumn=21::src/lmstrix/loaders/model_loader.py:86:12: BLE001 Do not catch blind exception: `Exception`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/logging.py,line=3,col=1,endLine=3,endColumn=42::src/lmstrix/utils/logging.py:3:1: ERA001 Found commented-out code
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/paths.py,line=26,col=16,endLine=26,endColumn=25::src/lmstrix/utils/paths.py:26:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/paths.py,line=41,col=11,endLine=44,endColumn=6::src/lmstrix/utils/paths.py:41:11: TRY003 Avoid specifying long messages outside the exception class
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (A002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=27,col=42,endLine=27,endColumn=45::src/lmstrix/cli/main.py:27:42: A002 Function argument `all` is shadowing a Python builtin
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=47,col=9,endLine=47,endColumn=13::src/lmstrix/cli/main.py:47:9: PLR0912 Too many branches (15 > 12)
-::error title=Ruff (PLR0911),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=141,col=9,endLine=141,endColumn=13::src/lmstrix/cli/main.py:141:9: PLR0911 Too many return statements (7 > 6)
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=141,col=9,endLine=141,endColumn=13::src/lmstrix/cli/main.py:141:9: PLR0912 Too many branches (35 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=141,col=9,endLine=141,endColumn=13::src/lmstrix/cli/main.py:141:9: PLR0915 Too many statements (139 > 50)
-::error title=Ruff (A002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=144,col=9,endLine=144,endColumn=12::src/lmstrix/cli/main.py:144:9: A002 Function argument `all` is shadowing a Python builtin
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=93,col=16,endLine=93,endColumn=25::src/lmstrix/core/inference.py:93:16: BLE001 Do not catch blind exception: `Exception`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context.py,line=54,col=20,endLine=54,endColumn=29::src/lmstrix/core/context.py:54:20: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context.py,line=62,col=16,endLine=62,endColumn=25::src/lmstrix/core/context.py:62:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context.py,line=102,col=16,endLine=102,endColumn=25::src/lmstrix/core/context.py:102:16: BLE001 Do not catch blind exception: `Exception`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/__init__.py,line=106,col=19,endLine=106,endColumn=79::src/lmstrix/__init__.py:106:19: TRY003 Avoid specifying long messages outside the exception class
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=186,col=24,endLine=186,endColumn=33::src/lmstrix/core/models.py:186:24: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=190,col=16,endLine=190,endColumn=25::src/lmstrix/core/models.py:190:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=249,col=34,endLine=249,endColumn=42::src/lmstrix/core/models.py:249:34: ARG002 Unused method argument: `model_id`
-::error title=Ruff (ANN201),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=276,col=9,endLine=276,endColumn=15::src/lmstrix/core/models.py:276:9: ANN201 Missing return type annotation for public function `models`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/scanner.py,line=119,col=20,endLine=119,endColumn=29::src/lmstrix/core/scanner.py:119:20: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/scanner.py,line=158,col=20,endLine=158,endColumn=29::src/lmstrix/core/scanner.py:158:20: BLE001 Do not catch blind exception: `Exception`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=51,col=33,endLine=51,endColumn=41::src/lmstrix/core/context_tester.py:51:33: ARG002 Unused method argument: `expected`
-::error title=Ruff (RUF012),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=76,col=26,endLine=76,endColumn=28::src/lmstrix/core/context_tester.py:76:26: RUF012 Mutable class attributes should be annotated with `typing.ClassVar`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=122,col=16,endLine=122,endColumn=25::src/lmstrix/core/context_tester.py:122:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=125,col=9,endLine=125,endColumn=25::src/lmstrix/core/context_tester.py:125:9: PLR0912 Too many branches (24 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=125,col=9,endLine=125,endColumn=25::src/lmstrix/core/context_tester.py:125:9: PLR0915 Too many statements (88 > 50)
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=241,col=17,endLine=241,endColumn=30::src/lmstrix/core/context_tester.py:241:17: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=278,col=20,endLine=278,endColumn=29::src/lmstrix/core/context_tester.py:278:20: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=334,col=28,endLine=334,endColumn=37::src/lmstrix/core/context_tester.py:334:28: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=355,col=9,endLine=355,endColumn=19::src/lmstrix/core/context_tester.py:355:9: PLR0912 Too many branches (47 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=355,col=9,endLine=355,endColumn=19::src/lmstrix/core/context_tester.py:355:9: PLR0915 Too many statements (198 > 50)
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=704,col=16,endLine=704,endColumn=25::src/lmstrix/core/context_tester.py:704:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=715,col=9,endLine=715,endColumn=24::src/lmstrix/core/context_tester.py:715:9: PLR0912 Too many branches (32 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=715,col=9,endLine=715,endColumn=24::src/lmstrix/core/context_tester.py:715:9: PLR0915 Too many statements (126 > 50)
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=741,col=32,endLine=741,endColumn=37::src/lmstrix/core/context_tester.py:741:32: ANN001 Missing type annotation for function argument `model`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
+Rewriting ./src/lmstrix/core/context.py
+Rewriting ./src/lmstrix/core/scanner.py
+Rewriting ./src/lmstrix/core/models.py
+Rewriting ./src/lmstrix/core/context_tester.py
+Rewriting ./src/lmstrix/utils/paths.py
+Rewriting ./tests/conftest.py
+::error title=Ruff (N818),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/exceptions.py,line=89,col=7,endLine=89,endColumn=35::src/lmstrix/api/exceptions.py:89:7: N818 Exception name `LMStudioInstallationNotFound` should be named with an Error suffix
+::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/__init__.py,line=106,col=19,endLine=106,endColumn=61::src/lmstrix/__init__.py:106:19: TRY003 Avoid specifying long messages outside the exception class
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=25,col=16,endLine=25,endColumn=29::src/lmstrix/cli/main.py:25:16: F821 Undefined name `ModelRegistry`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=29,col=12,endLine=29,endColumn=17::src/lmstrix/cli/main.py:29:12: F821 Undefined name `Model`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=71,col=32,endLine=71,endColumn=37::src/lmstrix/cli/main.py:71:32: F821 Undefined name `Model`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=71,col=64,endLine=71,endColumn=69::src/lmstrix/cli/main.py:71:64: F821 Undefined name `Model`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=92,col=13,endLine=92,endColumn=18::src/lmstrix/cli/main.py:92:13: F821 Undefined name `Model`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=94,col=16,endLine=94,endColumn=29::src/lmstrix/cli/main.py:94:16: F821 Undefined name `ModelRegistry`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=148,col=27,endLine=148,endColumn=32::src/lmstrix/cli/main.py:148:27: F821 Undefined name `Model`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=150,col=16,endLine=150,endColumn=29::src/lmstrix/cli/main.py:150:16: F821 Undefined name `ModelRegistry`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=151,col=12,endLine=151,endColumn=17::src/lmstrix/cli/main.py:151:12: F821 Undefined name `Model`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=196,col=27,endLine=196,endColumn=32::src/lmstrix/cli/main.py:196:27: F821 Undefined name `Model`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=198,col=16,endLine=198,endColumn=29::src/lmstrix/cli/main.py:198:16: F821 Undefined name `ModelRegistry`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=199,col=12,endLine=199,endColumn=17::src/lmstrix/cli/main.py:199:12: F821 Undefined name `Model`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=213,col=48,endLine=213,endColumn=53::src/lmstrix/cli/main.py:213:48: F821 Undefined name `Model`
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py,line=275,col=9,endLine=275,endColumn=13::src/lmstrix/cli/main.py:275:9: PLR0912 Too many branches (15 > 12)
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=93,col=17,endLine=93,endColumn=31::src/lmstrix/core/inference.py:93:17: F821 Undefined name `ModelLoadError`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=93,col=33,endLine=93,endColumn=47::src/lmstrix/core/inference.py:93:33: F821 Undefined name `InferenceError`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context.py,line=33,col=18,endLine=33,endColumn=32::src/lmstrix/core/context.py:33:18: F821 Undefined name `LMStudioClient`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context.py,line=38,col=9,endLine=38,endColumn=54::src/lmstrix/core/context.py:38:9: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (S603),file=/Users/Shared/lmstudio/lmstrix/tests/run_tests.py,line=23,col=14,endLine=23,endColumn=28::tests/run_tests.py:23:14: S603 `subprocess` call: check for execution of untrusted input
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=41,col=20,endLine=41,endColumn=29::examples/python/batch_processing.py:41:20: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=66,col=16,endLine=66,endColumn=25::examples/python/batch_processing.py:66:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=146,col=12,endLine=146,endColumn=30::src/lmstrix/loaders/model_loader.py:146:12: F821 Undefined name `APIConnectionError`
+::error title=Ruff (N814),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=10,col=30,endLine=10,endColumn=47::tests/test_integration/test_cli_integration.py:10:30: N814 Camelcase `LMStrixCLI` imported as constant `CLI`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=230,col=13,endLine=230,endColumn=17::tests/test_integration/test_cli_integration.py:230:13: F821 Undefined name `main`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=32,col=12,endLine=32,endColumn=21::examples/python/advanced_testing.py:32:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=47,col=12,endLine=47,endColumn=21::examples/python/advanced_testing.py:47:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=59,col=5,endLine=59,endColumn=9::src/lmstrix/core/context_tester.py:59:5: ANN001 Missing type annotation for function argument `self`
+::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=107,col=5,endLine=107,endColumn=9::src/lmstrix/core/context_tester.py:107:5: ANN001 Missing type annotation for function argument `self`
+::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=138,col=5,endLine=138,endColumn=9::src/lmstrix/core/context_tester.py:138:5: ANN001 Missing type annotation for function argument `self`
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=196,col=5,endLine=196,endColumn=27::src/lmstrix/core/context_tester.py:196:5: PLR0912 Too many branches (18 > 12)
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=196,col=5,endLine=196,endColumn=27::src/lmstrix/core/context_tester.py:196:5: PLR0915 Too many statements (74 > 50)
+::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=197,col=5,endLine=197,endColumn=9::src/lmstrix/core/context_tester.py:197:5: ANN001 Missing type annotation for function argument `self`
+::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=332,col=32,endLine=332,endColumn=36::src/lmstrix/core/context_tester.py:332:32: ANN001 Missing type annotation for function argument `self`
+::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=367,col=5,endLine=367,endColumn=9::src/lmstrix/core/context_tester.py:367:5: ANN001 Missing type annotation for function argument `self`
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=428,col=5,endLine=428,endColumn=31::src/lmstrix/core/context_tester.py:428:5: PLR0912 Too many branches (15 > 12)
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=428,col=5,endLine=428,endColumn=31::src/lmstrix/core/context_tester.py:428:5: PLR0915 Too many statements (51 > 50)
+::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=429,col=5,endLine=429,endColumn=9::src/lmstrix/core/context_tester.py:429:5: ANN001 Missing type annotation for function argument `self`
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=583,col=9,endLine=583,endColumn=25::src/lmstrix/core/context_tester.py:583:9: PLR0912 Too many branches (24 > 12)
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=583,col=9,endLine=583,endColumn=25::src/lmstrix/core/context_tester.py:583:9: PLR0915 Too many statements (88 > 50)
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=699,col=17,endLine=699,endColumn=30::src/lmstrix/core/context_tester.py:699:17: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (B025),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=736,col=21,endLine=736,endColumn=35::src/lmstrix/core/context_tester.py:736:21: B025 try-except block with duplicate exception `ModelLoadError`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=736,col=37,endLine=736,endColumn=51::src/lmstrix/core/context_tester.py:736:37: F821 Undefined name `InferenceError`
 ::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/_keep_this/lmsm.py,line=5,col=1,endLine=5,endColumn=21::_keep_this/lmsm.py:5:1: ERA001 Found commented-out code
 ::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/_keep_this/lmsm.py,line=166,col=9,endLine=166,endColumn=29::_keep_this/lmsm.py:166:9: PLR0912 Too many branches (13 > 12)
 ::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/_keep_this/lmsm.py,line=166,col=9,endLine=166,endColumn=29::_keep_this/lmsm.py:166:9: PLR0915 Too many statements (56 > 50)
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/_keep_this/lmsm.py,line=285,col=24,endLine=285,endColumn=33::_keep_this/lmsm.py:285:24: BLE001 Do not catch blind exception: `Exception`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_utils/test_paths.py,line=22,col=51,endLine=22,endColumn=59::tests/test_utils/test_paths.py:22:51: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_utils/test_paths.py,line=40,col=57,endLine=40,endColumn=65::tests/test_utils/test_paths.py:40:57: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_utils/test_paths.py,line=55,col=54,endLine=55,endColumn=62::tests/test_utils/test_paths.py:55:54: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (SIM117),file=/Users/Shared/lmstudio/lmstrix/tests/test_utils/test_paths.py,line=64,col=9,endLine=65,endColumn=62::tests/test_utils/test_paths.py:64:9: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_utils/test_paths.py,line=67,col=40,endLine=67,endColumn=44::tests/test_utils/test_paths.py:67:40: ANN001 Missing type annotation for function argument `self`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_utils/test_paths.py,line=83,col=48,endLine=83,endColumn=56::tests/test_utils/test_paths.py:83:48: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_utils/test_paths.py,line=94,col=41,endLine=94,endColumn=49::tests/test_utils/test_paths.py:94:41: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_utils/test_paths.py,line=106,col=48,endLine=106,endColumn=56::tests/test_utils/test_paths.py:106:48: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_utils/test_paths.py,line=118,col=44,endLine=118,endColumn=52::tests/test_utils/test_paths.py:118:44: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_utils/test_paths.py,line=128,col=42,endLine=128,endColumn=50::tests/test_utils/test_paths.py:128:42: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_utils/test_paths.py,line=139,col=46,endLine=139,endColumn=54::tests/test_utils/test_paths.py:139:46: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_utils/test_paths.py,line=154,col=36,endLine=154,endColumn=44::tests/test_utils/test_paths.py:154:36: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_utils/test_paths.py,line=165,col=37,endLine=165,endColumn=45::tests/test_utils/test_paths.py:165:37: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_utils/test_paths.py,line=176,col=57,endLine=176,endColumn=65::tests/test_utils/test_paths.py:176:57: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (SIM117),file=/Users/Shared/lmstudio/lmstrix/tests/test_utils/test_paths.py,line=181,col=9,endLine=182,endColumn=60::tests/test_utils/test_paths.py:181:9: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_prompt_loader.py,line=14,col=40,endLine=14,endColumn=48::tests/test_loaders/test_prompt_loader.py:14:40: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_prompt_loader.py,line=48,col=50,endLine=48,endColumn=58::tests/test_loaders/test_prompt_loader.py:48:50: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_prompt_loader.py,line=58,col=46,endLine=58,endColumn=54::tests/test_loaders/test_prompt_loader.py:58:46: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_prompt_loader.py,line=68,col=58,endLine=68,endColumn=66::tests/test_loaders/test_prompt_loader.py:68:58: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_prompt_loader.py,line=92,col=53,endLine=92,endColumn=61::tests/test_loaders/test_prompt_loader.py:92:53: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_prompt_loader.py,line=110,col=54,endLine=110,endColumn=62::tests/test_loaders/test_prompt_loader.py:110:54: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_prompt_loader.py,line=127,col=44,endLine=127,endColumn=52::tests/test_loaders/test_prompt_loader.py:127:44: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_prompt_loader.py,line=136,col=44,endLine=136,endColumn=52::tests/test_loaders/test_prompt_loader.py:136:44: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_prompt_loader.py,line=163,col=54,endLine=163,endColumn=62::tests/test_loaders/test_prompt_loader.py:163:54: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_prompt_loader.py,line=177,col=51,endLine=177,endColumn=59::tests/test_loaders/test_prompt_loader.py:177:51: ANN001 Missing type annotation for function argument `tmp_path`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (INP001),file=/Users/Shared/lmstudio/lmstrix/examples/python/basic_usage.py,line=1,col=1,endLine=1,endColumn=1::examples/python/basic_usage.py:1:1: INP001 File `examples/python/basic_usage.py` is part of an implicit namespace package. Add an `__init__.py`.
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/basic_usage.py,line=48,col=12,endLine=48,endColumn=21::examples/python/basic_usage.py:48:12: BLE001 Do not catch blind exception: `Exception`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (INP001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=1,col=1,endLine=1,endColumn=1::examples/python/advanced_testing.py:1:1: INP001 File `examples/python/advanced_testing.py` is part of an implicit namespace package. Add an `__init__.py`.
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=32,col=12,endLine=32,endColumn=21::examples/python/advanced_testing.py:32:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=47,col=12,endLine=47,endColumn=21::examples/python/advanced_testing.py:47:12: BLE001 Do not catch blind exception: `Exception`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (INP001),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=1,col=1,endLine=1,endColumn=1::examples/python/batch_processing.py:1:1: INP001 File `examples/python/batch_processing.py` is part of an implicit namespace package. Add an `__init__.py`.
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=41,col=20,endLine=41,endColumn=29::examples/python/batch_processing.py:41:20: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=66,col=16,endLine=66,endColumn=25::examples/python/batch_processing.py:66:16: BLE001 Do not catch blind exception: `Exception`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py,line=18,col=40,endLine=18,endColumn=48::tests/test_loaders/test_context_loader.py:18:40: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py,line=28,col=47,endLine=28,endColumn=55::tests/test_loaders/test_context_loader.py:28:47: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py,line=38,col=50,endLine=38,endColumn=58::tests/test_loaders/test_context_loader.py:38:50: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py,line=48,col=44,endLine=48,endColumn=52::tests/test_loaders/test_context_loader.py:48:44: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py,line=62,col=45,endLine=62,endColumn=53::tests/test_loaders/test_context_loader.py:62:45: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py,line=73,col=44,endLine=73,endColumn=52::tests/test_loaders/test_context_loader.py:73:44: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py,line=84,col=46,endLine=84,endColumn=54::tests/test_loaders/test_context_loader.py:84:46: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py,line=95,col=48,endLine=95,endColumn=56::tests/test_loaders/test_context_loader.py:95:48: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py,line=112,col=51,endLine=112,endColumn=59::tests/test_loaders/test_context_loader.py:112:51: ANN001 Missing type annotation for function argument `tmp_path`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_model_loader.py,line=17,col=53,endLine=17,endColumn=61::tests/test_loaders/test_model_loader.py:17:53: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_model_loader.py,line=46,col=52,endLine=46,endColumn=60::tests/test_loaders/test_model_loader.py:46:52: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_model_loader.py,line=67,col=57,endLine=67,endColumn=65::tests/test_loaders/test_model_loader.py:67:57: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_model_loader.py,line=77,col=53,endLine=77,endColumn=61::tests/test_loaders/test_model_loader.py:77:53: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_model_loader.py,line=102,col=52,endLine=102,endColumn=60::tests/test_loaders/test_model_loader.py:102:52: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_model_loader.py,line=130,col=43,endLine=130,endColumn=61::tests/test_loaders/test_model_loader.py:130:43: ANN001 Missing type annotation for function argument `mock_scanner_class`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_model_loader.py,line=130,col=63,endLine=130,endColumn=80::tests/test_loaders/test_model_loader.py:130:63: ANN001 Missing type annotation for function argument `mock_client_class`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_model_loader.py,line=130,col=82,endLine=130,endColumn=90::tests/test_loaders/test_model_loader.py:130:82: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_model_loader.py,line=178,col=9,endLine=178,endColumn=27::tests/test_loaders/test_model_loader.py:178:9: ANN001 Missing type annotation for function argument `mock_scanner_class`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_model_loader.py,line=179,col=9,endLine=179,endColumn=26::tests/test_loaders/test_model_loader.py:179:9: ANN001 Missing type annotation for function argument `mock_client_class`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (INP001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=1,col=1,endLine=1,endColumn=1::examples/python/custom_inference.py:1:1: INP001 File `examples/python/custom_inference.py` is part of an implicit namespace package. Add an `__init__.py`.
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=34,col=12,endLine=34,endColumn=21::examples/python/custom_inference.py:34:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=50,col=12,endLine=50,endColumn=21::examples/python/custom_inference.py:50:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=68,col=9,endLine=68,endColumn=22::examples/python/custom_inference.py:68:9: ERA001 Found commented-out code
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=69,col=9,endLine=69,endColumn=43::examples/python/custom_inference.py:69:9: ERA001 Found commented-out code
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=70,col=9,endLine=70,endColumn=54::examples/python/custom_inference.py:70:9: ERA001 Found commented-out code
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=71,col=12,endLine=71,endColumn=21::examples/python/custom_inference.py:71:12: BLE001 Do not catch blind exception: `Exception`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (ANN201),file=/Users/Shared/lmstudio/lmstrix/tests/run_tests.py,line=8,col=5,endLine=8,endColumn=14::tests/run_tests.py:8:5: ANN201 Missing return type annotation for public function `run_tests`
-::error title=Ruff (S603),file=/Users/Shared/lmstudio/lmstrix/tests/run_tests.py,line=23,col=14,endLine=23,endColumn=28::tests/run_tests.py:23:14: S603 `subprocess` call: check for execution of untrusted input
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (ANN201),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=16,col=9,endLine=16,endColumn=28::tests/test_integration/test_cli_integration.py:16:9: ANN201 Missing return type annotation for public function `mock_lmstudio_setup`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=16,col=35,endLine=16,endColumn=43::tests/test_integration/test_cli_integration.py:16:35: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=57,col=9,endLine=57,endColumn=26::tests/test_integration/test_cli_integration.py:57:9: ANN001 Missing type annotation for function argument `mock_client_class`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=58,col=9,endLine=58,endColumn=22::tests/test_integration/test_cli_integration.py:58:9: ANN001 Missing type annotation for function argument `mock_get_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=59,col=9,endLine=59,endColumn=28::tests/test_integration/test_cli_integration.py:59:9: ANN001 Missing type annotation for function argument `mock_lmstudio_setup`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=60,col=9,endLine=60,endColumn=15::tests/test_integration/test_cli_integration.py:60:9: ANN001 Missing type annotation for function argument `capsys`
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=72,col=13,endLine=72,endColumn=45::tests/test_integration/test_cli_integration.py:72:13: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=89,col=9,endLine=89,endColumn=27::tests/test_integration/test_cli_integration.py:89:9: ANN001 Missing type annotation for function argument `mock_scanner_class`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=90,col=9,endLine=90,endColumn=26::tests/test_integration/test_cli_integration.py:90:9: ANN001 Missing type annotation for function argument `mock_client_class`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=91,col=9,endLine=91,endColumn=22::tests/test_integration/test_cli_integration.py:91:9: ANN001 Missing type annotation for function argument `mock_get_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=92,col=9,endLine=92,endColumn=28::tests/test_integration/test_cli_integration.py:92:9: ANN001 Missing type annotation for function argument `mock_lmstudio_setup`
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=111,col=9,endLine=111,endColumn=41::tests/test_integration/test_cli_integration.py:111:9: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=124,col=9,endLine=124,endColumn=26::tests/test_integration/test_cli_integration.py:124:9: ANN001 Missing type annotation for function argument `mock_client_class`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=125,col=9,endLine=125,endColumn=22::tests/test_integration/test_cli_integration.py:125:9: ANN001 Missing type annotation for function argument `mock_get_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=126,col=9,endLine=126,endColumn=28::tests/test_integration/test_cli_integration.py:126:9: ANN001 Missing type annotation for function argument `mock_lmstudio_setup`
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=152,col=13,endLine=152,endColumn=45::tests/test_integration/test_cli_integration.py:152:13: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=163,col=49,endLine=163,endColumn=62::tests/test_integration/test_cli_integration.py:163:49: ANN001 Missing type annotation for function argument `mock_get_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=163,col=64,endLine=163,endColumn=83::tests/test_integration/test_cli_integration.py:163:64: ANN001 Missing type annotation for function argument `mock_lmstudio_setup`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=163,col=85,endLine=163,endColumn=91::tests/test_integration/test_cli_integration.py:163:85: ANN001 Missing type annotation for function argument `capsys`
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=168,col=9,endLine=168,endColumn=41::tests/test_integration/test_cli_integration.py:168:9: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=182,col=9,endLine=182,endColumn=26::tests/test_integration/test_cli_integration.py:182:9: ANN001 Missing type annotation for function argument `mock_engine_class`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=183,col=9,endLine=183,endColumn=26::tests/test_integration/test_cli_integration.py:183:9: ANN001 Missing type annotation for function argument `mock_load_prompts`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=184,col=9,endLine=184,endColumn=22::tests/test_integration/test_cli_integration.py:184:9: ANN001 Missing type annotation for function argument `mock_get_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=185,col=9,endLine=185,endColumn=28::tests/test_integration/test_cli_integration.py:185:9: ANN001 Missing type annotation for function argument `mock_lmstudio_setup`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=186,col=9,endLine=186,endColumn=17::tests/test_integration/test_cli_integration.py:186:9: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=196,col=9,endLine=196,endColumn=56::tests/test_integration/test_cli_integration.py:196:9: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=209,col=9,endLine=209,endColumn=59::tests/test_integration/test_cli_integration.py:209:9: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=221,col=9,endLine=221,endColumn=41::tests/test_integration/test_cli_integration.py:221:9: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=235,col=29,endLine=235,endColumn=35::tests/test_integration/test_cli_integration.py:235:29: ANN001 Missing type annotation for function argument `capsys`
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=238,col=13,endLine=238,endColumn=46::tests/test_integration/test_cli_integration.py:238:13: PLC0415 `import` should be at the top-level of a file
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_api/test_client.py,line=54,col=40,endLine=54,endColumn=53::tests/test_api/test_client.py:54:40: ANN001 Missing type annotation for function argument `mock_lmstudio`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_api/test_client.py,line=69,col=40,endLine=69,endColumn=53::tests/test_api/test_client.py:69:40: ANN001 Missing type annotation for function argument `mock_lmstudio`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_api/test_client.py,line=81,col=39,endLine=81,endColumn=52::tests/test_api/test_client.py:81:39: ANN001 Missing type annotation for function argument `mock_lmstudio`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_api/test_client.py,line=96,col=39,endLine=96,endColumn=52::tests/test_api/test_client.py:96:39: ANN001 Missing type annotation for function argument `mock_lmstudio`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_api/test_client.py,line=109,col=46,endLine=109,endColumn=54::tests/test_api/test_client.py:109:46: ANN001 Missing type annotation for function argument `mock_llm`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_api/test_client.py,line=109,col=56,endLine=109,endColumn=80::tests/test_api/test_client.py:109:56: ANN001 Missing type annotation for function argument `mock_completion_response`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_api/test_client.py,line=133,col=46,endLine=133,endColumn=54::tests/test_api/test_client.py:133:46: ANN001 Missing type annotation for function argument `mock_llm`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_api/test_client.py,line=146,col=52,endLine=146,endColumn=60::tests/test_api/test_client.py:146:52: ANN001 Missing type annotation for function argument `mock_llm`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_api/test_client.py,line=146,col=62,endLine=146,endColumn=86::tests/test_api/test_client.py:146:62: ANN001 Missing type annotation for function argument `mock_completion_response`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_scanner.py,line=12,col=43,endLine=12,endColumn=56::tests/test_core/test_scanner.py:12:43: ANN001 Missing type annotation for function argument `mock_get_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_scanner.py,line=12,col=58,endLine=12,endColumn=66::tests/test_core/test_scanner.py:12:58: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_scanner.py,line=22,col=40,endLine=22,endColumn=48::tests/test_core/test_scanner.py:22:40: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_scanner.py,line=33,col=45,endLine=33,endColumn=53::tests/test_core/test_scanner.py:33:45: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_scanner.py,line=49,col=47,endLine=49,endColumn=55::tests/test_core/test_scanner.py:49:47: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_scanner.py,line=57,col=49,endLine=57,endColumn=57::tests/test_core/test_scanner.py:57:49: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_scanner.py,line=72,col=53,endLine=72,endColumn=61::tests/test_core/test_scanner.py:72:53: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_scanner.py,line=89,col=51,endLine=89,endColumn=59::tests/test_core/test_scanner.py:89:51: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_scanner.py,line=99,col=54,endLine=99,endColumn=62::tests/test_core/test_scanner.py:99:54: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_scanner.py,line=110,col=32,endLine=110,endColumn=45::tests/test_core/test_scanner.py:110:32: ANN001 Missing type annotation for function argument `mock_get_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_scanner.py,line=110,col=47,endLine=110,endColumn=55::tests/test_core/test_scanner.py:110:47: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_scanner.py,line=150,col=39,endLine=150,endColumn=52::tests/test_core/test_scanner.py:150:39: ANN001 Missing type annotation for function argument `mock_get_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_scanner.py,line=150,col=54,endLine=150,endColumn=62::tests/test_core/test_scanner.py:150:54: ANN001 Missing type annotation for function argument `tmp_path`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=100,col=42,endLine=100,endColumn=62::tests/test_core/test_context_tester.py:100:42: ANN001 Missing type annotation for function argument `mock_lmstudio_client`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=139,col=52,endLine=139,endColumn=72::tests/test_core/test_context_tester.py:139:52: ANN001 Missing type annotation for function argument `mock_lmstudio_client`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=152,col=57,endLine=152,endColumn=77::tests/test_core/test_context_tester.py:152:57: ANN001 Missing type annotation for function argument `mock_lmstudio_client`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=152,col=79,endLine=152,endColumn=87::tests/test_core/test_context_tester.py:152:79: ANN001 Missing type annotation for function argument `mock_llm`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=167,col=47,endLine=167,endColumn=67::tests/test_core/test_context_tester.py:167:47: ANN001 Missing type annotation for function argument `mock_lmstudio_client`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=167,col=69,endLine=167,endColumn=77::tests/test_core/test_context_tester.py:167:69: ANN001 Missing type annotation for function argument `mock_llm`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=187,col=56,endLine=187,endColumn=76::tests/test_core/test_context_tester.py:187:56: ANN001 Missing type annotation for function argument `mock_lmstudio_client`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=187,col=78,endLine=187,endColumn=86::tests/test_core/test_context_tester.py:187:78: ANN001 Missing type annotation for function argument `mock_llm`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=202,col=54,endLine=202,endColumn=74::tests/test_core/test_context_tester.py:202:54: ANN001 Missing type annotation for function argument `mock_lmstudio_client`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=202,col=76,endLine=202,endColumn=84::tests/test_core/test_context_tester.py:202:76: ANN001 Missing type annotation for function argument `mock_llm`
-::error title=Ruff (ANN202),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=207,col=19,endLine=207,endColumn=34::tests/test_core/test_context_tester.py:207:19: ANN202 Missing return type annotation for private function `mock_completion`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=207,col=35,endLine=207,endColumn=38::tests/test_core/test_context_tester.py:207:35: ANN001 Missing type annotation for function argument `llm`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=207,col=40,endLine=207,endColumn=46::tests/test_core/test_context_tester.py:207:40: ANN001 Missing type annotation for function argument `prompt`
-::error title=Ruff (ANN003),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=207,col=48,endLine=207,endColumn=56::tests/test_core/test_context_tester.py:207:48: ANN003 Missing type annotation for `**kwargs`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=232,col=40,endLine=232,endColumn=48::tests/test_core/test_context_tester.py:232:40: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=257,col=9,endLine=257,endColumn=29::tests/test_core/test_context_tester.py:257:9: ANN001 Missing type annotation for function argument `mock_lmstudio_client`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=258,col=9,endLine=258,endColumn=17::tests/test_core/test_context_tester.py:258:9: ANN001 Missing type annotation for function argument `mock_llm`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=259,col=9,endLine=259,endColumn=17::tests/test_core/test_context_tester.py:259:9: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN202),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=265,col=19,endLine=265,endColumn=34::tests/test_core/test_context_tester.py:265:19: ANN202 Missing return type annotation for private function `mock_completion`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=265,col=35,endLine=265,endColumn=38::tests/test_core/test_context_tester.py:265:35: ANN001 Missing type annotation for function argument `llm`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=265,col=40,endLine=265,endColumn=46::tests/test_core/test_context_tester.py:265:40: ANN001 Missing type annotation for function argument `prompt`
-::error title=Ruff (ANN003),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=265,col=48,endLine=265,endColumn=56::tests/test_core/test_context_tester.py:265:48: ANN003 Missing type annotation for `**kwargs`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=301,col=49,endLine=301,endColumn=69::tests/test_core/test_context_tester.py:301:49: ANN001 Missing type annotation for function argument `mock_lmstudio_client`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=325,col=46,endLine=325,endColumn=66::tests/test_core/test_context_tester.py:325:46: ANN001 Missing type annotation for function argument `mock_lmstudio_client`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=325,col=68,endLine=325,endColumn=76::tests/test_core/test_context_tester.py:325:68: ANN001 Missing type annotation for function argument `mock_llm`
-::error title=Ruff (ANN202),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=330,col=19,endLine=330,endColumn=31::tests/test_core/test_context_tester.py:330:19: ANN202 Missing return type annotation for private function `always_works`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=330,col=32,endLine=330,endColumn=35::tests/test_core/test_context_tester.py:330:32: ANN001 Missing type annotation for function argument `llm`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=330,col=37,endLine=330,endColumn=43::tests/test_core/test_context_tester.py:330:37: ANN001 Missing type annotation for function argument `prompt`
-::error title=Ruff (ANN003),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=330,col=45,endLine=330,endColumn=53::tests/test_core/test_context_tester.py:330:45: ANN003 Missing type annotation for `**kwargs`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=348,col=31,endLine=348,endColumn=34::tests/test_core/test_context_tester.py:348:31: ANN001 Missing type annotation for function argument `llm`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=348,col=36,endLine=348,endColumn=42::tests/test_core/test_context_tester.py:348:36: ANN001 Missing type annotation for function argument `prompt`
-::error title=Ruff (ANN003),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=348,col=44,endLine=348,endColumn=52::tests/test_core/test_context_tester.py:348:44: ANN003 Missing type annotation for `**kwargs`
-::error title=Ruff (ANN202),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=367,col=19,endLine=367,endColumn=44::tests/test_core/test_context_tester.py:367:19: ANN202 Missing return type annotation for private function `loads_but_fails_inference`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=367,col=45,endLine=367,endColumn=48::tests/test_core/test_context_tester.py:367:45: ANN001 Missing type annotation for function argument `llm`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=367,col=50,endLine=367,endColumn=56::tests/test_core/test_context_tester.py:367:50: ANN001 Missing type annotation for function argument `prompt`
-::error title=Ruff (ANN003),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=367,col=58,endLine=367,endColumn=66::tests/test_core/test_context_tester.py:367:58: ANN003 Missing type annotation for `**kwargs`
-::error title=Ruff (ANN202),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=384,col=19,endLine=384,endColumn=35::tests/test_core/test_context_tester.py:384:19: ANN202 Missing return type annotation for private function `works_up_to_2048`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=384,col=36,endLine=384,endColumn=39::tests/test_core/test_context_tester.py:384:36: ANN001 Missing type annotation for function argument `llm`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=384,col=41,endLine=384,endColumn=47::tests/test_core/test_context_tester.py:384:41: ANN001 Missing type annotation for function argument `prompt`
-::error title=Ruff (ANN003),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_context_tester.py,line=384,col=49,endLine=384,endColumn=57::tests/test_core/test_context_tester.py:384:49: ANN003 Missing type annotation for `**kwargs`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_models.py,line=27,col=43,endLine=27,endColumn=60::tests/test_core/test_models.py:27:43: ANN001 Missing type annotation for function argument `sample_model_data`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_models.py,line=61,col=47,endLine=61,endColumn=64::tests/test_core/test_models.py:61:47: ANN001 Missing type annotation for function argument `sample_model_data`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_models.py,line=116,col=43,endLine=116,endColumn=60::tests/test_core/test_models.py:116:43: ANN001 Missing type annotation for function argument `sample_model_data`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_models.py,line=154,col=44,endLine=154,endColumn=61::tests/test_core/test_models.py:154:44: ANN001 Missing type annotation for function argument `tmp_registry_file`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_models.py,line=162,col=43,endLine=162,endColumn=60::tests/test_core/test_models.py:162:43: ANN001 Missing type annotation for function argument `tmp_registry_file`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_models.py,line=162,col=62,endLine=162,endColumn=79::tests/test_core/test_models.py:162:62: ANN001 Missing type annotation for function argument `sample_model_data`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_models.py,line=190,col=39,endLine=190,endColumn=56::tests/test_core/test_models.py:190:39: ANN001 Missing type annotation for function argument `tmp_registry_file`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_models.py,line=190,col=58,endLine=190,endColumn=75::tests/test_core/test_models.py:190:58: ANN001 Missing type annotation for function argument `sample_model_data`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_models.py,line=203,col=41,endLine=203,endColumn=58::tests/test_core/test_models.py:203:41: ANN001 Missing type annotation for function argument `tmp_registry_file`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_models.py,line=203,col=60,endLine=203,endColumn=77::tests/test_core/test_models.py:203:60: ANN001 Missing type annotation for function argument `sample_model_data`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_models.py,line=219,col=42,endLine=219,endColumn=59::tests/test_core/test_models.py:219:42: ANN001 Missing type annotation for function argument `tmp_registry_file`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_models.py,line=219,col=61,endLine=219,endColumn=78::tests/test_core/test_models.py:219:61: ANN001 Missing type annotation for function argument `sample_model_data`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_models.py,line=234,col=52,endLine=234,endColumn=69::tests/test_core/test_models.py:234:52: ANN001 Missing type annotation for function argument `tmp_registry_file`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_models.py,line=234,col=71,endLine=234,endColumn=88::tests/test_core/test_models.py:234:71: ANN001 Missing type annotation for function argument `sample_model_data`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_models.py,line=259,col=41,endLine=259,endColumn=58::tests/test_core/test_models.py:259:41: ANN001 Missing type annotation for function argument `tmp_registry_file`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_models.py,line=259,col=60,endLine=259,endColumn=77::tests/test_core/test_models.py:259:60: ANN001 Missing type annotation for function argument `sample_model_data`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (ANN201),file=/Users/Shared/lmstudio/lmstrix/tests/conftest.py,line=15,col=5,endLine=15,endColumn=25::tests/conftest.py:15:5: ANN201 Missing return type annotation for public function `mock_lmstudio_client`
-::error title=Ruff (ANN201),file=/Users/Shared/lmstudio/lmstrix/tests/conftest.py,line=42,col=5,endLine=42,endColumn=13::tests/conftest.py:42:5: ANN201 Missing return type annotation for public function `mock_llm`
-::error title=Ruff (ANN201),file=/Users/Shared/lmstudio/lmstrix/tests/conftest.py,line=50,col=5,endLine=50,endColumn=22::tests/conftest.py:50:5: ANN201 Missing return type annotation for public function `sample_model_data`
-::error title=Ruff (ANN201),file=/Users/Shared/lmstudio/lmstrix/tests/conftest.py,line=64,col=5,endLine=64,endColumn=19::tests/conftest.py:64:5: ANN201 Missing return type annotation for public function `tmp_models_dir`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/conftest.py,line=64,col=20,endLine=64,endColumn=28::tests/conftest.py:64:20: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN201),file=/Users/Shared/lmstudio/lmstrix/tests/conftest.py,line=72,col=5,endLine=72,endColumn=22::tests/conftest.py:72:5: ANN201 Missing return type annotation for public function `tmp_registry_file`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/conftest.py,line=72,col=23,endLine=72,endColumn=31::tests/conftest.py:72:23: ANN001 Missing type annotation for function argument `tmp_path`
-::error title=Ruff (ANN201),file=/Users/Shared/lmstudio/lmstrix/tests/conftest.py,line=78,col=5,endLine=78,endColumn=15::tests/conftest.py:78:5: ANN201 Missing return type annotation for public function `event_loop`
-::error title=Ruff (ANN201),file=/Users/Shared/lmstudio/lmstrix/tests/conftest.py,line=86,col=5,endLine=86,endColumn=29::tests/conftest.py:86:5: ANN201 Missing return type annotation for public function `mock_completion_response`
-::error title=Ruff (ANN201),file=/Users/Shared/lmstudio/lmstrix/tests/conftest.py,line=96,col=5,endLine=96,endColumn=25::tests/conftest.py:96:5: ANN201 Missing return type annotation for public function `mock_prompt_template`
-::error title=Ruff (ANN201),file=/Users/Shared/lmstudio/lmstrix/tests/conftest.py,line=107,col=5,endLine=107,endColumn=22::tests/conftest.py:107:5: ANN201 Missing return type annotation for public function `mock_context_data`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-::error title=Ruff (SIM117),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_inference.py,line=63,col=9,endLine=64,endColumn=87::tests/test_core/test_inference.py:63:9: SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_inference.py,line=71,col=49,endLine=71,endColumn=69::tests/test_core/test_inference.py:71:49: ANN001 Missing type annotation for function argument `mock_lmstudio_client`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_inference.py,line=102,col=40,endLine=102,endColumn=60::tests/test_core/test_inference.py:102:40: ANN001 Missing type annotation for function argument `mock_lmstudio_client`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_inference.py,line=102,col=62,endLine=102,endColumn=70::tests/test_core/test_inference.py:102:62: ANN001 Missing type annotation for function argument `mock_llm`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_inference.py,line=147,col=52,endLine=147,endColumn=72::tests/test_core/test_inference.py:147:52: ANN001 Missing type annotation for function argument `mock_lmstudio_client`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_inference.py,line=147,col=74,endLine=147,endColumn=82::tests/test_core/test_inference.py:147:74: ANN001 Missing type annotation for function argument `mock_llm`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_inference.py,line=176,col=48,endLine=176,endColumn=68::tests/test_core/test_inference.py:176:48: ANN001 Missing type annotation for function argument `mock_lmstudio_client`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_inference.py,line=176,col=70,endLine=176,endColumn=78::tests/test_core/test_inference.py:176:70: ANN001 Missing type annotation for function argument `mock_llm`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_inference.py,line=206,col=45,endLine=206,endColumn=65::tests/test_core/test_inference.py:206:45: ANN001 Missing type annotation for function argument `mock_lmstudio_client`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_inference.py,line=232,col=51,endLine=232,endColumn=71::tests/test_core/test_inference.py:232:51: ANN001 Missing type annotation for function argument `mock_lmstudio_client`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_inference.py,line=232,col=73,endLine=232,endColumn=81::tests/test_core/test_inference.py:232:73: ANN001 Missing type annotation for function argument `mock_llm`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_inference.py,line=261,col=47,endLine=261,endColumn=67::tests/test_core/test_inference.py:261:47: ANN001 Missing type annotation for function argument `mock_lmstudio_client`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_core/test_inference.py,line=261,col=69,endLine=261,endColumn=77::tests/test_core/test_inference.py:261:69: ANN001 Missing type annotation for function argument `mock_llm`
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_model_loader.py,line=172,col=20,endLine=172,endColumn=30::tests/test_loaders/test_model_loader.py:172:20: F821 Undefined name `new_models`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_model_loader.py,line=173,col=16,endLine=173,endColumn=26::tests/test_loaders/test_model_loader.py:173:16: F821 Undefined name `new_models`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_model_loader.py,line=174,col=20,endLine=174,endColumn=34::tests/test_loaders/test_model_loader.py:174:20: F821 Undefined name `removed_models`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_model_loader.py,line=175,col=16,endLine=175,endColumn=30::tests/test_loaders/test_model_loader.py:175:16: F821 Undefined name `removed_models`
+::error title=Ruff (F821),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_model_loader.py,line=194,col=9,endLine=194,endColumn=31::tests/test_loaders/test_model_loader.py:194:9: F821 Undefined name `scan_and_update_models`
+::error title=Ruff,file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py,line=1,col=6,endLine=1,endColumn=13::tests/test_loaders/test_context_loader.py:1:6: SyntaxError: Simple statements must be separated by newlines or semicolons
+::error title=Ruff,file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py,line=1,col=14,endLine=1,endColumn=21::tests/test_loaders/test_context_loader.py:1:14: SyntaxError: Simple statements must be separated by newlines or semicolons
+::error title=Ruff,file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py,line=1,col=22,endLine=1,endColumn=31::tests/test_loaders/test_context_loader.py:1:22: SyntaxError: Simple statements must be separated by newlines or semicolons
+::error title=Ruff,file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py,line=1,col=32,endLine=2,endColumn=1::tests/test_loaders/test_context_loader.py:1:32: SyntaxError: Expected an identifier
+::error title=Ruff,file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py,line=3,col=1,endLine=3,endColumn=5::tests/test_loaders/test_context_loader.py:3:1: SyntaxError: Unexpected indentation
+::error title=Ruff,file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py,line=67,col=43,endLine=67,endColumn=43::tests/test_loaders/test_context_loader.py:67:43: SyntaxError: Expected a statement
+::error title=Ruff (W292),file=/Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py,line=67,col=43,endLine=67,endColumn=43::tests/test_loaders/test_context_loader.py:67:43: W292 No newline at end of file
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
+warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
+1 file reformatted
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
+warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
+1 file reformatted
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
+warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
+1 file reformatted
+warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
+1 file reformatted
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
+warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
+warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
+error: Failed to parse tests/test_loaders/test_context_loader.py:1:6: Simple statements must be separated by newlines or semicolons
+1 file left unchanged
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
+warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
+1 file reformatted
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
+warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
+1 file reformatted
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
+warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
+1 file reformatted
+warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
+1 file reformatted
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
-1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
-1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
-1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
-1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
-1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
-1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
-1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
-1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
-warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
-1 file left unchanged
-warning: The following rules have been removed and ignoring them has no effect:
-    - ANN101
-    - ANN102
-
 warning: The following rule may cause conflicts when used with the formatter: `COM812`. To avoid unexpected behavior, we recommend disabling this rule, either by removing it from the `lint.select` or `lint.extend-select` configuration, or adding it to the `lint.ignore` configuration.
 ╭─────────────────────────────── CodeToPrompt (Local) ───────────────────────────────╮
 │ Configuration for this run:                                                        │
@@ -20949,6 +20402,11 @@ description = "Answers a question based on a provided context."
 </document_content>
 </document>
 
+# File: /Users/Shared/lmstudio/lmstrix/examples/python/__init__.py
+# Language: python
+
+
+
 # File: /Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py
 # Language: python
 
@@ -20982,6 +20440,7 @@ def main(()) -> None:
 # Language: python
 
 from lmstrix.api.client import LmsClient
+from lmstrix.api.exceptions import InferenceError, ModelLoadError
 
 def main(()) -> None:
     """Demonstrates custom inference workflows with the LMStrix Python API."""
@@ -21270,8 +20729,6 @@ ignore = [
   "E501",    # line too long (handled by formatter)
   "B008",    # do not perform function calls in argument defaults
   "C901",    # too complex
-  "ANN101",  # missing type annotation for self
-  "ANN102",  # missing type annotation for cls
   "ANN401",  # dynamically typed expressions (Any)
   "S101",    # use of assert detected
   "PLR0913", # too many arguments
@@ -21487,11 +20944,8 @@ class LMStudioClient:
         self,
         llm: Any,  # The loaded model object from lmstudio.llm
         prompt: str,
-        temperature: float = 0.7,
         max_tokens: int = -1,  # -1 for unlimited
-        model_id: str | None = None,  # Pass model_id separately since llm object may not have it
-        timeout: float = 30.0,  # Timeout in seconds
-        **kwargs: Any,
+        model_id: str | None = None,  # Pass model_id separately
     )) -> CompletionResponse:
         """Make a completion request to a loaded LM Studio model."""
 
@@ -21514,11 +20968,8 @@ def completion((
         self,
         llm: Any,  # The loaded model object from lmstudio.llm
         prompt: str,
-        temperature: float = 0.7,
         max_tokens: int = -1,  # -1 for unlimited
-        model_id: str | None = None,  # Pass model_id separately since llm object may not have it
-        timeout: float = 30.0,  # Timeout in seconds
-        **kwargs: Any,
+        model_id: str | None = None,  # Pass model_id separately
     )) -> CompletionResponse:
     """Make a completion request to a loaded LM Studio model."""
 
@@ -21567,6 +21018,11 @@ class ConfigurationError(L, M, S, t, r, i, x, E, r, r, o, r):
     def __init__((self, config_name: str, reason: str, details: dict | None = None)) -> None:
         """Initialize the exception."""
 
+class LMStudioInstallationNotFound(L, M, S, t, r, i, x, E, r, r, o, r):
+    """Raised when the LM Studio installation path cannot be found."""
+    def __init__((self)) -> None:
+        """Initialize the exception."""
+
 def __init__((self, message: str, details: dict | None = None)) -> None:
     """Initialize the exception."""
 
@@ -21592,6 +21048,9 @@ def __init__((self, model_id: str, available_models: list[str] | None = None)) -
     """Initialize the exception."""
 
 def __init__((self, config_name: str, reason: str, details: dict | None = None)) -> None:
+    """Initialize the exception."""
+
+def __init__((self)) -> None:
     """Initialize the exception."""
 
 
@@ -21621,14 +21080,14 @@ from lmstrix.utils import get_context_test_log_path, setup_logging
 
 class LMStrixCLI:
     """A CLI for testing and managing LM Studio models."""
-    def scan((self, failed: bool = False, all: bool = False, verbose: bool = False)) -> None:
+    def scan((self, failed: bool = False, scan_all: bool = False, verbose: bool = False)) -> None:
         """Scan for LM Studio models and update the local registry."""
     def list((self, sort: str = "id", show: str | None = None, verbose: bool = False)) -> None:
         """List all models from the registry with their test status."""
     def test((
         self,
         model_id: str | None = None,
-        all: bool = False,
+        test_all: bool = False,
         threshold: int = 102400,
         ctx: int | None = None,
         sort: str = "id",
@@ -21645,7 +21104,45 @@ class LMStrixCLI:
     )) -> None:
         """Run inference on a specified model."""
 
-def scan((self, failed: bool = False, all: bool = False, verbose: bool = False)) -> None:
+def _get_models_to_test((
+    registry: "ModelRegistry",
+    test_all: bool,
+    ctx: int | None,
+    model_id: str | None,
+)) -> list["Model"]:
+    """Filter and return a list of models to be tested."""
+
+def _sort_models((models: list["Model"], sort_by: str)) -> list["Model"]:
+    """Sort a list of models based on a given key."""
+
+def _test_single_model((
+    tester: "ContextTester",
+    model: "Model",
+    ctx: int,
+    registry: "ModelRegistry",
+)) -> None:
+    """Test a single model at a specific context size."""
+
+def _test_all_models_at_ctx((
+    tester: "ContextTester",
+    models_to_test: list["Model"],
+    ctx: int,
+    registry: "ModelRegistry",
+)) -> list["Model"]:
+    """Test all models at a specific context size."""
+
+def _test_all_models_optimized((
+    tester: "ContextTester",
+    models_to_test: list["Model"],
+    threshold: int,
+    registry: "ModelRegistry",
+)) -> list["Model"]:
+    """Run optimized batch testing for multiple models."""
+
+def _print_final_results((updated_models: list["Model"])) -> None:
+    """Print the final results table."""
+
+def scan((self, failed: bool = False, scan_all: bool = False, verbose: bool = False)) -> None:
     """Scan for LM Studio models and update the local registry."""
 
 def list((self, sort: str = "id", show: str | None = None, verbose: bool = False)) -> None:
@@ -21654,7 +21151,7 @@ def list((self, sort: str = "id", show: str | None = None, verbose: bool = False
 def test((
         self,
         model_id: str | None = None,
-        all: bool = False,
+        test_all: bool = False,
         threshold: int = 102400,
         ctx: int | None = None,
         sort: str = "id",
@@ -21693,8 +21190,9 @@ import json
 from pathlib import Path
 from loguru import logger
 from pydantic import BaseModel, Field
-from lmstrix.api.client import LMStudioClient
+from lmstrix.api.exceptions import InferenceError, ModelLoadError
 from lmstrix.core.models import Model
+from lmstrix.api.client import LMStudioClient
 
 class OptimizationResult(B, a, s, e, M, o, d, e, l):
     """Result from context optimization."""
@@ -21703,7 +21201,7 @@ class ContextOptimizer:
     """Finds the maximum effective context window for models."""
     def __init__((
         self,
-        client: LMStudioClient | None = None,
+        client: "LMStudioClient | None" = None,
         cache_file: Path | None = None,
         verbose: bool = False,
     )) -> None:
@@ -21735,7 +21233,7 @@ def succeeded((self)) -> bool:
 
 def __init__((
         self,
-        client: LMStudioClient | None = None,
+        client: "LMStudioClient | None" = None,
         cache_file: Path | None = None,
         verbose: bool = False,
     )) -> None:
@@ -21772,10 +21270,10 @@ def find_optimal_context((
 # Language: python
 
 import json
-import math
 import time
 from datetime import datetime
 from pathlib import Path
+from typing import ClassVar
 from loguru import logger
 from lmstrix.api import LMStudioClient
 from lmstrix.api.exceptions import ModelLoadError
@@ -21797,7 +21295,7 @@ class ContextTestResult:
         """Initialize test result."""
     def to_dict((self)) -> dict:
         """Convert to dictionary for logging."""
-    def is_valid_response((self, expected: str = "")) -> bool:
+    def is_valid_response((self)) -> bool:
         """Check if we got any response at all (not validating content)."""
 
 class ContextTester:
@@ -21831,6 +21329,8 @@ class ContextTester:
         registry: ModelRegistry | None = None,
     )) -> Model:
         """Run full context test on a model using the new safe testing strategy."""
+    def _is_embedding_model((self, model: Model)) -> bool:
+        """Check if a model is an embedding model."""
     def test_all_models((
         self,
         models: list[Model],
@@ -21853,8 +21353,64 @@ def __init__((
 def to_dict((self)) -> dict:
     """Convert to dictionary for logging."""
 
-def is_valid_response((self, expected: str = "")) -> bool:
+def is_valid_response((self)) -> bool:
     """Check if we got any response at all (not validating content)."""
+
+def _perform_initial_test((
+    self,
+    model: Model,
+    min_context: int,
+    log_path: Path,
+    registry: ModelRegistry,
+)) -> ContextTestResult | None:
+    """Perform the initial test at a minimal context to ensure the model is operational."""
+
+def _perform_threshold_test((
+    self,
+    model: Model,
+    max_context: int,
+    log_path: Path,
+    registry: ModelRegistry,
+)) -> ContextTestResult | None:
+    """Perform the test at the specified threshold."""
+
+def _perform_incremental_test((
+    self,
+    model: Model,
+    start_context: int,
+    log_path: Path,
+    registry: ModelRegistry,
+)) -> None:
+    """Perform incremental testing from a known good context."""
+
+def _perform_binary_search((
+    self,
+    model: Model,
+    low: int,
+    high: int,
+    log_path: Path,
+    registry: ModelRegistry,
+)) -> None:
+    """Perform binary search to find the optimal context size."""
+
+def _filter_models_for_testing((self, models: list[Model])) -> list[Model]:
+    """Filter out embedding models and already completed models."""
+
+def _perform_pass_one_testing((
+    self,
+    sorted_models: list[Model],
+    min_context: int,
+    registry: ModelRegistry,
+)) -> tuple[dict[str, Model], list[Model]]:
+    """Perform the first pass of testing at a minimal context."""
+
+def _perform_subsequent_passes((
+    self,
+    active_models: dict[str, Model],
+    threshold: int,
+    registry: ModelRegistry,
+)) -> None:
+    """Perform subsequent passes of testing at progressively higher contexts."""
 
 def __init__((self, client: LMStudioClient | None = None, verbose: bool = False)) -> None:
     """Initialize context tester."""
@@ -21890,6 +21446,9 @@ def test_model((
     )) -> Model:
     """Run full context test on a model using the new safe testing strategy."""
 
+def _is_embedding_model((self, model: Model)) -> bool:
+    """Check if a model is an embedding model."""
+
 def test_all_models((
         self,
         models: list[Model],
@@ -21897,8 +21456,6 @@ def test_all_models((
         registry: ModelRegistry | None = None,
     )) -> list[Model]:
     """Test multiple models efficiently using a pass-based approach."""
-
-def is_embedding_model((model)) -> bool:
 
 
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py
@@ -22003,7 +21560,7 @@ class ModelRegistry:
         """Get all models in the registry."""
     def update_model((self, model_path: str, model: Model)) -> None:
         """Update a model in the registry and save."""
-    def update_model_by_id((self, model_id: str, model: Model)) -> None:
+    def update_model_by_id((self, model: Model)) -> None:
         """Update a model by ID (backward compatibility)."""
     def remove_model((self, model_path: str)) -> None:
         """Remove a model from the registry and save."""
@@ -22051,7 +21608,7 @@ def list_models((self)) -> list[Model]:
 def update_model((self, model_path: str, model: Model)) -> None:
     """Update a model in the registry and save."""
 
-def update_model_by_id((self, model_id: str, model: Model)) -> None:
+def update_model_by_id((self, model: Model)) -> None:
     """Update a model by ID (backward compatibility)."""
 
 def remove_model((self, model_path: str)) -> None:
@@ -22063,7 +21620,7 @@ def remove_model_by_id((self, model_id: str)) -> None:
 def __len__((self)) -> int:
     """Return the number of models in the registry."""
 
-def models((self)):
+def models((self)) -> dict[str, Model]:
     """Public property for internal model mapping (path -> Model)."""
 
 
@@ -22299,6 +21856,20 @@ def save_model_registry((
 )) -> Path:
     """Save a ModelRegistry to a JSON file."""
 
+def _update_existing_model((
+    existing_model: Model,
+    model_data: dict,
+    rescan_all: bool,
+    rescan_failed: bool,
+)) -> Model:
+    """Update an existing model's data and handle rescan options."""
+
+def _add_new_model((model_data: dict)) -> Model:
+    """Create a new model entry from discovered data."""
+
+def _remove_deleted_models((registry: ModelRegistry, discovered_models: list[dict])) -> None:
+    """Remove models from the registry that are no longer discovered."""
+
 def scan_and_update_registry((
     rescan_failed: bool = False,
     rescan_all: bool = False,
@@ -22380,6 +21951,7 @@ def setup_logging((verbose: bool = False)) -> None:
 
 from pathlib import Path
 from loguru import logger
+from lmstrix.api.exceptions import LMStudioInstallationNotFound
 
 def get_lmstudio_path(()) -> Path:
     """Get the LM Studio installation path."""
@@ -22416,35 +21988,37 @@ def get_lmstrix_log_path(()) -> Path:
 
 import asyncio
 import sys
+from collections.abc import Generator
 from pathlib import Path
+from typing import Any
 from unittest.mock import Mock
 import pytest
 
-def mock_lmstudio_client(()):
+def mock_lmstudio_client(()) -> Mock:
     """Mock LMStudioClient for testing."""
 
-def mock_llm(()):
+def mock_llm(()) -> Mock:
     """Mock LLM object returned by lmstudio.llm()."""
 
-def sample_model_data(()):
+def sample_model_data(()) -> dict[str, Any]:
     """Sample model data for testing."""
 
-def tmp_models_dir((tmp_path)):
+def tmp_models_dir((tmp_path: Path)) -> Path:
     """Create a temporary models directory."""
 
-def tmp_registry_file((tmp_path)):
+def tmp_registry_file((tmp_path: Path)) -> Path:
     """Create a temporary registry file path."""
 
-def event_loop(()):
+def event_loop(()) -> Generator[asyncio.AbstractEventLoop, None, None]:
     """Create an instance of the default event loop for the test session."""
 
-def mock_completion_response(()):
+def mock_completion_response(()) -> dict[str, Any]:
     """Mock completion response from LM Studio."""
 
-def mock_prompt_template(()):
+def mock_prompt_template(()) -> dict[str, Any]:
     """Sample prompt template for testing."""
 
-def mock_context_data(()):
+def mock_context_data(()) -> dict[str, str]:
     """Sample context data for testing."""
 
 
@@ -22454,7 +22028,7 @@ def mock_context_data(()):
 import subprocess
 import sys
 
-def run_tests(()):
+def run_tests(()) -> int:
     """Run the test suite."""
 
 
@@ -22473,44 +22047,52 @@ from lmstrix.api.exceptions import APIConnectionError, InferenceError, ModelLoad
 
 class TestCompletionResponse:
     """Test CompletionResponse model."""
-    def test_completion_response_creation((self)) -> None:
+    def test_completion_response_creation((self: "TestCompletionResponse")) -> None:
         """Test creating a CompletionResponse."""
-    def test_completion_response_minimal((self)) -> None:
+    def test_completion_response_minimal((self: "TestCompletionResponse")) -> None:
         """Test creating a CompletionResponse with minimal fields."""
 
 class TestLMStudioClient:
     """Test LMStudioClient class."""
-    def test_client_initialization((self)) -> None:
+    def test_client_initialization((self: "TestLMStudioClient")) -> None:
         """Test client initialization with different verbose settings."""
 
-def test_completion_response_creation((self)) -> None:
+def test_completion_response_creation((self: "TestCompletionResponse")) -> None:
     """Test creating a CompletionResponse."""
 
-def test_completion_response_minimal((self)) -> None:
+def test_completion_response_minimal((self: "TestCompletionResponse")) -> None:
     """Test creating a CompletionResponse with minimal fields."""
 
-def test_client_initialization((self)) -> None:
+def test_client_initialization((self: "TestLMStudioClient")) -> None:
     """Test client initialization with different verbose settings."""
 
-def test_list_models_success((self, mock_lmstudio)) -> None:
+def test_list_models_success((self: "TestLMStudioClient", mock_lmstudio: Mock)) -> None:
     """Test successful list_models call."""
 
-def test_list_models_failure((self, mock_lmstudio)) -> None:
+def test_list_models_failure((self: "TestLMStudioClient", mock_lmstudio: Mock)) -> None:
     """Test list_models with connection error."""
 
-def test_load_model_success((self, mock_lmstudio)) -> None:
+def test_load_model_success((self: "TestLMStudioClient", mock_lmstudio: Mock)) -> None:
     """Test successful model loading."""
 
-def test_load_model_failure((self, mock_lmstudio)) -> None:
+def test_load_model_failure((self: "TestLMStudioClient", mock_lmstudio: Mock)) -> None:
     """Test model loading failure."""
 
-def test_acompletion_success((self, mock_llm, mock_completion_response)) -> None:
+def test_acompletion_success((
+        self: "TestLMStudioClient",
+        mock_llm: Mock,
+        mock_completion_response: CompletionResponse,
+    )) -> None:
     """Test successful async completion."""
 
-def test_acompletion_failure((self, mock_llm)) -> None:
+def test_acompletion_failure((self: "TestLMStudioClient", mock_llm: Mock)) -> None:
     """Test async completion failure."""
 
-def test_acompletion_with_defaults((self, mock_llm, mock_completion_response)) -> None:
+def test_acompletion_with_defaults((
+        self: "TestLMStudioClient",
+        mock_llm: Mock,
+        mock_completion_response: CompletionResponse,
+    )) -> None:
     """Test async completion with default parameters."""
 
 
@@ -22519,15 +22101,15 @@ def test_acompletion_with_defaults((self, mock_llm, mock_completion_response)) -
 
 from lmstrix.api.exceptions import (
     APIConnectionError,
-    APIError,
     InferenceError,
+    LMStrixError,
     ModelLoadError,
 )
 
 class TestAPIExceptions:
     """Test API exception classes."""
     def test_api_error_base((self)) -> None:
-        """Test base APIError class."""
+        """Test base LMStrixError class."""
     def test_api_connection_error((self)) -> None:
         """Test APIConnectionError creation and attributes."""
     def test_model_load_error((self)) -> None:
@@ -22535,10 +22117,10 @@ class TestAPIExceptions:
     def test_inference_error((self)) -> None:
         """Test InferenceError creation and attributes."""
     def test_exception_inheritance((self)) -> None:
-        """Test that all exceptions inherit from APIError."""
+        """Test that all exceptions inherit from LMStrixError."""
 
 def test_api_error_base((self)) -> None:
-    """Test base APIError class."""
+    """Test base LMStrixError class."""
 
 def test_api_connection_error((self)) -> None:
     """Test APIConnectionError creation and attributes."""
@@ -22550,7 +22132,7 @@ def test_inference_error((self)) -> None:
     """Test InferenceError creation and attributes."""
 
 def test_exception_inheritance((self)) -> None:
-    """Test that all exceptions inherit from APIError."""
+    """Test that all exceptions inherit from LMStrixError."""
 
 
 # File: /Users/Shared/lmstudio/lmstrix/tests/test_core/__init__.py
@@ -22563,6 +22145,7 @@ def test_exception_inheritance((self)) -> None:
 
 import json
 from datetime import datetime
+from pathlib import Path
 from typing import NoReturn
 from unittest.mock import AsyncMock, Mock, patch
 import pytest
@@ -22572,98 +22155,124 @@ from lmstrix.core.models import ContextTestStatus, Model
 
 class TestContextTestResult:
     """Test ContextTestResult class."""
-    def test_result_creation_minimal((self)) -> None:
+    def test_result_creation_minimal((self: "TestContextTestResult")) -> None:
         """Test creating a minimal test result."""
-    def test_result_creation_full((self)) -> None:
+    def test_result_creation_full((self: "TestContextTestResult")) -> None:
         """Test creating a full test result."""
-    def test_result_with_error((self)) -> None:
+    def test_result_with_error((self: "TestContextTestResult")) -> None:
         """Test result with error."""
-    def test_result_to_dict((self)) -> None:
+    def test_result_to_dict((self: "TestContextTestResult")) -> None:
         """Test converting result to dictionary."""
-    def test_is_valid_response((self)) -> None:
+    def test_is_valid_response((self: "TestContextTestResult")) -> None:
         """Test response validation."""
 
 class TestContextTester:
     """Test ContextTester class."""
-    def test_tester_initialization((self, mock_lmstudio_client)) -> None:
+    def test_tester_initialization((self: "TestContextTester", mock_lmstudio_client: Mock)) -> None:
         """Test context tester initialization."""
-    def test_tester_default_client((self)) -> None:
+    def test_tester_default_client((self: "TestContextTester")) -> None:
         """Test tester creates default client if none provided."""
-    def test_generate_test_prompt((self)) -> None:
+    def test_generate_test_prompt((self: "TestContextTester")) -> None:
         """Test test prompt generation."""
-    def test_estimate_tokens((self)) -> None:
+    def test_estimate_tokens((self: "TestContextTester")) -> None:
         """Test token estimation."""
 
-def test_result_creation_minimal((self)) -> None:
+def test_result_creation_minimal((self: "TestContextTestResult")) -> None:
     """Test creating a minimal test result."""
 
-def test_result_creation_full((self)) -> None:
+def test_result_creation_full((self: "TestContextTestResult")) -> None:
     """Test creating a full test result."""
 
-def test_result_with_error((self)) -> None:
+def test_result_with_error((self: "TestContextTestResult")) -> None:
     """Test result with error."""
 
-def test_result_to_dict((self)) -> None:
+def test_result_to_dict((self: "TestContextTestResult")) -> None:
     """Test converting result to dictionary."""
 
-def test_is_valid_response((self)) -> None:
+def test_is_valid_response((self: "TestContextTestResult")) -> None:
     """Test response validation."""
 
-def test_tester_initialization((self, mock_lmstudio_client)) -> None:
+def test_tester_initialization((self: "TestContextTester", mock_lmstudio_client: Mock)) -> None:
     """Test context tester initialization."""
 
-def test_tester_default_client((self)) -> None:
+def test_tester_default_client((self: "TestContextTester")) -> None:
     """Test tester creates default client if none provided."""
 
-def test_generate_test_prompt((self)) -> None:
+def test_generate_test_prompt((self: "TestContextTester")) -> None:
     """Test test prompt generation."""
 
-def test_estimate_tokens((self)) -> None:
+def test_estimate_tokens((self: "TestContextTester")) -> None:
     """Test token estimation."""
 
-def test_test_context_load_failure((self, mock_lmstudio_client)) -> None:
+def test_test_context_load_failure((
+        self: "TestContextTester",
+        mock_lmstudio_client: Mock,
+    )) -> None:
     """Test context testing when model fails to load."""
 
-def test_test_context_inference_failure((self, mock_lmstudio_client, mock_llm)) -> None:
+def test_test_context_inference_failure((
+        self: "TestContextTester",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
+    )) -> None:
     """Test context testing when inference fails."""
 
-def test_test_context_success((self, mock_lmstudio_client, mock_llm)) -> None:
+def test_test_context_success((
+        self: "TestContextTester",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
+    )) -> None:
     """Test successful context testing."""
 
-def test_test_context_invalid_response((self, mock_lmstudio_client, mock_llm)) -> None:
+def test_test_context_invalid_response((
+        self: "TestContextTester",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
+    )) -> None:
     """Test context testing with invalid response."""
 
-def test_find_optimal_context_simple((self, mock_lmstudio_client, mock_llm)) -> None:
+def test_find_optimal_context_simple((
+        self: "TestContextTester",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
+    )) -> None:
     """Test finding optimal context with simple scenario."""
 
-def mock_completion((llm, prompt, **kwargs)):
+def mock_completion((llm: Mock, prompt: str, **kwargs: dict)) -> Mock:
 
-def test_save_test_log((self, tmp_path)) -> None:
+def test_save_test_log((self: "TestContextTester", tmp_path: Path)) -> None:
     """Test saving test log to file."""
 
 def test_optimize_model_integration((
-        self,
-        mock_lmstudio_client,
-        mock_llm,
-        tmp_path,
+        self: "TestContextTester",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
+        tmp_path: Path,
     )) -> None:
     """Test full model optimization workflow."""
 
-def mock_completion((llm, prompt, **kwargs)):
+def mock_completion((llm: Mock, prompt: str, **kwargs: dict)) -> Mock:
 
-def test_optimize_model_failure((self, mock_lmstudio_client)) -> None:
+def test_optimize_model_failure((
+        self: "TestContextTester",
+        mock_lmstudio_client: Mock,
+    )) -> None:
     """Test model optimization when all tests fail."""
 
-def test_binary_search_logic((self, mock_lmstudio_client, mock_llm)) -> None:
+def test_binary_search_logic((
+        self: "TestContextTester",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
+    )) -> None:
     """Test binary search algorithm with various edge cases."""
 
-def always_works((llm, prompt, **kwargs)):
+def always_works((llm: Mock, prompt: str, **kwargs: dict)) -> Mock:
 
-def never_works((llm, prompt, **kwargs)) -> NoReturn:
+def never_works((llm: Mock, prompt: str, **kwargs: dict)) -> NoReturn:
 
-def loads_but_fails_inference((llm, prompt, **kwargs)):
+def loads_but_fails_inference((llm: Mock, prompt: str, **kwargs: dict)) -> Mock:
 
-def works_up_to_2048((llm, prompt, **kwargs)):
+def works_up_to_2048((llm: Mock, prompt: str, **kwargs: dict)) -> Mock:
 
 
 # File: /Users/Shared/lmstudio/lmstrix/tests/test_core/test_inference.py
@@ -22677,54 +22286,78 @@ from lmstrix.core.models import Model
 
 class TestInferenceResult:
     """Test InferenceResult model."""
-    def test_inference_result_success((self)) -> None:
+    def test_inference_result_success((self: "TestInferenceResult")) -> None:
         """Test successful inference result."""
-    def test_inference_result_failure((self)) -> None:
+    def test_inference_result_failure((self: "TestInferenceResult")) -> None:
         """Test failed inference result."""
-    def test_inference_result_empty_response((self)) -> None:
+    def test_inference_result_empty_response((self: "TestInferenceResult")) -> None:
         """Test result with empty response is considered failed."""
 
 class TestInferenceEngine:
     """Test InferenceEngine class."""
-    def test_engine_initialization_defaults((self)) -> None:
+    def test_engine_initialization_defaults((self: "TestInferenceEngine")) -> None:
         """Test engine initialization with defaults."""
-    def test_engine_initialization_custom((self, mock_lmstudio_client)) -> None:
+    def test_engine_initialization_custom((
+        self: "TestInferenceEngine", mock_lmstudio_client: Mock
+    )) -> None:
         """Test engine initialization with custom client and registry."""
 
-def test_inference_result_success((self)) -> None:
+def test_inference_result_success((self: "TestInferenceResult")) -> None:
     """Test successful inference result."""
 
-def test_inference_result_failure((self)) -> None:
+def test_inference_result_failure((self: "TestInferenceResult")) -> None:
     """Test failed inference result."""
 
-def test_inference_result_empty_response((self)) -> None:
+def test_inference_result_empty_response((self: "TestInferenceResult")) -> None:
     """Test result with empty response is considered failed."""
 
-def test_engine_initialization_defaults((self)) -> None:
+def test_engine_initialization_defaults((self: "TestInferenceEngine")) -> None:
     """Test engine initialization with defaults."""
 
-def test_engine_initialization_custom((self, mock_lmstudio_client)) -> None:
+def test_engine_initialization_custom((
+        self: "TestInferenceEngine", mock_lmstudio_client: Mock
+    )) -> None:
     """Test engine initialization with custom client and registry."""
 
-def test_infer_model_not_found((self)) -> None:
+def test_infer_model_not_found((self: "TestInferenceEngine")) -> None:
     """Test inference with non-existent model."""
 
-def test_infer_success((self, mock_lmstudio_client, mock_llm)) -> None:
+def test_infer_success((
+        self: "TestInferenceEngine", mock_lmstudio_client: Mock, mock_llm: Mock
+    )) -> None:
     """Test successful inference."""
 
-def test_infer_with_untested_model((self, mock_lmstudio_client, mock_llm)) -> None:
+def test_infer_with_untested_model((
+        self: "TestInferenceEngine",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
+    )) -> None:
     """Test inference with model that hasn't been context tested."""
 
-def test_infer_with_max_tokens((self, mock_lmstudio_client, mock_llm)) -> None:
+def test_infer_with_max_tokens((
+        self: "TestInferenceEngine",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
+    )) -> None:
     """Test inference with custom max_tokens."""
 
-def test_infer_load_failure((self, mock_lmstudio_client)) -> None:
+def test_infer_load_failure((
+        self: "TestInferenceEngine", mock_lmstudio_client: Mock
+    )) -> None:
     """Test inference when model fails to load."""
 
-def test_infer_completion_failure((self, mock_lmstudio_client, mock_llm)) -> None:
+def test_infer_completion_failure((
+        self: "TestInferenceEngine",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
+    )) -> None:
     """Test inference when completion fails."""
 
-def test_run_inference_simple((self, mock_lmstudio_client, mock_llm)) -> None:
+def test_run_inference_simple((
+        self: "TestInferenceEngine",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
+    )) -> None:
     """Test simple run_inference method."""
 
 
@@ -22734,92 +22367,145 @@ def test_run_inference_simple((self, mock_lmstudio_client, mock_llm)) -> None:
 import json
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 import pytest
 from pydantic import ValidationError
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 
 class TestContextTestStatus:
     """Test ContextTestStatus enum."""
-    def test_enum_values((self)) -> None:
+    def test_enum_values((self: "TestContextTestStatus")) -> None:
         """Test that all expected enum values exist."""
 
 class TestModel:
     """Test Model class."""
-    def test_model_creation_minimal((self, sample_model_data)) -> None:
+    def test_model_creation_minimal((self: "TestModel", sample_model_data: dict[str, Any])) -> None:
         """Test creating a model with minimal required fields."""
-    def test_model_creation_with_aliases((self)) -> None:
+    def test_model_creation_with_aliases((self: "TestModel")) -> None:
         """Test model creation using field aliases."""
-    def test_model_with_context_testing((self, sample_model_data)) -> None:
+    def test_model_with_context_testing((
+        self: "TestModel", sample_model_data: dict[str, Any]
+    )) -> None:
         """Test model with context testing information."""
-    def test_model_path_validation((self)) -> None:
+    def test_model_path_validation((self: "TestModel")) -> None:
         """Test that path field accepts both string and Path objects."""
-    def test_model_sanitized_id((self)) -> None:
+    def test_model_sanitized_id((self: "TestModel")) -> None:
         """Test sanitized_id method."""
-    def test_model_to_registry_dict((self, sample_model_data)) -> None:
+    def test_model_to_registry_dict((self: "TestModel", sample_model_data: dict[str, Any])) -> None:
         """Test converting model to registry dictionary format."""
-    def test_model_validation_error((self)) -> None:
+    def test_model_validation_error((self: "TestModel")) -> None:
         """Test that model validation raises appropriate errors."""
 
 class TestModelRegistry:
     """Test ModelRegistry class."""
-    def test_registry_initialization((self, tmp_registry_file)) -> None:
+    def test_registry_initialization((self: "TestModelRegistry", tmp_registry_file: Path)) -> None:
         """Test registry initialization with custom file path."""
-    def test_registry_save_and_load((self, tmp_registry_file, sample_model_data)) -> None:
+    def test_registry_save_and_load((
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    )) -> None:
         """Test saving and loading models."""
-    def test_registry_get_model((self, tmp_registry_file, sample_model_data)) -> None:
+    def test_registry_get_model((
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    )) -> None:
         """Test getting a model by ID."""
-    def test_registry_list_models((self, tmp_registry_file, sample_model_data)) -> None:
+    def test_registry_list_models((
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    )) -> None:
         """Test listing all models."""
-    def test_registry_remove_model((self, tmp_registry_file, sample_model_data)) -> None:
+    def test_registry_remove_model((
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    )) -> None:
         """Test removing a model."""
-    def test_registry_with_context_test_data((self, tmp_registry_file, sample_model_data)) -> None:
+    def test_registry_with_context_test_data((
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    )) -> None:
         """Test saving/loading models with context test information."""
-    def test_registry_json_format((self, tmp_registry_file, sample_model_data)) -> None:
+    def test_registry_json_format((
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    )) -> None:
         """Test that the saved JSON has the expected format."""
 
-def test_enum_values((self)) -> None:
+def test_enum_values((self: "TestContextTestStatus")) -> None:
     """Test that all expected enum values exist."""
 
-def test_model_creation_minimal((self, sample_model_data)) -> None:
+def test_model_creation_minimal((self: "TestModel", sample_model_data: dict[str, Any])) -> None:
     """Test creating a model with minimal required fields."""
 
-def test_model_creation_with_aliases((self)) -> None:
+def test_model_creation_with_aliases((self: "TestModel")) -> None:
     """Test model creation using field aliases."""
 
-def test_model_with_context_testing((self, sample_model_data)) -> None:
+def test_model_with_context_testing((
+        self: "TestModel", sample_model_data: dict[str, Any]
+    )) -> None:
     """Test model with context testing information."""
 
-def test_model_path_validation((self)) -> None:
+def test_model_path_validation((self: "TestModel")) -> None:
     """Test that path field accepts both string and Path objects."""
 
-def test_model_sanitized_id((self)) -> None:
+def test_model_sanitized_id((self: "TestModel")) -> None:
     """Test sanitized_id method."""
 
-def test_model_to_registry_dict((self, sample_model_data)) -> None:
+def test_model_to_registry_dict((self: "TestModel", sample_model_data: dict[str, Any])) -> None:
     """Test converting model to registry dictionary format."""
 
-def test_model_validation_error((self)) -> None:
+def test_model_validation_error((self: "TestModel")) -> None:
     """Test that model validation raises appropriate errors."""
 
-def test_registry_initialization((self, tmp_registry_file)) -> None:
+def test_registry_initialization((self: "TestModelRegistry", tmp_registry_file: Path)) -> None:
     """Test registry initialization with custom file path."""
 
-def test_registry_save_and_load((self, tmp_registry_file, sample_model_data)) -> None:
+def test_registry_save_and_load((
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    )) -> None:
     """Test saving and loading models."""
 
-def test_registry_get_model((self, tmp_registry_file, sample_model_data)) -> None:
+def test_registry_get_model((
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    )) -> None:
     """Test getting a model by ID."""
 
-def test_registry_list_models((self, tmp_registry_file, sample_model_data)) -> None:
+def test_registry_list_models((
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    )) -> None:
     """Test listing all models."""
 
-def test_registry_remove_model((self, tmp_registry_file, sample_model_data)) -> None:
+def test_registry_remove_model((
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    )) -> None:
     """Test removing a model."""
 
-def test_registry_with_context_test_data((self, tmp_registry_file, sample_model_data)) -> None:
+def test_registry_with_context_test_data((
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    )) -> None:
     """Test saving/loading models with context test information."""
 
-def test_registry_json_format((self, tmp_registry_file, sample_model_data)) -> None:
+def test_registry_json_format((
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    )) -> None:
     """Test that the saved JSON has the expected format."""
 
 
@@ -22913,54 +22599,59 @@ def test_resolve_with_special_characters((self)) -> None:
 # File: /Users/Shared/lmstudio/lmstrix/tests/test_core/test_scanner.py
 # Language: python
 
+from pathlib import Path
 from unittest.mock import Mock, patch
 from lmstrix.core.scanner import ModelScanner
 
 class TestModelScanner:
     """Test ModelScanner class."""
-    def test_get_model_size_file((self, tmp_path)) -> None:
+    def test_get_model_size_file((self: "TestModelScanner", tmp_path: Path)) -> None:
         """Test getting size of a single model file."""
-    def test_get_model_size_directory((self, tmp_path)) -> None:
+    def test_get_model_size_directory((self: "TestModelScanner", tmp_path: Path)) -> None:
         """Test getting size of a model directory."""
-    def test_get_model_size_nonexistent((self, tmp_path)) -> None:
+    def test_get_model_size_nonexistent((self: "TestModelScanner", tmp_path: Path)) -> None:
         """Test getting size of non-existent path."""
-    def test_extract_model_info_gguf_file((self, tmp_path)) -> None:
+    def test_extract_model_info_gguf_file((self: "TestModelScanner", tmp_path: Path)) -> None:
         """Test extracting info from GGUF model file."""
-    def test_extract_model_info_mlx_directory((self, tmp_path)) -> None:
+    def test_extract_model_info_mlx_directory((self: "TestModelScanner", tmp_path: Path)) -> None:
         """Test extracting info from MLX model directory."""
-    def test_extract_model_info_hidden_file((self, tmp_path)) -> None:
+    def test_extract_model_info_hidden_file((self: "TestModelScanner", tmp_path: Path)) -> None:
         """Test that hidden files are skipped."""
-    def test_extract_model_info_non_model_file((self, tmp_path)) -> None:
+    def test_extract_model_info_non_model_file((self: "TestModelScanner", tmp_path: Path)) -> None:
         """Test that non-model files are skipped."""
 
-def test_scanner_initialization((self, mock_get_path, tmp_path)) -> None:
+def test_scanner_initialization((
+        self: "TestModelScanner", mock_get_path: Mock, tmp_path: Path
+    )) -> None:
     """Test scanner initialization."""
 
-def test_get_model_size_file((self, tmp_path)) -> None:
+def test_get_model_size_file((self: "TestModelScanner", tmp_path: Path)) -> None:
     """Test getting size of a single model file."""
 
-def test_get_model_size_directory((self, tmp_path)) -> None:
+def test_get_model_size_directory((self: "TestModelScanner", tmp_path: Path)) -> None:
     """Test getting size of a model directory."""
 
-def test_get_model_size_nonexistent((self, tmp_path)) -> None:
+def test_get_model_size_nonexistent((self: "TestModelScanner", tmp_path: Path)) -> None:
     """Test getting size of non-existent path."""
 
-def test_extract_model_info_gguf_file((self, tmp_path)) -> None:
+def test_extract_model_info_gguf_file((self: "TestModelScanner", tmp_path: Path)) -> None:
     """Test extracting info from GGUF model file."""
 
-def test_extract_model_info_mlx_directory((self, tmp_path)) -> None:
+def test_extract_model_info_mlx_directory((self: "TestModelScanner", tmp_path: Path)) -> None:
     """Test extracting info from MLX model directory."""
 
-def test_extract_model_info_hidden_file((self, tmp_path)) -> None:
+def test_extract_model_info_hidden_file((self: "TestModelScanner", tmp_path: Path)) -> None:
     """Test that hidden files are skipped."""
 
-def test_extract_model_info_non_model_file((self, tmp_path)) -> None:
+def test_extract_model_info_non_model_file((self: "TestModelScanner", tmp_path: Path)) -> None:
     """Test that non-model files are skipped."""
 
-def test_scan_models((self, mock_get_path, tmp_path)) -> None:
+def test_scan_models((self: "TestModelScanner", mock_get_path: Mock, tmp_path: Path)) -> None:
     """Test scanning for models."""
 
-def test_sync_with_registry((self, mock_get_path, tmp_path)) -> None:
+def test_sync_with_registry((
+        self: "TestModelScanner", mock_get_path: Mock, tmp_path: Path
+    )) -> None:
     """Test syncing scanned models with registry."""
 
 
@@ -22978,67 +22669,68 @@ def test_sync_with_registry((self, mock_get_path, tmp_path)) -> None:
 # Language: python
 
 import json
+from pathlib import Path
 from unittest.mock import AsyncMock, Mock, patch
 import pytest
-from lmstrix.cli.main import create_app
-from lmstrix.core.models import Model
-from lmstrix.cli.main import CLI
-from lmstrix.cli.main import CLI
-from lmstrix.cli.main import CLI
-from lmstrix.cli.main import CLI
-from lmstrix.core.prompts import ResolvedPrompt
+from _pytest.capture import CaptureFixture
+from lmstrix.cli.main import LMStrixCLI as CLI
 from lmstrix.core.inference import InferenceResult
-from lmstrix.cli.main import CLI
-from lmstrix.cli.main import main
+from lmstrix.core.models import Model
+from lmstrix.core.prompts import ResolvedPrompt
 
 class TestCLIIntegration:
     """Test CLI integration scenarios."""
-    def test_cli_help((self, capsys)) -> None:
+    def test_cli_help((self: "TestCLIIntegration", capsys: CaptureFixture[str])) -> None:
         """Test CLI help output."""
 
-def mock_lmstudio_setup((self, tmp_path)):
+def mock_lmstudio_setup((self: "TestCLIIntegration", tmp_path: Path)) -> tuple[Path, Path]:
     """Set up mock LM Studio environment."""
 
 def test_list_models_command((
-        self,
-        mock_client_class,
-        mock_get_path,
-        mock_lmstudio_setup,
-        capsys,
+        self: "TestCLIIntegration",
+        mock_client_class: Mock,
+        mock_get_path: Mock,
+        mock_lmstudio_setup: tuple[Path, Path],
+        capsys: CaptureFixture[str],
     )) -> None:
     """Test 'models list' command."""
 
 def test_scan_models_command((
-        self,
-        mock_scanner_class,
-        mock_client_class,
-        mock_get_path,
-        mock_lmstudio_setup,
+        self: "TestCLIIntegration",
+        mock_scanner_class: Mock,
+        mock_client_class: Mock,
+        mock_get_path: Mock,
+        mock_lmstudio_setup: tuple[Path, Path],
     )) -> None:
     """Test 'models scan' command."""
 
 def test_optimize_command((
-        self,
-        mock_client_class,
-        mock_get_path,
-        mock_lmstudio_setup,
+        self: "TestCLIIntegration",
+        mock_client_class: Mock,
+        mock_get_path: Mock,
+        mock_lmstudio_setup: tuple[Path, Path],
     )) -> None:
     """Test 'optimize' command."""
 
-def test_infer_command_missing_prompt((self, mock_get_path, mock_lmstudio_setup, capsys)) -> None:
+def test_infer_command_missing_prompt((
+        self: "TestCLIIntegration",
+        mock_get_path: Mock,
+        mock_lmstudio_setup: tuple[Path, Path],
+        capsys: CaptureFixture[str],
+    )) -> None:
     """Test 'infer' command with missing prompt."""
 
 def test_infer_with_prompt_file((
-        self,
-        mock_engine_class,
-        mock_load_prompts,
-        mock_get_path,
-        mock_lmstudio_setup,
-        tmp_path,
+        self: "TestCLIIntegration",
+        mock_engine_class: Mock,
+        mock_load_prompts: Mock,
+        mock_get_path: Mock,
+        mock_lmstudio_setup: tuple[Path, Path],
+        tmp_path: Path,
     )) -> None:
     """Test 'infer' command with prompt file."""
 
-def test_cli_help((self, capsys)) -> None:
+def test_cli_help((self: "TestCLIIntegration", capsys: CaptureFixture[str])) -> None:
     """Test CLI help output."""
 
 
@@ -23050,141 +22742,61 @@ def test_cli_help((self, capsys)) -> None:
 # File: /Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py
 # Language: python
 
-from unittest.mock import patch
-import pytest
-from lmstrix.api.exceptions import ConfigurationError
-from lmstrix.loaders.context_loader import (
-    load_context,
-    load_context_batch,
-    merge_contexts,
-)
-
-class TestContextLoader:
-    """Test context loading functions."""
-    def test_load_context_simple((self, tmp_path)) -> None:
-        """Test loading simple text context."""
-    def test_load_context_with_encoding((self, tmp_path)) -> None:
-        """Test loading context with specific encoding."""
-    def test_load_context_nonexistent_file((self, tmp_path)) -> None:
-        """Test loading from non-existent file."""
-    def test_load_context_read_error((self, tmp_path)) -> None:
-        """Test handling read errors."""
-    def test_load_context_string_path((self, tmp_path)) -> None:
-        """Test loading context with string path."""
-    def test_load_context_large_file((self, tmp_path)) -> None:
-        """Test loading large context file."""
-    def test_load_context_batch_single((self, tmp_path)) -> None:
-        """Test loading batch with single file."""
-    def test_load_context_batch_multiple((self, tmp_path)) -> None:
-        """Test loading batch with multiple files."""
-    def test_load_context_batch_with_errors((self, tmp_path)) -> None:
-        """Test batch loading continues on error."""
-    def test_load_context_batch_empty((self)) -> None:
-        """Test loading empty batch."""
-    def test_merge_contexts_simple((self)) -> None:
-        """Test merging simple contexts."""
-    def test_merge_contexts_with_separator((self)) -> None:
-        """Test merging with custom separator."""
-    def test_merge_contexts_single((self)) -> None:
-        """Test merging single context."""
-    def test_merge_contexts_empty((self)) -> None:
-        """Test merging empty contexts."""
-    def test_merge_contexts_with_headers((self)) -> None:
-        """Test that merge includes file headers."""
-
-def test_load_context_simple((self, tmp_path)) -> None:
-    """Test loading simple text context."""
-
-def test_load_context_with_encoding((self, tmp_path)) -> None:
-    """Test loading context with specific encoding."""
-
-def test_load_context_nonexistent_file((self, tmp_path)) -> None:
-    """Test loading from non-existent file."""
-
-def test_load_context_read_error((self, tmp_path)) -> None:
-    """Test handling read errors."""
-
-def test_load_context_string_path((self, tmp_path)) -> None:
-    """Test loading context with string path."""
-
-def test_load_context_large_file((self, tmp_path)) -> None:
-    """Test loading large context file."""
-
-def test_load_context_batch_single((self, tmp_path)) -> None:
-    """Test loading batch with single file."""
-
-def test_load_context_batch_multiple((self, tmp_path)) -> None:
-    """Test loading batch with multiple files."""
-
-def test_load_context_batch_with_errors((self, tmp_path)) -> None:
-    """Test batch loading continues on error."""
-
-def test_load_context_batch_empty((self)) -> None:
-    """Test loading empty batch."""
-
-def test_merge_contexts_simple((self)) -> None:
-    """Test merging simple contexts."""
-
-def test_merge_contexts_with_separator((self)) -> None:
-    """Test merging with custom separator."""
-
-def test_merge_contexts_single((self)) -> None:
-    """Test merging single context."""
-
-def test_merge_contexts_empty((self)) -> None:
-    """Test merging empty contexts."""
-
-def test_merge_contexts_with_headers((self)) -> None:
-    """Test that merge includes file headers."""
 
 
 # File: /Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_model_loader.py
 # Language: python
 
 import json
+from pathlib import Path
 from unittest.mock import Mock, patch
 from lmstrix.core.models import Model, ModelRegistry
 from lmstrix.loaders.model_loader import (
     load_model_registry,
     save_model_registry,
-    scan_and_update_models,
+    scan_and_update_registry,
 )
 
 class TestModelLoader:
     """Test model loading functions."""
-    def test_load_model_registry_default_path((self, tmp_path)) -> None:
+    def test_load_model_registry_default_path((self: "TestModelLoader", tmp_path: Path)) -> None:
         """Test loading registry with default path."""
-    def test_load_model_registry_custom_path((self, tmp_path)) -> None:
+    def test_load_model_registry_custom_path((self: "TestModelLoader", tmp_path: Path)) -> None:
         """Test loading registry with custom path."""
-    def test_load_model_registry_nonexistent_file((self, tmp_path)) -> None:
+    def test_load_model_registry_nonexistent_file((self: "TestModelLoader", tmp_path: Path)) -> None:
         """Test loading registry when file doesn't exist."""
-    def test_save_model_registry_default_path((self, tmp_path)) -> None:
+    def test_save_model_registry_default_path((self: "TestModelLoader", tmp_path: Path)) -> None:
         """Test saving registry with default path."""
-    def test_save_model_registry_custom_path((self, tmp_path)) -> None:
+    def test_save_model_registry_custom_path((self: "TestModelLoader", tmp_path: Path)) -> None:
         """Test saving registry to custom path."""
 
-def test_load_model_registry_default_path((self, tmp_path)) -> None:
+def test_load_model_registry_default_path((self: "TestModelLoader", tmp_path: Path)) -> None:
     """Test loading registry with default path."""
 
-def test_load_model_registry_custom_path((self, tmp_path)) -> None:
+def test_load_model_registry_custom_path((self: "TestModelLoader", tmp_path: Path)) -> None:
     """Test loading registry with custom path."""
 
-def test_load_model_registry_nonexistent_file((self, tmp_path)) -> None:
+def test_load_model_registry_nonexistent_file((self: "TestModelLoader", tmp_path: Path)) -> None:
     """Test loading registry when file doesn't exist."""
 
-def test_save_model_registry_default_path((self, tmp_path)) -> None:
+def test_save_model_registry_default_path((self: "TestModelLoader", tmp_path: Path)) -> None:
     """Test saving registry with default path."""
 
-def test_save_model_registry_custom_path((self, tmp_path)) -> None:
+def test_save_model_registry_custom_path((self: "TestModelLoader", tmp_path: Path)) -> None:
     """Test saving registry to custom path."""
 
-def test_scan_and_update_models((self, mock_scanner_class, mock_client_class, tmp_path)) -> None:
+def test_scan_and_update_models((
+        self: "TestModelLoader",
+        mock_scanner_class: Mock,
+        mock_client_class: Mock,
+        tmp_path: Path,
+    )) -> None:
     """Test scanning and updating models."""
 
 def test_scan_and_update_models_default_client((
-        self,
-        mock_scanner_class,
-        mock_client_class,
+        self: "TestModelLoader",
+        mock_scanner_class: Mock,
+        mock_client_class: Mock,
     )) -> None:
     """Test scan_and_update_models creates default client if none provided."""
 
@@ -23192,64 +22804,54 @@ def test_scan_and_update_models_default_client((
 # File: /Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_prompt_loader.py
 # Language: python
 
+from pathlib import Path
 import pytest
 import toml
 from lmstrix.api.exceptions import ConfigurationError
 from lmstrix.core.prompts import PromptResolver, ResolvedPrompt
-from lmstrix.loaders.prompt_loader import load_prompt_file, load_prompts
+from lmstrix.loaders.prompt_loader import load_prompts
 
 class TestPromptLoader:
     """Test prompt loading functions."""
-    def test_load_prompts_simple((self, tmp_path)) -> None:
+    def test_load_prompts_simple((self: "TestPromptLoader", tmp_path: Path)) -> None:
         """Test loading simple prompts from TOML file."""
-    def test_load_prompts_nonexistent_file((self, tmp_path)) -> None:
+    def test_load_prompts_nonexistent_file((self: "TestPromptLoader", tmp_path: Path)) -> None:
         """Test loading prompts from non-existent file."""
-    def test_load_prompts_invalid_toml((self, tmp_path)) -> None:
+    def test_load_prompts_invalid_toml((self: "TestPromptLoader", tmp_path: Path)) -> None:
         """Test loading prompts from invalid TOML file."""
-    def test_load_prompts_with_nested_placeholders((self, tmp_path)) -> None:
+    def test_load_prompts_with_nested_placeholders((
+        self: "TestPromptLoader", tmp_path: Path
+    )) -> None:
         """Test loading prompts with nested placeholders."""
-    def test_load_prompts_with_missing_params((self, tmp_path)) -> None:
+    def test_load_prompts_with_missing_params((self: "TestPromptLoader", tmp_path: Path)) -> None:
         """Test loading prompts with missing parameters."""
-    def test_load_prompts_with_custom_resolver((self, tmp_path)) -> None:
+    def test_load_prompts_with_custom_resolver((self: "TestPromptLoader", tmp_path: Path)) -> None:
         """Test loading prompts with custom resolver."""
-    def test_load_prompts_empty_file((self, tmp_path)) -> None:
+    def test_load_prompts_empty_file((self: "TestPromptLoader", tmp_path: Path)) -> None:
         """Test loading prompts from empty TOML file."""
-    def test_load_prompt_file_simple((self, tmp_path)) -> None:
-        """Test loading a single prompt file."""
-    def test_load_prompt_file_missing_template((self, tmp_path)) -> None:
-        """Test loading prompt file without template field."""
-    def test_load_prompt_file_with_defaults((self, tmp_path)) -> None:
-        """Test loading prompt file with default values."""
 
-def test_load_prompts_simple((self, tmp_path)) -> None:
+def test_load_prompts_simple((self: "TestPromptLoader", tmp_path: Path)) -> None:
     """Test loading simple prompts from TOML file."""
 
-def test_load_prompts_nonexistent_file((self, tmp_path)) -> None:
+def test_load_prompts_nonexistent_file((self: "TestPromptLoader", tmp_path: Path)) -> None:
     """Test loading prompts from non-existent file."""
 
-def test_load_prompts_invalid_toml((self, tmp_path)) -> None:
+def test_load_prompts_invalid_toml((self: "TestPromptLoader", tmp_path: Path)) -> None:
     """Test loading prompts from invalid TOML file."""
 
-def test_load_prompts_with_nested_placeholders((self, tmp_path)) -> None:
+def test_load_prompts_with_nested_placeholders((
+        self: "TestPromptLoader", tmp_path: Path
+    )) -> None:
     """Test loading prompts with nested placeholders."""
 
-def test_load_prompts_with_missing_params((self, tmp_path)) -> None:
+def test_load_prompts_with_missing_params((self: "TestPromptLoader", tmp_path: Path)) -> None:
     """Test loading prompts with missing parameters."""
 
-def test_load_prompts_with_custom_resolver((self, tmp_path)) -> None:
+def test_load_prompts_with_custom_resolver((self: "TestPromptLoader", tmp_path: Path)) -> None:
     """Test loading prompts with custom resolver."""
 
-def test_load_prompts_empty_file((self, tmp_path)) -> None:
+def test_load_prompts_empty_file((self: "TestPromptLoader", tmp_path: Path)) -> None:
     """Test loading prompts from empty TOML file."""
-
-def test_load_prompt_file_simple((self, tmp_path)) -> None:
-    """Test loading a single prompt file."""
-
-def test_load_prompt_file_missing_template((self, tmp_path)) -> None:
-    """Test loading prompt file without template field."""
-
-def test_load_prompt_file_with_defaults((self, tmp_path)) -> None:
-    """Test loading prompt file with default values."""
 
 
 # File: /Users/Shared/lmstudio/lmstrix/tests/test_utils/__init__.py
@@ -23275,67 +22877,77 @@ from lmstrix.utils.paths import (
 
 class TestPathUtilities:
     """Test path utility functions."""
-    def test_get_lmstudio_path_from_pointer((self, tmp_path)) -> None:
+    def test_get_lmstudio_path_from_pointer((self: "TestPathUtilities", tmp_path: Path)) -> None:
         """Test getting LM Studio path from home pointer file."""
-    def test_get_lmstudio_path_fallback_locations((self, tmp_path)) -> None:
+    def test_get_lmstudio_path_fallback_locations((
+        self: "TestPathUtilities", tmp_path: Path
+    )) -> None:
         """Test fallback to common LM Studio locations."""
-    def test_get_lmstudio_path_shared_location((self, tmp_path)) -> None:
+    def test_get_lmstudio_path_shared_location((self: "TestPathUtilities", tmp_path: Path)) -> None:
         """Test finding LM Studio in shared location."""
-    def test_get_lmstudio_path_not_found((self, tmp_path)) -> None:
+    def test_get_lmstudio_path_not_found((self: "TestPathUtilities", tmp_path: Path)) -> None:
         """Test error when LM Studio is not found."""
-    def test_get_lmstrix_data_dir((self, tmp_path)) -> None:
+    def test_get_lmstrix_data_dir((self: "TestPathUtilities", tmp_path: Path)) -> None:
         """Test getting LMStrix data directory."""
-    def test_get_lmstrix_data_dir_exists((self, tmp_path)) -> None:
+    def test_get_lmstrix_data_dir_exists((self: "TestPathUtilities", tmp_path: Path)) -> None:
         """Test getting existing LMStrix data directory."""
-    def test_get_default_models_file((self, tmp_path)) -> None:
+    def test_get_default_models_file((self: "TestPathUtilities", tmp_path: Path)) -> None:
         """Test getting default models file path."""
-    def test_get_context_tests_dir((self, tmp_path)) -> None:
+    def test_get_context_tests_dir((self: "TestPathUtilities", tmp_path: Path)) -> None:
         """Test getting context tests directory."""
-    def test_get_context_test_log_path((self, tmp_path)) -> None:
+    def test_get_context_test_log_path((self: "TestPathUtilities", tmp_path: Path)) -> None:
         """Test getting context test log path."""
-    def test_get_prompts_dir((self, tmp_path)) -> None:
+    def test_get_prompts_dir((self: "TestPathUtilities", tmp_path: Path)) -> None:
         """Test getting prompts directory."""
-    def test_get_contexts_dir((self, tmp_path)) -> None:
+    def test_get_contexts_dir((self: "TestPathUtilities", tmp_path: Path)) -> None:
         """Test getting contexts directory."""
-    def test_directory_creation_permissions_error((self, tmp_path)) -> None:
+    def test_directory_creation_permissions_error((
+        self: "TestPathUtilities",
+        tmp_path: Path,
+    )) -> None:
         """Test handling permission errors when creating directories."""
 
-def test_get_lmstudio_path_from_pointer((self, tmp_path)) -> None:
+def test_get_lmstudio_path_from_pointer((self: "TestPathUtilities", tmp_path: Path)) -> None:
     """Test getting LM Studio path from home pointer file."""
 
-def test_get_lmstudio_path_fallback_locations((self, tmp_path)) -> None:
+def test_get_lmstudio_path_fallback_locations((
+        self: "TestPathUtilities", tmp_path: Path
+    )) -> None:
     """Test fallback to common LM Studio locations."""
 
-def test_get_lmstudio_path_shared_location((self, tmp_path)) -> None:
+def test_get_lmstudio_path_shared_location((self: "TestPathUtilities", tmp_path: Path)) -> None:
     """Test finding LM Studio in shared location."""
 
-def exists_side_effect((self)) -> bool:
+def exists_side_effect((self: Path)) -> bool:
 
-def test_get_lmstudio_path_not_found((self, tmp_path)) -> None:
+def test_get_lmstudio_path_not_found((self: "TestPathUtilities", tmp_path: Path)) -> None:
     """Test error when LM Studio is not found."""
 
-def test_get_lmstrix_data_dir((self, tmp_path)) -> None:
+def test_get_lmstrix_data_dir((self: "TestPathUtilities", tmp_path: Path)) -> None:
     """Test getting LMStrix data directory."""
 
-def test_get_lmstrix_data_dir_exists((self, tmp_path)) -> None:
+def test_get_lmstrix_data_dir_exists((self: "TestPathUtilities", tmp_path: Path)) -> None:
     """Test getting existing LMStrix data directory."""
 
-def test_get_default_models_file((self, tmp_path)) -> None:
+def test_get_default_models_file((self: "TestPathUtilities", tmp_path: Path)) -> None:
     """Test getting default models file path."""
 
-def test_get_context_tests_dir((self, tmp_path)) -> None:
+def test_get_context_tests_dir((self: "TestPathUtilities", tmp_path: Path)) -> None:
     """Test getting context tests directory."""
 
-def test_get_context_test_log_path((self, tmp_path)) -> None:
+def test_get_context_test_log_path((self: "TestPathUtilities", tmp_path: Path)) -> None:
     """Test getting context test log path."""
 
-def test_get_prompts_dir((self, tmp_path)) -> None:
+def test_get_prompts_dir((self: "TestPathUtilities", tmp_path: Path)) -> None:
     """Test getting prompts directory."""
 
-def test_get_contexts_dir((self, tmp_path)) -> None:
+def test_get_contexts_dir((self: "TestPathUtilities", tmp_path: Path)) -> None:
     """Test getting contexts directory."""
 
-def test_directory_creation_permissions_error((self, tmp_path)) -> None:
+def test_directory_creation_permissions_error((
+        self: "TestPathUtilities",
+        tmp_path: Path,
+    )) -> None:
     """Test handling permission errors when creating directories."""
 
 

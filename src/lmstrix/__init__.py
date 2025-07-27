@@ -103,7 +103,7 @@ class LMStrix:
         registry = load_model_registry(verbose=self.verbose)
         model = registry.get_model(model_id)
         if not model:
-            raise ValueError(f"Model '{model_id}' not found in the registry.")
+            raise ValueError(f"Model not found: {model_id}")
 
         tester = ContextTester()
         updated_model = tester.test_model(model)

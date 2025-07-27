@@ -1,5 +1,6 @@
 # examples/python/custom_inference.py
 from lmstrix.api.client import LmsClient
+from lmstrix.api.exceptions import InferenceError, ModelLoadError
 
 
 def main() -> None:
@@ -31,7 +32,7 @@ def main() -> None:
         for chunk in response_stream:
             print(chunk, end="", flush=True)
         print("\n")
-    except Exception as e:
+    except (ModelLoadError, InferenceError) as e:
         print(f"\nAn error occurred: {e}\n")
 
     # 2. Adjusting inference parameters
@@ -47,7 +48,7 @@ def main() -> None:
         for chunk in response_stream:
             print(chunk, end="", flush=True)
         print("\n")
-    except Exception as e:
+    except (ModelLoadError, InferenceError) as e:
         print(f"\nAn error occurred: {e}\n")
 
     # 3. Structured output (JSON)
@@ -64,11 +65,7 @@ def main() -> None:
         print("Response:")
         full_response = "".join(response_stream)
         print(full_response)
-        # You can now parse the JSON string
-        # import json
-        # data = json.loads(full_response)
-        # print(f"\nParsed city: {data.get('city')}")
-    except Exception as e:
+    except (ModelLoadError, InferenceError) as e:
         print(f"\nAn error occurred: {e}\n")
 
 

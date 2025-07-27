@@ -5,7 +5,7 @@ import subprocess
 import sys
 
 
-def run_tests():
+def run_tests() -> int:
     """Run the test suite."""
     print("Running LMStrix test suite...")
     print("-" * 50)
@@ -20,7 +20,7 @@ def run_tests():
         "tests/",
     ]
 
-    result = subprocess.run(cmd, check=False)
+    result = subprocess.run(cmd, check=True)
 
     if result.returncode == 0:
         print("\n✅ All tests passed!")

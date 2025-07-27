@@ -2,8 +2,8 @@
 
 from lmstrix.api.exceptions import (
     APIConnectionError,
-    APIError,
     InferenceError,
+    LMStrixError,
     ModelLoadError,
 )
 
@@ -12,15 +12,15 @@ class TestAPIExceptions:
     """Test API exception classes."""
 
     def test_api_error_base(self) -> None:
-        """Test base APIError class."""
-        error = APIError("Test error message")
+        """Test base LMStrixError class."""
+        error = LMStrixError("Test error message")
         assert str(error) == "Test error message"
         assert isinstance(error, Exception)
 
     def test_api_connection_error(self) -> None:
         """Test APIConnectionError creation and attributes."""
         error = APIConnectionError("localhost:1234", "Connection refused")
-        assert isinstance(error, APIError)
+        assert isinstance(error, LMStrixError)
         assert "localhost:1234" in str(error)
         assert "Connection refused" in str(error)
 
@@ -30,7 +30,7 @@ class TestAPIExceptions:
         reason = "Insufficient memory"
         error = ModelLoadError(model_id, reason)
 
-        assert isinstance(error, APIError)
+        assert isinstance(error, LMStrixError)
         assert model_id in str(error)
         assert reason in str(error)
 
@@ -40,12 +40,12 @@ class TestAPIExceptions:
         reason = "Context too long"
         error = InferenceError(model_id, reason)
 
-        assert isinstance(error, APIError)
+        assert isinstance(error, LMStrixError)
         assert model_id in str(error)
         assert reason in str(error)
 
     def test_exception_inheritance(self) -> None:
-        """Test that all exceptions inherit from APIError."""
+        """Test that all exceptions inherit from LMStrixError."""
         exceptions = [
             APIConnectionError("host", "reason"),
             ModelLoadError("model", "reason"),
@@ -53,5 +53,5 @@ class TestAPIExceptions:
         ]
 
         for exc in exceptions:
-            assert isinstance(exc, APIError)
+            assert isinstance(exc, LMStrixError)
             assert isinstance(exc, Exception)

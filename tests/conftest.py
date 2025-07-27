@@ -2,7 +2,9 @@
 
 import asyncio
 import sys
+from collections.abc import Generator
 from pathlib import Path
+from typing import Any
 from unittest.mock import Mock
 
 import pytest
@@ -12,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 
 @pytest.fixture
-def mock_lmstudio_client():
+def mock_lmstudio_client() -> Mock:
     """Mock LMStudioClient for testing."""
     client = Mock()
     client.list_models.return_value = [
@@ -39,7 +41,7 @@ def mock_lmstudio_client():
 
 
 @pytest.fixture
-def mock_llm():
+def mock_llm() -> Mock:
     """Mock LLM object returned by lmstudio.llm()."""
     llm = Mock()
     llm.model_id = "test-model-1"
@@ -47,7 +49,7 @@ def mock_llm():
 
 
 @pytest.fixture
-def sample_model_data():
+def sample_model_data() -> dict[str, Any]:
     """Sample model data for testing."""
     return {
         "id": "test-model",
@@ -61,7 +63,7 @@ def sample_model_data():
 
 
 @pytest.fixture
-def tmp_models_dir(tmp_path):
+def tmp_models_dir(tmp_path: Path) -> Path:
     """Create a temporary models directory."""
     models_dir = tmp_path / "models"
     models_dir.mkdir()
@@ -69,13 +71,13 @@ def tmp_models_dir(tmp_path):
 
 
 @pytest.fixture
-def tmp_registry_file(tmp_path):
+def tmp_registry_file(tmp_path: Path) -> Path:
     """Create a temporary registry file path."""
     return tmp_path / "models_registry.json"
 
 
 @pytest.fixture
-def event_loop():
+def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
     """Create an instance of the default event loop for the test session."""
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
@@ -83,7 +85,7 @@ def event_loop():
 
 
 @pytest.fixture
-def mock_completion_response():
+def mock_completion_response() -> dict[str, Any]:
     """Mock completion response from LM Studio."""
     return {
         "choices": [{"text": "4"}],
@@ -93,7 +95,7 @@ def mock_completion_response():
 
 
 @pytest.fixture
-def mock_prompt_template():
+def mock_prompt_template() -> dict[str, Any]:
     """Sample prompt template for testing."""
     return {
         "name": "test_prompt",
@@ -104,7 +106,7 @@ def mock_prompt_template():
 
 
 @pytest.fixture
-def mock_context_data():
+def mock_context_data() -> dict[str, str]:
     """Sample context data for testing."""
     return {
         "expression": "2+2",

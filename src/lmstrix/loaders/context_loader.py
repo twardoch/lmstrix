@@ -126,7 +126,7 @@ def estimate_tokens(
         encoder = tiktoken.get_encoding(model_encoding)
         tokens = encoder.encode(text, disallowed_special=())
         return len(tokens)
-    except Exception as e:
+    except (ValueError, KeyError) as e:
         logger.warning(f"Failed to estimate tokens with tiktoken: {e}")
         # Fallback: rough estimate of 1 token per 4 characters
         return len(text) // 4

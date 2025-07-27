@@ -90,7 +90,7 @@ class InferenceEngine:
                 error=None,
             )
 
-        except Exception as e:
+        except (ModelLoadError, InferenceError) as e:
             logger.error(f"Inference failed for model {model_id}: {e}")
             return InferenceResult(
                 model_id=model_id,
