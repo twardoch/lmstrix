@@ -116,7 +116,7 @@ class ModelScanner:
                 if model_info:
                     models[model_info["id"]] = model_info
                     logger.debug(f"Found model: {model_info['id']}")
-            except Exception as e:
+            except (OSError, FileNotFoundError) as e:
                 logger.warning(f"Error scanning {path}: {e}")
 
         logger.info(f"Found {len(models)} models")
@@ -155,7 +155,7 @@ class ModelScanner:
                 model = Model(**model_info)
                 registry.update_model(model_id, model)
                 logger.info(f"Added new model: {model_id}")
-            except Exception as e:
+            except (TypeError, KeyError) as e:
                 logger.error(f"Failed to add model {model_id}: {e}")
 
         # Update LMS path in registry

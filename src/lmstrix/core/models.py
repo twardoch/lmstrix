@@ -183,11 +183,11 @@ class ModelRegistry:
                     # Use path as the key instead of model_id
                     model_path = str(model.path)
                     self._models[model_path] = model
-                except Exception as e:
+                except (TypeError, KeyError) as e:
                     logger.error(f"Failed to load model {model_key}: {e}")
 
             logger.info(f"Read {len(self._models)} models from {self.models_file}")
-        except Exception as e:
+        except (OSError, json.JSONDecodeError) as e:
             logger.error(f"Failed to load models: {e}")
 
     def save(self) -> None:
@@ -246,7 +246,7 @@ class ModelRegistry:
         self._models[model_path] = model
         self.save()
 
-    def update_model_by_id(self, model_id: str, model: Model) -> None:
+    def update_model_by_id(self, model: Model) -> None:
         """Update a model by ID (backward compatibility)."""
         # Find existing model by ID and update it
         model_path = str(model.path)
@@ -273,6 +273,6 @@ class ModelRegistry:
         return len(self._models)
 
     @property
-    def models(self):
+    def models(self) -> dict[str, Model]:
         """Public property for internal model mapping (path -> Model)."""
         return self._models

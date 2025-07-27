@@ -2,6 +2,7 @@
 
 import json
 from datetime import datetime
+from pathlib import Path
 from typing import NoReturn
 from unittest.mock import AsyncMock, Mock, patch
 
@@ -15,7 +16,7 @@ from lmstrix.core.models import ContextTestStatus, Model
 class TestContextTestResult:
     """Test ContextTestResult class."""
 
-    def test_result_creation_minimal(self) -> None:
+    def test_result_creation_minimal(self: "TestContextTestResult") -> None:
         """Test creating a minimal test result."""
         result = ContextTestResult(
             context_size=4096,
@@ -30,7 +31,7 @@ class TestContextTestResult:
         assert result.error == ""
         assert isinstance(result.timestamp, datetime)
 
-    def test_result_creation_full(self) -> None:
+    def test_result_creation_full(self: "TestContextTestResult") -> None:
         """Test creating a full test result."""
         result = ContextTestResult(
             context_size=8192,
@@ -48,7 +49,7 @@ class TestContextTestResult:
         assert result.response == "4"
         assert result.error == ""
 
-    def test_result_with_error(self) -> None:
+    def test_result_with_error(self: "TestContextTestResult") -> None:
         """Test result with error."""
         result = ContextTestResult(
             context_size=16384,
@@ -60,7 +61,7 @@ class TestContextTestResult:
         assert result.inference_success is False
         assert result.error == "Out of memory"
 
-    def test_result_to_dict(self) -> None:
+    def test_result_to_dict(self: "TestContextTestResult") -> None:
         """Test converting result to dictionary."""
         result = ContextTestResult(
             context_size=4096,
@@ -80,7 +81,7 @@ class TestContextTestResult:
         assert result_dict["error"] == ""
         assert "timestamp" in result_dict
 
-    def test_is_valid_response(self) -> None:
+    def test_is_valid_response(self: "TestContextTestResult") -> None:
         """Test response validation."""
         result = ContextTestResult(
             context_size=4096,
@@ -97,7 +98,7 @@ class TestContextTestResult:
 class TestContextTester:
     """Test ContextTester class."""
 
-    def test_tester_initialization(self, mock_lmstudio_client) -> None:
+    def test_tester_initialization(self: "TestContextTester", mock_lmstudio_client: Mock) -> None:
         """Test context tester initialization."""
         tester = ContextTester(mock_lmstudio_client)
 
@@ -106,14 +107,14 @@ class TestContextTester:
         assert tester.expected_response == "4"
         assert tester.filler_char == "."
 
-    def test_tester_default_client(self) -> None:
+    def test_tester_default_client(self: "TestContextTester") -> None:
         """Test tester creates default client if none provided."""
         with patch("lmstrix.core.context_tester.LMStudioClient") as mock_client_class:
             tester = ContextTester()
             mock_client_class.assert_called_once()
             assert tester.client == mock_client_class.return_value
 
-    def test_generate_test_prompt(self) -> None:
+    def test_generate_test_prompt(self: "TestContextTester") -> None:
         """Test test prompt generation."""
         tester = ContextTester()
 
@@ -126,7 +127,7 @@ class TestContextTester:
         prompt = tester._generate_test_prompt(10)
         assert prompt == "......" + tester.test_prompt  # 6 dots + 4 chars = 10
 
-    def test_estimate_tokens(self) -> None:
+    def test_estimate_tokens(self: "TestContextTester") -> None:
         """Test token estimation."""
         tester = ContextTester()
 
@@ -136,7 +137,10 @@ class TestContextTester:
         assert tester._estimate_tokens("") == 0
 
     @pytest.mark.asyncio
-    async def test_test_context_load_failure(self, mock_lmstudio_client) -> None:
+    async def test_test_context_load_failure(
+        self: "TestContextTester",
+        mock_lmstudio_client: Mock,
+    ) -> None:
         """Test context testing when model fails to load."""
         mock_lmstudio_client.load_model.side_effect = ModelLoadError("test-model", "OOM")
 
@@ -149,7 +153,11 @@ class TestContextTester:
         assert "OOM" in result.error
 
     @pytest.mark.asyncio
-    async def test_test_context_inference_failure(self, mock_lmstudio_client, mock_llm) -> None:
+    async def test_test_context_inference_failure(
+        self: "TestContextTester",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
+    ) -> None:
         """Test context testing when inference fails."""
         mock_lmstudio_client.load_model.return_value = mock_llm
         mock_lmstudio_client.acompletion = AsyncMock(
@@ -164,7 +172,11 @@ class TestContextTester:
         assert "Context too long" in result.error
 
     @pytest.mark.asyncio
-    async def test_test_context_success(self, mock_lmstudio_client, mock_llm) -> None:
+    async def test_test_context_success(
+        self: "TestContextTester",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
+    ) -> None:
         """Test successful context testing."""
         mock_lmstudio_client.load_model.return_value = mock_llm
         mock_response = Mock(content="4")
@@ -184,7 +196,11 @@ class TestContextTester:
         assert "2+2=" in prompt
 
     @pytest.mark.asyncio
-    async def test_test_context_invalid_response(self, mock_lmstudio_client, mock_llm) -> None:
+    async def test_test_context_invalid_response(
+        self: "TestContextTester",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
+    ) -> None:
         """Test context testing with invalid response."""
         mock_lmstudio_client.load_model.return_value = mock_llm
         mock_response = Mock(content="5")  # Wrong answer
@@ -199,12 +215,16 @@ class TestContextTester:
         # Note: is_valid_response check is done at a higher level
 
     @pytest.mark.asyncio
-    async def test_find_optimal_context_simple(self, mock_lmstudio_client, mock_llm) -> None:
+    async def test_find_optimal_context_simple(
+        self: "TestContextTester",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
+    ) -> None:
         """Test finding optimal context with simple scenario."""
         mock_lmstudio_client.load_model.return_value = mock_llm
 
         # Mock responses: succeed up to 4096, fail above
-        async def mock_completion(llm, prompt, **kwargs):
+        async def mock_completion(llm: Mock, prompt: str, **kwargs: dict) -> Mock:
             if len(prompt) <= 4096:
                 return Mock(content="4")
             raise InferenceError("test-model", "Too long")
@@ -229,7 +249,7 @@ class TestContextTester:
         assert len(test_log) > 0
 
     @pytest.mark.asyncio
-    async def test_save_test_log(self, tmp_path) -> None:
+    async def test_save_test_log(self: "TestContextTester", tmp_path: Path) -> None:
         """Test saving test log to file."""
         tester = ContextTester()
 
@@ -253,16 +273,16 @@ class TestContextTester:
 
     @pytest.mark.asyncio
     async def test_optimize_model_integration(
-        self,
-        mock_lmstudio_client,
-        mock_llm,
-        tmp_path,
+        self: "TestContextTester",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
+        tmp_path: Path,
     ) -> None:
         """Test full model optimization workflow."""
         mock_lmstudio_client.load_model.return_value = mock_llm
 
         # Mock successful inference up to 4096
-        async def mock_completion(llm, prompt, **kwargs):
+        async def mock_completion(llm: Mock, prompt: str, **kwargs: dict) -> Mock:
             if len(prompt) <= 4096:
                 return Mock(content="4")
             raise InferenceError("test-model", "Too long")
@@ -298,7 +318,10 @@ class TestContextTester:
         mock_registry.update_model.assert_called_once_with("test-model", updated_model)
 
     @pytest.mark.asyncio
-    async def test_optimize_model_failure(self, mock_lmstudio_client) -> None:
+    async def test_optimize_model_failure(
+        self: "TestContextTester",
+        mock_lmstudio_client: Mock,
+    ) -> None:
         """Test model optimization when all tests fail."""
         # Mock all loads failing
         mock_lmstudio_client.load_model.side_effect = ModelLoadError("test-model", "Cannot load")
@@ -322,12 +345,16 @@ class TestContextTester:
         mock_registry.update_model.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_binary_search_logic(self, mock_lmstudio_client, mock_llm) -> None:
+    async def test_binary_search_logic(
+        self: "TestContextTester",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
+    ) -> None:
         """Test binary search algorithm with various edge cases."""
         mock_lmstudio_client.load_model.return_value = mock_llm
 
         # Test Case 1: Model works at all sizes
-        async def always_works(llm, prompt, **kwargs):
+        async def always_works(llm: Mock, prompt: str, **kwargs: dict) -> Mock:
             return Mock(content="4")
 
         mock_lmstudio_client.acompletion = AsyncMock(side_effect=always_works)
@@ -345,7 +372,7 @@ class TestContextTester:
         assert loadable == 8192
 
         # Test Case 2: Model never works
-        async def never_works(llm, prompt, **kwargs) -> NoReturn:
+        async def never_works(llm: Mock, prompt: str, **kwargs: dict) -> NoReturn:
             raise InferenceError("test-model", "Always fails")
 
         mock_lmstudio_client.acompletion = AsyncMock(side_effect=never_works)
@@ -364,7 +391,7 @@ class TestContextTester:
         # Test Case 3: Model loads but never passes inference
         mock_lmstudio_client.load_model.return_value = mock_llm
 
-        async def loads_but_fails_inference(llm, prompt, **kwargs):
+        async def loads_but_fails_inference(llm: Mock, prompt: str, **kwargs: dict) -> Mock:
             return Mock(content="wrong answer")  # Never returns "4"
 
         mock_lmstudio_client.acompletion = AsyncMock(side_effect=loads_but_fails_inference)
@@ -381,7 +408,7 @@ class TestContextTester:
         assert loadable3 == 8192
 
         # Test Case 4: Model works up to exactly 2048
-        async def works_up_to_2048(llm, prompt, **kwargs):
+        async def works_up_to_2048(llm: Mock, prompt: str, **kwargs: dict) -> Mock:
             if len(prompt) <= 2048:
                 return Mock(content="4")
             raise InferenceError("test-model", "Too long")

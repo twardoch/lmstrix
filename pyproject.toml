@@ -206,8 +206,6 @@ ignore = [
   "E501",    # line too long (handled by formatter)
   "B008",    # do not perform function calls in argument defaults
   "C901",    # too complex
-  "ANN101",  # missing type annotation for self
-  "ANN102",  # missing type annotation for cls
   "ANN401",  # dynamically typed expressions (Any)
   "S101",    # use of assert detected
   "PLR0913", # too many arguments

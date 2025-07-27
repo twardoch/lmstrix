@@ -3,6 +3,7 @@
 import json
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import pytest
 from pydantic import ValidationError
@@ -13,7 +14,7 @@ from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 class TestContextTestStatus:
     """Test ContextTestStatus enum."""
 
-    def test_enum_values(self) -> None:
+    def test_enum_values(self: "TestContextTestStatus") -> None:
         """Test that all expected enum values exist."""
         assert ContextTestStatus.UNTESTED.value == "untested"
         assert ContextTestStatus.TESTING.value == "testing"
@@ -24,7 +25,7 @@ class TestContextTestStatus:
 class TestModel:
     """Test Model class."""
 
-    def test_model_creation_minimal(self, sample_model_data) -> None:
+    def test_model_creation_minimal(self: "TestModel", sample_model_data: dict[str, Any]) -> None:
         """Test creating a model with minimal required fields."""
         model = Model(**sample_model_data)
 
@@ -39,7 +40,7 @@ class TestModel:
         assert model.tested_max_context is None
         assert model.loadable_max_context is None
 
-    def test_model_creation_with_aliases(self) -> None:
+    def test_model_creation_with_aliases(self: "TestModel") -> None:
         """Test model creation using field aliases."""
         data = {
             "id": "alias-test",
@@ -58,7 +59,9 @@ class TestModel:
         assert model.supports_tools is True
         assert model.supports_vision is True
 
-    def test_model_with_context_testing(self, sample_model_data) -> None:
+    def test_model_with_context_testing(
+        self: "TestModel", sample_model_data: dict[str, Any]
+    ) -> None:
         """Test model with context testing information."""
         sample_model_data.update(
             {
@@ -78,7 +81,7 @@ class TestModel:
         assert model.context_test_date is not None
         assert model.context_test_log == "/path/to/log.json"
 
-    def test_model_path_validation(self) -> None:
+    def test_model_path_validation(self: "TestModel") -> None:
         """Test that path field accepts both string and Path objects."""
         data = {
             "id": "path-test",
@@ -96,7 +99,7 @@ class TestModel:
         assert isinstance(model2.path, Path)
         assert str(model2.path) == "/path/object/model.gguf"
 
-    def test_model_sanitized_id(self) -> None:
+    def test_model_sanitized_id(self: "TestModel") -> None:
         """Test sanitized_id method."""
         data = {
             "id": "test-model/with:special@chars!",
@@ -113,7 +116,7 @@ class TestModel:
             for c in sanitized
         )
 
-    def test_model_to_registry_dict(self, sample_model_data) -> None:
+    def test_model_to_registry_dict(self: "TestModel", sample_model_data: dict[str, Any]) -> None:
         """Test converting model to registry dictionary format."""
         test_date = datetime.now()
         sample_model_data.update(
@@ -142,7 +145,7 @@ class TestModel:
         assert registry_dict["failed"] is True
         assert registry_dict["error_msg"] == "Test error"
 
-    def test_model_validation_error(self) -> None:
+    def test_model_validation_error(self: "TestModel") -> None:
         """Test that model validation raises appropriate errors."""
         with pytest.raises(ValidationError):
             Model(id="test")  # Missing required fields
@@ -151,7 +154,7 @@ class TestModel:
 class TestModelRegistry:
     """Test ModelRegistry class."""
 
-    def test_registry_initialization(self, tmp_registry_file) -> None:
+    def test_registry_initialization(self: "TestModelRegistry", tmp_registry_file: Path) -> None:
         """Test registry initialization with custom file path."""
         registry = ModelRegistry(tmp_registry_file)
 
@@ -159,7 +162,11 @@ class TestModelRegistry:
         assert len(registry) == 0
         assert registry.lms_path is None
 
-    def test_registry_save_and_load(self, tmp_registry_file, sample_model_data) -> None:
+    def test_registry_save_and_load(
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    ) -> None:
         """Test saving and loading models."""
         # Create and save models
         registry = ModelRegistry(tmp_registry_file)
@@ -187,7 +194,11 @@ class TestModelRegistry:
         assert loaded_model1.id == "test-model"
         assert loaded_model1.size == 1500000
 
-    def test_registry_get_model(self, tmp_registry_file, sample_model_data) -> None:
+    def test_registry_get_model(
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    ) -> None:
         """Test getting a model by ID."""
         registry = ModelRegistry(tmp_registry_file)
         model = Model(**sample_model_data)
@@ -200,7 +211,11 @@ class TestModelRegistry:
         # Test non-existent model
         assert registry.get_model("non-existent") is None
 
-    def test_registry_list_models(self, tmp_registry_file, sample_model_data) -> None:
+    def test_registry_list_models(
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    ) -> None:
         """Test listing all models."""
         registry = ModelRegistry(tmp_registry_file)
 
@@ -216,7 +231,11 @@ class TestModelRegistry:
         assert all(isinstance(m, Model) for m in models)
         assert {m.id for m in models} == {"model-0", "model-1", "model-2"}
 
-    def test_registry_remove_model(self, tmp_registry_file, sample_model_data) -> None:
+    def test_registry_remove_model(
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    ) -> None:
         """Test removing a model."""
         registry = ModelRegistry(tmp_registry_file)
         model = Model(**sample_model_data)
@@ -231,7 +250,11 @@ class TestModelRegistry:
         # Test removing non-existent model (should not raise)
         registry.remove_model("non-existent")
 
-    def test_registry_with_context_test_data(self, tmp_registry_file, sample_model_data) -> None:
+    def test_registry_with_context_test_data(
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    ) -> None:
         """Test saving/loading models with context test information."""
         registry = ModelRegistry(tmp_registry_file)
 
@@ -256,7 +279,11 @@ class TestModelRegistry:
         assert loaded_model.context_test_status == ContextTestStatus.COMPLETED
         assert loaded_model.context_test_date is not None
 
-    def test_registry_json_format(self, tmp_registry_file, sample_model_data) -> None:
+    def test_registry_json_format(
+        self: "TestModelRegistry",
+        tmp_registry_file: Path,
+        sample_model_data: dict[str, Any],
+    ) -> None:
         """Test that the saved JSON has the expected format."""
         registry = ModelRegistry(tmp_registry_file)
         registry.lms_path = Path("/lms/path")
