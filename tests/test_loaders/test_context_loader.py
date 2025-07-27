@@ -1,6 +1,18 @@
-Test context loading functions.
+"""Test context loading functions."""
 
-    def test_load_context_simple(self: "TestContextLoader", tmp_path: Path) -> None:
+from pathlib import Path
+from unittest.mock import patch
+
+import pytest
+
+from lmstrix.api.exceptions import ConfigurationError
+from lmstrix.loaders.context_loader import load_context
+
+
+class TestContextLoader:
+    """Test context loading functions."""
+
+    def test_load_context_simple(self, tmp_path: Path) -> None:
         """Test loading simple text context."""
         context_file = tmp_path / "context.txt"
         test_content = "This is a test context file.\nIt has multiple lines.\nAnd some content."
@@ -10,7 +22,7 @@ Test context loading functions.
 
         assert content == test_content
 
-    def test_load_context_with_encoding(self: "TestContextLoader", tmp_path: Path) -> None:
+    def test_load_context_with_encoding(self, tmp_path: Path) -> None:
         """Test loading context with specific encoding."""
         context_file = tmp_path / "context_utf8.txt"
         test_content = "Unicode content: 你好世界 🌍"
@@ -20,7 +32,7 @@ Test context loading functions.
 
         assert content == test_content
 
-    def test_load_context_nonexistent_file(self: "TestContextLoader", tmp_path: Path) -> None:
+    def test_load_context_nonexistent_file(self, tmp_path: Path) -> None:
         """Test loading from non-existent file."""
         nonexistent = tmp_path / "does_not_exist.txt"
 
@@ -30,7 +42,7 @@ Test context loading functions.
         assert "not found" in str(exc_info.value)
         assert str(nonexistent) in str(exc_info.value)
 
-    def test_load_context_read_error(self: "TestContextLoader", tmp_path: Path) -> None:
+    def test_load_context_read_error(self, tmp_path: Path) -> None:
         """Test handling read errors."""
         # Create a file then make it unreadable (platform-specific)
         bad_file = tmp_path / "unreadable.txt"
@@ -44,7 +56,7 @@ Test context loading functions.
 
             assert "read" in str(exc_info.value).lower()
 
-    def test_load_context_string_path(self: "TestContextLoader", tmp_path: Path) -> None:
+    def test_load_context_string_path(self, tmp_path: Path) -> None:
         """Test loading context with string path."""
         context_file = tmp_path / "string_path.txt"
         test_content = "String path test"
@@ -55,7 +67,7 @@ Test context loading functions.
 
         assert content == test_content
 
-    def test_load_context_large_file(self: "TestContextLoader", tmp_path: Path) -> None:
+    def test_load_context_large_file(self, tmp_path: Path) -> None:
         """Test loading large context file."""
         large_file = tmp_path / "large.txt"
         # Create a ~1MB file

@@ -4,7 +4,7 @@ from pathlib import Path
 
 from loguru import logger
 
-from lmstrix.api.exceptions import LMStudioInstallationNotFound
+from lmstrix.api.exceptions import LMStudioInstallationNotFoundError
 
 
 def get_lmstudio_path() -> Path:
@@ -14,7 +14,7 @@ def get_lmstudio_path() -> Path:
         Path to LM Studio directory.
 
     Raises:
-        LMStudioInstallationNotFound: If LM Studio path cannot be determined.
+        LMStudioInstallationNotFoundError: If LM Studio path cannot be determined.
     """
     # Check for .lmstudio-home-pointer file
     home_pointer = Path.home() / ".lmstudio-home-pointer"
@@ -40,7 +40,7 @@ def get_lmstudio_path() -> Path:
             logger.debug(f"Found LM Studio at {path}")
             return path
 
-    raise LMStudioInstallationNotFound
+    raise LMStudioInstallationNotFoundError
 
 
 def get_lmstrix_data_dir() -> Path:

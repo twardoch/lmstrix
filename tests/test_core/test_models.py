@@ -60,7 +60,8 @@ class TestModel:
         assert model.supports_vision is True
 
     def test_model_with_context_testing(
-        self: "TestModel", sample_model_data: dict[str, Any]
+        self: "TestModel",
+        sample_model_data: dict[str, Any],
     ) -> None:
         """Test model with context testing information."""
         sample_model_data.update(

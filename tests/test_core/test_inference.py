@@ -73,7 +73,8 @@ class TestInferenceEngine:
             assert engine.verbose is False
 
     def test_engine_initialization_custom(
-        self: "TestInferenceEngine", mock_lmstudio_client: Mock
+        self: "TestInferenceEngine",
+        mock_lmstudio_client: Mock,
     ) -> None:
         """Test engine initialization with custom client and registry."""
         mock_registry = Mock()
@@ -106,7 +107,9 @@ class TestInferenceEngine:
 
     @pytest.mark.asyncio
     async def test_infer_success(
-        self: "TestInferenceEngine", mock_lmstudio_client: Mock, mock_llm: Mock
+        self: "TestInferenceEngine",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
     ) -> None:
         """Test successful inference."""
         # Set up mock model in registry
@@ -220,7 +223,8 @@ class TestInferenceEngine:
 
     @pytest.mark.asyncio
     async def test_infer_load_failure(
-        self: "TestInferenceEngine", mock_lmstudio_client: Mock
+        self: "TestInferenceEngine",
+        mock_lmstudio_client: Mock,
     ) -> None:
         """Test inference when model fails to load."""
         model = Model(

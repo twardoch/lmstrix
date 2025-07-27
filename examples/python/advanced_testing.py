@@ -1,5 +1,6 @@
 # examples/python/advanced_testing.py
 from lmstrix.api.client import LmsClient
+from lmstrix.api.exceptions import InferenceError, ModelLoadError
 from lmstrix.core.context_tester import TestPattern
 
 
@@ -29,7 +30,7 @@ def main() -> None:
             pattern=TestPattern.BINARY,
         )
         print(f"Binary search complete. Max working context: {result} tokens.")
-    except Exception as e:
+    except (ModelLoadError, InferenceError) as e:
         print(f"An error occurred: {e}")
 
     # 2. Run a linear ramp-up test
@@ -44,7 +45,7 @@ def main() -> None:
             force=True,  # Force re-test, ignoring previous results
         )
         print(f"Linear test complete. Max working context: {result} tokens.")
-    except Exception as e:
+    except (ModelLoadError, InferenceError) as e:
         print(f"An error occurred: {e}")
 
     # 3. Save the results

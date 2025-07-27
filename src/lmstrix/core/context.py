@@ -6,6 +6,7 @@ from pathlib import Path
 from loguru import logger
 from pydantic import BaseModel, Field
 
+from lmstrix.api.client import LMStudioClient
 from lmstrix.api.exceptions import InferenceError, ModelLoadError
 from lmstrix.core.models import Model
 
@@ -30,13 +31,11 @@ class ContextOptimizer:
 
     def __init__(
         self,
-        client: "LMStudioClient | None" = None,
+        client: LMStudioClient | None = None,
         cache_file: Path | None = None,
         verbose: bool = False,
     ) -> None:
         """Initialize the context optimizer."""
-        from lmstrix.api.client import LMStudioClient
-
         self.client = client or LMStudioClient(verbose=verbose)
         self.cache_file = cache_file or Path("context_cache.json")
         self.verbose = verbose

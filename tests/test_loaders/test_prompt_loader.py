@@ -68,7 +68,8 @@ class TestPromptLoader:
         assert "parse" in str(exc_info.value).lower()
 
     def test_load_prompts_with_nested_placeholders(
-        self: "TestPromptLoader", tmp_path: Path
+        self: "TestPromptLoader",
+        tmp_path: Path,
     ) -> None:
         """Test loading prompts with nested placeholders."""
         toml_file = tmp_path / "nested.toml"

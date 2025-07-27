@@ -86,7 +86,7 @@ class ConfigurationError(LMStrixError):
         self.reason = reason
 
 
-class LMStudioInstallationNotFound(LMStrixError):
+class LMStudioInstallationNotFoundError(LMStrixError):
     """Raised when the LM Studio installation path cannot be found."""
 
     def __init__(self) -> None:

@@ -6,6 +6,7 @@ Project Structure:
 │   ├── 📄 lmsm.json
 │   ├── 📄 lmsm.py
 │   ├── 📄 lodels.sh
+│   ├── 📄 test22.command
 │   ├── 📄 test23.command
 │   └── 📄 toml-topl.txt
 ├── 📁 context_tests
@@ -12371,6 +12372,21 @@ done
 </document>
 
 <document index="18">
+<source>_keep_this/test22.command</source>
+<document_content>
+#!/usr/bin/env bash
+for p in $(lmstrix list --sort size --show id); do
+	echo
+	echo "--------------------"
+	echo ">> $p @ $c"
+	lms unload --all
+	lmstrix test "$p"
+done
+
+</document_content>
+</document>
+
+<document index="19">
 <source>_keep_this/test23.command</source>
 <document_content>
 #!/usr/bin/env bash
@@ -12385,7 +12401,7 @@ done
 </document_content>
 </document>
 
-<document index="19">
+<document index="20">
 <source>_keep_this/toml-topl.txt</source>
 <document_content>
 Project Structure:
@@ -19487,7 +19503,7 @@ def test_strings_in_lists((self)):
 </document_content>
 </document>
 
-<document index="20">
+<document index="21">
 <source>build.sh</source>
 <document_content>
 #!/bin/bash
@@ -19525,7 +19541,7 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 </document_content>
 </document>
 
-<document index="21">
+<document index="22">
 <source>cleanup.log.txt</source>
 <document_content>
 Rewriting ./src/lmstrix/core/context.py
@@ -19706,10 +19722,31 @@ warning: The following rule may cause conflicts when used with the formatter: `C
 │ Interactive Mode: False                                                            │
 ╰────────────────────────────────────────────────────────────────────────────────────╯
 
+╭───────────── Processing Complete ─────────────╮
+│ Summary:                                      │
+│ Files Processed: 89                           │
+│ Total Tokens: 260,629                         │
+│ Output Destination: ./llms.txt                │
+│                                               │
+│ Top 3 Files by Tokens:                        │
+│   - _keep_this/llmstudio.txt (156,271 tokens) │
+│   - _keep_this/toml-topl.txt (51,274 tokens)  │
+│   - cleanup.log.txt (7,438 tokens)            │
+│                                               │
+│ Top 5 Extensions by Tokens:                   │
+│   - .txt (215,743 tokens)                     │
+│   - .py (17,945 tokens)                       │
+│   - .md (17,842 tokens)                       │
+│   - .<no_ext> (3,356 tokens)                  │
+│   - .toml (2,795 tokens)                      │
+╰───────────────────────────────────────────────╯
+2025-07-27 02:16:19 | INFO     | Working in directory: /Users/Shared/lmstudio/lmstrix
+2025-07-27 02:16:19 | INFO     | Stashing uncommitted changes before pull …
+
 </document_content>
 </document>
 
-<document index="22">
+<document index="23">
 <source>cleanup.sh</source>
 <document_content>
 #!/usr/bin/env bash
@@ -19728,7 +19765,7 @@ hatch publish
 </document_content>
 </document>
 
-<document index="23">
+<document index="24">
 <source>docs/_config.yml</source>
 <document_content>
 title: LMStrix
@@ -19750,7 +19787,7 @@ plugins:
 </document_content>
 </document>
 
-<document index="24">
+<document index="25">
 <source>docs/api.md</source>
 <document_content>
 ---
@@ -19799,7 +19836,7 @@ Represents the response from an inference request.
 </document_content>
 </document>
 
-<document index="25">
+<document index="26">
 <source>docs/how-it-works.md</source>
 <document_content>
 ---
@@ -19838,7 +19875,7 @@ The command saves the results of the test to a local registry, so you only need 
 </document_content>
 </document>
 
-<document index="26">
+<document index="27">
 <source>docs/index.md</source>
 <document_content>
 ---
@@ -19883,7 +19920,7 @@ This gives you a reliable, empirical measurement of the model's true capabilitie
 </document_content>
 </document>
 
-<document index="27">
+<document index="28">
 <source>docs/installation.md</source>
 <document_content>
 ---
@@ -19923,7 +19960,7 @@ pip install -e .[dev]
 </document_content>
 </document>
 
-<document index="28">
+<document index="29">
 <source>docs/usage.md</source>
 <document_content>
 ---
@@ -20044,7 +20081,7 @@ if __name__ == "__main__":
 </document_content>
 </document>
 
-<document index="29">
+<document index="30">
 <source>examples/README.md</source>
 <document_content>
 # LMStrix Usage Examples
@@ -20113,7 +20150,7 @@ python3 python/basic_usage.py
 </document_content>
 </document>
 
-<document index="30">
+<document index="31">
 <source>examples/cli/basic_workflow.sh</source>
 <document_content>
 #!/bin/bash
@@ -20173,7 +20210,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="31">
+<document index="32">
 <source>examples/cli/inference_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -20235,7 +20272,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="32">
+<document index="33">
 <source>examples/cli/model_testing.sh</source>
 <document_content>
 #!/bin/bash
@@ -20293,7 +20330,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="33">
+<document index="34">
 <source>examples/data/sample_context.txt</source>
 <document_content>
 This is a sample text file designed for context length testing in LMStrix. The purpose of this file is to provide a sufficiently large and repetitive block of text that can be used to fill the context window of a large language model. By feeding a model a long prompt composed of this text, we can determine the maximum number of tokens it can process before it fails to load or produce a coherent response. This process is crucial for understanding the true operational limits of a model, which may differ from the limits advertised by its developers. The text itself is not intended to be meaningful, but rather to serve as a consistent and measurable filler for the model's context buffer. The repetition ensures that the content is uniform and does not introduce unexpected variables into the testing process.
@@ -20309,7 +20346,7 @@ This is a sample text file designed for context length testing in LMStrix. The p
 </document_content>
 </document>
 
-<document index="34">
+<document index="35">
 <source>examples/data/test_questions.json</source>
 <document_content>
 [
@@ -20321,7 +20358,7 @@ This is a sample text file designed for context length testing in LMStrix. The p
 </document_content>
 </document>
 
-<document index="35">
+<document index="36">
 <source>examples/prompts/analysis.toml</source>
 <document_content>
 # examples/prompts/analysis.toml
@@ -20342,7 +20379,7 @@ description = "Analyzes the sentiment of a given text."
 </document_content>
 </document>
 
-<document index="36">
+<document index="37">
 <source>examples/prompts/coding.toml</source>
 <document_content>
 # examples/prompts/coding.toml
@@ -20364,7 +20401,7 @@ description = "Explains a snippet of code."
 </document_content>
 </document>
 
-<document index="37">
+<document index="38">
 <source>examples/prompts/creative.toml</source>
 <document_content>
 # examples/prompts/creative.toml
@@ -20381,7 +20418,7 @@ description = "Generates a story idea from a genre and character."
 </document_content>
 </document>
 
-<document index="38">
+<document index="39">
 <source>examples/prompts/qa.toml</source>
 <document_content>
 # examples/prompts/qa.toml
@@ -20411,6 +20448,7 @@ description = "Answers a question based on a provided context."
 # Language: python
 
 from lmstrix.api.client import LmsClient
+from lmstrix.api.exceptions import InferenceError, ModelLoadError
 from lmstrix.core.context_tester import TestPattern
 
 def main(()) -> None:
@@ -20421,6 +20459,7 @@ def main(()) -> None:
 # Language: python
 
 from lmstrix.api.client import LmsClient
+from lmstrix.api.exceptions import InferenceError, ModelLoadError
 
 def main(()) -> None:
     """Demonstrates basic usage of the LMStrix Python API."""
@@ -20431,6 +20470,7 @@ def main(()) -> None:
 
 import time
 from lmstrix.api.client import LmsClient
+from lmstrix.api.exceptions import InferenceError, ModelLoadError
 
 def main(()) -> None:
     """ Demonstrates batch processing of multiple models for testing or inference...."""
@@ -20446,7 +20486,7 @@ def main(()) -> None:
     """Demonstrates custom inference workflows with the LMStrix Python API."""
 
 
-<document index="39">
+<document index="40">
 <source>examples/run_all_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -20518,7 +20558,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="40">
+<document index="41">
 <source>pyproject.toml</source>
 <document_content>
 [build-system]
@@ -20802,6 +20842,7 @@ filterwarnings = [
   "error",
   "ignore::DeprecationWarning",
   "ignore::PendingDeprecationWarning",
+  "ignore:Benchmarks are automatically disabled",
 ]
 asyncio_mode = "auto"
 markers = [
@@ -20844,6 +20885,7 @@ directory = "htmlcov"
 # Language: python
 
 from importlib.metadata import PackageNotFoundError, version
+from lmstrix.api.exceptions import ModelNotFoundError
 from lmstrix.core.context_tester import ContextTester
 from lmstrix.core.inference import InferenceEngine, InferenceResult
 from lmstrix.core.models import Model
@@ -21018,7 +21060,7 @@ class ConfigurationError(L, M, S, t, r, i, x, E, r, r, o, r):
     def __init__((self, config_name: str, reason: str, details: dict | None = None)) -> None:
         """Initialize the exception."""
 
-class LMStudioInstallationNotFound(L, M, S, t, r, i, x, E, r, r, o, r):
+class LMStudioInstallationNotFoundError(L, M, S, t, r, i, x, E, r, r, o, r):
     """Raised when the LM Studio installation path cannot be found."""
     def __init__((self)) -> None:
         """Initialize the exception."""
@@ -21070,7 +21112,7 @@ from rich.console import Console
 from rich.table import Table
 from lmstrix.core.context_tester import ContextTester
 from lmstrix.core.inference import InferenceEngine
-from lmstrix.core.models import ContextTestStatus
+from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 from lmstrix.loaders.model_loader import (
     load_model_registry,
     save_model_registry,
@@ -21088,7 +21130,7 @@ class LMStrixCLI:
         self,
         model_id: str | None = None,
         test_all: bool = False,
-        threshold: int = 102400,
+        threshold: int = 31744,
         ctx: int | None = None,
         sort: str = "id",
         verbose: bool = False,
@@ -21105,41 +21147,41 @@ class LMStrixCLI:
         """Run inference on a specified model."""
 
 def _get_models_to_test((
-    registry: "ModelRegistry",
+    registry: ModelRegistry,
     test_all: bool,
     ctx: int | None,
     model_id: str | None,
-)) -> list["Model"]:
+)) -> list[Model]:
     """Filter and return a list of models to be tested."""
 
-def _sort_models((models: list["Model"], sort_by: str)) -> list["Model"]:
+def _sort_models((models: list[Model], sort_by: str)) -> list[Model]:
     """Sort a list of models based on a given key."""
 
 def _test_single_model((
-    tester: "ContextTester",
-    model: "Model",
+    tester: ContextTester,
+    model: Model,
     ctx: int,
-    registry: "ModelRegistry",
+    registry: ModelRegistry,
 )) -> None:
     """Test a single model at a specific context size."""
 
 def _test_all_models_at_ctx((
-    tester: "ContextTester",
-    models_to_test: list["Model"],
+    tester: ContextTester,
+    models_to_test: list[Model],
     ctx: int,
-    registry: "ModelRegistry",
-)) -> list["Model"]:
+    registry: ModelRegistry,
+)) -> list[Model]:
     """Test all models at a specific context size."""
 
 def _test_all_models_optimized((
-    tester: "ContextTester",
-    models_to_test: list["Model"],
+    tester: ContextTester,
+    models_to_test: list[Model],
     threshold: int,
-    registry: "ModelRegistry",
-)) -> list["Model"]:
+    registry: ModelRegistry,
+)) -> list[Model]:
     """Run optimized batch testing for multiple models."""
 
-def _print_final_results((updated_models: list["Model"])) -> None:
+def _print_final_results((updated_models: list[Model])) -> None:
     """Print the final results table."""
 
 def scan((self, failed: bool = False, scan_all: bool = False, verbose: bool = False)) -> None:
@@ -21152,7 +21194,7 @@ def test((
         self,
         model_id: str | None = None,
         test_all: bool = False,
-        threshold: int = 102400,
+        threshold: int = 31744,
         ctx: int | None = None,
         sort: str = "id",
         verbose: bool = False,
@@ -21190,9 +21232,9 @@ import json
 from pathlib import Path
 from loguru import logger
 from pydantic import BaseModel, Field
+from lmstrix.api.client import LMStudioClient
 from lmstrix.api.exceptions import InferenceError, ModelLoadError
 from lmstrix.core.models import Model
-from lmstrix.api.client import LMStudioClient
 
 class OptimizationResult(B, a, s, e, M, o, d, e, l):
     """Result from context optimization."""
@@ -21201,7 +21243,7 @@ class ContextOptimizer:
     """Finds the maximum effective context window for models."""
     def __init__((
         self,
-        client: "LMStudioClient | None" = None,
+        client: LMStudioClient | None = None,
         cache_file: Path | None = None,
         verbose: bool = False,
     )) -> None:
@@ -21233,7 +21275,7 @@ def succeeded((self)) -> bool:
 
 def __init__((
         self,
-        client: "LMStudioClient | None" = None,
+        client: LMStudioClient | None = None,
         cache_file: Path | None = None,
         verbose: bool = False,
     )) -> None:
@@ -21273,10 +21315,10 @@ import json
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, Self
 from loguru import logger
 from lmstrix.api import LMStudioClient
-from lmstrix.api.exceptions import ModelLoadError
+from lmstrix.api.exceptions import InferenceError, ModelLoadError
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 from lmstrix.loaders.model_loader import load_model_registry, save_model_registry
 from lmstrix.utils import get_context_test_log_path, get_lmstrix_log_path
@@ -21313,7 +21355,7 @@ class ContextTester:
     )) -> None:
         """Log attempt or solution to the main lmstrix.log.txt file."""
     def _test_at_context((
-        self,
+        self: Self,
         model_path: str,
         context_size: int,
         log_path: Path,
@@ -21321,18 +21363,67 @@ class ContextTester:
         registry: ModelRegistry | None = None,
     )) -> ContextTestResult:
         """Test model at a specific context size with retry logic for timeouts."""
+    def _perform_initial_test((
+        self: Self,
+        model: Model,
+        min_context: int,
+        log_path: Path,
+        registry: ModelRegistry,
+    )) -> ContextTestResult | None:
+        """Perform the initial test at a minimal context to ensure the model is operational."""
+    def _perform_threshold_test((
+        self: Self,
+        model: Model,
+        max_context: int,
+        log_path: Path,
+        registry: ModelRegistry,
+    )) -> ContextTestResult | None:
+        """Perform the test at the specified threshold."""
+    def _perform_incremental_test((
+        self: Self,
+        model: Model,
+        start_context: int,
+        log_path: Path,
+        registry: ModelRegistry,
+    )) -> None:
+        """Perform incremental testing from a known good context."""
+    def _perform_binary_search((
+        self: Self,
+        model: Model,
+        low: int,
+        high: int,
+        log_path: Path,
+        registry: ModelRegistry,
+    )) -> None:
+        """Perform binary search to find the optimal context size."""
+    def _filter_models_for_testing((self: Self, models: list[Model])) -> list[Model]:
+        """Filter out embedding models and already completed models."""
+    def _perform_pass_one_testing((
+        self: Self,
+        sorted_models: list[Model],
+        min_context: int,
+        registry: ModelRegistry,
+    )) -> tuple[dict[str, Model], list[Model]]:
+        """Perform the first pass of testing at a minimal context."""
+    def _perform_subsequent_passes((
+        self: Self,
+        active_models: dict[str, Model],
+        threshold: int,
+        registry: ModelRegistry,
+    )) -> None:
+        """Perform subsequent passes of testing at progressively higher contexts."""
     def test_model((
-        self,
+        self: Self,
         model: Model,
         min_context: int = 2048,
         max_context: int | None = None,
         registry: ModelRegistry | None = None,
     )) -> Model:
         """Run full context test on a model using the new safe testing strategy."""
-    def _is_embedding_model((self, model: Model)) -> bool:
+    def _is_embedding_model((self: Self, model: Model)) -> bool:
         """Check if a model is an embedding model."""
     def test_all_models((
-        self,
+        self: Self,
         models: list[Model],
         threshold: int = 102400,
         registry: ModelRegistry | None = None,
@@ -21356,62 +21447,6 @@ def to_dict((self)) -> dict:
 def is_valid_response((self)) -> bool:
     """Check if we got any response at all (not validating content)."""
 
-def _perform_initial_test((
-    self,
-    model: Model,
-    min_context: int,
-    log_path: Path,
-    registry: ModelRegistry,
-)) -> ContextTestResult | None:
-    """Perform the initial test at a minimal context to ensure the model is operational."""
-
-def _perform_threshold_test((
-    self,
-    model: Model,
-    max_context: int,
-    log_path: Path,
-    registry: ModelRegistry,
-)) -> ContextTestResult | None:
-    """Perform the test at the specified threshold."""
-
-def _perform_incremental_test((
-    self,
-    model: Model,
-    start_context: int,
-    log_path: Path,
-    registry: ModelRegistry,
-)) -> None:
-    """Perform incremental testing from a known good context."""
-
-def _perform_binary_search((
-    self,
-    model: Model,
-    low: int,
-    high: int,
-    log_path: Path,
-    registry: ModelRegistry,
-)) -> None:
-    """Perform binary search to find the optimal context size."""
-
-def _filter_models_for_testing((self, models: list[Model])) -> list[Model]:
-    """Filter out embedding models and already completed models."""
-
-def _perform_pass_one_testing((
-    self,
-    sorted_models: list[Model],
-    min_context: int,
-    registry: ModelRegistry,
-)) -> tuple[dict[str, Model], list[Model]]:
-    """Perform the first pass of testing at a minimal context."""
-
-def _perform_subsequent_passes((
-    self,
-    active_models: dict[str, Model],
-    threshold: int,
-    registry: ModelRegistry,
-)) -> None:
-    """Perform subsequent passes of testing at progressively higher contexts."""
-
 def __init__((self, client: LMStudioClient | None = None, verbose: bool = False)) -> None:
     """Initialize context tester."""
 
@@ -21428,7 +21463,7 @@ def _log_to_main_log((
     """Log attempt or solution to the main lmstrix.log.txt file."""
 
 def _test_at_context((
-        self,
+        self: Self,
         model_path: str,
         context_size: int,
         log_path: Path,
@@ -21437,8 +21472,64 @@ def _test_at_context((
     )) -> ContextTestResult:
     """Test model at a specific context size with retry logic for timeouts."""
 
+def _perform_initial_test((
+        self: Self,
+        model: Model,
+        min_context: int,
+        log_path: Path,
+        registry: ModelRegistry,
+    )) -> ContextTestResult | None:
+    """Perform the initial test at a minimal context to ensure the model is operational."""
+
+def _perform_threshold_test((
+        self: Self,
+        model: Model,
+        max_context: int,
+        log_path: Path,
+        registry: ModelRegistry,
+    )) -> ContextTestResult | None:
+    """Perform the test at the specified threshold."""
+
+def _perform_incremental_test((
+        self: Self,
+        model: Model,
+        start_context: int,
+        log_path: Path,
+        registry: ModelRegistry,
+    )) -> None:
+    """Perform incremental testing from a known good context."""
+
+def _perform_binary_search((
+        self: Self,
+        model: Model,
+        low: int,
+        high: int,
+        log_path: Path,
+        registry: ModelRegistry,
+    )) -> None:
+    """Perform binary search to find the optimal context size."""
+
+def _filter_models_for_testing((self: Self, models: list[Model])) -> list[Model]:
+    """Filter out embedding models and already completed models."""
+
+def _perform_pass_one_testing((
+        self: Self,
+        sorted_models: list[Model],
+        min_context: int,
+        registry: ModelRegistry,
+    )) -> tuple[dict[str, Model], list[Model]]:
+    """Perform the first pass of testing at a minimal context."""
+
+def _perform_subsequent_passes((
+        self: Self,
+        active_models: dict[str, Model],
+        threshold: int,
+        registry: ModelRegistry,
+    )) -> None:
+    """Perform subsequent passes of testing at progressively higher contexts."""
+
 def test_model((
-        self,
+        self: Self,
         model: Model,
         min_context: int = 2048,
         max_context: int | None = None,
@@ -21446,11 +21537,11 @@ def test_model((
     )) -> Model:
     """Run full context test on a model using the new safe testing strategy."""
 
-def _is_embedding_model((self, model: Model)) -> bool:
+def _is_embedding_model((self: Self, model: Model)) -> bool:
     """Check if a model is an embedding model."""
 
 def test_all_models((
-        self,
+        self: Self,
         models: list[Model],
         threshold: int = 102400,
         registry: ModelRegistry | None = None,
@@ -21466,7 +21557,7 @@ from typing import Any
 from loguru import logger
 from pydantic import BaseModel, Field
 from lmstrix.api.client import LMStudioClient
-from lmstrix.api.exceptions import ModelNotFoundError
+from lmstrix.api.exceptions import InferenceError, ModelLoadError, ModelNotFoundError
 from lmstrix.core.models import ModelRegistry
 
 class InferenceResult(B, a, s, e, M, o, d, e, l):
@@ -21517,12 +21608,13 @@ def infer((
 # Language: python
 
 import json
+import shutil
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any
 from loguru import logger
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, ValidationError, field_validator
 from lmstrix.utils.paths import get_default_models_file
 
 class ContextTestStatus(s, t, r, ,,  , E, n, u, m):
@@ -21538,18 +21630,31 @@ class Model(B, a, s, e, M, o, d, e, l):
         """Get the short_id, computing it from path if not set."""
     def to_registry_dict((self)) -> dict[str, Any]:
         """Convert to dictionary format for registry storage."""
+    def validate_integrity((self)) -> bool:
+        """Validate model data integrity."""
 
 class Config:
     """Pydantic configuration."""
+
+class ModelRegistryError(E, x, c, e, p, t, i, o, n):
+    """Exception raised for model registry errors."""
 
 class ModelRegistry:
     """Manages the collection of available models."""
     def __init__((self, models_file: Path | None = None)) -> None:
         """Initialize the model registry."""
+    def _create_backup((self)) -> Path | None:
+        """Create a backup of the current registry file."""
+    def _cleanup_old_backups((self, keep_count: int = 10)) -> None:
+        """Keep only the most recent N backup files."""
+    def _validate_registry_data((self, data: dict)) -> dict:
+        """Validate and sanitize registry data before use."""
     def load((self)) -> None:
-        """Load models from the JSON file."""
+        """Load models from the JSON file with validation and recovery."""
+    def _attempt_recovery((self)) -> None:
+        """Attempt to recover from backup files."""
     def save((self)) -> None:
-        """Save models to the JSON file."""
+        """Save models to the JSON file with validation and backup."""
     def get_model((self, model_path: str)) -> Model | None:
         """Get a model by its path."""
     def find_model((self, identifier: str)) -> Model | None:
@@ -21559,9 +21664,9 @@ class ModelRegistry:
     def list_models((self)) -> list[Model]:
         """Get all models in the registry."""
     def update_model((self, model_path: str, model: Model)) -> None:
-        """Update a model in the registry and save."""
+        """Update a model in the registry with validation."""
     def update_model_by_id((self, model: Model)) -> None:
-        """Update a model by ID (backward compatibility)."""
+        """Update a model by ID with validation."""
     def remove_model((self, model_path: str)) -> None:
         """Remove a model from the registry and save."""
     def remove_model_by_id((self, model_id: str)) -> None:
@@ -21571,6 +21676,12 @@ class ModelRegistry:
 
 def validate_path((cls, v: Any)) -> Path:
     """Ensure path is a Path object."""
+
+def validate_context_limit((cls, v: Any)) -> int:
+    """Validate context limit is reasonable."""
+
+def validate_size((cls, v: Any)) -> int:
+    """Validate model size is reasonable."""
 
 def sanitized_path((self)) -> str:
     """Return a sanitized version of the model path suitable for filenames."""
@@ -21584,14 +21695,29 @@ def get_short_id((self)) -> str:
 def to_registry_dict((self)) -> dict[str, Any]:
     """Convert to dictionary format for registry storage."""
 
+def validate_integrity((self)) -> bool:
+    """Validate model data integrity."""
+
 def __init__((self, models_file: Path | None = None)) -> None:
     """Initialize the model registry."""
 
+def _create_backup((self)) -> Path | None:
+    """Create a backup of the current registry file."""
+
+def _cleanup_old_backups((self, keep_count: int = 10)) -> None:
+    """Keep only the most recent N backup files."""
+
+def _validate_registry_data((self, data: dict)) -> dict:
+    """Validate and sanitize registry data before use."""
+
 def load((self)) -> None:
-    """Load models from the JSON file."""
+    """Load models from the JSON file with validation and recovery."""
+
+def _attempt_recovery((self)) -> None:
+    """Attempt to recover from backup files."""
 
 def save((self)) -> None:
-    """Save models to the JSON file."""
+    """Save models to the JSON file with validation and backup."""
 
 def get_model((self, model_path: str)) -> Model | None:
     """Get a model by its path."""
@@ -21606,10 +21732,10 @@ def list_models((self)) -> list[Model]:
     """Get all models in the registry."""
 
 def update_model((self, model_path: str, model: Model)) -> None:
-    """Update a model in the registry and save."""
+    """Update a model in the registry with validation."""
 
 def update_model_by_id((self, model: Model)) -> None:
-    """Update a model by ID (backward compatibility)."""
+    """Update a model by ID with validation."""
 
 def remove_model((self, model_path: str)) -> None:
     """Remove a model from the registry and save."""
@@ -21841,6 +21967,7 @@ def save_context((
 from pathlib import Path
 from loguru import logger
 from lmstrix.api.client import LMStudioClient
+from lmstrix.api.exceptions import APIConnectionError
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 from lmstrix.utils.paths import get_default_models_file
 
@@ -21912,7 +22039,7 @@ def save_prompts((
     """Save prompts to a TOML file."""
 
 
-<document index="41">
+<document index="42">
 <source>src/lmstrix/py.typed</source>
 <document_content>
 # This file indicates that the package supports type hints
@@ -21951,7 +22078,7 @@ def setup_logging((verbose: bool = False)) -> None:
 
 from pathlib import Path
 from loguru import logger
-from lmstrix.api.exceptions import LMStudioInstallationNotFound
+from lmstrix.api.exceptions import LMStudioInstallationNotFoundError
 
 def get_lmstudio_path(()) -> Path:
     """Get the LM Studio installation path."""
@@ -22298,7 +22425,8 @@ class TestInferenceEngine:
     def test_engine_initialization_defaults((self: "TestInferenceEngine")) -> None:
         """Test engine initialization with defaults."""
     def test_engine_initialization_custom((
-        self: "TestInferenceEngine", mock_lmstudio_client: Mock
+        self: "TestInferenceEngine",
+        mock_lmstudio_client: Mock,
     )) -> None:
         """Test engine initialization with custom client and registry."""
 
@@ -22315,7 +22443,8 @@ def test_engine_initialization_defaults((self: "TestInferenceEngine")) -> None:
     """Test engine initialization with defaults."""
 
 def test_engine_initialization_custom((
-        self: "TestInferenceEngine", mock_lmstudio_client: Mock
+        self: "TestInferenceEngine",
+        mock_lmstudio_client: Mock,
     )) -> None:
     """Test engine initialization with custom client and registry."""
 
@@ -22323,7 +22452,9 @@ def test_infer_model_not_found((self: "TestInferenceEngine")) -> None:
     """Test inference with non-existent model."""
 
 def test_infer_success((
-        self: "TestInferenceEngine", mock_lmstudio_client: Mock, mock_llm: Mock
+        self: "TestInferenceEngine",
+        mock_lmstudio_client: Mock,
+        mock_llm: Mock,
     )) -> None:
     """Test successful inference."""
 
@@ -22342,7 +22473,8 @@ def test_infer_with_max_tokens((
     """Test inference with custom max_tokens."""
 
 def test_infer_load_failure((
-        self: "TestInferenceEngine", mock_lmstudio_client: Mock
+        self: "TestInferenceEngine",
+        mock_lmstudio_client: Mock,
     )) -> None:
     """Test inference when model fails to load."""
 
@@ -22384,7 +22516,8 @@ class TestModel:
     def test_model_creation_with_aliases((self: "TestModel")) -> None:
         """Test model creation using field aliases."""
     def test_model_with_context_testing((
-        self: "TestModel", sample_model_data: dict[str, Any]
+        self: "TestModel",
+        sample_model_data: dict[str, Any],
     )) -> None:
         """Test model with context testing information."""
     def test_model_path_validation((self: "TestModel")) -> None:
@@ -22447,7 +22580,8 @@ def test_model_creation_with_aliases((self: "TestModel")) -> None:
     """Test model creation using field aliases."""
 
 def test_model_with_context_testing((
-        self: "TestModel", sample_model_data: dict[str, Any]
+        self: "TestModel",
+        sample_model_data: dict[str, Any],
     )) -> None:
     """Test model with context testing information."""
 
@@ -22621,7 +22755,9 @@ class TestModelScanner:
         """Test that non-model files are skipped."""
 
 def test_scanner_initialization((
-        self: "TestModelScanner", mock_get_path: Mock, tmp_path: Path
+        self: "TestModelScanner",
+        mock_get_path: Mock,
+        tmp_path: Path,
     )) -> None:
     """Test scanner initialization."""
 
@@ -22650,7 +22786,9 @@ def test_scan_models((self: "TestModelScanner", mock_get_path: Mock, tmp_path: P
     """Test scanning for models."""
 
 def test_sync_with_registry((
-        self: "TestModelScanner", mock_get_path: Mock, tmp_path: Path
+        self: "TestModelScanner",
+        mock_get_path: Mock,
+        tmp_path: Path,
     )) -> None:
     """Test syncing scanned models with registry."""
 
@@ -22674,6 +22812,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import pytest
 from _pytest.capture import CaptureFixture
 from lmstrix.cli.main import LMStrixCLI as CLI
+from lmstrix.cli.main import main
 from lmstrix.core.inference import InferenceResult
 from lmstrix.core.models import Model
 from lmstrix.core.prompts import ResolvedPrompt
@@ -22742,6 +22881,44 @@ def test_cli_help((self: "TestCLIIntegration", capsys: CaptureFixture[str])) -> 
 # File: /Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_context_loader.py
 # Language: python
 
+from pathlib import Path
+from unittest.mock import patch
+import pytest
+from lmstrix.api.exceptions import ConfigurationError
+from lmstrix.loaders.context_loader import load_context
+
+class TestContextLoader:
+    """Test context loading functions."""
+    def test_load_context_simple((self, tmp_path: Path)) -> None:
+        """Test loading simple text context."""
+    def test_load_context_with_encoding((self, tmp_path: Path)) -> None:
+        """Test loading context with specific encoding."""
+    def test_load_context_nonexistent_file((self, tmp_path: Path)) -> None:
+        """Test loading from non-existent file."""
+    def test_load_context_read_error((self, tmp_path: Path)) -> None:
+        """Test handling read errors."""
+    def test_load_context_string_path((self, tmp_path: Path)) -> None:
+        """Test loading context with string path."""
+    def test_load_context_large_file((self, tmp_path: Path)) -> None:
+        """Test loading large context file."""
+
+def test_load_context_simple((self, tmp_path: Path)) -> None:
+    """Test loading simple text context."""
+
+def test_load_context_with_encoding((self, tmp_path: Path)) -> None:
+    """Test loading context with specific encoding."""
+
+def test_load_context_nonexistent_file((self, tmp_path: Path)) -> None:
+    """Test loading from non-existent file."""
+
+def test_load_context_read_error((self, tmp_path: Path)) -> None:
+    """Test handling read errors."""
+
+def test_load_context_string_path((self, tmp_path: Path)) -> None:
+    """Test loading context with string path."""
+
+def test_load_context_large_file((self, tmp_path: Path)) -> None:
+    """Test loading large context file."""
 
 
 # File: /Users/Shared/lmstudio/lmstrix/tests/test_loaders/test_model_loader.py
@@ -22787,7 +22964,8 @@ def test_save_model_registry_custom_path((self: "TestModelLoader", tmp_path: Pat
 
 def test_scan_and_update_models((
         self: "TestModelLoader",
-        mock_scanner_class: Mock,
+        mock_save_registry: Mock,
+        mock_load_registry: Mock,
         mock_client_class: Mock,
         tmp_path: Path,
     )) -> None:
@@ -22795,7 +22973,7 @@ def test_scan_and_update_models((
 
 def test_scan_and_update_models_default_client((
         self: "TestModelLoader",
-        mock_scanner_class: Mock,
+        mock_load_registry: Mock,
         mock_client_class: Mock,
     )) -> None:
     """Test scan_and_update_models creates default client if none provided."""
@@ -22820,7 +22998,8 @@ class TestPromptLoader:
     def test_load_prompts_invalid_toml((self: "TestPromptLoader", tmp_path: Path)) -> None:
         """Test loading prompts from invalid TOML file."""
     def test_load_prompts_with_nested_placeholders((
-        self: "TestPromptLoader", tmp_path: Path
+        self: "TestPromptLoader",
+        tmp_path: Path,
     )) -> None:
         """Test loading prompts with nested placeholders."""
     def test_load_prompts_with_missing_params((self: "TestPromptLoader", tmp_path: Path)) -> None:
@@ -22840,7 +23019,8 @@ def test_load_prompts_invalid_toml((self: "TestPromptLoader", tmp_path: Path)) -
     """Test loading prompts from invalid TOML file."""
 
 def test_load_prompts_with_nested_placeholders((
-        self: "TestPromptLoader", tmp_path: Path
+        self: "TestPromptLoader",
+        tmp_path: Path,
     )) -> None:
     """Test loading prompts with nested placeholders."""
 
@@ -22880,7 +23060,8 @@ class TestPathUtilities:
     def test_get_lmstudio_path_from_pointer((self: "TestPathUtilities", tmp_path: Path)) -> None:
         """Test getting LM Studio path from home pointer file."""
     def test_get_lmstudio_path_fallback_locations((
-        self: "TestPathUtilities", tmp_path: Path
+        self: "TestPathUtilities",
+        tmp_path: Path,
     )) -> None:
         """Test fallback to common LM Studio locations."""
     def test_get_lmstudio_path_shared_location((self: "TestPathUtilities", tmp_path: Path)) -> None:
@@ -22911,7 +23092,8 @@ def test_get_lmstudio_path_from_pointer((self: "TestPathUtilities", tmp_path: Pa
     """Test getting LM Studio path from home pointer file."""
 
 def test_get_lmstudio_path_fallback_locations((
-        self: "TestPathUtilities", tmp_path: Path
+        self: "TestPathUtilities",
+        tmp_path: Path,
     )) -> None:
     """Test fallback to common LM Studio locations."""
 

@@ -2,6 +2,7 @@
 
 from importlib.metadata import PackageNotFoundError, version
 
+from lmstrix.api.exceptions import ModelNotFoundError
 from lmstrix.core.context_tester import ContextTester
 from lmstrix.core.inference import InferenceEngine, InferenceResult
 from lmstrix.core.models import Model
@@ -103,7 +104,8 @@ class LMStrix:
         registry = load_model_registry(verbose=self.verbose)
         model = registry.get_model(model_id)
         if not model:
-            raise ValueError(f"Model not found: {model_id}")
+            available_models = [m.id for m in registry.list_models()]
+            raise ModelNotFoundError(model_id, available_models)
 
         tester = ContextTester()
         updated_model = tester.test_model(model)

@@ -8,6 +8,7 @@ import pytest
 from _pytest.capture import CaptureFixture
 
 from lmstrix.cli.main import LMStrixCLI as CLI
+from lmstrix.cli.main import main
 from lmstrix.core.inference import InferenceResult
 from lmstrix.core.models import Model
 from lmstrix.core.prompts import ResolvedPrompt
