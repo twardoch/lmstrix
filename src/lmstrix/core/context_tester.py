@@ -76,12 +76,18 @@ class ContextTester:
     # Models with known issues - these may need special handling
     PROBLEMATIC_MODELS: ClassVar[dict] = {}
 
-    def __init__(self, client: LMStudioClient | None = None, verbose: bool = False) -> None:
+    def __init__(
+        self,
+        client: LMStudioClient | None = None,
+        verbose: bool = False,
+        fast_mode: bool = False,
+    ) -> None:
         """Initialize context tester.
 
         Args:
             client: LMStudioClient instance for model operations.
             verbose: Enable verbose logging output.
+            fast_mode: Skip semantic verification - only test if inference completes.
         """
         self.client = client or LMStudioClient()
         # Enhanced dual testing prompts
@@ -90,6 +96,7 @@ class ContextTester:
         # Keep legacy for backward compatibility
         self.test_prompt = "Say hello"
         self.verbose = verbose
+        self.fast_mode = fast_mode
         self.inference_timeout = 90.0  # Increased to 90 seconds for better reliability
         self.max_retries = 2  # Retry timeouts up to 2 times
 
@@ -196,38 +203,48 @@ class ContextTester:
                         "[Context Test] ✓ Model loaded successfully, attempting inference...",
                     )
 
-                # Enhanced dual testing system
-                # Test 1: Number words to digits
-                response_1 = self.client.completion(
-                    llm=llm,
-                    prompt=self.test_prompt_1,
-                    max_tokens=10,
-                    temperature=0.1,
-                    model_id=model_path,
-                )
+                if self.fast_mode:
+                    # Fast mode: Just test if inference completes technically
+                    response = self.client.completion(
+                        llm=llm,
+                        prompt=self.test_prompt,  # Use simple prompt
+                        temperature=0.9,
+                        model_id=model_path,
+                    )
+                    # Any response means technical success in fast mode
+                    inference_success = bool(response.content.strip())
+                    combined_response = f"Fast mode - Response: '{response.content.strip()}'"
+                else:
+                    # Enhanced dual testing system
+                    # Test 1: Number words to digits
+                    response_1 = self.client.completion(
+                        llm=llm,
+                        prompt=self.test_prompt_1,
+                        temperature=0.9,
+                        model_id=model_path,
+                    )
 
-                test_1_pass = "96" in response_1.content
+                    test_1_pass = "96" in response_1.content
 
-                # Test 2: Simple arithmetic
-                response_2 = self.client.completion(
-                    llm=llm,
-                    prompt=self.test_prompt_2,
-                    max_tokens=10,
-                    temperature=0.1,
-                    model_id=model_path,
-                )
+                    # Test 2: Simple arithmetic
+                    response_2 = self.client.completion(
+                        llm=llm,
+                        prompt=self.test_prompt_2,
+                        temperature=0.9,
+                        model_id=model_path,
+                    )
 
-                test_2_pass = "5" in response_2.content
+                    test_2_pass = "5" in response_2.content
 
-                # Success if ANY test passes
-                inference_success = test_1_pass or test_2_pass
+                    # Success if ANY test passes
+                    inference_success = test_1_pass or test_2_pass
 
-                test_1_status = "✓" if test_1_pass else "✗"
-                test_2_status = "✓" if test_2_pass else "✗"
-                combined_response = (
-                    f"Test1: '{response_1.content.strip()}' ({test_1_status}), "
-                    f"Test2: '{response_2.content.strip()}' ({test_2_status})"
-                )
+                    test_1_status = "✓" if test_1_pass else "✗"
+                    test_2_status = "✓" if test_2_pass else "✗"
+                    combined_response = (
+                        f"Test1: '{response_1.content.strip()}' ({test_1_status}), "
+                        f"Test2: '{response_2.content.strip()}' ({test_2_status})"
+                    )
 
                 # Create a combined response object for logging
 
@@ -243,7 +260,11 @@ class ContextTester:
                     context_size=context_size,
                     load_success=True,
                     inference_success=inference_success,
-                    prompt=f"{self.test_prompt_1} | {self.test_prompt_2}",
+                    prompt=(
+                        self.test_prompt
+                        if self.fast_mode
+                        else f"{self.test_prompt_1} | {self.test_prompt_2}"
+                    ),
                     response=combined_response,
                 )
 
@@ -288,32 +309,56 @@ class ContextTester:
             except ModelLoadError as e:
                 logger.warning(f"Failed to load {model_path} at context {context_size}: {e}")
 
+                # Check for specific error types for better user guidance
+                error_str = str(e).lower()
+                is_model_not_found = any(
+                    phrase in error_str
+                    for phrase in [
+                        "model not found",
+                        "path not found",
+                        "not available in lm studio",
+                        "nomodelmatchingquery",
+                        "possibly deleted or unloaded",
+                    ]
+                )
+
                 if self.verbose:
                     logger.info(
                         f"[Context Test] ✗ Model failed to load at context {context_size:,}",
                     )
                     logger.debug(f"[Context Test] Load error: {e!s}")
 
-                    # Check if it's a "model not found" error
-                    if "noModelMatchingQuery" in str(e):
+                    if is_model_not_found:
                         logger.info(
-                            f"[Context Test] ⚠️  Model '{model_path}' is not loaded in LM Studio",
+                            f"[Context Test] 🚫 Model '{model_path}' not found in LM Studio",
                         )
                         logger.info(
-                            "[Context Test] ⚠️  Please load the model in LM Studio first before testing",
+                            "[Context Test] 🚫 Model may have been deleted or unloaded",
                         )
+
+                # Mark model as bad in the registry if model not found
+                if model and registry and is_model_not_found:
+                    from lmstrix.core.models import ContextTestStatus
+
+                    model.context_test_status = ContextTestStatus.FAILED
+                    model.last_known_bad_context = context_size
+                    model.context_test_date = datetime.now()
+                    registry.update_model_by_id(model)
+                    logger.info(
+                        f"Marked model {model_path} as bad in registry (not found in LM Studio)",
+                    )
 
                 result = ContextTestResult(
                     context_size=context_size,
                     load_success=False,
-                    error=str(e),
+                    error=f"Model load failed: {str(e)[:100]}",
                 )
 
                 # Log the failed solution
                 self._log_to_main_log(
                     model_path,
                     context_size,
-                    "SOLUTION",
+                    "MODEL_NOT_FOUND" if is_model_not_found else "LOAD_FAILED",
                     f"success=False, load_failed=True, error={str(e)[:50]}",
                 )
 
@@ -464,6 +509,33 @@ class ContextTester:
         self._log_result(log_path, result)
         return result
 
+    def _calculate_smart_increment(
+        self,
+        last_tested: int,
+        max_declared: int,
+    ) -> int:
+        """Calculate smart context increment based on gap between tested and declared max.
+
+        Args:
+            last_tested: Last successfully tested context size
+            max_declared: Maximum declared context limit
+
+        Returns:
+            Increment value to add to last_tested
+        """
+        # Calculate 5% of the gap between max declared and last tested
+        gap = max_declared - last_tested
+        value_a = int(gap * 0.05)
+
+        # Calculate 10% of last tested context size
+        value_b = int(last_tested * 0.1)
+
+        # Use the higher of the two values
+        increment = max(value_a, value_b)
+
+        # Ensure we have at least some minimal increment
+        return max(increment, 256)
+
     def _perform_initial_test(
         self: Self,
         model: Model,
@@ -473,11 +545,11 @@ class ContextTester:
     ) -> ContextTestResult | None:
         """Perform the initial test at a minimal context to ensure the model is operational."""
         logger.info(f"Initial test for {model.id} with context size {min_context}")
-        print(f"\nPhase 1: Verifying model loads at {min_context:,} tokens...")
+        print(f"\nPhase 1: Verifying {model.id} loads at {min_context:,} tokens...")
 
         if self.verbose:
             logger.info(
-                f"[Phase 1] Verifying model can load with minimal context ({min_context} tokens)...",
+                f"[Phase 1] Verifying {model.id} can load with minimal context ({min_context} tokens)...",
             )
 
         initial_result = self._test_at_context(model.id, min_context, log_path, model, registry)
@@ -522,9 +594,9 @@ class ContextTester:
         test_context = max_context
         declared_limit = model.context_limit
 
-        print(f"\nPhase 2: Testing at threshold ({test_context:,} tokens)...")
+        print(f"\nPhase 2: Testing {model.id} at threshold ({test_context:,} tokens)...")
         if self.verbose:
-            logger.info(f"[Phase 2] Testing at threshold: {test_context:,} tokens")
+            logger.info(f"[Phase 2] Testing {model.id} at threshold: {test_context:,} tokens")
             logger.info(f"[Phase 2] Declared limit: {declared_limit:,} tokens")
             logger.info(f"[Phase 2] Using min(threshold, declared_limit) = {test_context:,}")
 
@@ -549,9 +621,9 @@ class ContextTester:
         registry: ModelRegistry,
     ) -> None:
         """Perform incremental testing from a known good context."""
-        print("\nPhase 3: Testing higher contexts...")
+        print(f"\nPhase 3: Testing {model.id} at higher contexts...")
         if self.verbose:
-            logger.info("[Phase 3] Threshold test passed, testing higher contexts...")
+            logger.info(f"[Phase 3] {model.id}: Threshold test passed, testing higher contexts...")
             logger.info(f"[Phase 3] Will use progressive strategy up to {model.context_limit:,}")
 
         current_context = start_context
@@ -560,7 +632,9 @@ class ContextTester:
             if current_context < start_context:
                 next_context = current_context * 2
             else:
-                next_context = int(current_context * 1.1)
+                # Use smart increment calculation
+                increment = self._calculate_smart_increment(current_context, model.context_limit)
+                next_context = current_context + increment
 
             next_context = min(next_context, model.context_limit)
 
@@ -574,7 +648,7 @@ class ContextTester:
             print(f"  → Testing context size: {next_context:,} tokens...")
 
             if self.verbose:
-                logger.info(f"[Phase 3] Testing at {next_context:,} tokens...")
+                logger.info(f"[Phase 3] Testing {model.id} at {next_context:,} tokens...")
 
             result = self._test_at_context(model.id, next_context, log_path, model, registry)
 
@@ -590,7 +664,7 @@ class ContextTester:
                     logger.info(
                         f"✓ Model {model.id} works at full declared limit {next_context:,}!",
                     )
-                    print("  ✓ Success! Model works at declared limit.")
+                    print(f"  ✓ Success! {model.id} works at declared limit.")
                     return
             else:
                 model.last_known_bad_context = next_context
@@ -607,9 +681,9 @@ class ContextTester:
         registry: ModelRegistry,
     ) -> None:
         """Perform binary search to find the optimal context size."""
-        print(f"\nPhase 4: Binary search between {low:,} and {high:,}...")
+        print(f"\nPhase 4: Binary search for {model.id} between {low:,} and {high:,}...")
         if self.verbose:
-            logger.info(f"[Phase 4] Failed at {high + 1:,}, starting binary search")
+            logger.info(f"[Phase 4] {model.id}: Failed at {high + 1:,}, starting binary search")
 
         left = low
         right = high
@@ -632,7 +706,9 @@ class ContextTester:
             if self.verbose:
                 remaining = right - left
                 progress = ((model.context_limit - remaining) / model.context_limit) * 100
-                logger.info(f"[Iteration {iteration}] Testing midpoint: {mid:,} tokens")
+                logger.info(
+                    f"[Iteration {iteration}] Testing {model.id} at midpoint: {mid:,} tokens",
+                )
                 logger.info(
                     f"[Iteration {iteration}] Current range: {left:,} - {right:,} ({remaining:,} tokens)",
                 )
@@ -717,7 +793,7 @@ class ContextTester:
         logger.info(
             f"Context test completed for {model.id}. Optimal working context: {best_working_context}",
         )
-        print(f"  ✓ Test complete! Optimal context: {best_working_context:,} tokens")
+        print(f"  ✓ Test complete for {model.id}! Optimal context: {best_working_context:,} tokens")
 
         if self.verbose:
             logger.info("[Test Complete] Final Results:")
@@ -796,7 +872,7 @@ class ContextTester:
                 continue
 
             if i > 1:
-                print("  ⏳ Waiting 3 seconds before next model (resource cleanup)...")
+                print("\n\n  ⏳ Waiting 3 seconds before next model (resource cleanup)...")
                 time.sleep(3.0)
 
             log_path = get_context_test_log_path(model.id)
@@ -846,7 +922,12 @@ class ContextTester:
                 if model.last_known_good_context < threshold:
                     next_context = model.last_known_good_context * 2
                 else:
-                    next_context = int(model.last_known_good_context * 1.1)
+                    # Use smart increment calculation
+                    increment = self._calculate_smart_increment(
+                        model.last_known_good_context,
+                        model.context_limit,
+                    )
+                    next_context = model.last_known_good_context + increment
 
                 next_context = min(next_context, model.context_limit)
 
@@ -875,7 +956,7 @@ class ContextTester:
                 model = active_models[model_id]
                 print(f"Testing {model.id} at {test_context:,} tokens...")
 
-                print("  ⏳ Waiting 3 seconds before next model (resource cleanup)...")
+                print("\n\n  ⏳ Waiting 3 seconds before next model (resource cleanup)...")
                 time.sleep(3.0)
 
                 log_path = get_context_test_log_path(model.id)
@@ -911,17 +992,21 @@ class ContextTester:
     def test_model(
         self: Self,
         model: Model,
-        min_context: int = 2048,
+        min_context: int = 2047,
         max_context: int | None = None,
         registry: ModelRegistry | None = None,
     ) -> Model:
-        """Run full context test on a model using the new safe testing strategy."""
+        """Run full context test on a model using the new fixed context testing strategy."""
         logger.info(f"Starting context test for {model.id}")
 
         if self.verbose:
             logger.info(f"[Test Start] Model: {model.id}")
-            logger.info(f"[Test Start] Declared context limit: {model.context_limit:,} tokens")
-            logger.info("[Test Start] Using binary search to find true operational limit")
+            logger.info(
+                f"[Test Start] {model.id} declared context limit: {model.context_limit:,} tokens",
+            )
+            logger.info(
+                "[Test Start] Using fixed context values testing strategy",
+            )
 
         model.context_test_status = ContextTestStatus.TESTING
         model.context_test_date = datetime.now()
@@ -932,49 +1017,135 @@ class ContextTester:
         registry.update_model_by_id(model)
 
         max_context = max_context or model.context_limit
-
-        if model.last_known_bad_context:
-            safe_max_context = int(model.last_known_bad_context * 0.75)
-            if max_context >= model.last_known_bad_context:
-                logger.warning(
-                    f"Requested max_context ({max_context:,}) is at or above last known bad context "
-                    f"({model.last_known_bad_context:,}). Limiting to {safe_max_context:,} (75% of last bad).",
-                )
-                max_context = safe_max_context
+        declared_max = model.context_limit
 
         log_path = get_context_test_log_path(model.id)
 
         if self.verbose:
             logger.info(f"[Test Start] Test log will be saved to: {log_path}")
 
-        initial_result = self._perform_initial_test(model, min_context, log_path, registry)
-        if not initial_result:
+        # Define fixed context values to test
+        fixed_contexts = [120000, 100000, 80000, 60000, 40000, 30000]
+
+        # Filter out contexts that are >= declared max
+        test_contexts = [ctx for ctx in fixed_contexts if ctx < declared_max]
+
+        # Add declared max - 1 to the test list
+        test_contexts.append(declared_max - 1)
+
+        # Skip contexts that are <= last known good context
+        if model.last_known_good_context:
+            original_count = len(test_contexts)
+            test_contexts = [ctx for ctx in test_contexts if ctx > model.last_known_good_context]
+            skipped_count = original_count - len(test_contexts)
+            if skipped_count > 0:
+                logger.info(
+                    f"Skipping {skipped_count} contexts <= last known good ({model.last_known_good_context:,})",
+                )
+                print(
+                    f"  ℹ️  Model already tested successfully at {model.last_known_good_context:,} tokens",
+                )
+                print("  ⏭️  Skipping lower context values...")
+
+        if not test_contexts:
+            # Model already tested at or above all our test contexts
+            logger.info(
+                f"Model {model.id} already tested at {model.last_known_good_context:,}, no higher contexts to test",
+            )
+            print(
+                f"\n✓ Model already tested at {model.last_known_good_context:,} tokens - no higher fixed contexts to test",
+            )
+            model.context_test_status = ContextTestStatus.COMPLETED
+            registry.update_model_by_id(model)
             return model
 
-        threshold_result = self._perform_threshold_test(model, max_context, log_path, registry)
-        if threshold_result:
-            if threshold_result.context_size >= model.context_limit:
-                model.context_test_status = ContextTestStatus.COMPLETED
-                model.context_test_log = str(log_path)
-                logger.info(
-                    f"✓ Model {model.id} works at declared limit {threshold_result.context_size:,}!",
-                )
-                print("  ✓ Success! Model works at declared limit.")
-                registry.update_model_by_id(model)
-                return model
+        logger.info(f"Testing {model.id} with context values: {test_contexts}")
+        print(f"\nTesting {model.id} with fixed context values...")
 
-            self._perform_incremental_test(model, threshold_result.context_size, log_path, registry)
-        else:
-            self._perform_binary_search(
-                model,
-                min_context,
-                max_context - 1,
-                log_path,
-                registry,
+        # Track successful contexts
+        last_successful_context = None
+
+        # Test each context value
+        for ctx_value in test_contexts:
+            if ctx_value > max_context:
+                continue
+
+            print(f"\nTesting at {ctx_value:,} tokens...")
+            result = self._test_at_context(model.id, ctx_value, log_path, model, registry)
+
+            if result.load_success and result.inference_success:
+                last_successful_context = ctx_value
+                model.last_known_good_context = ctx_value
+                model.tested_max_context = ctx_value
+                logger.info(f"✓ Success at {ctx_value:,} tokens")
+
+                # If we succeeded at declared_max - 1, we're done!
+                if ctx_value == declared_max - 1:
+                    model.context_test_status = ContextTestStatus.COMPLETED
+                    model.context_test_log = str(log_path)
+                    logger.info(f"✓ Model {model.id} works at declared limit - 1!")
+                    print(
+                        f"  ✓ Success! {model.id} works at {ctx_value:,} tokens (declared limit - 1).",
+                    )
+                    registry.update_model_by_id(model)
+                    return model
+            else:
+                # Test failed
+                model.last_known_bad_context = ctx_value
+
+                # If context > 4095 and < declared max, try 10% reduction
+                if ctx_value > 4095 and ctx_value < declared_max:
+                    reduced_context = ctx_value
+                    max_retries = 10  # Prevent infinite loop
+                    retry_count = 0
+
+                    while retry_count < max_retries:
+                        reduced_context = int(reduced_context * 0.9)  # 10% reduction
+
+                        # Don't go below 4095
+                        if reduced_context <= 4095:
+                            break
+
+                        print(f"  ↻ Retrying with reduced context: {reduced_context:,} tokens...")
+                        retry_result = self._test_at_context(
+                            model.id,
+                            reduced_context,
+                            log_path,
+                            model,
+                            registry,
+                        )
+
+                        if retry_result.load_success and retry_result.inference_success:
+                            last_successful_context = reduced_context
+                            model.last_known_good_context = reduced_context
+                            model.tested_max_context = reduced_context
+                            logger.info(f"✓ Success at reduced context {reduced_context:,} tokens")
+                            break
+                        retry_count += 1
+                        model.last_known_bad_context = reduced_context
+
+                # Stop testing further contexts after a failure
+                break
+
+        # Determine final status
+        if last_successful_context:
+            model.context_test_status = ContextTestStatus.COMPLETED
+            model.tested_max_context = last_successful_context
+            model.context_test_log = str(log_path)
+            logger.info(
+                f"Context test completed for {model.id}. Maximum working context: {last_successful_context:,}",
             )
+            print(
+                f"\n✓ Test complete for {model.id}! Maximum working context: {last_successful_context:,} tokens",
+            )
+        else:
+            # All tests failed
+            model.context_test_status = ContextTestStatus.FAILED
+            model.error_msg = "Failed all fixed context tests"
+            logger.error(f"All context tests failed for {model.id}")
+            print(f"\n✗ All context tests failed for {model.id}")
 
         registry.update_model_by_id(model)
-
         return model
 
     def _is_embedding_model(self: Self, model: Model) -> bool:
@@ -1007,7 +1178,7 @@ class ContextTester:
 
         active_models, updated_models = self._perform_pass_one_testing(
             sorted_models,
-            2048,
+            16000,
             registry,
         )
 

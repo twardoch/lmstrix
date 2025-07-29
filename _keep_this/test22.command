@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-for p in $(lmstrix list --sort size --show id); do
+lmstrix scan
+for p in $(lmstrix list --sort smart --show id); do
 	echo
 	echo "--------------------"
-	echo ">> $p @ $c"
+	echo ">> $p"
 	lms unload --all
 	lmstrix test "$p"
 done

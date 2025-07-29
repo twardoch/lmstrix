@@ -70,6 +70,16 @@ class LMStudioClient:
             # Use camelCase for config keys as expected by lmstudio SDK
             config: Any = {"contextLength": context_len, "flashAttention": True}
             return lmstudio.llm(model_path, config=config)
+        except LMStudioServerError as e:
+            # Handle specific LM Studio server errors during model loading
+            error_message = str(e).lower()
+            if "model not found" in error_message or "path not found" in error_message:
+                raise ModelLoadError(
+                    model_path,
+                    f"Model not available in LM Studio (possibly deleted or unloaded): {e}",
+                ) from e
+            # Generic LM Studio server error during load
+            raise ModelLoadError(model_path, f"LM Studio server error during load: {e}") from e
         except (TypeError, ValueError) as e:
             raise ModelLoadError(model_path, f"Failed to load model: {e}") from e
 
@@ -88,7 +98,7 @@ class LMStudioClient:
 
                 # Match by model_key, display_name, or if model_id appears in path
                 if model_id in (lms_model_key, display_name) or model_id in str(
-                    getattr(info, "path", "")
+                    getattr(info, "path", ""),
                 ):
                     model_key = lms_model_key
                     logger.debug(f"Found model match: {model_id} -> {model_key}")

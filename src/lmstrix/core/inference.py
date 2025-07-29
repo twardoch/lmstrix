@@ -118,7 +118,7 @@ class InferenceEngine:
             Working context length (0 if none found)
         """
         current_context = initial_context
-        min_context = 2048
+        min_context = 2047
 
         logger.info(
             f"Testing inference capability for {model_id} starting at {current_context:,} tokens",

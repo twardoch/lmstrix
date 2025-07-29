@@ -298,9 +298,11 @@ class ModelLoadTester:
                     reg_model.id[:50] + ("..." if len(reg_model.id) > 50 else ""),
                     reg_model.get_short_id(),
                     str(reg_model.path)[:50] + ("..." if len(str(reg_model.path)) > 50 else ""),
-                    getattr(lms_match, "model_key", getattr(lms_match, "modelKey", "No match"))
-                    if lms_match
-                    else "No match",
+                    (
+                        getattr(lms_match, "model_key", getattr(lms_match, "modelKey", "No match"))
+                        if lms_match
+                        else "No match"
+                    ),
                     load_status,
                 )
 

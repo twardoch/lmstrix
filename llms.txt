@@ -13,6 +13,7 @@ Project Structure:
 │   ├── 📄 model_load_tester.py
 │   ├── 📄 test22.command
 │   ├── 📄 test23.command
+│   ├── 📄 test31.sh
 │   ├── 📄 test_english--elo_liczby--llama-3-2-3b-instruct.txt
 │   ├── 📄 test_english--elo_liczby--sarcasmll-1b.txt
 │   ├── 📄 test_english.txt
@@ -2243,7 +2244,86 @@ The test suite is designed to run in CI/CD pipelines:
 <document_content>
 # Work Progress
 
-## 🎉 **LATEST IMPROVEMENT - GRACEFUL MEMORY/CACHE ERROR HANDLING** 🎉
+## 🎉 **LATEST IMPROVEMENT - GRACEFUL MODEL LOAD ERROR HANDLING** 🎉
+
+### **CRITICAL ISSUE RESOLVED** ✅
+
+**Issue**: User encountered `LMStudioServerError: Model get/load error: Model not found: lucy-128k` during model testing, causing the entire `lmstrix test --all` process to crash.
+
+**Root Cause**: Models that exist in the LMStrix registry but are no longer available in LM Studio (deleted, unloaded, or moved) would cause a crash during the model loading phase, preventing the testing process from continuing.
+
+### **COMPREHENSIVE SOLUTION IMPLEMENTED** ✅
+
+#### **1. Enhanced Client Model Load Error Handling**
+- ✅ Added `LMStudioServerError` handling to `load_model` method in `src/lmstrix/api/client.py`
+- ✅ Specific detection for "model not found" and "path not found" errors
+- ✅ Converts `LMStudioServerError` to descriptive `ModelLoadError` with context
+
+#### **2. Intelligent Context Tester Model Load Recovery**
+- ✅ Enhanced ModelLoadError handler in `src/lmstrix/core/context_tester.py`
+- ✅ **Automatic Bad Model Detection**: Identifies models not found in LM Studio
+- ✅ **Registry Status Updates**: Marks bad models as FAILED in the database
+- ✅ **Detailed Logging**: Logs with "MODEL_NOT_FOUND" category for tracking
+- ✅ **Graceful Continuation**: Testing continues with remaining models
+
+#### **3. Robust Model Status Management**
+- ✅ **Automatic Model Marking**: Models not found are marked as FAILED status
+- ✅ **Database Updates**: Registry automatically updated with failure information
+- ✅ **Clear Error Classification**: Distinguishes between load errors and not-found errors
+- ✅ **Comprehensive Error Patterns**: Handles multiple error message variations
+
+### **Error Handling Flow** 🔄
+
+```mermaid
+graph TD
+    A[Start Model Test] --> B[Load Model]
+    B --> C{Model Load Success?}
+    C -->|No| D{LMStudioServerError?}
+    D -->|Yes| E{Model Not Found?}
+    E -->|Yes| F[Mark Model as BAD]
+    F --> G[Update Registry Status]
+    G --> H[Log MODEL_NOT_FOUND]
+    H --> I[Continue to Next Model]
+    E -->|No| J[Log LOAD_FAILED]
+    J --> I
+    D -->|No| K[Handle Other Errors]
+    K --> I
+    C -->|Yes| L[Continue with Testing]
+```
+
+### **User Benefits** 🎯
+
+1. **✅ Crash-Proof Testing**: `lmstrix test --all` no longer crashes on missing models
+2. **✅ Automatic Cleanup**: Bad models are automatically marked as failed
+3. **✅ Clear Error Messages**: Users understand when models are missing from LM Studio
+4. **✅ Continuous Operation**: Testing continues with remaining valid models
+5. **✅ Database Integrity**: Registry kept up-to-date with model availability
+6. **✅ Better Diagnostics**: Clear distinction between load errors and missing models
+
+### **Example Error Messages** 📝
+
+**Before:**
+```
+Testing lucy-128k at 4,096 tokens...
+lmstudio.LMStudioServerError: Model get/load error: Model not found: lucy-128k
+Traceback (most recent call last):
+  ... [ENTIRE PROCESS CRASHES]
+```
+
+**After:**
+```
+Testing lucy-128k at 4,096 tokens...
+  ⏳ Waiting 3 seconds before next model (resource cleanup)...
+  → Testing context size: 4,096 tokens...
+  ✗ Model failed to load at 4,096 tokens (load failed)
+  🚫 Model 'lucy-128k' not found in LM Studio
+  🚫 Model may have been deleted or unloaded
+  ✅ Marked model lucy-128k as bad in registry (not found in LM Studio)
+Testing next-model at 4,096 tokens...
+  ⏳ Waiting 3 seconds before next model (resource cleanup)...
+```
+
+## 🎉 **PREVIOUS IMPROVEMENT - GRACEFUL MEMORY/CACHE ERROR HANDLING** 🎉
 
 ### **CRITICAL ISSUE RESOLVED** ✅
 
@@ -2420,13 +2500,169 @@ lmstrix scan --verbose
 
 ---
 
+## **LATEST UPDATE - SMART SORTING IMPLEMENTATION** 🎉
+
+### **Feature Enhancement Completed** ✅
+
+**Request**: `lmstrix list --sort smart` should sort models the same way as `lmstrix test --all` does.
+
+**Solution**: Implemented the "smart" sorting algorithm for the `list` command that matches the exact sorting used by `test --all`.
+
+### **Implementation Details** ✅
+
+#### **Smart Sorting Algorithm**
+- Formula: `size_bytes + (context_limit * 100,000)`
+- Prioritizes smaller models first
+- Within similar sizes, prioritizes lower context limits
+- Available in both ascending (`--sort smart`) and descending (`--sort smartd`) order
+
+#### **Code Changes**
+- ✅ Added smart sorting case to `list` command in `src/lmstrix/cli/main.py`
+- ✅ Updated help text to include smart sorting option
+- ✅ Updated docstring documentation
+
+### **Usage Examples** 📝
+
+```bash
+# List models with smart sorting (ascending - smaller models first)
+lmstrix list --sort smart
+
+# List models with smart sorting (descending - larger models first)  
+lmstrix list --sort smartd
+
+# Test all models (uses smart sorting automatically)
+lmstrix test --all
+```
+
+### **Benefits** 🎯
+
+1. **✅ Consistent Sorting**: List and test commands now use the same sorting algorithm
+2. **✅ Optimal Testing Order**: Models are sorted for efficient testing (smaller models first)
+3. **✅ User Control**: Can choose ascending or descending order
+
+---
+
+## 🎉 **LATEST UPDATE - FAST MODE TESTING** 🎉
+
+### **Feature Request Completed** ✅
+
+**Request**: `lms test --fast` (with --all or with a model id) should test only loading and whether the inference is possible, but should not perform the semantic verification of 96 or 5. In other words, if the inference has technically completed then we treat it as pass.
+
+### **Implementation Details** ✅
+
+#### **1. CLI Enhancement**
+- ✅ Added `--fast` flag to the `test` command in `src/lmstrix/cli/main.py`
+- ✅ Updated help documentation to explain fast mode functionality
+- ✅ Fast mode parameter properly propagated through all test functions
+
+#### **2. Context Tester Fast Mode**
+- ✅ Added `fast_mode` parameter to `ContextTester.__init__()` in `src/lmstrix/core/context_tester.py`
+- ✅ Modified `_test_at_context()` to skip semantic verification when fast mode is enabled
+- ✅ Fast mode uses simple "Say hello" prompt instead of dual arithmetic/number tests
+- ✅ Any non-empty response is considered success in fast mode
+
+#### **3. Fast Mode Logic**
+```python
+if self.fast_mode:
+    # Fast mode: Just test if inference completes technically
+    response = self.client.completion(
+        llm=llm,
+        prompt=self.test_prompt,  # Use simple prompt
+        temperature=0.9,
+        model_id=model_path,
+    )
+    # Any response means technical success in fast mode
+    inference_success = bool(response.content.strip())
+    combined_response = f"Fast mode - Response: '{response.content.strip()}'"
+```
+
+### **Usage Examples** 📝
+
+```bash
+# Fast test a specific model (skip semantic checks)
+lmstrix test my-model --fast
+
+# Fast test all models (check only if inference works)
+lmstrix test --all --fast
+
+# Fast test at specific context size
+lmstrix test my-model --ctx 8192 --fast
+
+# Combine with verbose for detailed output
+lmstrix test --all --fast --verbose
+```
+
+### **Benefits** 🎯
+
+1. **✅ Faster Testing**: Skip semantic verification for quicker results
+2. **✅ Technical Validation**: Confirms model can load and generate responses
+3. **✅ Flexible Testing**: Choose between thorough (default) or fast testing
+4. **✅ Better for Initial Scans**: Quickly identify which models work at all
+
+## 🎉 **LATEST UPDATE - NEW CONTEXT TESTING STRATEGY** 🎉
+
+### **Feature Request Completed** ✅ (2025-07-29)
+
+**Request**: Change 'lmstrix test' approach to use fixed context values instead of binary search.
+
+### **Implementation Details** ✅
+
+#### **New Testing Strategy**
+- ✅ **Fixed Context Values**: Tests at 30k, 40k, 60k, 80k, 100k, 120k (if < declared max)
+- ✅ **Always Test Max-1**: Always tests declared max context - 1
+- ✅ **10% Reduction Retry**: If failure at context > 4095 and < declared max, retries with 10% reduction
+- ✅ **Stop on Failure**: Stops testing further contexts after first failure (with retry attempts)
+- ✅ **Failure Declaration**: Declares failure if all tests fail
+
+#### **Code Changes**
+- ✅ Completely rewrote `test_model()` method in `src/lmstrix/core/context_tester.py`
+- ✅ Removed binary search logic in favor of fixed context testing
+- ✅ Added retry logic with 10% reduction for failed contexts
+- ✅ Updated logging and progress messages for new approach
+
+### **Testing Flow** 🔄
+
+```mermaid
+graph TD
+    A[Start Testing] --> B[Test Fixed Contexts]
+    B --> C[30k, 40k, 60k, 80k, 100k, 120k]
+    C --> D[Filter < Declared Max]
+    D --> E[Add Declared Max - 1]
+    E --> F[Test Each Context]
+    F --> G{Success?}
+    G -->|Yes| H{Max-1?}
+    H -->|Yes| I[Complete Success]
+    H -->|No| F
+    G -->|No| J{Context > 4095?}
+    J -->|Yes| K[Reduce by 10%]
+    K --> L{Still > 4095?}
+    L -->|Yes| M[Retry Test]
+    L -->|No| N[Stop Testing]
+    M --> O{Success?}
+    O -->|Yes| P[Record Success]
+    O -->|No| K
+    J -->|No| N
+```
+
+### **Benefits** 🎯
+
+1. **✅ Predictable Testing**: Fixed context values make testing more consistent
+2. **✅ Faster Results**: No binary search overhead for finding optimal context
+3. **✅ Better Coverage**: Tests common context sizes that users actually use
+4. **✅ Smart Retry**: 10% reduction helps find working context near failure point
+5. **✅ Clear Success Criteria**: Success at declared max - 1 means full support
+
 ## **NEXT TASKS** 📋
 
-- [ ] Monitor user feedback on the new memory/cache error handling
+- [ ] Update test suite to match new testing approach
+- [ ] Monitor user feedback on the new testing strategy
 - [ ] Consider adding retry logic for temporary LM Studio server issues (non-memory errors)
-- [ ] Document the new error handling features in README.md
+- [ ] Document the new testing strategy in README.md
+- [x] Implement new fixed context testing strategy
+- [x] Implement smart sorting for `lmstrix list` command
+- [x] Implement --fast mode for test command
 
-**Status**: ✅ **COMPLETE - Both database protection and memory/cache error handling fully operational**
+**Status**: ✅ **COMPLETE - New context testing strategy, database protection, memory/cache error handling, smart sorting, and fast mode testing fully operational**
 </document_content>
 </document>
 
@@ -12617,10 +12853,11 @@ def main(()) -> None:
 <source>_keep_this/test22.command</source>
 <document_content>
 #!/usr/bin/env bash
-for p in $(lmstrix list --sort size --show id); do
+lmstrix scan
+for p in $(lmstrix list --sort smart --show id); do
 	echo
 	echo "--------------------"
-	echo ">> $p @ $c"
+	echo ">> $p"
 	lms unload --all
 	lmstrix test "$p"
 done
@@ -12644,13 +12881,27 @@ done
 </document>
 
 <document index="20">
+<source>_keep_this/test31.sh</source>
+<document_content>
+#!/usr/bin/env bash
+for m in "mistralai/magistral-small" "kernelllm" "acereason-nemotron-1.1-7b-i1" "skywork-or1-7b-i1" "skywork-critic-llama-3.1-8b" "llama-3-8b-instruct-gradient-1048k" "llama-3.1-1-million-ctx-deephermes-deep-reasoning-8b" "qwen3-128k-30b-a3b-neo-max-imatrix" "qwen3-30b-a1.5b-64k-high-speed-neo-imatrix-max" "openreasoning-nemotron-14b" "baidu/ernie-4.5-21b-a3b" "ernie-4.5-21b-a3b-pt" "r3-qwen3-14b-skywork-i1" "minicpm-o-2_6" "exaone-deep-7.8b-i1@iq4_nl" "exaone-deep-7.8b-i1@q6_k"; do
+    for c in 30000 40000 60000 80000 100000 120000; do
+        echo "$c $m"
+        lmstrix test -m "$m" -c "$c"
+    done
+done
+
+</document_content>
+</document>
+
+<document index="21">
 <source>_keep_this/test_english--elo_liczby--llama-3-2-3b-instruct.txt</source>
 <document_content>
 [ERROR: Completion error: Metal error: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory), Metal error: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)]
 </document_content>
 </document>
 
-<document index="21">
+<document index="22">
 <source>_keep_this/test_english--elo_liczby--sarcasmll-1b.txt</source>
 <document_content>
 [ERROR: RPC error: 
@@ -12669,7 +12920,7 @@ done
 </document_content>
 </document>
 
-<document index="22">
+<document index="23">
 <source>_keep_this/test_english.txt</source>
 <document_content>
 Test with 5 cats and 3 dogs.
@@ -12677,7 +12928,7 @@ Test with 5 cats and 3 dogs.
 </document_content>
 </document>
 
-<document index="23">
+<document index="24">
 <source>_keep_this/test_short--elo_liczby--llama-3-2-3b-instruct.txt</source>
 <document_content>
 into <text>One hundred and twenty-three numbers are here.</text>
@@ -12695,7 +12946,7 @@ The final answer is: $\boxed{One hundred and twenty-three}$
 </document_content>
 </document>
 
-<document index="24">
+<document index="25">
 <source>_keep_this/test_short--elo_liczby--sarcasmll-1b.txt</source>
 <document_content>
 Convert to words:
@@ -12707,7 +12958,7 @@ Answer: Test, numbers, here.
 </document_content>
 </document>
 
-<document index="25">
+<document index="26">
 <source>_keep_this/test_short.txt</source>
 <document_content>
 Test 123 numbers here.
@@ -12715,7 +12966,7 @@ Test 123 numbers here.
 </document_content>
 </document>
 
-<document index="26">
+<document index="27">
 <source>_keep_this/toml-topl.txt</source>
 <document_content>
 Project Structure:
@@ -19817,7 +20068,7 @@ def test_strings_in_lists((self)):
 </document_content>
 </document>
 
-<document index="27">
+<document index="28">
 <source>_keep_this/wieszanie/rymkiewicz-wieszanie.md</source>
 <document_content>
 JAROSŁAW MAREK RYMKIEWICZ. "Wieszanie". 
@@ -20701,7 +20952,7 @@ Na tych pytaniach kończy się ta historia i nic już więcej nie wiadomo, bo da
 </document_content>
 </document>
 
-<document index="28">
+<document index="29">
 <source>_keep_this/wieszanie/rymkiewicz-wieszanie1.md</source>
 <document_content>
 Przeczytałem ponownie poznańskie wydanie (z roku 1865) "Drugiego rozbioru Polski" z "Pamiętników" Sieversa (są to nie tyle pamiętniki Johanna Jakoba Sieversa, ile zbiór różnych materiałów, listów oraz raportów, które z rodzinnego archiwum Sieversów opublikował, w połowie XIX wieku, niemiecki historyk Karl Ludwig Blum) i wydaje mi się teraz, że Tadeusz Korzon, opisując grodzieńskie dochody Stanisława Augusta; czyli to, co król dostał od rosyjskiej carycy za współudział w przeprowadzeniu drugiego rozbioru; mógł się jednak trochę mylić. Wygląda bowiem na to, że autor Wewnętrznych dziejów Polski za Stanisława Augusta, oceniając królewskie dochody, właśnie te z roku 1793, na podstawie dokumentów zachowanych w archiwum Sieversów, dokonywał obliczeń, których można by dokonać w inny sposób. Mówiąc inaczej, to, co dla Korzona było całkowicie pewne, jest (jeśli wnikniemy w informacje podawane przez Sieversa i ujmiemy je w inny sposób) bardzo niepewne; te informacje mogą być rozumiane tak, jak rozumiał je Korzon, ale mogą też być rozumiane inaczej. Nie znaczy to, że król za udział w Sejmie Grodzieńskim (i za przyjazną tam współpracę z rosyjskim ambasadorem) dostał od carycy mniej, niż uważał Korzon. Może nawet dostał więcej; tyle że chyba nie da się tego ostatecznie wyjaśnić. Oto dwa przykłady, które pokazują, że obliczenia, mające za punkt wyjścia wiadomości z Drugiego rozbioru Polski, mogłyby dać inny rezultat. Według Korzona, na początku roku 1793 Stanisław August popadł "w zupełną recydywę podłości”. Na podróż z Warszawy do Białegostoku, a potem do Grodna; w pierwszych dniach kwietnia 1793 roku; wziął od rosyjskiego ambasadora wprzód 20 000 dukatów, a potem jeszcze 10 000 dukatów. Pieniądze na podróż, które faktycznie były zapłatą za wyrażenie zgody na drugi rozbiór Polski (powiedzmy, że pierwszą ratą takiej zapłaty), wziął wtedy nie tylko król; zachęcani w ten sposób do wyjazdu byli także różni wysocy urzędnicy Rzeczypospolitej. Królewskim dygnitarzom rosyjski ambasador płacił jednak znacznie gorzej; na koszty podróży z Warszawy do Grodna dostali oni wówczas dziesięć, dwadzieścia, nawet trzydzieści razy mniej. "Myślę zatem; pisał Sievers do Płatona Zubowa; że aby pozyskać wielkiego kanclerza Małachowskiego, podkanclerzego Chreptowicza i marszałka nadwornego Raczyńskiego, byłoby dobrze ofiarować każdemu tysiąc do dwóch i trzech tysięcy dukatów na drogę jako sekretny podarunek”. Ale czy ówczesny "sekretny podarunek” dla króla wynosił rzeczywiście 30 000 dukatów?
@@ -20711,7 +20962,7 @@ Czy chodzi tu o te pierwsze 20 000 dukatów? Może, ale niekoniecznie. W tymże 
 </document_content>
 </document>
 
-<document index="29">
+<document index="30">
 <source>build.log.txt</source>
 <document_content>
 Running linter and formatter...
@@ -21974,7 +22225,7 @@ Found 124 errors.
 </document_content>
 </document>
 
-<document index="30">
+<document index="31">
 <source>build.sh</source>
 <document_content>
 #!/bin/bash
@@ -22012,7 +22263,7 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 </document_content>
 </document>
 
-<document index="31">
+<document index="32">
 <source>cleanup.log.txt</source>
 <document_content>
 Rewriting ./src/lmstrix/core/context.py
@@ -22217,7 +22468,7 @@ warning: The following rule may cause conflicts when used with the formatter: `C
 </document_content>
 </document>
 
-<document index="32">
+<document index="33">
 <source>cleanup.sh</source>
 <document_content>
 #!/usr/bin/env bash
@@ -22236,7 +22487,7 @@ hatch publish
 </document_content>
 </document>
 
-<document index="33">
+<document index="34">
 <source>docs/_config.yml</source>
 <document_content>
 title: LMStrix
@@ -22258,7 +22509,7 @@ plugins:
 </document_content>
 </document>
 
-<document index="34">
+<document index="35">
 <source>docs/api.md</source>
 <document_content>
 ---
@@ -22307,7 +22558,7 @@ Represents the response from an inference request.
 </document_content>
 </document>
 
-<document index="35">
+<document index="36">
 <source>docs/how-it-works.md</source>
 <document_content>
 ---
@@ -22346,7 +22597,7 @@ The command saves the results of the test to a local registry, so you only need 
 </document_content>
 </document>
 
-<document index="36">
+<document index="37">
 <source>docs/index.md</source>
 <document_content>
 ---
@@ -22391,7 +22642,7 @@ This gives you a reliable, empirical measurement of the model's true capabilitie
 </document_content>
 </document>
 
-<document index="37">
+<document index="38">
 <source>docs/installation.md</source>
 <document_content>
 ---
@@ -22431,7 +22682,7 @@ pip install -e .[dev]
 </document_content>
 </document>
 
-<document index="38">
+<document index="39">
 <source>docs/usage.md</source>
 <document_content>
 ---
@@ -22552,7 +22803,7 @@ if __name__ == "__main__":
 </document_content>
 </document>
 
-<document index="39">
+<document index="40">
 <source>examples/README.md</source>
 <document_content>
 # LMStrix Usage Examples
@@ -22621,7 +22872,7 @@ python3 python/basic_usage.py
 </document_content>
 </document>
 
-<document index="40">
+<document index="41">
 <source>examples/cli/basic_workflow.sh</source>
 <document_content>
 #!/bin/bash
@@ -22681,7 +22932,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="41">
+<document index="42">
 <source>examples/cli/inference_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -22743,7 +22994,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="42">
+<document index="43">
 <source>examples/cli/model_testing.sh</source>
 <document_content>
 #!/bin/bash
@@ -22801,7 +23052,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="43">
+<document index="44">
 <source>examples/data/sample_context.txt</source>
 <document_content>
 This is a sample text file designed for context length testing in LMStrix. The purpose of this file is to provide a sufficiently large and repetitive block of text that can be used to fill the context window of a large language model. By feeding a model a long prompt composed of this text, we can determine the maximum number of tokens it can process before it fails to load or produce a coherent response. This process is crucial for understanding the true operational limits of a model, which may differ from the limits advertised by its developers. The text itself is not intended to be meaningful, but rather to serve as a consistent and measurable filler for the model's context buffer. The repetition ensures that the content is uniform and does not introduce unexpected variables into the testing process.
@@ -22817,7 +23068,7 @@ This is a sample text file designed for context length testing in LMStrix. The p
 </document_content>
 </document>
 
-<document index="44">
+<document index="45">
 <source>examples/data/test_questions.json</source>
 <document_content>
 [
@@ -22829,7 +23080,7 @@ This is a sample text file designed for context length testing in LMStrix. The p
 </document_content>
 </document>
 
-<document index="45">
+<document index="46">
 <source>examples/prompts/analysis.toml</source>
 <document_content>
 # examples/prompts/analysis.toml
@@ -22850,7 +23101,7 @@ description = "Analyzes the sentiment of a given text."
 </document_content>
 </document>
 
-<document index="46">
+<document index="47">
 <source>examples/prompts/coding.toml</source>
 <document_content>
 # examples/prompts/coding.toml
@@ -22872,7 +23123,7 @@ description = "Explains a snippet of code."
 </document_content>
 </document>
 
-<document index="47">
+<document index="48">
 <source>examples/prompts/creative.toml</source>
 <document_content>
 # examples/prompts/creative.toml
@@ -22889,7 +23140,7 @@ description = "Generates a story idea from a genre and character."
 </document_content>
 </document>
 
-<document index="48">
+<document index="49">
 <source>examples/prompts/qa.toml</source>
 <document_content>
 # examples/prompts/qa.toml
@@ -22957,7 +23208,7 @@ def main(()) -> None:
     """Demonstrates custom inference workflows with the LMStrix Python API."""
 
 
-<document index="49">
+<document index="50">
 <source>examples/run_all_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -23029,7 +23280,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="50">
+<document index="51">
 <source>issues/101.txt</source>
 <document_content>
 examples/python/batch_processing.py:67:16: BLE001 Do not catch blind exception: `Exception`
@@ -23496,7 +23747,7 @@ tests/test_integration/test_cli_integration.py:10:30: N814 Camelcase `LMStrixCLI
 </document_content>
 </document>
 
-<document index="51">
+<document index="52">
 <source>pyproject.toml</source>
 <document_content>
 [build-system]
@@ -24114,6 +24365,7 @@ from lmstrix.loaders.model_loader import (
 )
 from lmstrix.utils import get_context_test_log_path, setup_logging
 from lmstrix.utils.paths import get_default_models_file
+import sys
 
 class LMStrixCLI:
     """A CLI for testing and managing LM Studio models."""
@@ -24129,6 +24381,7 @@ class LMStrixCLI:
         threshold: int = 31744,
         ctx: int | None = None,
         sort: str = "id",
+        fast: bool = False,
         verbose: bool = False,
     )) -> None:
         """Test the context limits for models."""
@@ -24150,6 +24403,7 @@ def _get_models_to_test((
     ctx: int | None,
     model_id: str | None,
     reset: bool = False,
+    fast_mode: bool = False,
 )) -> list[Model]:
     """Filter and return a list of models to be tested."""
 
@@ -24197,6 +24451,7 @@ def test((
         threshold: int = 31744,
         ctx: int | None = None,
         sort: str = "id",
+        fast: bool = False,
         verbose: bool = False,
     )) -> None:
     """Test the context limits for models."""
@@ -24213,6 +24468,9 @@ def infer((
 
 def health((self, verbose: bool = False)) -> None:
     """Check database health and backup status."""
+
+def show_help(()) -> None:
+    """Show comprehensive help text."""
 
 def main(()) -> None:
     """Main entry point for the CLI."""
@@ -24326,6 +24584,7 @@ from lmstrix.api.exceptions import InferenceError, ModelLoadError
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 from lmstrix.loaders.model_loader import load_model_registry, save_model_registry
 from lmstrix.utils import get_context_test_log_path, get_lmstrix_log_path
+from lmstrix.core.models import ContextTestStatus
 
 class ContextTestResult:
     """Result of a context test attempt."""
@@ -24346,7 +24605,12 @@ class ContextTestResult:
 
 class ContextTester:
     """Tests models to find their true operational context limits."""
-    def __init__((self, client: LMStudioClient | None = None, verbose: bool = False)) -> None:
+    def __init__((
+        self,
+        client: LMStudioClient | None = None,
+        verbose: bool = False,
+        fast_mode: bool = False,
+    )) -> None:
         """Initialize context tester."""
     def _log_result((self, log_path: Path, result: ContextTestResult)) -> None:
         """Append test result to log file."""
@@ -24367,6 +24631,12 @@ class ContextTester:
         registry: ModelRegistry | None = None,
     )) -> ContextTestResult:
         """Test model at a specific context size with retry logic for timeouts."""
+    def _calculate_smart_increment((
+        self,
+        last_tested: int,
+        max_declared: int,
+    )) -> int:
+        """Calculate smart context increment based on gap between tested and declared max."""
     def _perform_initial_test((
         self: Self,
         model: Model,
@@ -24419,11 +24689,11 @@ class ContextTester:
     def test_model((
         self: Self,
         model: Model,
-        min_context: int = 2048,
+        min_context: int = 2047,
         max_context: int | None = None,
         registry: ModelRegistry | None = None,
     )) -> Model:
-        """Run full context test on a model using the new safe testing strategy."""
+        """Run full context test on a model using the new fixed context testing strategy."""
     def _is_embedding_model((self: Self, model: Model)) -> bool:
         """Check if a model is an embedding model."""
     def test_all_models((
@@ -24451,7 +24721,12 @@ def to_dict((self)) -> dict:
 def is_valid_response((self)) -> bool:
     """Check if we got any response at all (not validating content)."""
 
-def __init__((self, client: LMStudioClient | None = None, verbose: bool = False)) -> None:
+def __init__((
+        self,
+        client: LMStudioClient | None = None,
+        verbose: bool = False,
+        fast_mode: bool = False,
+    )) -> None:
     """Initialize context tester."""
 
 def _log_result((self, log_path: Path, result: ContextTestResult)) -> None:
@@ -24475,6 +24750,13 @@ def _test_at_context((
         registry: ModelRegistry | None = None,
     )) -> ContextTestResult:
     """Test model at a specific context size with retry logic for timeouts."""
+
+def _calculate_smart_increment((
+        self,
+        last_tested: int,
+        max_declared: int,
+    )) -> int:
+    """Calculate smart context increment based on gap between tested and declared max."""
 
 def _perform_initial_test((
         self: Self,
@@ -24535,11 +24817,11 @@ def _perform_subsequent_passes((
 def test_model((
         self: Self,
         model: Model,
-        min_context: int = 2048,
+        min_context: int = 2047,
         max_context: int | None = None,
         registry: ModelRegistry | None = None,
     )) -> Model:
-    """Run full context test on a model using the new safe testing strategy."""
+    """Run full context test on a model using the new fixed context testing strategy."""
 
 def _is_embedding_model((self: Self, model: Model)) -> bool:
     """Check if a model is an embedding model."""
@@ -25074,7 +25356,7 @@ def save_prompts((
     """Save prompts to a TOML file."""
 
 
-<document index="52">
+<document index="53">
 <source>src/lmstrix/py.typed</source>
 <document_content>
 # This file indicates that the package supports type hints

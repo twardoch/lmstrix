@@ -38,7 +38,7 @@ def main() -> None:
     print("\n--- Running linear ramp-up test (2048 to 3072, step 1024) ---")
     try:
         result = model.test_context(
-            start_context=2048,
+            start_context=2047,
             max_context=3072,
             step=1024,
             pattern=TestPattern.LINEAR,

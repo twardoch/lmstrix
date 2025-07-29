@@ -32,7 +32,7 @@ def main() -> None:
             print(f"\nTesting model: {model.path}...")
             try:
                 start_time = time.time()
-                result = model.test_context(max_context=2048)
+                result = model.test_context(max_context=2047)
                 end_time = time.time()
                 print(
                     f"Test complete for {model.id}. "
