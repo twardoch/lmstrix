@@ -162,6 +162,18 @@ class Model(BaseModel):
             "error_msg": self.error_msg,
         }
 
+    def reset_test_data(self) -> None:
+        """Reset all context testing data."""
+        self.tested_max_context = None
+        self.loadable_max_context = None
+        self.last_known_good_context = None
+        self.last_known_bad_context = None
+        self.context_test_status = ContextTestStatus.UNTESTED
+        self.context_test_log = None
+        self.context_test_date = None
+        self.failed = False
+        self.error_msg = ""
+
     def validate_integrity(self) -> bool:
         """Validate model data integrity."""
         try:
