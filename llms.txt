@@ -15,16 +15,11 @@ Project Structure:
 │   ├── 📄 test23.command
 │   ├── 📄 test31.sh
 │   ├── 📄 test32.sh
-│   ├── 📄 
-│   │   test_english--elo_liczby--llama-3-2-3b-instr
-│   │   uct.txt
-│   ├── 📄 
-│   │   test_english--elo_liczby--sarcasmll-1b.txt
+│   ├── 📄 test_english--elo_liczby--llama-3-2-3b-instruct.txt
+│   ├── 📄 test_english--elo_liczby--sarcasmll-1b.txt
 │   ├── 📄 test_english.txt
 │   ├── 📄 test_input.txt
-│   ├── 📄 
-│   │   test_short--elo_liczby--llama-3-2-3b-instruc
-│   │   t.txt
+│   ├── 📄 test_short--elo_liczby--llama-3-2-3b-instruct.txt
 │   ├── 📄 test_short--elo_liczby--sarcasmll-1b.txt
 │   ├── 📄 test_short.txt
 │   └── 📄 toml-topl.txt

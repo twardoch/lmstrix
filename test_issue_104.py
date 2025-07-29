@@ -28,7 +28,7 @@ def main() -> int:
     # Test 1: Basic prompt from file
     print("\nTest 1: Load simple prompt from TOML file")
     if not run_command(
-        f'lmstrix infer greetings.casual {model_id} --file_prompt {prompt_file} --dict "name=Alice,topic=AI" --out_ctx 50'
+        f'lmstrix infer greetings.casual {model_id} --file_prompt {prompt_file} --dict "name=Alice,topic=AI" --out_ctx 50',
     ):
         print("❌ Test 1 failed")
         return 1
@@ -36,7 +36,7 @@ def main() -> int:
     # Test 2: Formal greeting with parameters
     print("\nTest 2: Load formal greeting with parameters")
     if not run_command(
-        f'lmstrix infer greetings.formal {model_id} --file_prompt {prompt_file} --dict "name=Dr. Smith,topic=machine learning" --out_ctx 50'
+        f'lmstrix infer greetings.formal {model_id} --file_prompt {prompt_file} --dict "name=Dr. Smith,topic=machine learning" --out_ctx 50',
     ):
         print("❌ Test 2 failed")
         return 1
@@ -44,7 +44,7 @@ def main() -> int:
     # Test 3: Template with nested placeholders
     print("\nTest 3: Template with nested placeholders")
     if not run_command(
-        f'lmstrix infer templates.instruction {model_id} --file_prompt {prompt_file} --dict "domain=Python programming,style=beginner-friendly,concept=decorators,level=intermediate" --out_ctx 100'
+        f'lmstrix infer templates.instruction {model_id} --file_prompt {prompt_file} --dict "domain=Python programming,style=beginner-friendly,concept=decorators,level=intermediate" --out_ctx 100',
     ):
         print("❌ Test 3 failed")
         return 1
@@ -53,14 +53,14 @@ def main() -> int:
     print("\nTest 4: Code review prompt")
     code_snippet = "def add(a, b): return a + b"
     if not run_command(
-        f'lmstrix infer code.explain {model_id} --file_prompt {prompt_file} --dict "language=Python,code={code_snippet}" --out_ctx 100'
+        f'lmstrix infer code.explain {model_id} --file_prompt {prompt_file} --dict "language=Python,code={code_snippet}" --out_ctx 100',
     ):
         print("❌ Test 4 failed (note: may need proper escaping for code)")
 
     # Test 5: Simple QA prompt
     print("\nTest 5: Simple QA prompt")
     if not run_command(
-        f'lmstrix infer qa.simple {model_id} --file_prompt {prompt_file} --dict "question=What is the capital of France?" --out_ctx 50'
+        f'lmstrix infer qa.simple {model_id} --file_prompt {prompt_file} --dict "question=What is the capital of France?" --out_ctx 50',
     ):
         print("❌ Test 5 failed")
         return 1
@@ -68,7 +68,7 @@ def main() -> int:
     # Test 6: Prompt without parameters (should show unresolved placeholders)
     print("\nTest 6: Prompt with unresolved placeholders (verbose)")
     if not run_command(
-        f"lmstrix infer greetings.casual {model_id} --file_prompt {prompt_file} --out_ctx 50 --verbose"
+        f"lmstrix infer greetings.casual {model_id} --file_prompt {prompt_file} --out_ctx 50 --verbose",
     ):
         print("❌ Test 6 failed")
         return 1
