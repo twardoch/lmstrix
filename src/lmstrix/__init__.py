@@ -119,7 +119,7 @@ class LMStrix:
         self,
         model_id: str,
         prompt: str,
-        max_tokens: int = -1,
+        out_ctx: int = -1,
         temperature: float = 0.7,
     ) -> InferenceResult:
         """Runs inference on a specified model.
@@ -127,7 +127,7 @@ class LMStrix:
         Args:
             model_id: The ID of the model to use.
             prompt: The prompt to send to the model.
-            max_tokens: The maximum number of tokens to generate.
+            out_ctx: The maximum number of tokens to generate.
             temperature: The sampling temperature.
 
         Returns:
@@ -138,7 +138,7 @@ class LMStrix:
         return engine.infer(
             model_id=model_id,
             prompt=prompt,
-            max_tokens=max_tokens,
+            out_ctx=out_ctx,
             temperature=temperature,
         )
 

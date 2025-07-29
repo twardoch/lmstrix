@@ -134,7 +134,7 @@ def estimate_tokens(
 
 def load_context_with_limit(
     file_path: str | Path,
-    max_tokens: int,
+    out_ctx: int,
     encoding: str = "utf-8",
     model_encoding: str = "cl100k_base",
     verbose: bool = False,
@@ -143,7 +143,7 @@ def load_context_with_limit(
 
     Args:
         file_path: Path to the context file.
-        max_tokens: Maximum number of tokens to load.
+        out_ctx: Maximum number of tokens to load.
         encoding: File encoding (default: utf-8).
         model_encoding: Tiktoken encoding for token counting.
         verbose: Enable verbose logging.
@@ -165,13 +165,13 @@ def load_context_with_limit(
     # Estimate tokens
     total_tokens = estimate_tokens(content, model_encoding)
 
-    if total_tokens <= max_tokens:
-        logger.info(f"Context fits within limit: {total_tokens} tokens <= {max_tokens} tokens")
+    if total_tokens <= out_ctx:
+        logger.info(f"Context fits within limit: {total_tokens} tokens <= {out_ctx} tokens")
         return content, total_tokens, False
 
     # Need to truncate
     logger.warning(
-        f"Context exceeds limit: {total_tokens} tokens > {max_tokens} tokens, truncating",
+        f"Context exceeds limit: {total_tokens} tokens > {out_ctx} tokens, truncating",
     )
 
     # Binary search to find the right truncation point
@@ -179,12 +179,12 @@ def load_context_with_limit(
     tokens = encoder.encode(content, disallowed_special=())
 
     # Truncate tokens and decode
-    truncated_tokens = tokens[:max_tokens]
+    truncated_tokens = tokens[:out_ctx]
     truncated_content = encoder.decode(truncated_tokens)
 
-    logger.info(f"Truncated context from {total_tokens} to {max_tokens} tokens")
+    logger.info(f"Truncated context from {total_tokens} to {out_ctx} tokens")
 
-    return truncated_content, max_tokens, True
+    return truncated_content, out_ctx, True
 
 
 def save_context(

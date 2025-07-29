@@ -9,6 +9,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Prompt File Support with TOML (Issue #104)**
+  - Added `--file_prompt` parameter to load prompts from TOML files
+  - Added `--dict` parameter for passing key=value pairs for placeholder resolution
+  - When using `--file_prompt`, the prompt parameter refers to the prompt name in the TOML file
+  - Supports nested placeholders and internal template references
+  - Reports unresolved placeholders in verbose mode
+  - Includes comprehensive example prompt file with various use cases
+
+- **Enhanced Infer Context Control (Issue #103)**
+  - Added `--in_ctx` parameter to control model loading context size
+  - Added `--out_ctx` parameter to replace deprecated `--max_tokens`
+  - Supports `--in_ctx 0` to load model without context specification
+  - When `--in_ctx` is not specified, uses optimal context (tested or declared)
+  - Explicit `--in_ctx` always unloads existing models and reloads with specified context
+  - Smart unloading: only unloads models that were explicitly loaded with `--in_ctx`
+
+- **Smart Model Loading**
+  - Added model state detection to check if models are already loaded
+  - Reuses existing loaded models when no explicit context specified
+  - Added `--force-reload` flag to force model reload even if already loaded
+  - Shows clear status messages about model reuse vs reload
+
+- **Context Validation**
+  - Validates requested context against model's declared and tested limits
+  - Warns when context exceeds safe limits
+  - Suggests optimal context values
+
+### Changed
+
+- **Inference Command**
+  - Deprecated `--max_tokens` in favor of `--out_ctx` (backward compatible with warnings)
+  - Updated help text and documentation for new parameters
+  - Improved model loading logic for better memory management
+  - Enhanced status messages during inference operations
+
+## [1.0.53] - 2025-07-29
+
+### Fixed
+
+- **Git Configuration**
+  - Fixed git pull error by setting upstream branch tracking with `git branch --set-upstream-to=origin/main main`
+  - Resolved "exit code(1)" error when running `git pull -v -- origin` without branch specification
+
+### Changed
+
+- **Version Maintenance**
+  - Updated to version 1.0.53 with proper git configuration fixes
+
+## [1.0.28 - 1.0.52] - 2025-07-25 to 2025-07-29
+
+### Added
+
 - **Enhanced CLI Features**
   - Added `--sort` option to `lmstrix test --all` command with same sort options as list (id, ctx, dtx, size, etc.)
   - Added `--ctx` option to `lmstrix test --all` for testing all untested models at a specific context size

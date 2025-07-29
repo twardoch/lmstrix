@@ -1,0 +1,4 @@
+`lmstrix infer` should have:
+
+- `--in_ctx INT` should be used to specify at which 'max tokens' to LOAD THE MODEL. If I specify `0`, then it should load the model without specified max tokens. If I specify `--in_ctx`, then we unload all models and always load the specified model. If I don't specify `--in_ctx`, then it should not unload the model if it's already loaded, and only load it if it's not loaded (and then unload all)
+- `--out_ctx INT` should replace `--max_tokens` as the maximum tokens to generate

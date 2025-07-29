@@ -161,7 +161,7 @@ class TestLMStudioClient:
         result = client.completion(
             llm=mock_llm,
             prompt="2+2=",
-            max_tokens=100,
+            out_ctx=100,
         )
 
         assert isinstance(result, CompletionResponse)

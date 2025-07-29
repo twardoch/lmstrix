@@ -36,14 +36,14 @@ def main() -> None:
         print(f"\nAn error occurred: {e}\n")
 
     # 2. Adjusting inference parameters
-    # Control creativity (temperature) and response length (max_tokens).
-    print("\n--- 2. Adjusting temperature and max_tokens ---")
+    # Control creativity (temperature) and response length (out_ctx).
+    print("\n--- 2. Adjusting temperature and out_ctx ---")
     prompt = "Write a single sentence that is surprising and philosophical."
     print(f"Prompt: {prompt}")
-    print("Settings: temperature=1.8 (highly creative), max_tokens=50")
+    print("Settings: temperature=1.8 (highly creative), out_ctx=50")
 
     try:
-        response_stream = model.infer(prompt, temperature=1.8, max_tokens=50)
+        response_stream = model.infer(prompt, temperature=1.8, out_ctx=50)
         print("Response:")
         for chunk in response_stream:
             print(chunk, end="", flush=True)

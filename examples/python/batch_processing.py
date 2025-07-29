@@ -59,7 +59,7 @@ def main() -> None:
         print(f"\n--- Querying model: {model.path} ---")
         print(f"Prompt: {prompt}")
         try:
-            response_stream = model.infer(prompt, max_tokens=150)
+            response_stream = model.infer(prompt, out_ctx=150)
             print("Response: ", end="")
             for chunk in response_stream:
                 print(chunk, end="", flush=True)

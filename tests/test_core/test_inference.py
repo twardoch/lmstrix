@@ -151,7 +151,7 @@ class TestInferenceEngine:
             mock_llm,
             "Hello",
             temperature=0.8,
-            max_tokens=-1,
+            out_ctx=-1,
         )
 
     @pytest.mark.asyncio
@@ -188,12 +188,12 @@ class TestInferenceEngine:
         mock_lmstudio_client.load_model.assert_called_once_with("untested-model", 8192)
 
     @pytest.mark.asyncio
-    async def test_infer_with_max_tokens(
+    async def test_infer_with_out_ctx(
         self: "TestInferenceEngine",
         mock_lmstudio_client: Mock,
         mock_llm: Mock,
     ) -> None:
-        """Test inference with custom max_tokens."""
+        """Test inference with custom out_ctx."""
         model = Model(
             id="test-model",
             path="/path/to/model.gguf",
@@ -213,13 +213,13 @@ class TestInferenceEngine:
             model_registry=mock_registry,
         )
 
-        result = await engine.infer("test-model", "Generate text", max_tokens=50)
+        result = await engine.infer("test-model", "Generate text", out_ctx=50)
 
         assert result.succeeded is True
 
-        # Verify max_tokens was passed
+        # Verify out_ctx was passed
         call_args = mock_lmstudio_client.acompletion.call_args
-        assert call_args[1]["max_tokens"] == 50
+        assert call_args[1]["out_ctx"] == 50
 
     @pytest.mark.asyncio
     async def test_infer_load_failure(
@@ -314,7 +314,7 @@ class TestInferenceEngine:
             model_id="test-model",
             prompt="What is the answer?",
             temperature=0.5,
-            max_tokens=100,
+            out_ctx=100,
         )
 
         assert isinstance(result, InferenceResult)

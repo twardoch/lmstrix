@@ -155,7 +155,7 @@ def process_text_with_model(
                 model_id=model.id,
                 prompt=prompt,
                 temperature=0.1,  # Low temperature for consistent results
-                max_tokens=4096,  # Very generous token limit
+                out_ctx=4096,  # Very generous token limit
             )
 
             if result.succeeded:

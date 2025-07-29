@@ -280,7 +280,7 @@ class PromptResolver:
         prompt: str,
         context: str,
         context_placeholder: str = "{{text}}",
-        max_tokens: int | None = None,
+        out_ctx: int | None = None,
     ) -> str:
         """Inject context into a prompt, with optional truncation.
 
@@ -288,7 +288,7 @@ class PromptResolver:
             prompt: Prompt template with context placeholder.
             context: Context text to inject.
             context_placeholder: Placeholder to replace with context.
-            max_tokens: Maximum total tokens (prompt + context).
+            out_ctx: Maximum total tokens (prompt + context).
 
         Returns:
             Prompt with context injected.
@@ -297,11 +297,11 @@ class PromptResolver:
             logger.warning(f"Context placeholder '{context_placeholder}' not found in prompt")
             return prompt
 
-        if max_tokens:
+        if out_ctx:
             # Calculate available space for context
             prompt_without_context = prompt.replace(context_placeholder, "")
             prompt_tokens = len(self.encoder.encode(prompt_without_context))
-            available_tokens = max_tokens - prompt_tokens - 100  # Safety margin
+            available_tokens = out_ctx - prompt_tokens - 100  # Safety margin
 
             if available_tokens > 0:
                 context = self.truncate_to_limit(context, available_tokens)

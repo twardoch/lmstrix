@@ -90,7 +90,7 @@ class ContextOptimizer:
             response = self.client.completion(
                 llm=llm,
                 prompt=test_prompt,
-                max_tokens=50,
+                out_ctx=50,
                 temperature=0.1,
                 model_id=model_id,
             )

@@ -1,0 +1,7 @@
+With `lmstrix infer`, I want an extra parameter --file_prompt
+
+If specified, we load the prompts from the specified file (a TOML). The TOML file needs to be parsed with @_keep_this/toml-topl.txt and the placeholders resolved.
+
+The --prompt parameter in that case refers to the prompt name in the TOML file, and the --file_prompt is the TOML file to load.
+
+Then the optional --dict parameter should be used to specify the dictionary of variables to resolve in the TOML file.

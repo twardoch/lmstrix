@@ -1,0 +1,81 @@
+# Example prompt templates for LMStrix
+# Demonstrates placeholder resolution and template reuse
+
+# Simple greeting prompts
+[greetings]
+formal = "Good day, {{name}}. How may I assist you with {{topic}}?"
+casual = "Hey {{name}}! What's up with {{topic}}?"
+professional = "Hello {{name}}, I'm here to help you with {{topic}}. Please describe your requirements."
+
+# Templates for different use cases
+[templates]
+base = "You are an expert assistant specializing in {{domain}}."
+instruction = """{{templates.base}}
+
+Please provide a {{style}} explanation of {{concept}}.
+Your response should be appropriate for someone with {{level}} knowledge."""
+
+# Code-related prompts
+[code]
+review = """You are a code reviewer. Please review the following {{language}} code:
+
+{{code}}
+
+Focus on:
+1. Code quality and best practices
+2. Potential bugs or issues
+3. Performance considerations
+4. Security concerns"""
+
+explain = "Explain this {{language}} code in simple terms: {{code}}"
+
+# Research prompts
+[research]
+summarize = """Please summarize the following text about {{topic}}:
+
+{{text}}
+
+Provide a {{length}} summary focusing on the key points."""
+
+analyze = """Analyze the following information about {{subject}}:
+
+{{content}}
+
+Consider the following aspects:
+- {{aspect1}}
+- {{aspect2}}
+- {{aspect3}}"""
+
+# Math and science prompts
+[math]
+solve = "Solve this {{difficulty}} math problem step by step: {{problem}}"
+explain_concept = "Explain the concept of {{concept}} in {{field}} using {{approach}} approach."
+
+# Creative writing prompts
+[creative]
+story = "Write a {{genre}} story about {{character}} who {{situation}}. The story should be {{length}} and include {{elements}}."
+poem = "Create a {{style}} poem about {{theme}} that incorporates {{imagery}}."
+
+# Question answering
+[qa]
+simple = "{{question}}"
+detailed = """Question: {{question}}
+
+Please provide a comprehensive answer that includes:
+- Direct answer
+- Explanation
+- Examples where relevant
+- Any important caveats or exceptions"""
+
+# System prompts
+[system]
+assistant = """You are a helpful AI assistant. Your traits:
+- {{personality}}
+- Knowledge level: {{expertise}}
+- Communication style: {{style}}
+- Primary language: {{language}}"""
+
+chatbot = """You are {{bot_name}}, a {{bot_type}} chatbot.
+Your purpose: {{purpose}}
+Your tone: {{tone}}
+Special instructions: {{instructions}}"""

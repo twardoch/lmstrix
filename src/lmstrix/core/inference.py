@@ -3,6 +3,7 @@
 import time
 from typing import Any
 
+import lmstudio
 from loguru import logger
 from pydantic import BaseModel, Field
 
@@ -65,7 +66,7 @@ class InferenceEngine:
             response_1 = self.client.completion(
                 llm=llm,
                 prompt=test_prompt_1,
-                max_tokens=10,
+                out_ctx=10,
                 temperature=0.1,
                 model_id=model_id,
             )
@@ -77,7 +78,7 @@ class InferenceEngine:
             response_2 = self.client.completion(
                 llm=llm,
                 prompt=test_prompt_2,
-                max_tokens=10,
+                out_ctx=10,
                 temperature=0.1,
                 model_id=model_id,
             )
@@ -159,11 +160,26 @@ class InferenceEngine:
         self,
         model_id: str,
         prompt: str,
-        max_tokens: int = -1,  # Use -1 for unlimited as per new client
+        in_ctx: int | None = None,
+        out_ctx: int = -1,  # Use -1 for unlimited as per new client
         temperature: float = 0.7,
         **kwargs: Any,
     ) -> InferenceResult:
-        """Run inference on a model with automatic context optimization."""
+        """Run inference on a model with automatic context optimization.
+
+        Args:
+            model_id: Model identifier
+            prompt: Text prompt for the model
+            in_ctx: Context size at which to load the model.
+                   If 0, load without specified context.
+                   If None, reuse existing loaded model if available.
+            out_ctx: Maximum tokens to generate (-1 for unlimited)
+            temperature: Sampling temperature
+            **kwargs: Additional arguments passed to completion
+
+        Returns:
+            InferenceResult with response or error
+        """
         model = self.registry.find_model(model_id)
         if not model:
             available = [m.id for m in self.registry.list_models()]
@@ -171,19 +187,99 @@ class InferenceEngine:
 
         start_time = time.time()
         llm = None
+        should_unload_after = False
+        model_was_reused = False
 
-        # Use tested context limit if available, otherwise fallback to declared limit
-        initial_context = model.tested_max_context or model.context_limit
+        # Check if model is already loaded
+        is_loaded, loaded_context = self.client.is_model_loaded(model_id)
+
+        # Determine context size based on in_ctx parameter
+        if in_ctx is not None:
+            # Explicit context specified - always unload existing and reload
+            logger.info(f"Explicit context specified: {in_ctx}")
+            if is_loaded:
+                logger.info(
+                    f"Model currently loaded with context {loaded_context:,}, will reload with new context",
+                )
+
+            try:
+                # Unload all models first when explicit context is specified
+                logger.info("Unloading all models before loading with specific context...")
+                lmstudio.unload()
+                time.sleep(0.5)  # Brief pause after unload
+            except Exception as e:
+                logger.warning(f"Failed to unload existing models: {e}")
+
+            if in_ctx == 0:
+                # Load without specified context (use model's default)
+                logger.info(
+                    f"Loading model {model_id} without specified context (using default)...",
+                )
+                context_to_use = None
+            else:
+                # Validate context size
+                if in_ctx > model.context_limit:
+                    logger.warning(
+                        f"Requested context {in_ctx:,} exceeds model's declared limit {model.context_limit:,}",
+                    )
+                    logger.warning("This may cause loading to fail or performance issues")
+
+                if model.tested_max_context and in_ctx > model.tested_max_context:
+                    logger.warning(
+                        f"Requested context {in_ctx:,} exceeds tested maximum {model.tested_max_context:,}",
+                    )
+                    logger.info("Consider using the tested maximum for best results")
+
+                # Load with specific context
+                logger.info(f"Loading model {model_id} with context length {in_ctx:,}...")
+                context_to_use = in_ctx
+            should_unload_after = True  # Always unload after when explicit context specified
+        else:
+            # No explicit context - try to reuse existing or load with optimal context
+            logger.info("No explicit context specified, checking if model already loaded...")
+
+            if is_loaded:
+                # Model already loaded - reuse it
+                logger.info(
+                    f"Model {model_id} already loaded with context {loaded_context:,}, reusing...",
+                )
+                model_was_reused = True
+                # We'll skip loading and use the existing model
+                context_to_use = None  # Signal to skip loading
+            else:
+                # Model not loaded - load with optimal context
+                context_to_use = model.tested_max_context or model.context_limit
+                logger.info(f"Model not loaded, loading with optimal context {context_to_use:,}...")
 
         try:
-            logger.info(f"Loading model {model_id} with context length {initial_context:,}...")
-            llm = self.client.load_model_by_id(model.id, context_len=initial_context)
+            if model_was_reused:
+                # Model already loaded, get a reference to it
+                # Note: We need to get the loaded model reference
+                loaded_models = lmstudio.list_loaded_models()
+                for loaded_llm in loaded_models:
+                    # Try to match by model ID
+                    if (hasattr(loaded_llm, "id") and loaded_llm.id == model.id) or (
+                        hasattr(loaded_llm, "model_key") and loaded_llm.model_key == model.id
+                    ):
+                        llm = loaded_llm
+                        break
+                if llm is None:
+                    # Fallback: couldn't find the loaded model, load it anyway
+                    logger.warning("Could not find reference to loaded model, loading anyway...")
+                    context_to_use = model.tested_max_context or model.context_limit
+                    llm = self.client.load_model_by_id(model.id, context_len=context_to_use)
+            elif context_to_use is None and in_ctx == 0:
+                # Load without context specification (for in_ctx=0 case)
+                llm = lmstudio.llm(model.id)
+            else:
+                # Normal loading with context
+                llm = self.client.load_model_by_id(model.id, context_len=context_to_use)
 
             logger.info(f"Running inference on model {model_id}")
             response = self.client.completion(
                 llm=llm,
                 prompt=prompt,
-                max_tokens=max_tokens,
+                out_ctx=out_ctx,
                 temperature=temperature,
                 model_id=model_id,
                 **kwargs,
@@ -242,7 +338,7 @@ class InferenceEngine:
                         response = self.client.completion(
                             llm=llm,
                             prompt=prompt,
-                            max_tokens=max_tokens,
+                            out_ctx=out_ctx,
                             temperature=temperature,
                             model_id=model_id,
                             **kwargs,
@@ -280,9 +376,10 @@ class InferenceEngine:
             )
 
         finally:
-            if llm:
+            # Only unload if we explicitly loaded with in_ctx
+            if llm and should_unload_after:
                 try:
-                    logger.info(f"Unloading model {model_id}...")
+                    logger.info(f"Unloading model {model_id} (was loaded with explicit context)...")
                     llm.unload()
                 except (TypeError, AttributeError) as e:
                     logger.warning(f"Failed to unload model: {e}")

@@ -126,6 +126,49 @@ class LMStudioClient:
                 error_msg = f"Failed to load model '{model_id}': {e}"
             raise ModelLoadError(model_id, error_msg) from e
 
+    def get_loaded_models(self) -> list[dict[str, Any]]:
+        """Get information about currently loaded models.
+
+        Returns:
+            List of dicts with model information including id and context_length
+        """
+        try:
+            loaded = lmstudio.list_loaded_models()
+            models_info = []
+            for llm in loaded:
+                try:
+                    # Extract model info from the loaded LLM object
+                    model_info = {
+                        "id": getattr(llm, "id", "unknown"),
+                        "model_key": getattr(llm, "model_key", getattr(llm, "modelKey", "unknown")),
+                        "context_length": getattr(llm.config, "contextLength", None)
+                        if hasattr(llm, "config")
+                        else None,
+                    }
+                    models_info.append(model_info)
+                except Exception as e:
+                    logger.warning(f"Failed to extract info from loaded model: {e}")
+            return models_info
+        except Exception as e:
+            logger.warning(f"Failed to list loaded models: {e}")
+            return []
+
+    def is_model_loaded(self, model_id: str) -> tuple[bool, int | None]:
+        """Check if a specific model is currently loaded.
+
+        Args:
+            model_id: Model identifier to check
+
+        Returns:
+            Tuple of (is_loaded, context_length)
+        """
+        loaded_models = self.get_loaded_models()
+        for model in loaded_models:
+            # Check various possible matches
+            if model_id in (model.get("id"), model.get("model_key")):
+                return True, model.get("context_length")
+        return False, None
+
     def unload_all_models(self) -> None:
         """Unload all currently loaded models to free up resources."""
         try:
@@ -138,7 +181,7 @@ class LMStudioClient:
         self,
         llm: Any,  # The loaded model object from lmstudio.llm
         prompt: str,
-        max_tokens: int = -1,  # -1 for unlimited
+        out_ctx: int = -1,  # -1 for unlimited
         temperature: float = 0.7,  # Temperature for generation
         model_id: str | None = None,  # Pass model_id separately
         **kwargs: Any,  # Accept additional parameters
@@ -146,7 +189,7 @@ class LMStudioClient:
         """Make a completion request to a loaded LM Studio model."""
         # LM Studio's complete() method accepts a config dict
         # Pass maxTokens (camelCase) to prevent models from generating indefinitely
-        config = {"maxTokens": max_tokens if max_tokens > 0 else 100, "temperature": temperature}
+        config = {"maxTokens": out_ctx if out_ctx > 0 else 100, "temperature": temperature}
         logger.debug(f"Calling llm.complete with config: {config}, prompt: {prompt[:50]}...")
 
         try:

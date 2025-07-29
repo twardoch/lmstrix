@@ -42,7 +42,7 @@ classifiers = [
   "Typing :: Typed",
 ]
 dependencies = [
-  "fire>=0.5",
+  "fire>=0.7.0",
   "httpx>=0.24",
   "lmstudio>=1.4.1",
   "loguru>=0.7",

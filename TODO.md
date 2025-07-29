@@ -1,66 +1,75 @@
 # TODO List for LMStrix
 
-## Recent CLI Enhancements (COMPLETED)
-- [x] Add --sort option to `test --all` command
-- [x] Add --ctx option to work with `test --all`
-- [x] Add --show option to `list` command with id/path/json formats
-- [x] Make all --show formats respect --sort option
-- [x] Fix model field updates during --ctx testing
 
-## Issue #204: Remove all asyncio from lmstrix (COMPLETED)
-- [x] Remove asyncio from context_tester.py
-- [x] Remove asyncio from client.py
-- [x] Remove asyncio from cli/main.py
-- [x] Remove asyncio from inference.py
-- [x] Remove asyncio from context.py
-- [x] Remove asyncio from __init__.py
-- [x] Test files still use AsyncMock (low priority)
+## Remaining Tasks for v1.1.0 Release
 
-## Issue #201: Enhanced Context Testing Strategy (LARGELY COMPLETED)
+### Documentation
+- [ ] Update documentation for new --threshold parameter and enhanced strategy
+- [ ] Update README with new testing strategy explanation
+- [ ] Document CLI enhancements (--sort, --ctx, --show options)
+- [ ] Add examples for new CLI features
 
-### Core Implementation (COMPLETED)
-- [x] Add --threshold parameter to CLI test command (default: 102400)
-- [x] Refactor ContextTester.test_model() for new incremental/binary search algorithm
-- [x] Implement test_all_models() method for efficient batch testing
-- [x] Update output to use Rich tables for test results
-
-### Testing Algorithm Changes (COMPLETED)
-- [x] Implement initial test at min(threshold, declared_max)
-- [x] Add incremental testing (increase by 10240) when threshold > declared_max
-- [x] Ensure binary search only happens on failure
-- [x] Save progress after each individual test
-
-### Multi-Model Optimization (--all flag) (COMPLETED)
-- [x] Sort models by declared context size before testing
-- [x] Implement pass-based testing to minimize model loading
-- [x] Track failed models and exclude from subsequent passes
-- [x] Persist progress between passes
-
-### Output Improvements (COMPLETED)
-- [x] Create tabular output similar to 'list' command
-- [x] Show: Model ID, Context Size, Result, Duration
-- [x] Remove live updates, just append rows
-
-### Remaining Tasks for Full Completion
+### Testing & Validation
 - [ ] Review and optimize incremental testing algorithm performance
 - [ ] Validate binary search edge cases with comprehensive testing
 - [ ] Add performance benchmarking suite
-- [ ] Update documentation for new --threshold parameter and enhanced strategy
-- [ ] Update README with new testing strategy explanation
+- [ ] Final validation testing with real models
 
-## Phase 5: Package & Release (After Issue #201)
+## Phase 5: Package & Release
 
-### Release Tasks
-
-- [x] Create git tag v1.0.30 with release message
+### Next Release (v1.1.0)
+- [ ] Create git tag v1.1.0 with release message
 - [ ] Push tag to GitHub repository
-- [x] Build distribution packages with `python -m build`
-- [x] Verify wheel and sdist files
+- [ ] Build distribution packages with `python -m build`
+- [ ] Verify wheel and sdist files
 - [ ] Publish to PyPI using `twine upload dist/*`
 - [ ] Test installation from PyPI: `pip install lmstrix`
 - [ ] Verify all CLI commands work after PyPI install
-- [ ] Create GitHub release from v1.0.30 tag
+- [ ] Create GitHub release from v1.1.0 tag
 - [ ] Write comprehensive release notes for GitHub
+
+
+## Immediate Improvements (Pre v1.1.0)
+
+### Model State Detection (COMPLETED)
+- [x] Add get_loaded_models() method to LMStudioClient
+- [x] Check loaded models before reloading in InferenceEngine
+- [x] Display status when reusing already loaded model
+- [x] Add --force-reload flag to force model reload
+
+### Inference Status Display (PARTIALLY COMPLETED)
+- [x] Show loading context information in status messages
+- [x] Display whether model was reloaded or reused
+- [x] Show actual context size used for loading
+- [ ] Add timing breakdown for load vs inference phases
+
+### Error Message Improvements (PARTIALLY COMPLETED)
+- [x] Detect when requested context exceeds model limits
+- [ ] Suggest optimal context when load fails
+- [ ] Add helpful hints for memory-related failures
+- [ ] Include model's tested context in error messages
+
+### CLI Usability (PARTIALLY COMPLETED)
+- [ ] Add lmstrix infer --list-loaded command
+- [x] Add context size validation before loading
+- [x] Warn when --in_ctx differs from tested context
+- [ ] Add --dry-run flag for testing commands
+
+## Issue #104: Prompt File Support with TOML (COMPLETED)
+
+### Implementation Tasks
+- [x] Add --file_prompt parameter to infer command
+- [x] Add --dict parameter for key=value pairs
+- [x] Implement parameter parsing for --dict
+- [x] Modify prompt handling when --file_prompt is present
+- [x] Integrate with existing prompt loading system
+- [x] Add validation for TOML file existence
+- [x] Handle path expansion for file paths
+- [x] Add error handling for missing prompts
+- [x] Report unresolved placeholders clearly
+- [x] Create example TOML prompt files
+- [x] Update help text and documentation
+- [x] Test with various parameter combinations
 
 ## Future Improvements
 

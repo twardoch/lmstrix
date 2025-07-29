@@ -16,18 +16,16 @@ Project Structure:
 │   ├── 📄 test31.sh
 │   ├── 📄 test32.sh
 │   ├── 📄 
-│   │   test_english--elo_liczby--llama-3-2-3b-in
-│   │   struct.txt
+│   │   test_english--elo_liczby--llama-3-2-3b-instr
+│   │   uct.txt
 │   ├── 📄 
-│   │   test_english--elo_liczby--sarcasmll-1b.tx
-│   │   t
+│   │   test_english--elo_liczby--sarcasmll-1b.txt
 │   ├── 📄 test_english.txt
 │   ├── 📄 test_input.txt
 │   ├── 📄 
-│   │   test_short--elo_liczby--llama-3-2-3b-inst
-│   │   ruct.txt
-│   ├── 📄 
-│   │   test_short--elo_liczby--sarcasmll-1b.txt
+│   │   test_short--elo_liczby--llama-3-2-3b-instruc
+│   │   t.txt
+│   ├── 📄 test_short--elo_liczby--sarcasmll-1b.txt
 │   ├── 📄 test_short.txt
 │   └── 📄 toml-topl.txt
 ├── 📁 context_tests
@@ -57,11 +55,14 @@ Project Structure:
 │   │   ├── 📄 basic_usage.py
 │   │   ├── 📄 batch_processing.py
 │   │   └── 📄 custom_inference.py
+│   ├── 📄 prompts.toml
 │   ├── 📄 README.md
 │   └── 📄 run_all_examples.sh
 ├── 📁 issues
 │   ├── 📄 101.txt
-│   └── 📄 102.txt
+│   ├── 📄 102.txt
+│   ├── 📄 103.txt
+│   └── 📄 104.txt
 ├── 📁 results
 ├── 📁 src
 │   ├── 📁 lmstrix
@@ -136,6 +137,8 @@ Project Structure:
 ├── 📄 PLAN.md
 ├── 📄 pyproject.toml
 ├── 📄 README.md
+├── 📄 test_issue_103.py
+├── 📄 test_issue_104.py
 ├── 📄 TESTING.md
 ├── 📄 TODO.md
 └── 📄 WORK.md
@@ -915,6 +918,58 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added
+
+- **Prompt File Support with TOML (Issue #104)**
+  - Added `--file_prompt` parameter to load prompts from TOML files
+  - Added `--dict` parameter for passing key=value pairs for placeholder resolution
+  - When using `--file_prompt`, the prompt parameter refers to the prompt name in the TOML file
+  - Supports nested placeholders and internal template references
+  - Reports unresolved placeholders in verbose mode
+  - Includes comprehensive example prompt file with various use cases
+
+- **Enhanced Infer Context Control (Issue #103)**
+  - Added `--in_ctx` parameter to control model loading context size
+  - Added `--out_ctx` parameter to replace deprecated `--max_tokens`
+  - Supports `--in_ctx 0` to load model without context specification
+  - When `--in_ctx` is not specified, uses optimal context (tested or declared)
+  - Explicit `--in_ctx` always unloads existing models and reloads with specified context
+  - Smart unloading: only unloads models that were explicitly loaded with `--in_ctx`
+
+- **Smart Model Loading**
+  - Added model state detection to check if models are already loaded
+  - Reuses existing loaded models when no explicit context specified
+  - Added `--force-reload` flag to force model reload even if already loaded
+  - Shows clear status messages about model reuse vs reload
+
+- **Context Validation**
+  - Validates requested context against model's declared and tested limits
+  - Warns when context exceeds safe limits
+  - Suggests optimal context values
+
+### Changed
+
+- **Inference Command**
+  - Deprecated `--max_tokens` in favor of `--out_ctx` (backward compatible with warnings)
+  - Updated help text and documentation for new parameters
+  - Improved model loading logic for better memory management
+  - Enhanced status messages during inference operations
+
+## [1.0.53] - 2025-07-29
+
+### Fixed
+
+- **Git Configuration**
+  - Fixed git pull error by setting upstream branch tracking with `git branch --set-upstream-to=origin/main main`
+  - Resolved "exit code(1)" error when running `git pull -v -- origin` without branch specification
+
+### Changed
+
+- **Version Maintenance**
+  - Updated to version 1.0.53 with proper git configuration fixes
+
+## [1.0.28 - 1.0.52] - 2025-07-25 to 2025-07-29
 
 ### Added
 
@@ -1768,8 +1823,9 @@ SOFTWARE.
 - ✓ Added `--show` option to `list` command with multiple output formats (id, path, json)
 - ✓ All show formats respect the sort option for flexible data export
 - ✓ Enhanced model field updates during --ctx testing with proper persistence
+- ✓ Fixed git upstream branch tracking configuration (v1.0.53)
 
-## 3. Phase 4: Enhanced Context Testing (LARGELY COMPLETED)
+## 3. Phase 4: Enhanced Context Testing (COMPLETED)
 
 **Goal**: Implement safer and more efficient context testing strategy per Issue #201.
 
@@ -1791,13 +1847,7 @@ SOFTWARE.
    - ✓ Model ID, Status, Optimal Context, Declared Limit, Efficiency columns
    - ✓ Clean progress indicators during batch testing
 
-🔄 **Remaining Tasks for Full Issue #201 Implementation**
-   - [ ] Review and optimize the incremental testing algorithm (currently uses threshold-based approach)
-   - [ ] Validate that binary search logic handles edge cases efficiently
-   - [ ] Add performance benchmarking to measure testing efficiency improvements
-   - [ ] Update documentation to reflect the enhanced testing strategy
-
-## 4. Phase 5: Package & Release (READY)
+## 4. Phase 5: Package & Release (IN PROGRESS)
 
 **Goal**: Release LMStrix v1.1.0 to PyPI with enhanced CLI features and testing capabilities.
 
@@ -1805,9 +1855,12 @@ SOFTWARE.
    - ✓ Core functionality stable and tested
    - ✓ CLI enhancements completed (--sort, --ctx, --show)
    - ✓ Asyncio removal completed (Issue #204)
-   - ✓ Enhanced context testing largely implemented (Issue #201)
-   - [ ] Final validation testing with real models
+   - ✓ Enhanced context testing completed (Issue #201)
+   - ✓ Git configuration fixed (v1.0.53)
+   - ✓ Enhanced infer context control (Issue #103)
    - [ ] Documentation updates for new features
+   - [ ] Final validation testing with real models
+   - [ ] Performance benchmarking suite
 
 ### 4.2. Release Steps
 
@@ -1846,7 +1899,181 @@ Major Enhancements:
 
 This release significantly improves usability and performance while maintaining the core value proposition of discovering true model context limits.
 
-## 5. Future Phases (Post v1.1.0)
+## 5. Issue #103: Enhanced Infer Context Control (COMPLETED)
+
+✅ **Successfully implemented** `--in_ctx` and `--out_ctx` options for better control over model loading and generation context.
+
+### 5.1. Implementation Summary
+
+- ✓ Added `--in_ctx` parameter to control model loading context size
+- ✓ Added `--out_ctx` parameter to replace deprecated `--max_tokens`
+- ✓ Implemented smart loading logic that unloads/reloads only when needed
+- ✓ Supports `--in_ctx 0` to load model without context specification
+- ✓ Maintains backward compatibility with deprecation warnings
+- ✓ Enhanced memory management with conditional unloading
+
+## 6. Immediate Improvements (Pre v1.1.0)
+
+### 6.1. Model State Detection Enhancement
+
+**Goal**: Improve the infer command to actually detect if a model is already loaded in LM Studio.
+
+#### Implementation Plan:
+1. Add `get_loaded_models()` method to LMStudioClient
+2. Check loaded models before deciding to reload in InferenceEngine
+3. Display status message when reusing already loaded model
+4. Add `--force-reload` flag to force reload even if already loaded
+
+#### Benefits:
+- Better performance by avoiding unnecessary reloads
+- Clear feedback about model loading status
+- More intuitive behavior matching user expectations
+
+### 6.2. Inference Status Display
+
+**Goal**: Provide better feedback during inference operations.
+
+#### Implementation Plan:
+1. Add loading context information to status messages
+2. Show whether model was reloaded or reused
+3. Display actual context size used for loading
+4. Add timing information for load vs inference phases
+
+#### Example Output:
+```
+Loading model at context 8192... (explicit --in_ctx)
+Model loaded successfully in 2.3s
+Running inference...
+Inference completed in 1.5s
+```
+
+### 6.3. Error Message Improvements
+
+**Goal**: Provide more helpful error messages for common issues.
+
+#### Implementation Plan:
+1. Detect and report when requested context exceeds model limits
+2. Suggest optimal context when load fails
+3. Add hints for memory-related failures
+4. Include model's tested context in error messages
+
+### 6.4. CLI Usability Enhancements
+
+**Goal**: Make the CLI more user-friendly.
+
+#### Implementation Plan:
+1. Add `lmstrix infer --list-loaded` to show currently loaded models
+2. Add context size validation before attempting to load
+3. Warn when --in_ctx significantly differs from tested context
+4. Add `--dry-run` flag to show what would happen without executing
+
+## 7. Issue #104: Prompt File Support with TOML
+
+**Goal**: Implement `--file_prompt` and `--dict` parameters for loading prompts from TOML files with advanced placeholder resolution.
+
+### 7.1. Requirements Analysis
+
+The issue requests:
+1. **`--file_prompt`**: Path to a TOML file containing prompt templates
+2. **`--prompt`**: When used with `--file_prompt`, refers to the prompt name in the TOML file
+3. **`--dict`**: Dictionary of variables to resolve placeholders in the TOML file
+4. Use `topl` library for enhanced TOML parsing and placeholder resolution
+
+### 7.2. Implementation Plan
+
+#### Phase 1: CLI Parameter Updates
+1. Add `--file_prompt` parameter to specify TOML file path
+2. Add `--dict` parameter to accept key=value pairs
+3. Modify `--prompt` behavior when `--file_prompt` is present
+4. Validate parameter combinations
+
+#### Phase 2: Parameter Parsing
+1. Parse `--dict` parameter into dictionary format
+   - Support formats: `--dict key1=value1 key2=value2`
+   - Alternative: `--dict "key1=value1,key2=value2"`
+2. Validate TOML file exists and is readable
+3. Handle path expansion (~, relative paths)
+
+#### Phase 3: Prompt Loading Integration
+1. Detect when `--file_prompt` is provided
+2. Load TOML file using existing `load_single_prompt` function
+3. Pass dictionary parameters for placeholder resolution
+4. Use resolved prompt text for inference
+
+#### Phase 4: Enhanced Resolution (Optional)
+1. Consider integrating `topl` library features:
+   - Circular reference detection
+   - Multi-pass internal resolution
+   - Better error reporting for unresolved placeholders
+2. Maintain backward compatibility with existing prompt system
+
+### 7.3. Technical Details
+
+#### CLI Interface
+```bash
+# Load prompt from file with parameters
+lmstrix infer my_prompt model-id \
+  --file_prompt prompts.toml \
+  --dict name=Alice topic=AI
+
+# Or with comma-separated format
+lmstrix infer my_prompt model-id \
+  --file_prompt prompts.toml \
+  --dict "name=Alice,topic=AI,style=formal"
+```
+
+#### TOML File Example
+```toml
+# prompts.toml
+[greetings]
+formal = "Good day, {{name}}. How may I assist you with {{topic}}?"
+casual = "Hey {{name}}! What's up with {{topic}}?"
+
+[templates]
+base = "You are an expert in {{domain}}."
+instruction = "{{templates.base}} Please explain {{concept}} in {{style}} terms."
+```
+
+#### Implementation Flow
+```python
+if file_prompt:
+    # Load and resolve prompt from TOML
+    prompt_params = parse_dict_parameter(dict_param)
+    resolved = load_single_prompt(
+        toml_path=Path(file_prompt),
+        prompt_name=prompt,  # Now refers to prompt name in TOML
+        **prompt_params
+    )
+    actual_prompt = resolved.resolved
+else:
+    # Use prompt parameter directly as text
+    actual_prompt = prompt
+```
+
+### 7.4. Benefits
+
+1. **Reusable Prompts**: Store prompts in version-controlled files
+2. **Dynamic Templates**: Use placeholders for flexible prompts
+3. **Better Organization**: Separate prompt logic from code
+4. **Team Collaboration**: Share prompt libraries across projects
+
+### 7.5. Considerations
+
+1. **Error Handling**:
+   - Clear messages when prompt not found in TOML
+   - Report unresolved placeholders
+   - Validate TOML syntax
+
+2. **Performance**:
+   - Cache loaded TOML files
+   - Efficient placeholder resolution
+
+3. **Security**:
+   - Validate file paths
+   - Sanitize parameter values
+   - Prevent path traversal attacks
+
+## 8. Future Phases (Post v1.1.0)
 
 ### Phase 6: Performance & Monitoring
 - [ ] Add performance benchmarking suite for context testing efficiency
@@ -1879,15 +2106,17 @@ This release significantly improves usability and performance while maintaining 
 <document_content>
 LMStrix is a professional, installable Python toolkit designed to supercharge your interaction with [LM Studio](https://lmstudio.ai/). It provides a powerful command-line interface (CLI) and a clean Python API for managing, testing, and running local language models, with a standout feature: the **Adaptive Context Optimizer**.
 
+**Current version: 1.0.53** - Enhanced CLI features, full synchronous architecture, and improved safety controls.
+
 **For the full documentation, please visit the [LMStrix GitHub Pages site](https://twardoch.github.io/lmstrix/).**
 
 ## Key Features
 
-- **Automatic Context Optimization**: Discover the true context limit of any model with the `test` command.
-- **Full Model Management**: Programmatically `list` available models and `scan` for newly downloaded ones.
+- **Automatic Context Optimization**: Discover the true context limit of any model with the `test` command, featuring safety thresholds and batch testing.
+- **Full Model Management**: Programmatically `list` available models with sorting and multiple output formats, and `scan` for newly downloaded ones.
 - **Flexible Inference Engine**: Run inference with a powerful two-phase prompt templating system that separates prompt structure from its content.
 - **Rich CLI**: A beautiful and intuitive command-line interface built with `rich` and `fire`.
-- **Modern Python API**: An `async`-first API designed for high-performance, concurrent applications.
+- **Modern Python API**: A fully synchronous API for reliable and straightforward integration.
 
 ## Installation
 
@@ -1924,6 +2153,8 @@ lmstrix test --all --ctx 32768
 # Sort and filter model listings
 lmstrix list --sort size_gb  # Sort by model size descending
 lmstrix list --show json --sort name  # Export as JSON sorted by model name
+lmstrix list --show id  # Get plain list of model IDs
+lmstrix list --show path  # Get newline-delimited paths
 
 # Run inference on a model
 lmstrix infer "Your prompt here" --model "model-id" --max-tokens 150
@@ -2178,67 +2409,76 @@ The test suite is designed to run in CI/CD pipelines:
 <document_content>
 # TODO List for LMStrix
 
-## Recent CLI Enhancements (COMPLETED)
-- [x] Add --sort option to `test --all` command
-- [x] Add --ctx option to work with `test --all`
-- [x] Add --show option to `list` command with id/path/json formats
-- [x] Make all --show formats respect --sort option
-- [x] Fix model field updates during --ctx testing
 
-## Issue #204: Remove all asyncio from lmstrix (COMPLETED)
-- [x] Remove asyncio from context_tester.py
-- [x] Remove asyncio from client.py
-- [x] Remove asyncio from cli/main.py
-- [x] Remove asyncio from inference.py
-- [x] Remove asyncio from context.py
-- [x] Remove asyncio from __init__.py
-- [x] Test files still use AsyncMock (low priority)
+## Remaining Tasks for v1.1.0 Release
 
-## Issue #201: Enhanced Context Testing Strategy (LARGELY COMPLETED)
+### Documentation
+- [ ] Update documentation for new --threshold parameter and enhanced strategy
+- [ ] Update README with new testing strategy explanation
+- [ ] Document CLI enhancements (--sort, --ctx, --show options)
+- [ ] Add examples for new CLI features
 
-### Core Implementation (COMPLETED)
-- [x] Add --threshold parameter to CLI test command (default: 102400)
-- [x] Refactor ContextTester.test_model() for new incremental/binary search algorithm
-- [x] Implement test_all_models() method for efficient batch testing
-- [x] Update output to use Rich tables for test results
-
-### Testing Algorithm Changes (COMPLETED)
-- [x] Implement initial test at min(threshold, declared_max)
-- [x] Add incremental testing (increase by 10240) when threshold > declared_max
-- [x] Ensure binary search only happens on failure
-- [x] Save progress after each individual test
-
-### Multi-Model Optimization (--all flag) (COMPLETED)
-- [x] Sort models by declared context size before testing
-- [x] Implement pass-based testing to minimize model loading
-- [x] Track failed models and exclude from subsequent passes
-- [x] Persist progress between passes
-
-### Output Improvements (COMPLETED)
-- [x] Create tabular output similar to 'list' command
-- [x] Show: Model ID, Context Size, Result, Duration
-- [x] Remove live updates, just append rows
-
-### Remaining Tasks for Full Completion
+### Testing & Validation
 - [ ] Review and optimize incremental testing algorithm performance
 - [ ] Validate binary search edge cases with comprehensive testing
 - [ ] Add performance benchmarking suite
-- [ ] Update documentation for new --threshold parameter and enhanced strategy
-- [ ] Update README with new testing strategy explanation
+- [ ] Final validation testing with real models
 
-## Phase 5: Package & Release (After Issue #201)
+## Phase 5: Package & Release
 
-### Release Tasks
-
-- [x] Create git tag v1.0.30 with release message
+### Next Release (v1.1.0)
+- [ ] Create git tag v1.1.0 with release message
 - [ ] Push tag to GitHub repository
-- [x] Build distribution packages with `python -m build`
-- [x] Verify wheel and sdist files
+- [ ] Build distribution packages with `python -m build`
+- [ ] Verify wheel and sdist files
 - [ ] Publish to PyPI using `twine upload dist/*`
 - [ ] Test installation from PyPI: `pip install lmstrix`
 - [ ] Verify all CLI commands work after PyPI install
-- [ ] Create GitHub release from v1.0.30 tag
+- [ ] Create GitHub release from v1.1.0 tag
 - [ ] Write comprehensive release notes for GitHub
+
+
+## Immediate Improvements (Pre v1.1.0)
+
+### Model State Detection (COMPLETED)
+- [x] Add get_loaded_models() method to LMStudioClient
+- [x] Check loaded models before reloading in InferenceEngine
+- [x] Display status when reusing already loaded model
+- [x] Add --force-reload flag to force model reload
+
+### Inference Status Display (PARTIALLY COMPLETED)
+- [x] Show loading context information in status messages
+- [x] Display whether model was reloaded or reused
+- [x] Show actual context size used for loading
+- [ ] Add timing breakdown for load vs inference phases
+
+### Error Message Improvements (PARTIALLY COMPLETED)
+- [x] Detect when requested context exceeds model limits
+- [ ] Suggest optimal context when load fails
+- [ ] Add helpful hints for memory-related failures
+- [ ] Include model's tested context in error messages
+
+### CLI Usability (PARTIALLY COMPLETED)
+- [ ] Add lmstrix infer --list-loaded command
+- [x] Add context size validation before loading
+- [x] Warn when --in_ctx differs from tested context
+- [ ] Add --dry-run flag for testing commands
+
+## Issue #104: Prompt File Support with TOML (COMPLETED)
+
+### Implementation Tasks
+- [x] Add --file_prompt parameter to infer command
+- [x] Add --dict parameter for key=value pairs
+- [x] Implement parameter parsing for --dict
+- [x] Modify prompt handling when --file_prompt is present
+- [x] Integrate with existing prompt loading system
+- [x] Add validation for TOML file existence
+- [x] Handle path expansion for file paths
+- [x] Add error handling for missing prompts
+- [x] Report unresolved placeholders clearly
+- [x] Create example TOML prompt files
+- [x] Update help text and documentation
+- [x] Test with various parameter combinations
 
 ## Future Improvements
 
@@ -2253,31 +2493,92 @@ The test suite is designed to run in CI/CD pipelines:
 <document index="13">
 <source>WORK.md</source>
 <document_content>
-# Work Progress
+# WORK.md - Issue #103 Implementation
 
-## 🎉 **LATEST IMPROVEMENT - GRACEFUL MODEL LOAD ERROR HANDLING** 🎉
+## Current Tasks
 
-### **CRITICAL ISSUE RESOLVED** ✅
+### Implementing Enhanced Infer Context Control
+
+1. **Add CLI parameters** - Add --in_ctx and --out_ctx to infer command
+2. **Update InferenceEngine** - Modify to support new context control
+3. **Implement smart loading** - Check if model already loaded
+4. **Handle edge cases** - in_ctx=0, backward compatibility
+5. **Test implementation** - Verify all scenarios work correctly
+
+## Progress
+
+- [x] Modify cli/main.py to add new parameters
+- [x] Update InferenceEngine.infer() method
+- [x] Add model loading state detection
+- [x] Implement conditional loading logic
+- [x] Test and validate changes
+
+## Implementation Complete! ✅
+
+### Changes Made:
+
+1. **CLI Enhancement (cli/main.py)**:
+   - Added `--in_ctx` parameter for controlling model loading context
+   - Added `--out_ctx` parameter to replace deprecated `--max_tokens`
+   - Maintained backward compatibility with deprecation warning
+   - Parameter validation and precedence handling
+
+2. **InferenceEngine Updates (core/inference.py)**:
+   - Added `in_ctx` parameter to `infer()` method
+   - Implemented conditional loading logic:
+     - When `in_ctx` specified: Always unload existing and reload
+     - When `in_ctx=0`: Load without context specification
+     - When `in_ctx` not specified: Load with optimal context
+   - Smart unloading: Only unload if explicitly loaded with `in_ctx`
+
+3. **Key Features Implemented**:
+   - ✅ `--in_ctx INT`: Controls model loading context
+   - ✅ `--in_ctx 0`: Loads model without specified context
+   - ✅ No `--in_ctx`: Uses optimal context (tested or declared)
+   - ✅ `--out_ctx INT`: Replaces `--max_tokens` for generation
+   - ✅ Backward compatibility with deprecation warnings
+
+### Usage Examples:
+
+```bash
+# Load model with specific context
+lmstrix infer "Hello" model-id --in_ctx 8192 --out_ctx 100
+
+# Load model with default context (no specification)
+lmstrix infer "Hello" model-id --in_ctx 0 --out_ctx 100
+
+# Reuse existing loaded model
+lmstrix infer "Hello" model-id --out_ctx 100
+
+# Backward compatibility (deprecated)
+lmstrix infer "Hello" model-id --max_tokens 100
+```
+
+## Previous Work Progress
+
+### 🎉 **LATEST IMPROVEMENT - GRACEFUL MODEL LOAD ERROR HANDLING** 🎉
+
+#### **CRITICAL ISSUE RESOLVED** ✅
 
 **Issue**: User encountered `LMStudioServerError: Model get/load error: Model not found: lucy-128k` during model testing, causing the entire `lmstrix test --all` process to crash.
 
 **Root Cause**: Models that exist in the LMStrix registry but are no longer available in LM Studio (deleted, unloaded, or moved) would cause a crash during the model loading phase, preventing the testing process from continuing.
 
-### **COMPREHENSIVE SOLUTION IMPLEMENTED** ✅
+#### **COMPREHENSIVE SOLUTION IMPLEMENTED** ✅
 
-#### **1. Enhanced Client Model Load Error Handling**
+##### **1. Enhanced Client Model Load Error Handling**
 - ✅ Added `LMStudioServerError` handling to `load_model` method in `src/lmstrix/api/client.py`
 - ✅ Specific detection for "model not found" and "path not found" errors
 - ✅ Converts `LMStudioServerError` to descriptive `ModelLoadError` with context
 
-#### **2. Intelligent Context Tester Model Load Recovery**
+##### **2. Intelligent Context Tester Model Load Recovery**
 - ✅ Enhanced ModelLoadError handler in `src/lmstrix/core/context_tester.py`
 - ✅ **Automatic Bad Model Detection**: Identifies models not found in LM Studio
 - ✅ **Registry Status Updates**: Marks bad models as FAILED in the database
 - ✅ **Detailed Logging**: Logs with "MODEL_NOT_FOUND" category for tracking
 - ✅ **Graceful Continuation**: Testing continues with remaining models
 
-#### **3. Robust Model Status Management**
+##### **3. Robust Model Status Management**
 - ✅ **Automatic Model Marking**: Models not found are marked as FAILED status
 - ✅ **Database Updates**: Registry automatically updated with failure information
 - ✅ **Clear Error Classification**: Distinguishes between load errors and not-found errors
@@ -2674,6 +2975,132 @@ graph TD
 - [x] Implement --fast mode for test command
 
 **Status**: ✅ **COMPLETE - New context testing strategy, database protection, memory/cache error handling, smart sorting, and fast mode testing fully operational**
+
+---
+
+## 🎉 **LATEST UPDATE - PROMPT FILE SUPPORT WITH TOML** 🎉
+
+### **Issue #104 Implementation** ✅ (2025-07-29)
+
+**Feature**: Added support for loading prompts from TOML files with parameter resolution.
+
+### **Implementation Details** ✅
+
+#### **1. New CLI Parameters**
+- ✅ Added `--file_prompt PATH` to specify TOML file containing prompts
+- ✅ Added `--dict PARAMS` for key=value parameter pairs
+- ✅ Modified `--prompt` behavior: when used with `--file_prompt`, refers to prompt name in TOML
+
+#### **2. Parameter Resolution**
+- ✅ Supports comma-separated format: `--dict "name=Alice,topic=AI"`
+- ✅ Integrates with existing PromptResolver for placeholder resolution
+- ✅ Handles nested placeholders and internal references
+- ✅ Reports unresolved placeholders with warnings
+
+#### **3. File Loading**
+- ✅ Path expansion for ~ and relative paths
+- ✅ Validates TOML file existence
+- ✅ Clear error messages for missing files or prompts
+- ✅ Verbose mode shows resolution details
+
+#### **4. Example TOML Structure**
+```toml
+[greetings]
+formal = "Good day, {{name}}. How may I assist you with {{topic}}?"
+casual = "Hey {{name}}! What's up with {{topic}}?"
+
+[templates]
+base = "You are an expert in {{domain}}."
+instruction = "{{templates.base}} Please explain {{concept}} in {{style}} terms."
+```
+
+### **Usage Examples** 📝
+
+```bash
+# Simple greeting with parameters
+lmstrix infer greetings.casual model-id \
+  --file_prompt prompts.toml \
+  --dict "name=Alice,topic=AI"
+
+# Nested template resolution
+lmstrix infer templates.instruction model-id \
+  --file_prompt prompts.toml \
+  --dict "domain=Python,concept=decorators,style=simple"
+
+# Multiple parameters
+lmstrix infer code.review model-id \
+  --file_prompt examples/prompts.toml \
+  --dict "language=Python,code=def hello(): pass"
+```
+
+### **Benefits** 🎯
+
+1. **✅ Reusable Prompts**: Store prompts in version-controlled files
+2. **✅ Dynamic Templates**: Use placeholders for flexible prompts
+3. **✅ Better Organization**: Separate prompt logic from code
+4. **✅ Team Collaboration**: Share prompt libraries
+5. **✅ Complex Prompts**: Support nested templates and references
+
+---
+
+## 🎉 **PREVIOUS UPDATE - ENHANCED INFERENCE IMPROVEMENTS** 🎉
+
+### **Features Implemented** ✅ (2025-07-29)
+
+**Enhancement**: Improved `lmstrix infer` command with smart model loading and better user feedback.
+
+### **Implementation Details** ✅
+
+#### **1. Smart Model State Detection**
+- ✅ Added `get_loaded_models()` and `is_model_loaded()` methods to LMStudioClient
+- ✅ Checks if model is already loaded before reloading
+- ✅ Reuses existing loaded model when no explicit context specified
+- ✅ Shows clear status messages about model reuse vs reload
+
+#### **2. Force Reload Option**
+- ✅ Added `--force-reload` flag to force model reload
+- ✅ Automatically uses optimal context when force reloading
+- ✅ Useful for refreshing model state or changing context
+
+#### **3. Context Validation**
+- ✅ Validates requested context against model's declared limit
+- ✅ Warns when context exceeds tested maximum
+- ✅ Suggests using tested maximum for best results
+- ✅ Prevents common errors before attempting to load
+
+#### **4. Enhanced Status Messages**
+- ✅ Shows when model is being reused vs reloaded
+- ✅ Displays current loaded context information
+- ✅ Clear warnings for context size issues
+- ✅ Better error messages with actionable hints
+
+### **Usage Examples** 📝
+
+```bash
+# First run - loads model
+lmstrix infer "Hello" model-id --out_ctx 100
+# Output: Loading model with optimal context 32,768...
+
+# Second run - reuses loaded model
+lmstrix infer "Hello again" model-id --out_ctx 100
+# Output: Model already loaded with context 32,768, reusing...
+
+# Force reload with different context
+lmstrix infer "Hello" model-id --in_ctx 16384 --out_ctx 100
+# Output: Model currently loaded with context 32,768, will reload with new context
+
+# Force reload without specific context
+lmstrix infer "Hello" model-id --force-reload --out_ctx 100
+# Output: Force reload requested, loading with context 32,768
+```
+
+### **Benefits** 🎯
+
+1. **✅ Better Performance**: Avoids unnecessary model reloads
+2. **✅ Clear Feedback**: Users know exactly what's happening
+3. **✅ Safer Loading**: Context validation prevents common errors
+4. **✅ More Control**: Force reload when needed
+5. **✅ Smarter Defaults**: Optimal behavior without flags
 </document_content>
 </document>
 
@@ -13030,7 +13457,6 @@ Project Structure:
 ├── 📄 CHANGELOG.md
 ├── 📄 CLAUDE.md
 ├── 📄 LICENSE
-├── 📄 llms.txt
 ├── 📄 pyproject.toml
 ├── 📄 README.md
 ├── 📄 REPORT-2025-07-24.md
@@ -15163,4223 +15589,6 @@ You are receiving this because you were mentioned.
 </document>
 
 <document index="17">
-<source>llms.txt</source>
-<document_content>
-Project Structure:
-📁 topl
-├── 📁 docs
-│   └── 📄 github-actions-templates.md
-├── 📁 issues
-│   ├── 📄 101.txt
-│   └── 📄 102.txt
-├── 📁 src
-│   ├── 📁 repo
-│   │   └── 📄 __init__.py
-│   └── 📁 topl
-│       ├── 📄 __init__.py
-│       ├── 📄 __main__.py
-│       ├── 📄 _version.py
-│       ├── 📄 cli.py
-│       ├── 📄 constants.py
-│       ├── 📄 core.py
-│       ├── 📄 exceptions.py
-│       ├── 📄 py.typed
-│       ├── 📄 types.py
-│       └── 📄 utils.py
-├── 📁 tests
-│   ├── 📁 integration
-│   │   └── 📄 test_end_to_end.py
-│   ├── 📁 unit
-│   │   ├── 📄 test_cli.py
-│   │   ├── 📄 test_core.py
-│   │   └── 📄 test_utils.py
-│   └── 📄 conftest.py
-├── 📄 .gitignore
-├── 📄 CHANGELOG.md
-├── 📄 CLAUDE.md
-├── 📄 LICENSE
-├── 📄 llms.txt
-├── 📄 pyproject.toml
-├── 📄 README.md
-├── 📄 TODO.md
-└── 📄 WORK.md
-
-
-<documents>
-<document index="1">
-<source>.gitignore</source>
-<document_content>
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[codz]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py.cover
-.hypothesis/
-.pytest_cache/
-cover/
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-.pybuilder/
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-#   For a library or package, you might want to ignore these files since the code is
-#   intended to run in multiple environments; otherwise, check them in:
-# .python-version
-
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
-
-# UV
-#   Similar to Pipfile.lock, it is generally recommended to include uv.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#uv.lock
-
-# poetry
-#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
-#poetry.lock
-#poetry.toml
-
-# pdm
-#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
-#   pdm recommends including project-wide configuration in pdm.toml, but excluding .pdm-python.
-#   https://pdm-project.org/en/latest/usage/project/#working-with-version-control
-#pdm.lock
-#pdm.toml
-.pdm-python
-.pdm-build/
-
-# pixi
-#   Similar to Pipfile.lock, it is generally recommended to include pixi.lock in version control.
-#pixi.lock
-#   Pixi creates a virtual environment in the .pixi directory, just like venv module creates one
-#   in the .venv directory. It is recommended not to include this directory in version control.
-.pixi
-
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.envrc
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# pytype static type analyzer
-.pytype/
-
-# Cython debug symbols
-cython_debug/
-
-# PyCharm
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#  and can be added to the global gitignore or merged into this file.  For a more nuclear
-#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#.idea/
-
-# Abstra
-# Abstra is an AI-powered process automation framework.
-# Ignore directories containing user credentials, local state, and settings.
-# Learn more at https://abstra.io/docs
-.abstra/
-
-# Visual Studio Code
-#  Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore 
-#  that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
-#  and can be added to the global gitignore or merged into this file. However, if you prefer, 
-#  you could uncomment the following to ignore the entire vscode folder
-# .vscode/
-
-# Ruff stuff:
-.ruff_cache/
-
-# PyPI configuration file
-.pypirc
-
-# Cursor
-#  Cursor is an AI-powered code editor. `.cursorignore` specifies files/directories to
-#  exclude from AI features like autocomplete and code analysis. Recommended for sensitive data
-#  refer to https://docs.cursor.com/context/ignore-files
-.cursorignore
-.cursorindexingignore
-
-# Marimo
-marimo/_static/
-marimo/_lsp/
-__marimo__/
-
-</document_content>
-</document>
-
-<document index="2">
-<source>.python-version</source>
-<document_content>
-3.11
-</document_content>
-</document>
-
-<document index="3">
-<source>CHANGELOG.md</source>
-<document_content>
-# Changelog
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
-
-### Added
-- Initial implementation of TOPL (TOML Extended with Placeholders)
-- Two-phase placeholder resolution (internal → external)
-- Command-line interface via Fire
-- Comprehensive programmatic API
-- Full type hint support
-- Circular reference detection
-- Rich console output and logging
-- 95%+ test coverage
-- Modern Python packaging with uv and hatch
-- GitHub Actions CI/CD workflows
-- Documentation and examples
-
-### Core Features
-- `resolve_placeholders()` function for processing TOML data
-- `TOPLConfig` class for enhanced configuration objects  
-- Support for nested placeholder resolution
-- External parameter injection
-- Unresolved placeholder tracking and warnings
-- Path expansion and file handling utilities
-
-### CLI Features
-- `topl` command-line tool
-- `python -m topl` module execution
-- Verbose logging mode
-- External parameter passing
-- Rich formatting for output
-- Comprehensive error handling
-
-### Development
-- Modern Python 3.11+ compatibility
-- PEP 621 compliant pyproject.toml
-- UV package management
-- Hatch build system
-- Git-tag based versioning
-- Ruff linting and formatting
-- MyPy type checking
-- Pytest testing framework
-- Pre-commit hooks ready
-- GitHub Actions for testing and releases
-
-## [0.1.0] - Initial Development
-
-### Added
-- Project structure and configuration
-- Core placeholder resolution engine
-- CLI interface implementation
-- Basic test suite
-- Documentation framework
-
----
-
-## Release Notes Template
-
-For future releases, use this template:
-
-## [X.Y.Z] - YYYY-MM-DD
-
-### Added
-- New features
-
-### Changed
-- Changes in existing functionality
-
-### Deprecated
-- Soon-to-be removed features
-
-### Removed
-- Now removed features
-
-### Fixed
-- Bug fixes
-
-### Security
-- Vulnerability fixes
-</document_content>
-</document>
-
-<document index="4">
-<source>CLAUDE.md</source>
-<document_content>
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## Project Overview
-
-TOPL (TOML extended with placeholders) is a Python package that extends TOML files with dynamic placeholder resolution. It provides a two-phase resolution system for internal references and external parameters.
-
-## Essential Commands
-
-### Development Setup
-```bash
-# Install all dependencies including dev tools
-uv sync --all-extras
-```
-
-### Testing
-```bash
-# Run all tests
-uv run pytest
-
-# Run with coverage report
-uv run pytest --cov=topl --cov-report=term-missing
-
-# Run specific test categories
-uv run pytest -m unit        # Unit tests only
-uv run pytest -m integration # Integration tests only
-uv run pytest tests/unit/test_core.py::test_specific  # Single test
-```
-
-### Code Quality
-```bash
-# Linting and formatting (MUST run before committing)
-uv run ruff check .
-uv run ruff format .
-
-# Type checking (MUST pass)
-uv run mypy src tests
-
-# Security scanning
-uv run bandit -r src/
-```
-
-### Building and Running
-```bash
-# Build the package
-uv build
-
-# Run the CLI
-uv run topl config.toml --external key=value
-
-# Install locally for testing
-uv pip install -e .
-```
-
-## Architecture
-
-### Core Design: Two-Phase Resolution
-
-The project implements a two-phase placeholder resolution system:
-
-1. **Phase 1: Internal Resolution** - Resolves `${section.key}` references within the TOML file
-   - Maximum 10 iterations to prevent infinite loops
-   - Uses regex pattern matching for efficiency
-   - Handles nested references automatically
-
-2. **Phase 2: External Resolution** - Resolves `${param}` with user-supplied values
-   - Single pass resolution
-   - Validates all required parameters are provided
-   - Returns warnings for unresolved placeholders
-
-### Key Components
-
-- **src/topl/core.py**: Main resolution engine (`TOPLConfig`, `resolve_placeholders`)
-- **src/topl/cli.py**: Fire-based CLI interface with rich output formatting
-- **src/topl/utils.py**: Helper functions for placeholder detection and resolution
-- **src/topl/types.py**: Type definitions for the project
-
-### Important Patterns
-
-1. **TOPLConfig Wrapper**: Extends Box dictionary with metadata about resolution status
-2. **Error Handling**: Custom exceptions in `exceptions.py` for domain-specific errors
-3. **Configuration Constants**: Centralized in `constants.py` (e.g., MAX_INTERNAL_PASSES=10)
-
-## Development Guidelines
-
-### Before Committing Code
-
-1. Ensure all tests pass: `uv run pytest`
-2. Run linting and formatting: `uv run ruff check . && uv run ruff format .`
-3. Verify type checking: `uv run mypy src tests`
-4. Check test coverage meets 95% target
-
-### Testing Strategy
-
-- Write unit tests in `tests/unit/` for individual functions
-- Write integration tests in `tests/integration/` for end-to-end scenarios
-- Use pytest fixtures from `conftest.py` for common test data
-- Test both success cases and error conditions
-
-### Type Safety
-
-The project uses strict mypy configuration. All public functions must have type hints.
-
-### Version Management
-
-Versions are automatically derived from git tags using hatch-vcs. Do not manually edit version numbers.
-
-## Current Project Status
-
-The project is completing Phase 1 (MVP) as tracked in WORK.md. Key features implemented:
-- Two-phase placeholder resolution
-- CLI interface
-- Comprehensive test suite
-- Full type annotations
-- Package structure and tooling
-
-Refer to TODO.md for the complete development roadmap (261 items) and WORK.md for progress tracking.
-</document_content>
-</document>
-
-<document index="5">
-<source>LICENSE</source>
-<document_content>
-MIT License
-
-Copyright (c) 2025 Adam Twardoch
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-</document_content>
-</document>
-
-<document index="6">
-<source>README.md</source>
-<document_content>
-# topl
-
-TOML extended with placeholders
-
----
-
-#!/usr/bin/env -S uv run -s
-# /// script
-# dependencies = ["python-box", "rich", "fire"]
-# ///
-# this_file: resolve_toml.py
-"""
-resolve_toml.py
-===============
-
-Resolve double‑curly‑brace placeholders in a TOML file **in two phases**:
-
-1. **Internal phase** – placeholders that reference keys *inside* the same
-   TOML structure are substituted first (e.g. ``{{dict2.key2}}``).
-2. **External phase** – any *remaining* placeholders are substituted with
-   user‑supplied parameters (e.g. ``external1="foo"``).
-3. **Warning phase** – unresolved placeholders are left intact **and** a
-   warning is emitted.
-
-The script purposefully performs *minimal* work: it does **not** try to
-re‑order keys, merge files, or perform type conversions beyond ``str``;
-it only “does what it says on the tin”.
-
----------------------------------------------------------------------------
-Usage (CLI)
------------
-
-./resolve_toml.py path/to/file.toml --external external1="bar" external2="baz"
-
-The CLI is provided by fire; every keyword argument after the filename is
-treated as an external parameter.
-
-⸻
-
-Why Box?
-
-Box gives intuitive dotted access (cfg.dict2.key2) while still behaving
-like a plain dict for serialization.
-
-“””
-
-from future import annotations
-
-import logging
-import re
-import sys
-from pathlib import Path
-from types import MappingProxyType
-from typing import Any, Mapping
-
-import tomllib  # Python 3.11+
-from box import Box
-import fire
-from rich.console import Console
-from rich.logging import RichHandler
-
-—————————————————————————
-
-Constants & regexes
-
-_PLACEHOLDER_RE = re.compile(r”{{([^{}]+)}}”)
-_MAX_INTERNAL_PASSES = 10  # avoid infinite loops on circular refs
-
-—————————————————————————
-
-Logging setup – colourised & optionally verbose
-
-def _configure_logging(verbose: bool = False) -> None:
-level = logging.DEBUG if verbose else logging.INFO
-logging.basicConfig(
-level=level,
-format=”%(message)s”,
-handlers=[RichHandler(rich_tracebacks=True, console=Console(stderr=True))],
-)
-
-logger = logging.getLogger(name)
-
-—————————————————————————
-
-Low‑level helpers
-
-def _get_by_path(box: Box, dotted_path: str) -> Any:
-“””
-Return value at dotted_path or None if the path is invalid.
-
-``dotted_path`` follows Box semantics: ``"foo.bar.baz"``.
-"""
-current = box
-for part in dotted_path.split("."):
-    if not isinstance(current, Mapping) or part not in current:
-        return None
-    current = current[part]
-return current
-
-def _resolve_internal_once(s: str, root: Box) -> str:
-“””
-Replace one pass of internal placeholders in s.
-
-A placeholder is internal if the path exists in *root*.
-"""
-def repl(match: re.Match[str]) -> str:
-    path = match.group(1).strip()
-    value = _get_by_path(root, path)
-    return str(value) if value is not None else match.group(0)
-
-return _PLACEHOLDER_RE.sub(repl, s)
-
-def _resolve_external(s: str, params: Mapping[str, str]) -> str:
-“””
-Replace external placeholders using str.format_map.
-
-We temporarily convert ``{{name}}`` → ``{name}`` then format.
-Missing keys are left untouched.
-"""
-
-class _SafeDict(dict):  # noqa: D401
-    """dict that leaves unknown placeholders unchanged."""
-
-    def __missing__(self, key: str) -> str:  # noqa: D401
-        return f"{{{{{key}}}}}"
-
-if not params:
-    return s
-
-# Convert `{{name}}` → `{name}`
-tmp = _PLACEHOLDER_RE.sub(lambda m: "{" + m.group(1).strip() + "}", s)
-return tmp.format_map(_SafeDict(params))
-
-def _iter_box_strings(box: Box) -> tuple[tuple[str, Box], …]:
-“””
-Yield (key, parent_box) pairs for every string leaf in box.
-
-We return both key *and* the parent so we can assign new values in‑place.
-"""
-results: list[tuple[str, Box]] = []
-for key, val in box.items():
-    if isinstance(val, str):
-        results.append((key, box))
-    elif isinstance(val, Mapping):
-        results.extend(_iter_box_strings(val))  # type: ignore[arg-type]
-return tuple(results)
-
-—————————————————————————
-
-Public API
-
-def resolve_placeholders(data: Mapping[str, Any], **params: str) -> Box:
-“””
-Resolve placeholders inside data in‑place and return a new Box.
-
-Parameters
-----------
-data:
-    Mapping returned by ``tomllib.load``.
-**params:
-    External parameters used during the *external* phase.
-
-Returns
--------
-Box
-    The resolved configuration object.
-"""
-cfg = Box(data, default_box=True, default_box_attr=None)
-
-# -- Phase 1: internal substitutions (multiple passes) ------------------ #
-for i in range(_MAX_INTERNAL_PASSES):
-    changed = False
-    for key, parent in _iter_box_strings(cfg):
-        original = parent[key]
-        resolved = _resolve_internal_once(original, cfg)
-        if original != resolved:
-            parent[key] = resolved
-            changed = True
-    if not changed:
-        logger.debug("Internal resolution stabilised after %s passes", i + 1)
-        break
-else:  # pragma: no cover
-    logger.warning(
-        "Reached maximum internal passes (%s). "
-        "Possible circular placeholder references?",
-        _MAX_INTERNAL_PASSES,
-    )
-
-# -- Phase 2: external substitutions ----------------------------------- #
-for key, parent in _iter_box_strings(cfg):
-    parent[key] = _resolve_external(parent[key], MappingProxyType(params))
-
-# -- Phase 3: warn about leftovers ------------------------------------- #
-leftovers: list[str] = []
-for key, parent in _iter_box_strings(cfg):
-    for match in _PLACEHOLDER_RE.finditer(parent[key]):
-        leftovers.append(match.group(0))
-if leftovers:
-    unique = sorted(set(leftovers))
-    logger.warning(
-        "Could not resolve %s placeholder(s): %s",
-        len(unique),
-        ", ".join(unique),
-    )
-
-return cfg
-
-—————————————————————————
-
-CLI entry‑point
-
-def main(path: str, verbose: bool = False, **params: str) -> None:  # noqa: D401
-“””
-Read path (TOML), resolve placeholders, and pretty‑print the result.
-
-Any ``key=value`` arguments after *path* are considered external params.
-"""
-_configure_logging(verbose)
-
-toml_path = Path(path).expanduser()
-try:
-    data = toml_path.read_bytes()
-except FileNotFoundError:
-    logger.error("TOML file %s not found", toml_path)
-    sys.exit(1)
-
-config = resolve_placeholders(tomllib.loads(data.decode()), **params)
-Console().print(config.to_dict())
-
-if name == “main”:  # pragma: no cover
-fire.Fire(main)
-
----
-
-### How this fulfils the brief 📝
-
-1. **Two‑phase resolution**:  
-   *Internal* references are substituted first; only the unresolved placeholders
-   are then offered to external parameters via ``str.format_map``.
-2. **Warnings**: Any placeholders still unreplaced are logged **once** –
-   exactly as requested.
-3. **Box integration**: The Toml structure is returned as a `Box`, so callers
-   keep dotted access for further processing.
-4. **CLI optionality**: Fire provides a one‑liner interface but is *not*
-   mandatory for library use.
-5. **Safety**: Circular references are detected via a pass‑count limit and will
-   not hang the program.
-
-Feel free to drop the CLI bits if you only need a function – everything is
-modular.
-
-</document_content>
-</document>
-
-<document index="7">
-<source>TODO.md</source>
-<document_content>
-# TODO: TOPL Package Development Specification
-
-## Project Overview
-Build a complete, production-ready Python package for TOML Extended with Placeholders (topl) that provides:
-- Two-phase placeholder resolution (internal → external)
-- CLI interface via Fire
-- Programmatic API
-- Full test coverage
-- Modern Python packaging with uv/hatch
-- Git-tag-based versioning with Denver
-- GitHub Actions CI/CD
-
-## Package Structure & Setup
-
-### Core Package Infrastructure
-- [ ] Create proper Python package structure with `src/topl/` layout following PEP 621
-- [ ] Set up `pyproject.toml` with hatch build system and uv integration
-- [ ] Initialize uv project with `uv init --package --build-backend hatchling`
-- [ ] Add `src/topl/__init__.py` with version import from `_version.py`
-- [ ] Create `src/topl/py.typed` marker file for type checking support
-- [ ] Set up `this_file` tracking comments in all source files
-- [ ] Configure `src/topl/_version.py` for dynamic versioning
-
-### Configuration Files
-- [ ] Create comprehensive `pyproject.toml` with:
-  - Project metadata following PEP 621 (name="topl", dynamic=["version"])
-  - Build system: `build-backend = "hatchling.build"`
-  - Core dependencies: `python-box>=7.0`, `rich>=13.0`, `fire>=0.5`
-  - Optional dependencies for dev: `pytest`, `ruff`, `mypy`, `coverage`
-  - Tool configurations: ruff (format + lint), pytest, mypy, coverage
-  - Console scripts entry point: `topl = "topl.__main__:main"`
-  - Hatch version source from git tags
-- [ ] Set up `.gitignore` with Python, uv, and IDE exclusions
-- [ ] Generate initial `uv.lock` for reproducible development builds
-- [ ] Create `.python-version` file specifying minimum Python 3.11
-
-## Core Functionality Implementation
-
-### Main Module Structure
-- [ ] Create `src/topl/__init__.py` with public API exports
-- [ ] Implement `src/topl/core.py` with:
-  - `resolve_placeholders()` function (current main logic)
-  - `TOPLConfig` class wrapper
-  - Exception classes (`TOPLError`, `CircularReferenceError`, etc.)
-- [ ] Create `src/topl/utils.py` for helper functions:
-  - `_get_by_path()`
-  - `_resolve_internal_once()`
-  - `_resolve_external()`
-  - `_iter_box_strings()`
-- [ ] Implement `src/topl/constants.py` for configuration constants
-
-### CLI Implementation
-- [ ] Create `src/topl/__main__.py` with Fire-based CLI
-- [ ] Implement `src/topl/cli.py` with:
-  - Main CLI class with proper argument parsing
-  - Verbose logging configuration
-  - File I/O handling with proper error messages
-  - Rich console output formatting
-- [ ] Add proper CLI help documentation
-- [ ] Support for configuration files and environment variables
-
-### Type Hints & Documentation
-- [ ] Add comprehensive type hints throughout codebase
-- [ ] Create type aliases in `src/topl/types.py`
-- [ ] Add detailed docstrings following Google/NumPy style
-- [ ] Implement proper error handling with custom exceptions
-
-## Testing Infrastructure
-
-### Test Setup
-- [ ] Create `tests/` directory with structured layout:
-  - `tests/unit/` for isolated unit tests
-  - `tests/integration/` for end-to-end tests
-  - `tests/fixtures/` for test data (sample TOML files)
-- [ ] Set up `tests/conftest.py` with reusable pytest fixtures:
-  - Sample TOML data fixtures (simple, nested, circular refs)
-  - Temporary file/directory fixtures
-  - Mock console/logging fixtures
-- [ ] Configure pytest in `pyproject.toml`:
-  - Test discovery patterns, markers, coverage settings
-  - Plugins: pytest-cov, pytest-mock, pytest-xdist for parallel testing
-
-### Core Tests
-- [ ] `tests/test_core.py` - Test placeholder resolution logic:
-  - Internal placeholder resolution
-  - External parameter substitution
-  - Circular reference detection
-  - Warning generation for unresolved placeholders
-  - Edge cases (empty files, malformed TOML, etc.)
-- [ ] `tests/test_cli.py` - Test CLI functionality:
-  - Command-line argument parsing
-  - File input/output
-  - Error handling
-  - Verbose mode
-- [ ] `tests/test_utils.py` - Test utility functions
-- [ ] `tests/test_integration.py` - End-to-end integration tests
-
-### Test Coverage & Quality
-- [ ] Achieve 95%+ test coverage
-- [ ] Add property-based testing with hypothesis
-- [ ] Create performance benchmarks
-- [ ] Add mutation testing with mutmut
-
-## Documentation
-
-### User Documentation
-- [ ] Update `README.md` with:
-  - Clear project description
-  - Installation instructions
-  - Usage examples (CLI and programmatic)
-  - API reference
-  - Contributing guidelines
-- [ ] Create `docs/` directory with:
-  - User guide with examples
-  - API documentation
-  - Changelog format specification
-  - Development setup guide
-
-### Code Documentation
-- [ ] Add comprehensive docstrings to all public functions
-- [ ] Include usage examples in docstrings
-- [ ] Document all parameters and return values
-- [ ] Add type information to all docstrings
-
-## Build & Release Infrastructure
-
-### Version Management  
-- [ ] Configure hatch-vcs for git-tag-based versioning:
-  - Add `hatch-vcs` to build dependencies in `pyproject.toml`
-  - Set version source: `[tool.hatch.version] source = "vcs"`
-  - Configure tag pattern for semantic versioning (v*.*.*)
-  - Create `_version.py` generation via hatch metadata hook
-- [ ] Create version bumping workflow:
-  - Script for creating release tags
-  - Automated changelog generation from commits
-  - Version validation in pre-commit hooks
-
-### GitHub Actions
-- [ ] Create `.github/workflows/ci.yml` for continuous integration:
-  - Matrix testing: Python 3.11, 3.12, 3.13 on ubuntu-latest, macos-latest, windows-latest
-  - Use `astral-sh/setup-uv@v4` action for fast dependency management
-  - Run `uv sync --all-extras` for reproducible test environments
-  - Code quality: `uv run ruff check && uv run ruff format --check`
-  - Type checking: `uv run mypy src tests`
-  - Tests: `uv run pytest --cov=topl --cov-report=xml`
-  - Upload coverage to codecov.io
-  - Security: `uv run bandit -r src/`
-- [ ] Create `.github/workflows/release.yml` for automated releases:
-  - Trigger on pushed tags matching `v*.*.*` pattern
-  - Build with `uv build` (both sdist and wheel)
-  - Upload to PyPI using trusted publishing (no API keys)
-  - Create GitHub release with auto-generated changelog
-  - Verify package installability: `uv run --with topl --from-source`
-- [ ] Create `.github/workflows/test-pypi.yml` for pre-release testing
-- [ ] Configure dependabot for both GitHub Actions and Python dependencies
-
-### Build System
-- [ ] Configure hatch for building:
-  - Source distribution creation
-  - Wheel building
-  - Version management integration
-- [ ] Set up pre-commit hooks:
-  - Code formatting (ruff)
-  - Type checking (mypy)
-  - Test execution
-  - Documentation checks
-
-## Quality Assurance
-
-### Code Quality Tools
-- [ ] Configure ruff for linting and formatting
-- [ ] Set up mypy for static type checking
-- [ ] Add bandit for security scanning
-- [ ] Configure pre-commit for automated checks
-
-### Performance & Monitoring
-- [ ] Add performance benchmarks
-- [ ] Memory usage profiling
-- [ ] Large file handling tests
-- [ ] Stress testing for circular reference detection
-
-## Advanced Features
-
-### API Enhancements
-- [ ] Add async support for file I/O operations
-- [ ] Implement plugin system for custom placeholder resolvers
-- [ ] Add configuration validation with pydantic
-- [ ] Support for different output formats (JSON, YAML)
-
-### CLI Enhancements
-- [ ] Add shell completion support
-- [ ] Implement configuration file support
-- [ ] Add batch processing capabilities
-- [ ] Rich progress bars for large files
-
-### Error Handling & Logging
-- [ ] Implement structured logging with loguru
-- [ ] Add comprehensive error recovery
-- [ ] Create detailed error messages with suggestions
-- [ ] Add debug mode with detailed tracing
-
-## Security & Compliance
-
-### Security Measures
-- [ ] Input validation and sanitization
-- [ ] Path traversal protection
-- [ ] Resource usage limits
-- [ ] Security-focused code review
-
-### Compliance
-- [ ] License file (MIT/Apache 2.0)
-- [ ] Security policy document
-- [ ] Code of conduct
-- [ ] Contributing guidelines
-
-## Final Integration & Polish
-
-### Integration Testing
-- [ ] End-to-end workflow testing
-- [ ] Cross-platform compatibility testing
-- [ ] Performance regression testing
-- [ ] Memory leak detection
-
-### Release Preparation
-- [ ] Final code review and refactoring
-- [ ] Documentation completeness check
-- [ ] Version 2.0 release preparation
-- [ ] PyPI package publication
-- [ ] GitHub release with comprehensive changelog
-
-## Implementation Phases
-
-### Phase 1: Core Infrastructure (MVP)
-- [ ] Basic package structure and pyproject.toml
-- [ ] Core functionality migration from original script
-- [ ] Basic CLI with Fire integration
-- [ ] Essential tests for core functionality
-- [ ] Initial CI pipeline
-
-### Phase 2: Quality & Documentation
-- [ ] Comprehensive test suite with 95%+ coverage
-- [ ] Full API documentation and type hints
-- [ ] Error handling and logging improvements
-- [ ] Performance optimization and benchmarking
-
-### Phase 3: Release Preparation
-- [ ] Complete GitHub Actions workflows
-- [ ] Security scanning and compliance
-- [ ] Final documentation polish
-- [ ] v2.0 release to PyPI
-
-## Success Criteria & Acceptance Tests
-- [ ] **Functionality**: All original script features work identically
-- [ ] **Quality**: 95%+ test coverage, all quality gates pass
-- [ ] **Performance**: ≤10% performance regression vs original
-- [ ] **Compatibility**: Works on Python 3.11+ across all major OS
-- [ ] **Usability**: CLI help is clear, API is intuitive
-- [ ] **Maintainability**: Code follows PEP 8, fully type-hinted
-- [ ] **Automation**: Full CI/CD pipeline with automated releases
-- [ ] **Distribution**: Successfully published to PyPI
-- [ ] **Documentation**: Complete user and API documentation
-</document_content>
-</document>
-
-<document index="8">
-<source>WORK.md</source>
-<document_content>
-# Work Progress: TOPL Package Development
-
-## PHASE 1 COMPLETED: Core Infrastructure (MVP) ✅
-
-### Completed Phase 1 Tasks
-- [x] Analyzed README.md requirements and created comprehensive TODO.md specification
-- [x] Refined TODO.md through multiple critical review iterations
-- [x] Set up complete package structure with src/topl/ layout
-- [x] Created comprehensive pyproject.toml with uv/hatch integration
-- [x] Initialized uv project with proper dependencies
-- [x] Migrated and enhanced core functionality from original script
-- [x] Implemented CLI with Fire integration
-- [x] Created comprehensive test suite with 95% coverage
-- [x] Designed GitHub Actions workflows (manual setup required due to permissions)
-- [x] Applied proper code formatting and linting
-- [x] Created CHANGELOG.md and documentation
-
-### Key Achievements
-- **Functionality**: All original script features work identically ✅
-- **Quality**: 95% test coverage, all quality gates pass ✅
-- **Performance**: No performance regression vs original ✅
-- **Modern Standards**: PEP 621 compliant, fully type-hinted ✅
-- **CLI**: Fire-based interface with rich output ✅
-- **Testing**: 44 tests covering unit and integration scenarios ✅
-- **Automation**: Complete CI workflow with multi-OS/Python testing ✅
-
-### Package Structure Created
-```
-topl/
-├── src/topl/
-│   ├── __init__.py (public API exports)
-│   ├── __main__.py (CLI entry point)
-│   ├── core.py (main resolution logic)
-│   ├── cli.py (CLI implementation)
-│   ├── utils.py (helper functions)
-│   ├── types.py (type definitions)
-│   ├── exceptions.py (custom exceptions)
-│   ├── constants.py (configuration constants)
-│   └── py.typed (type checking marker)
-├── tests/ (comprehensive test suite)
-├── .github/workflows/ (CI/CD automation)
-├── pyproject.toml (modern Python packaging)
-└── documentation files
-```
-
-### Current Status: Ready for Phase 2
-- Package builds successfully ✅
-- All tests pass on multiple Python versions ✅
-- Code quality checks pass ✅
-- CLI works identically to original script ✅
-- Ready for enhanced features and release preparation ✅
-
-## NEXT PHASE: Phase 2 - Quality & Documentation Enhancement
-
-### Upcoming Phase 2 Goals
-1. Enhanced error handling and recovery
-2. Performance optimization and benchmarking  
-3. Advanced CLI features (shell completion, config files)
-4. Comprehensive documentation (mkdocs)
-5. Additional test scenarios and edge cases
-6. Security hardening and validation
-7. Plugin system architecture planning
-</document_content>
-</document>
-
-<document index="9">
-<source>docs/github-actions-templates.md</source>
-<document_content>
-# GitHub Actions Workflow Templates
-
-Due to GitHub App permission restrictions, the workflow files must be created manually. Here are the recommended templates:
-
-## CI Workflow
-
-Create `.github/workflows/ci.yml`:
-
-```yaml
-name: CI
-
-on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.11", "3.12", "3.13"]
-
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Install uv
-      uses: astral-sh/setup-uv@v4
-    
-    - name: Set up Python ${{ matrix.python-version }}
-      run: uv python install ${{ matrix.python-version }}
-    
-    - name: Install dependencies
-      run: uv sync --all-extras
-    
-    - name: Run linting
-      run: |
-        uv run ruff check .
-        uv run ruff format --check .
-    
-    - name: Run type checking
-      run: uv run mypy src tests
-    
-    - name: Run tests
-      run: uv run pytest --cov=topl --cov-report=xml --cov-report=term-missing
-    
-    - name: Run security scan
-      run: uv run bandit -r src/
-    
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
-      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
-      with:
-        file: ./coverage.xml
-        fail_ci_if_error: true
-```
-
-## Release Workflow
-
-Create `.github/workflows/release.yml`:
-
-```yaml
-name: Release
-
-on:
-  push:
-    tags:
-      - 'v*.*.*'
-
-permissions:
-  contents: read
-  id-token: write  # For trusted publishing to PyPI
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # Fetch full history for proper versioning
-    
-    - name: Install uv
-      uses: astral-sh/setup-uv@v4
-    
-    - name: Set up Python
-      run: uv python install 3.11
-    
-    - name: Install dependencies
-      run: uv sync --dev
-    
-    - name: Run tests
-      run: uv run pytest
-    
-    - name: Build package
-      run: uv build
-    
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: dist
-        path: dist/
-
-  publish:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: release
-    steps:
-    - name: Download artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: dist
-        path: dist/
-    
-    - name: Publish to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        packages-dir: dist/
-
-  github-release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Download artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: dist
-        path: dist/
-    
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v2
-      with:
-        files: dist/*
-        generate_release_notes: true
-        draft: false
-        prerelease: false
-```
-
-## Setup Instructions
-
-1. Create the `.github/workflows/` directory in your repository
-2. Copy the above templates into the respective files
-3. Commit and push the workflow files
-4. Configure any required secrets (for PyPI publishing, etc.)
-5. Set up branch protection rules as needed
-
-## Additional Recommendations
-
-- Configure Dependabot for automated dependency updates
-- Set up CodeCov for test coverage reporting
-- Configure branch protection rules for the main branch
-- Enable GitHub's security features (vulnerability alerts, etc.)
-</document_content>
-</document>
-
-<document index="10">
-<source>issues/102.txt</source>
-<document_content>
-
-sourcery-ai[bot] <notifications@github.com> Unsubscribe
-Wed, Jul 23, 2:08 PM (22 hours ago)
-to twardoch/topl, Adam, Author
-
-
-sourcery-ai[bot]
- left a comment 
-(twardoch/topl#1)
-🧙 Sourcery is reviewing your pull request!
-
-Tips and commands
-Interacting with Sourcery
-Trigger a new review: Comment @sourcery-ai review on the pull request.
-Continue discussions: Reply directly to Sourcery's review comments.
-Generate a GitHub issue from a review comment: Ask Sourcery to create an
-issue from a review comment by replying to it. You can also reply to a
-review comment with @sourcery-ai issue to create an issue from it.
-Generate a pull request title: Write @sourcery-ai anywhere in the pull
-request title to generate a title at any time. You can also comment
-@sourcery-ai title on the pull request to (re-)generate the title at any time.
-Generate a pull request summary: Write @sourcery-ai summary anywhere in
-the pull request body to generate a PR summary at any time exactly where you
-want it. You can also comment @sourcery-ai summary on the pull request to
-(re-)generate the summary at any time.
-Generate reviewer's guide: Comment @sourcery-ai guide on the pull
-request to (re-)generate the reviewer's guide at any time.
-Resolve all Sourcery comments: Comment @sourcery-ai resolve on the
-pull request to resolve all Sourcery comments. Useful if you've already
-addressed all the comments and don't want to see them anymore.
-Dismiss all Sourcery reviews: Comment @sourcery-ai dismiss on the pull
-request to dismiss all existing Sourcery reviews. Especially useful if you
-want to start fresh with a new review - don't forget to comment
-@sourcery-ai review to trigger a new review!
-Customizing Your Experience
-Access your dashboard to:
-
-Enable or disable review features such as the Sourcery-generated pull request
-summary, the reviewer's guide, and others.
-Change the review language.
-Add, remove or edit custom review instructions.
-Adjust other review settings.
-Getting Help
-Contact our support team for questions or feedback.
-Visit our documentation for detailed guides and information.
-Keep in touch with the Sourcery team by following us on X/Twitter, LinkedIn or GitHub.
-—
-Reply to this email directly, view it on GitHub, or unsubscribe.
-You are receiving this because you authored the thread.
-
-
-qodo-merge-pro[bot] <notifications@github.com>
-Wed, Jul 23, 4:44 PM (20 hours ago)
-to State, twardoch/topl, Adam
-
-
-qodo-merge-pro[bot]
- left a comment 
-(twardoch/topl#1)
-PR Reviewer Guide 🔍
-Here are some key observations to aid the review process:
-
-⏱️ Estimated effort to review: 4 🔵🔵🔵🔵⚪
-🧪 PR contains tests
-🔒 No security concerns identified
-⚡ Recommended focus areas for review
-
-Circular Reference
-The circular reference detection relies on MAX_INTERNAL_PASSES constant but may not catch all circular reference patterns. The current implementation could miss complex circular dependencies that don't trigger the maximum pass limit.
-
-for i in range(MAX_INTERNAL_PASSES):
-    changed = False
-    for key, parent in iter_box_strings(cfg):
-        original = parent[key]
-        resolved = resolve_internal_once(original, cfg)
-        if original != resolved:
-            parent[key] = resolved
-            changed = True
-            logger.debug(f"Resolved internal: {original} -> {resolved}")
-
-    if not changed:
-        logger.debug(f"Internal resolution stabilized after {i + 1} passes")
-        break
-else:
-    # This indicates circular references or very deep nesting
-    raise CircularReferenceError(
-        f"Reached maximum internal passes ({MAX_INTERNAL_PASSES}). "
-        "Circular placeholder references detected or resolution is too complex."
-    )
-Error Handling
-The CLI catches all exceptions with a broad except clause which could mask unexpected errors. The verbose flag only shows full traceback for unexpected errors, potentially hiding important debugging information for known error types.
-
-except Exception as e:
-    logger.error(f"Unexpected error: {e}")
-    if verbose:
-        logger.exception("Full traceback:")
-    sys.exit(1)
-Type Safety
-The get_by_path function returns None for missing paths but doesn't validate the input path format. Malformed dotted paths could cause unexpected behavior or errors during path traversal.
-
-def get_by_path(box: Box, dotted_path: str) -> Any:
-    """Return value at dotted_path or None if the path is invalid.
-
-    Args:
-        box: Box instance to search in
-        dotted_path: Dot-separated path like "foo.bar.baz"
-
-    Returns:
-        Value at the specified path, or None if path doesn't exist
-
-    Examples:
-        >>> data = Box({"a": {"b": {"c": "value"}}})
-        >>> get_by_path(data, "a.b.c")
-        'value'
-        >>> get_by_path(data, "a.missing")
-        None
-    """
-    current = box
-    for part in dotted_path.split("."):
-        if not isinstance(current, Mapping) or part not in current:
-            return None
-        current = current[part]
-    return current
-—
-Reply to this email directly, view it on GitHub, or unsubscribe.
-You are receiving this because you modified the open/close state.
-
-
-sourcery-ai[bot] <notifications@github.com>
-Wed, Jul 23, 4:44 PM (20 hours ago)
-to Mention, twardoch/topl, Adam
-
-@sourcery-ai[bot] commented on this pull request.
-
-Hey @twardoch - I've reviewed your changes - here's some feedback:
-
-This PR combines core logic, CLI, packaging, docs, and CI in a single massive change—consider splitting it into smaller, focused PRs (e.g., core resolution, CLI, then packaging/CI) to simplify review and isolate concerns.
-The iter_box_strings helper only descends through Mapping types, so placeholders inside lists or tuples won’t be resolved—consider extending it to traverse those iterables as well.
-In main_cli, add an explicit catch for PlaceholderResolutionError (or other resolution-specific errors) to provide clearer error messages and exit codes rather than relying on the generic exception handler.
-Prompt for AI Agents
-Please address the comments from this code review:
-## Overall Comments
-- This PR combines core logic, CLI, packaging, docs, and CI in a single massive change—consider splitting it into smaller, focused PRs (e.g., core resolution, CLI, then packaging/CI) to simplify review and isolate concerns.
-- The iter_box_strings helper only descends through Mapping types, so placeholders inside lists or tuples won’t be resolved—consider extending it to traverse those iterables as well.
-- In main_cli, add an explicit catch for PlaceholderResolutionError (or other resolution-specific errors) to provide clearer error messages and exit codes rather than relying on the generic exception handler.
-
-## Individual Comments
-
-### Comment 1
-<location> `src/topl/cli.py:36` </location>
-<code_context>
-+    )
-+
-+
-+def load_toml_file(path: Path) -> dict[str, Any]:
-+    """Load and parse a TOML file.
-+
-</code_context>
-
-<issue_to_address>
-The function reads the entire file into memory before decoding.
-
-Using tomllib.load(path.open('rb')) can improve memory efficiency and handle file encoding more robustly.
-
-Suggested implementation:
-
-```python
-def load_toml_file(path: Path) -> dict[str, Any]:
-    """Load and parse a TOML file.
-
-
-```
-
-```python
-def load_toml_file(path: Path) -> dict[str, Any]:
-    """Load and parse a TOML file.
-
-    with path.open("rb") as f:
-        return tomllib.load(f)
-
-```
-</issue_to_address>
-
-### Comment 2
-<location> `src/topl/utils.py:103` </location>
-<code_context>
-+    return tmp.format_map(SafeDict(params))
-+
-+
-+def iter_box_strings(box: Box) -> Generator[tuple[str, Box], None, None]:
-+    """Yield (key, parent_box) pairs for every string leaf in box.
-+
-</code_context>
-
-<issue_to_address>
-The function does not handle lists or other sequence types within the Box.
-
-Currently, iter_box_strings skips string values inside lists or nested sequences, so placeholders in those structures are not processed. Please update the function to handle these cases recursively.
-</issue_to_address>
-
-### Comment 3
-<location> `tests/unit/test_core.py:61` </location>
-<code_context>
-+        with pytest.raises(CircularReferenceError):
-+            resolve_placeholders(circular_data)
-+
-+    def test_unresolved_placeholders(self):
-+        """Test handling of unresolved placeholders."""
-+        data = {"message": "Hello {{missing}}!"}
-+        config = resolve_placeholders(data)
-+
-+        assert config.has_unresolved
-+        assert "{{missing}}" in config.unresolved_placeholders
-+        assert config.message == "Hello {{missing}}!"
-+
-+    def test_no_placeholders(self):
-</code_context>
-
-<issue_to_address>
-Add a test for multiple unresolved placeholders in a single value.
-
-Consider adding a test with multiple unresolved placeholders in one string to verify all are detected and reported correctly.
-</issue_to_address>
-
-<suggested_fix>
-<<<<<<< SEARCH
-    def test_no_placeholders(self):
-        """Test data without any placeholders."""
-        data = {"simple": "value", "number": 42}
-        config = resolve_placeholders(data)
-
-        assert not config.has_unresolved
-        assert config.simple == "value"
-        assert config.number == 42
-=======
-    def test_multiple_unresolved_placeholders(self):
-        """Test handling of multiple unresolved placeholders in a single value."""
-        data = {"message": "Hello {{missing1}} and {{missing2}} and {{missing3}}!"}
-        config = resolve_placeholders(data)
-
-        assert config.has_unresolved
-        assert "{{missing1}}" in config.unresolved_placeholders
-        assert "{{missing2}}" in config.unresolved_placeholders
-        assert "{{missing3}}" in config.unresolved_placeholders
-        assert config.message == "Hello {{missing1}} and {{missing2}} and {{missing3}}!"
-
-    def test_no_placeholders(self):
-        """Test data without any placeholders."""
-        data = {"simple": "value", "number": 42}
-        config = resolve_placeholders(data)
-
-        assert not config.has_unresolved
-        assert config.simple == "value"
-        assert config.number == 42
->>>>>>> REPLACE
-
-</suggested_fix>
-Sourcery is free for open source - if you like our reviews please consider sharing them ✨
-X
-Mastodon
-LinkedIn
-Facebook
-Help me be more useful! Please click 👍 or 👎 on each comment and I'll use the feedback to improve your reviews.
-In src/topl/cli.py:
-
-> +
-+def configure_logging(verbose: bool = False) -> None:
-+    """Configure logging with Rich formatting.
-+
-+    Args:
-+        verbose: Enable debug-level logging if True
-+    """
-+    level = logging.DEBUG if verbose else logging.INFO
-+    logging.basicConfig(
-+        level=level,
-+        format="%(message)s",
-+        handlers=[RichHandler(rich_tracebacks=True, console=Console(stderr=True))],
-+    )
-+
-+
-+def load_toml_file(path: Path) -> dict[str, Any]:
-suggestion (performance): The function reads the entire file into memory before decoding.
-
-Using tomllib.load(path.open('rb')) can improve memory efficiency and handle file encoding more robustly.
-
-Suggested implementation:
-
-def load_toml_file(path: Path) -> dict[str, Any]:
-    """Load and parse a TOML file.
-def load_toml_file(path: Path) -> dict[str, Any]:
-    """Load and parse a TOML file.
-
-    with path.open("rb") as f:
-        return tomllib.load(f)
-In src/topl/utils.py:
-
-> +
-+    class SafeDict(dict):
-+        """Dict that leaves unknown placeholders unchanged."""
-+
-+        def __missing__(self, key: str) -> str:
-+            return f"{{{{{key}}}}}"
-+
-+    if not params:
-+        return s
-+
-+    # Convert {{name}} → {name}
-+    tmp = PLACEHOLDER_PATTERN.sub(lambda m: "{" + m.group(1).strip() + "}", s)
-+    return tmp.format_map(SafeDict(params))
-+
-+
-+def iter_box_strings(box: Box) -> Generator[tuple[str, Box], None, None]:
-issue: The function does not handle lists or other sequence types within the Box.
-
-Currently, iter_box_strings skips string values inside lists or nested sequences, so placeholders in those structures are not processed. Please update the function to handle these cases recursively.
-
-In tests/unit/test_core.py:
-
-> +    def test_no_placeholders(self):
-+        """Test data without any placeholders."""
-+        data = {"simple": "value", "number": 42}
-+        config = resolve_placeholders(data)
-+
-+        assert not config.has_unresolved
-+        assert config.simple == "value"
-+        assert config.number == 42
-suggestion (testing): Add a test for multiple unresolved placeholders in a single value.
-
-Consider adding a test with multiple unresolved placeholders in one string to verify all are detected and reported correctly.
-
-⬇️ Suggested change
--    def test_no_placeholders(self):
--        """Test data without any placeholders."""
--        data = {"simple": "value", "number": 42}
--        config = resolve_placeholders(data)
--
--        assert not config.has_unresolved
--        assert config.simple == "value"
--        assert config.number == 42
-+    def test_multiple_unresolved_placeholders(self):
-+        """Test handling of multiple unresolved placeholders in a single value."""
-+        data = {"message": "Hello {{missing1}} and {{missing2}} and {{missing3}}!"}
-+        config = resolve_placeholders(data)
-+
-+        assert config.has_unresolved
-+        assert "{{missing1}}" in config.unresolved_placeholders
-+        assert "{{missing2}}" in config.unresolved_placeholders
-+        assert "{{missing3}}" in config.unresolved_placeholders
-+        assert config.message == "Hello {{missing1}} and {{missing2}} and {{missing3}}!"
-+
-+    def test_no_placeholders(self):
-+        """Test data without any placeholders."""
-+        data = {"simple": "value", "number": 42}
-+        config = resolve_placeholders(data)
-+
-+        assert not config.has_unresolved
-+        assert config.simple == "value"
-+        assert config.number == 42
-In src/topl/core.py:
-
-> +        for match in PLACEHOLDER_PATTERN.finditer(parent[key]):
-+            unresolved_placeholders.append(match.group(0))
-+
-suggestion (code-quality): Replace a for append loop with list extend (for-append-to-extend)
-
-⬇️ Suggested change
--        for match in PLACEHOLDER_PATTERN.finditer(parent[key]):
--            unresolved_placeholders.append(match.group(0))
--
-+        unresolved_placeholders.extend(
-+            match.group(0)
-+            for match in PLACEHOLDER_PATTERN.finditer(parent[key])
-+        )
-—
-Reply to this email directly, view it on GitHub, or unsubscribe.
-You are receiving this because you were mentioned.
-
-
-qodo-merge-pro[bot] <notifications@github.com>
-Wed, Jul 23, 4:45 PM (20 hours ago)
-to twardoch/topl, Adam, Mention
-
-
-qodo-merge-pro[bot]
- left a comment 
-(twardoch/topl#1)
-PR Code Suggestions ✨
-Explore these optional code suggestions:
-
-Category	Suggestion                                                                                                                                   	Impact
-General	Prevent input data mutations
-The Box initialization should use deep copying to prevent mutations of the
-original data structure. This ensures the input data remains unchanged during
-placeholder resolution.
-
-src/topl/core.py [75-108]
-
- def resolve_placeholders(data: ConfigMapping, **params: str) -> TOPLConfig:
-     """Resolve placeholders inside data and return a TOPLConfig instance.
-     ...
-     """
--    # Create Box with safe attribute access
--    cfg = Box(data, default_box=True, default_box_attr=None)
-+    # Create Box with safe attribute access and deep copy to prevent mutations
-+    import copy
-+    cfg = Box(copy.deepcopy(data), default_box=True, default_box_attr=None)
-[To ensure code accuracy, apply this suggestion manually]
-
-Suggestion importance[1-10]: 7
-__
-
-Why: The suggestion correctly identifies that the function mutates its input data, and proposing copy.deepcopy is the right solution to prevent this side effect, improving the function's robustness and adhering to good API design principles.
-
-Medium
-Handle empty path inputs
-The function should handle empty or whitespace-only paths gracefully. Currently,
-an empty string would result in splitting to [''] which could cause unexpected
-behavior.
-
-src/topl/utils.py [18-40]
-
- def get_by_path(box: Box, dotted_path: str) -> Any:
-     """Return value at dotted_path or None if the path is invalid.
-     ...
-     """
-+    if not dotted_path or not dotted_path.strip():
-+        return None
-+        
-     current = box
-     for part in dotted_path.split("."):
-         if not isinstance(current, Mapping) or part not in current:
-             return None
-         current = current[part]
-     return current
-[To ensure code accuracy, apply this suggestion manually]
-
-Suggestion importance[1-10]: 5
-__
-
-Why: The suggestion correctly points out that an empty dotted_path is not handled and adds a necessary check, which improves the robustness of the get_by_path utility function.
-
-Low
- More
-—
-Reply to this email directly, view it on GitHub, or unsubscribe.
-You are receiving this because you were mentioned.
-
-
-</document_content>
-</document>
-
-<document index="11">
-<source>llms.txt</source>
-<document_content>
-Project Structure:
-📁 topl
-├── 📁 docs
-│   └── 📄 github-actions-templates.md
-├── 📁 src
-│   ├── 📁 repo
-│   │   └── 📄 __init__.py
-│   └── 📁 topl
-│       ├── 📄 __init__.py
-│       ├── 📄 __main__.py
-│       ├── 📄 _version.py
-│       ├── 📄 cli.py
-│       ├── 📄 constants.py
-│       ├── 📄 core.py
-│       ├── 📄 exceptions.py
-│       ├── 📄 py.typed
-│       ├── 📄 types.py
-│       └── 📄 utils.py
-├── 📁 tests
-│   ├── 📁 integration
-│   │   └── 📄 test_end_to_end.py
-│   ├── 📁 unit
-│   │   ├── 📄 test_cli.py
-│   │   ├── 📄 test_core.py
-│   │   └── 📄 test_utils.py
-│   └── 📄 conftest.py
-├── 📄 .gitignore
-├── 📄 CHANGELOG.md
-├── 📄 LICENSE
-├── 📄 pyproject.toml
-├── 📄 README.md
-├── 📄 TODO.md
-└── 📄 WORK.md
-
-
-<documents>
-<document index="1">
-<source>.gitignore</source>
-<document_content>
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[codz]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py.cover
-.hypothesis/
-.pytest_cache/
-cover/
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-.pybuilder/
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-#   For a library or package, you might want to ignore these files since the code is
-#   intended to run in multiple environments; otherwise, check them in:
-# .python-version
-
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
-
-# UV
-#   Similar to Pipfile.lock, it is generally recommended to include uv.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#uv.lock
-
-# poetry
-#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
-#poetry.lock
-#poetry.toml
-
-# pdm
-#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
-#   pdm recommends including project-wide configuration in pdm.toml, but excluding .pdm-python.
-#   https://pdm-project.org/en/latest/usage/project/#working-with-version-control
-#pdm.lock
-#pdm.toml
-.pdm-python
-.pdm-build/
-
-# pixi
-#   Similar to Pipfile.lock, it is generally recommended to include pixi.lock in version control.
-#pixi.lock
-#   Pixi creates a virtual environment in the .pixi directory, just like venv module creates one
-#   in the .venv directory. It is recommended not to include this directory in version control.
-.pixi
-
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.envrc
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# pytype static type analyzer
-.pytype/
-
-# Cython debug symbols
-cython_debug/
-
-# PyCharm
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#  and can be added to the global gitignore or merged into this file.  For a more nuclear
-#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#.idea/
-
-# Abstra
-# Abstra is an AI-powered process automation framework.
-# Ignore directories containing user credentials, local state, and settings.
-# Learn more at https://abstra.io/docs
-.abstra/
-
-# Visual Studio Code
-#  Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore 
-#  that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
-#  and can be added to the global gitignore or merged into this file. However, if you prefer, 
-#  you could uncomment the following to ignore the entire vscode folder
-# .vscode/
-
-# Ruff stuff:
-.ruff_cache/
-
-# PyPI configuration file
-.pypirc
-
-# Cursor
-#  Cursor is an AI-powered code editor. `.cursorignore` specifies files/directories to
-#  exclude from AI features like autocomplete and code analysis. Recommended for sensitive data
-#  refer to https://docs.cursor.com/context/ignore-files
-.cursorignore
-.cursorindexingignore
-
-# Marimo
-marimo/_static/
-marimo/_lsp/
-__marimo__/
-
-</document_content>
-</document>
-
-<document index="2">
-<source>.python-version</source>
-<document_content>
-3.11
-</document_content>
-</document>
-
-<document index="3">
-<source>CHANGELOG.md</source>
-<document_content>
-# Changelog
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
-
-### Added
-- Initial implementation of TOPL (TOML Extended with Placeholders)
-- Two-phase placeholder resolution (internal → external)
-- Command-line interface via Fire
-- Comprehensive programmatic API
-- Full type hint support
-- Circular reference detection
-- Rich console output and logging
-- 95%+ test coverage
-- Modern Python packaging with uv and hatch
-- GitHub Actions CI/CD workflows
-- Documentation and examples
-
-### Core Features
-- `resolve_placeholders()` function for processing TOML data
-- `TOPLConfig` class for enhanced configuration objects  
-- Support for nested placeholder resolution
-- External parameter injection
-- Unresolved placeholder tracking and warnings
-- Path expansion and file handling utilities
-
-### CLI Features
-- `topl` command-line tool
-- `python -m topl` module execution
-- Verbose logging mode
-- External parameter passing
-- Rich formatting for output
-- Comprehensive error handling
-
-### Development
-- Modern Python 3.11+ compatibility
-- PEP 621 compliant pyproject.toml
-- UV package management
-- Hatch build system
-- Git-tag based versioning
-- Ruff linting and formatting
-- MyPy type checking
-- Pytest testing framework
-- Pre-commit hooks ready
-- GitHub Actions for testing and releases
-
-## [0.1.0] - Initial Development
-
-### Added
-- Project structure and configuration
-- Core placeholder resolution engine
-- CLI interface implementation
-- Basic test suite
-- Documentation framework
-
----
-
-## Release Notes Template
-
-For future releases, use this template:
-
-## [X.Y.Z] - YYYY-MM-DD
-
-### Added
-- New features
-
-### Changed
-- Changes in existing functionality
-
-### Deprecated
-- Soon-to-be removed features
-
-### Removed
-- Now removed features
-
-### Fixed
-- Bug fixes
-
-### Security
-- Vulnerability fixes
-</document_content>
-</document>
-
-<document index="4">
-<source>LICENSE</source>
-<document_content>
-MIT License
-
-Copyright (c) 2025 Adam Twardoch
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-</document_content>
-</document>
-
-<document index="5">
-<source>README.md</source>
-<document_content>
-# topl
-
-TOML extended with placeholders
-
----
-
-#!/usr/bin/env -S uv run -s
-# /// script
-# dependencies = ["python-box", "rich", "fire"]
-# ///
-# this_file: resolve_toml.py
-"""
-resolve_toml.py
-===============
-
-Resolve double‑curly‑brace placeholders in a TOML file **in two phases**:
-
-1. **Internal phase** – placeholders that reference keys *inside* the same
-   TOML structure are substituted first (e.g. ``{{dict2.key2}}``).
-2. **External phase** – any *remaining* placeholders are substituted with
-   user‑supplied parameters (e.g. ``external1="foo"``).
-3. **Warning phase** – unresolved placeholders are left intact **and** a
-   warning is emitted.
-
-The script purposefully performs *minimal* work: it does **not** try to
-re‑order keys, merge files, or perform type conversions beyond ``str``;
-it only “does what it says on the tin”.
-
----------------------------------------------------------------------------
-Usage (CLI)
------------
-
-./resolve_toml.py path/to/file.toml --external external1="bar" external2="baz"
-
-The CLI is provided by fire; every keyword argument after the filename is
-treated as an external parameter.
-
-⸻
-
-Why Box?
-
-Box gives intuitive dotted access (cfg.dict2.key2) while still behaving
-like a plain dict for serialization.
-
-“””
-
-from future import annotations
-
-import logging
-import re
-import sys
-from pathlib import Path
-from types import MappingProxyType
-from typing import Any, Mapping
-
-import tomllib  # Python 3.11+
-from box import Box
-import fire
-from rich.console import Console
-from rich.logging import RichHandler
-
-—————————————————————————
-
-Constants & regexes
-
-_PLACEHOLDER_RE = re.compile(r”{{([^{}]+)}}”)
-_MAX_INTERNAL_PASSES = 10  # avoid infinite loops on circular refs
-
-—————————————————————————
-
-Logging setup – colourised & optionally verbose
-
-def _configure_logging(verbose: bool = False) -> None:
-level = logging.DEBUG if verbose else logging.INFO
-logging.basicConfig(
-level=level,
-format=”%(message)s”,
-handlers=[RichHandler(rich_tracebacks=True, console=Console(stderr=True))],
-)
-
-logger = logging.getLogger(name)
-
-—————————————————————————
-
-Low‑level helpers
-
-def _get_by_path(box: Box, dotted_path: str) -> Any:
-“””
-Return value at dotted_path or None if the path is invalid.
-
-``dotted_path`` follows Box semantics: ``"foo.bar.baz"``.
-"""
-current = box
-for part in dotted_path.split("."):
-    if not isinstance(current, Mapping) or part not in current:
-        return None
-    current = current[part]
-return current
-
-def _resolve_internal_once(s: str, root: Box) -> str:
-“””
-Replace one pass of internal placeholders in s.
-
-A placeholder is internal if the path exists in *root*.
-"""
-def repl(match: re.Match[str]) -> str:
-    path = match.group(1).strip()
-    value = _get_by_path(root, path)
-    return str(value) if value is not None else match.group(0)
-
-return _PLACEHOLDER_RE.sub(repl, s)
-
-def _resolve_external(s: str, params: Mapping[str, str]) -> str:
-“””
-Replace external placeholders using str.format_map.
-
-We temporarily convert ``{{name}}`` → ``{name}`` then format.
-Missing keys are left untouched.
-"""
-
-class _SafeDict(dict):  # noqa: D401
-    """dict that leaves unknown placeholders unchanged."""
-
-    def __missing__(self, key: str) -> str:  # noqa: D401
-        return f"{{{{{key}}}}}"
-
-if not params:
-    return s
-
-# Convert `{{name}}` → `{name}`
-tmp = _PLACEHOLDER_RE.sub(lambda m: "{" + m.group(1).strip() + "}", s)
-return tmp.format_map(_SafeDict(params))
-
-def _iter_box_strings(box: Box) -> tuple[tuple[str, Box], …]:
-“””
-Yield (key, parent_box) pairs for every string leaf in box.
-
-We return both key *and* the parent so we can assign new values in‑place.
-"""
-results: list[tuple[str, Box]] = []
-for key, val in box.items():
-    if isinstance(val, str):
-        results.append((key, box))
-    elif isinstance(val, Mapping):
-        results.extend(_iter_box_strings(val))  # type: ignore[arg-type]
-return tuple(results)
-
-—————————————————————————
-
-Public API
-
-def resolve_placeholders(data: Mapping[str, Any], **params: str) -> Box:
-“””
-Resolve placeholders inside data in‑place and return a new Box.
-
-Parameters
-----------
-data:
-    Mapping returned by ``tomllib.load``.
-**params:
-    External parameters used during the *external* phase.
-
-Returns
--------
-Box
-    The resolved configuration object.
-"""
-cfg = Box(data, default_box=True, default_box_attr=None)
-
-# -- Phase 1: internal substitutions (multiple passes) ------------------ #
-for i in range(_MAX_INTERNAL_PASSES):
-    changed = False
-    for key, parent in _iter_box_strings(cfg):
-        original = parent[key]
-        resolved = _resolve_internal_once(original, cfg)
-        if original != resolved:
-            parent[key] = resolved
-            changed = True
-    if not changed:
-        logger.debug("Internal resolution stabilised after %s passes", i + 1)
-        break
-else:  # pragma: no cover
-    logger.warning(
-        "Reached maximum internal passes (%s). "
-        "Possible circular placeholder references?",
-        _MAX_INTERNAL_PASSES,
-    )
-
-# -- Phase 2: external substitutions ----------------------------------- #
-for key, parent in _iter_box_strings(cfg):
-    parent[key] = _resolve_external(parent[key], MappingProxyType(params))
-
-# -- Phase 3: warn about leftovers ------------------------------------- #
-leftovers: list[str] = []
-for key, parent in _iter_box_strings(cfg):
-    for match in _PLACEHOLDER_RE.finditer(parent[key]):
-        leftovers.append(match.group(0))
-if leftovers:
-    unique = sorted(set(leftovers))
-    logger.warning(
-        "Could not resolve %s placeholder(s): %s",
-        len(unique),
-        ", ".join(unique),
-    )
-
-return cfg
-
-—————————————————————————
-
-CLI entry‑point
-
-def main(path: str, verbose: bool = False, **params: str) -> None:  # noqa: D401
-“””
-Read path (TOML), resolve placeholders, and pretty‑print the result.
-
-Any ``key=value`` arguments after *path* are considered external params.
-"""
-_configure_logging(verbose)
-
-toml_path = Path(path).expanduser()
-try:
-    data = toml_path.read_bytes()
-except FileNotFoundError:
-    logger.error("TOML file %s not found", toml_path)
-    sys.exit(1)
-
-config = resolve_placeholders(tomllib.loads(data.decode()), **params)
-Console().print(config.to_dict())
-
-if name == “main”:  # pragma: no cover
-fire.Fire(main)
-
----
-
-### How this fulfils the brief 📝
-
-1. **Two‑phase resolution**:  
-   *Internal* references are substituted first; only the unresolved placeholders
-   are then offered to external parameters via ``str.format_map``.
-2. **Warnings**: Any placeholders still unreplaced are logged **once** –
-   exactly as requested.
-3. **Box integration**: The Toml structure is returned as a `Box`, so callers
-   keep dotted access for further processing.
-4. **CLI optionality**: Fire provides a one‑liner interface but is *not*
-   mandatory for library use.
-5. **Safety**: Circular references are detected via a pass‑count limit and will
-   not hang the program.
-
-Feel free to drop the CLI bits if you only need a function – everything is
-modular.
-
-</document_content>
-</document>
-
-<document index="6">
-<source>TODO.md</source>
-<document_content>
-# TODO: TOPL Package Development Specification
-
-## Project Overview
-Build a complete, production-ready Python package for TOML Extended with Placeholders (topl) that provides:
-- Two-phase placeholder resolution (internal → external)
-- CLI interface via Fire
-- Programmatic API
-- Full test coverage
-- Modern Python packaging with uv/hatch
-- Git-tag-based versioning with Denver
-- GitHub Actions CI/CD
-
-## Package Structure & Setup
-
-### Core Package Infrastructure
-- [ ] Create proper Python package structure with `src/topl/` layout following PEP 621
-- [ ] Set up `pyproject.toml` with hatch build system and uv integration
-- [ ] Initialize uv project with `uv init --package --build-backend hatchling`
-- [ ] Add `src/topl/__init__.py` with version import from `_version.py`
-- [ ] Create `src/topl/py.typed` marker file for type checking support
-- [ ] Set up `this_file` tracking comments in all source files
-- [ ] Configure `src/topl/_version.py` for dynamic versioning
-
-### Configuration Files
-- [ ] Create comprehensive `pyproject.toml` with:
-  - Project metadata following PEP 621 (name="topl", dynamic=["version"])
-  - Build system: `build-backend = "hatchling.build"`
-  - Core dependencies: `python-box>=7.0`, `rich>=13.0`, `fire>=0.5`
-  - Optional dependencies for dev: `pytest`, `ruff`, `mypy`, `coverage`
-  - Tool configurations: ruff (format + lint), pytest, mypy, coverage
-  - Console scripts entry point: `topl = "topl.__main__:main"`
-  - Hatch version source from git tags
-- [ ] Set up `.gitignore` with Python, uv, and IDE exclusions
-- [ ] Generate initial `uv.lock` for reproducible development builds
-- [ ] Create `.python-version` file specifying minimum Python 3.11
-
-## Core Functionality Implementation
-
-### Main Module Structure
-- [ ] Create `src/topl/__init__.py` with public API exports
-- [ ] Implement `src/topl/core.py` with:
-  - `resolve_placeholders()` function (current main logic)
-  - `TOPLConfig` class wrapper
-  - Exception classes (`TOPLError`, `CircularReferenceError`, etc.)
-- [ ] Create `src/topl/utils.py` for helper functions:
-  - `_get_by_path()`
-  - `_resolve_internal_once()`
-  - `_resolve_external()`
-  - `_iter_box_strings()`
-- [ ] Implement `src/topl/constants.py` for configuration constants
-
-### CLI Implementation
-- [ ] Create `src/topl/__main__.py` with Fire-based CLI
-- [ ] Implement `src/topl/cli.py` with:
-  - Main CLI class with proper argument parsing
-  - Verbose logging configuration
-  - File I/O handling with proper error messages
-  - Rich console output formatting
-- [ ] Add proper CLI help documentation
-- [ ] Support for configuration files and environment variables
-
-### Type Hints & Documentation
-- [ ] Add comprehensive type hints throughout codebase
-- [ ] Create type aliases in `src/topl/types.py`
-- [ ] Add detailed docstrings following Google/NumPy style
-- [ ] Implement proper error handling with custom exceptions
-
-## Testing Infrastructure
-
-### Test Setup
-- [ ] Create `tests/` directory with structured layout:
-  - `tests/unit/` for isolated unit tests
-  - `tests/integration/` for end-to-end tests
-  - `tests/fixtures/` for test data (sample TOML files)
-- [ ] Set up `tests/conftest.py` with reusable pytest fixtures:
-  - Sample TOML data fixtures (simple, nested, circular refs)
-  - Temporary file/directory fixtures
-  - Mock console/logging fixtures
-- [ ] Configure pytest in `pyproject.toml`:
-  - Test discovery patterns, markers, coverage settings
-  - Plugins: pytest-cov, pytest-mock, pytest-xdist for parallel testing
-
-### Core Tests
-- [ ] `tests/test_core.py` - Test placeholder resolution logic:
-  - Internal placeholder resolution
-  - External parameter substitution
-  - Circular reference detection
-  - Warning generation for unresolved placeholders
-  - Edge cases (empty files, malformed TOML, etc.)
-- [ ] `tests/test_cli.py` - Test CLI functionality:
-  - Command-line argument parsing
-  - File input/output
-  - Error handling
-  - Verbose mode
-- [ ] `tests/test_utils.py` - Test utility functions
-- [ ] `tests/test_integration.py` - End-to-end integration tests
-
-### Test Coverage & Quality
-- [ ] Achieve 95%+ test coverage
-- [ ] Add property-based testing with hypothesis
-- [ ] Create performance benchmarks
-- [ ] Add mutation testing with mutmut
-
-## Documentation
-
-### User Documentation
-- [ ] Update `README.md` with:
-  - Clear project description
-  - Installation instructions
-  - Usage examples (CLI and programmatic)
-  - API reference
-  - Contributing guidelines
-- [ ] Create `docs/` directory with:
-  - User guide with examples
-  - API documentation
-  - Changelog format specification
-  - Development setup guide
-
-### Code Documentation
-- [ ] Add comprehensive docstrings to all public functions
-- [ ] Include usage examples in docstrings
-- [ ] Document all parameters and return values
-- [ ] Add type information to all docstrings
-
-## Build & Release Infrastructure
-
-### Version Management  
-- [ ] Configure hatch-vcs for git-tag-based versioning:
-  - Add `hatch-vcs` to build dependencies in `pyproject.toml`
-  - Set version source: `[tool.hatch.version] source = "vcs"`
-  - Configure tag pattern for semantic versioning (v*.*.*)
-  - Create `_version.py` generation via hatch metadata hook
-- [ ] Create version bumping workflow:
-  - Script for creating release tags
-  - Automated changelog generation from commits
-  - Version validation in pre-commit hooks
-
-### GitHub Actions
-- [ ] Create `.github/workflows/ci.yml` for continuous integration:
-  - Matrix testing: Python 3.11, 3.12, 3.13 on ubuntu-latest, macos-latest, windows-latest
-  - Use `astral-sh/setup-uv@v4` action for fast dependency management
-  - Run `uv sync --all-extras` for reproducible test environments
-  - Code quality: `uv run ruff check && uv run ruff format --check`
-  - Type checking: `uv run mypy src tests`
-  - Tests: `uv run pytest --cov=topl --cov-report=xml`
-  - Upload coverage to codecov.io
-  - Security: `uv run bandit -r src/`
-- [ ] Create `.github/workflows/release.yml` for automated releases:
-  - Trigger on pushed tags matching `v*.*.*` pattern
-  - Build with `uv build` (both sdist and wheel)
-  - Upload to PyPI using trusted publishing (no API keys)
-  - Create GitHub release with auto-generated changelog
-  - Verify package installability: `uv run --with topl --from-source`
-- [ ] Create `.github/workflows/test-pypi.yml` for pre-release testing
-- [ ] Configure dependabot for both GitHub Actions and Python dependencies
-
-### Build System
-- [ ] Configure hatch for building:
-  - Source distribution creation
-  - Wheel building
-  - Version management integration
-- [ ] Set up pre-commit hooks:
-  - Code formatting (ruff)
-  - Type checking (mypy)
-  - Test execution
-  - Documentation checks
-
-## Quality Assurance
-
-### Code Quality Tools
-- [ ] Configure ruff for linting and formatting
-- [ ] Set up mypy for static type checking
-- [ ] Add bandit for security scanning
-- [ ] Configure pre-commit for automated checks
-
-### Performance & Monitoring
-- [ ] Add performance benchmarks
-- [ ] Memory usage profiling
-- [ ] Large file handling tests
-- [ ] Stress testing for circular reference detection
-
-## Advanced Features
-
-### API Enhancements
-- [ ] Add async support for file I/O operations
-- [ ] Implement plugin system for custom placeholder resolvers
-- [ ] Add configuration validation with pydantic
-- [ ] Support for different output formats (JSON, YAML)
-
-### CLI Enhancements
-- [ ] Add shell completion support
-- [ ] Implement configuration file support
-- [ ] Add batch processing capabilities
-- [ ] Rich progress bars for large files
-
-### Error Handling & Logging
-- [ ] Implement structured logging with loguru
-- [ ] Add comprehensive error recovery
-- [ ] Create detailed error messages with suggestions
-- [ ] Add debug mode with detailed tracing
-
-## Security & Compliance
-
-### Security Measures
-- [ ] Input validation and sanitization
-- [ ] Path traversal protection
-- [ ] Resource usage limits
-- [ ] Security-focused code review
-
-### Compliance
-- [ ] License file (MIT/Apache 2.0)
-- [ ] Security policy document
-- [ ] Code of conduct
-- [ ] Contributing guidelines
-
-## Final Integration & Polish
-
-### Integration Testing
-- [ ] End-to-end workflow testing
-- [ ] Cross-platform compatibility testing
-- [ ] Performance regression testing
-- [ ] Memory leak detection
-
-### Release Preparation
-- [ ] Final code review and refactoring
-- [ ] Documentation completeness check
-- [ ] Version 2.0 release preparation
-- [ ] PyPI package publication
-- [ ] GitHub release with comprehensive changelog
-
-## Implementation Phases
-
-### Phase 1: Core Infrastructure (MVP)
-- [ ] Basic package structure and pyproject.toml
-- [ ] Core functionality migration from original script
-- [ ] Basic CLI with Fire integration
-- [ ] Essential tests for core functionality
-- [ ] Initial CI pipeline
-
-### Phase 2: Quality & Documentation
-- [ ] Comprehensive test suite with 95%+ coverage
-- [ ] Full API documentation and type hints
-- [ ] Error handling and logging improvements
-- [ ] Performance optimization and benchmarking
-
-### Phase 3: Release Preparation
-- [ ] Complete GitHub Actions workflows
-- [ ] Security scanning and compliance
-- [ ] Final documentation polish
-- [ ] v2.0 release to PyPI
-
-## Success Criteria & Acceptance Tests
-- [ ] **Functionality**: All original script features work identically
-- [ ] **Quality**: 95%+ test coverage, all quality gates pass
-- [ ] **Performance**: ≤10% performance regression vs original
-- [ ] **Compatibility**: Works on Python 3.11+ across all major OS
-- [ ] **Usability**: CLI help is clear, API is intuitive
-- [ ] **Maintainability**: Code follows PEP 8, fully type-hinted
-- [ ] **Automation**: Full CI/CD pipeline with automated releases
-- [ ] **Distribution**: Successfully published to PyPI
-- [ ] **Documentation**: Complete user and API documentation
-</document_content>
-</document>
-
-<document index="7">
-<source>WORK.md</source>
-<document_content>
-# Work Progress: TOPL Package Development
-
-## PHASE 1 COMPLETED: Core Infrastructure (MVP) ✅
-
-### Completed Phase 1 Tasks
-- [x] Analyzed README.md requirements and created comprehensive TODO.md specification
-- [x] Refined TODO.md through multiple critical review iterations
-- [x] Set up complete package structure with src/topl/ layout
-- [x] Created comprehensive pyproject.toml with uv/hatch integration
-- [x] Initialized uv project with proper dependencies
-- [x] Migrated and enhanced core functionality from original script
-- [x] Implemented CLI with Fire integration
-- [x] Created comprehensive test suite with 95% coverage
-- [x] Designed GitHub Actions workflows (manual setup required due to permissions)
-- [x] Applied proper code formatting and linting
-- [x] Created CHANGELOG.md and documentation
-
-### Key Achievements
-- **Functionality**: All original script features work identically ✅
-- **Quality**: 95% test coverage, all quality gates pass ✅
-- **Performance**: No performance regression vs original ✅
-- **Modern Standards**: PEP 621 compliant, fully type-hinted ✅
-- **CLI**: Fire-based interface with rich output ✅
-- **Testing**: 44 tests covering unit and integration scenarios ✅
-- **Automation**: Complete CI workflow with multi-OS/Python testing ✅
-
-### Package Structure Created
-```
-topl/
-├── src/topl/
-│   ├── __init__.py (public API exports)
-│   ├── __main__.py (CLI entry point)
-│   ├── core.py (main resolution logic)
-│   ├── cli.py (CLI implementation)
-│   ├── utils.py (helper functions)
-│   ├── types.py (type definitions)
-│   ├── exceptions.py (custom exceptions)
-│   ├── constants.py (configuration constants)
-│   └── py.typed (type checking marker)
-├── tests/ (comprehensive test suite)
-├── .github/workflows/ (CI/CD automation)
-├── pyproject.toml (modern Python packaging)
-└── documentation files
-```
-
-### Current Status: Ready for Phase 2
-- Package builds successfully ✅
-- All tests pass on multiple Python versions ✅
-- Code quality checks pass ✅
-- CLI works identically to original script ✅
-- Ready for enhanced features and release preparation ✅
-
-## NEXT PHASE: Phase 2 - Quality & Documentation Enhancement
-
-### Upcoming Phase 2 Goals
-1. Enhanced error handling and recovery
-2. Performance optimization and benchmarking  
-3. Advanced CLI features (shell completion, config files)
-4. Comprehensive documentation (mkdocs)
-5. Additional test scenarios and edge cases
-6. Security hardening and validation
-7. Plugin system architecture planning
-</document_content>
-</document>
-
-<document index="8">
-<source>docs/github-actions-templates.md</source>
-<document_content>
-# GitHub Actions Workflow Templates
-
-Due to GitHub App permission restrictions, the workflow files must be created manually. Here are the recommended templates:
-
-## CI Workflow
-
-Create `.github/workflows/ci.yml`:
-
-```yaml
-name: CI
-
-on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.11", "3.12", "3.13"]
-
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Install uv
-      uses: astral-sh/setup-uv@v4
-    
-    - name: Set up Python ${{ matrix.python-version }}
-      run: uv python install ${{ matrix.python-version }}
-    
-    - name: Install dependencies
-      run: uv sync --all-extras
-    
-    - name: Run linting
-      run: |
-        uv run ruff check .
-        uv run ruff format --check .
-    
-    - name: Run type checking
-      run: uv run mypy src tests
-    
-    - name: Run tests
-      run: uv run pytest --cov=topl --cov-report=xml --cov-report=term-missing
-    
-    - name: Run security scan
-      run: uv run bandit -r src/
-    
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
-      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
-      with:
-        file: ./coverage.xml
-        fail_ci_if_error: true
-```
-
-## Release Workflow
-
-Create `.github/workflows/release.yml`:
-
-```yaml
-name: Release
-
-on:
-  push:
-    tags:
-      - 'v*.*.*'
-
-permissions:
-  contents: read
-  id-token: write  # For trusted publishing to PyPI
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # Fetch full history for proper versioning
-    
-    - name: Install uv
-      uses: astral-sh/setup-uv@v4
-    
-    - name: Set up Python
-      run: uv python install 3.11
-    
-    - name: Install dependencies
-      run: uv sync --dev
-    
-    - name: Run tests
-      run: uv run pytest
-    
-    - name: Build package
-      run: uv build
-    
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: dist
-        path: dist/
-
-  publish:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: release
-    steps:
-    - name: Download artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: dist
-        path: dist/
-    
-    - name: Publish to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        packages-dir: dist/
-
-  github-release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Download artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: dist
-        path: dist/
-    
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v2
-      with:
-        files: dist/*
-        generate_release_notes: true
-        draft: false
-        prerelease: false
-```
-
-## Setup Instructions
-
-1. Create the `.github/workflows/` directory in your repository
-2. Copy the above templates into the respective files
-3. Commit and push the workflow files
-4. Configure any required secrets (for PyPI publishing, etc.)
-5. Set up branch protection rules as needed
-
-## Additional Recommendations
-
-- Configure Dependabot for automated dependency updates
-- Set up CodeCov for test coverage reporting
-- Configure branch protection rules for the main branch
-- Enable GitHub's security features (vulnerability alerts, etc.)
-</document_content>
-</document>
-
-<document index="9">
-<source>pyproject.toml</source>
-<document_content>
-[build-system]
-requires = ["hatchling", "hatch-vcs"]
-build-backend = "hatchling.build"
-
-[project]
-name = "topl"
-dynamic = ["version"]
-description = "TOML extended with placeholders - two-phase placeholder resolution"
-readme = "README.md"
-license = {text = "MIT"}
-authors = [
-    {name = "Terragon Labs", email = "dev@terragonlabs.com"}
-]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: System :: Systems Administration",
-    "Topic :: Utilities",
-]
-keywords = ["toml", "configuration", "placeholders", "templates"]
-requires-python = ">=3.11"
-dependencies = [
-    "python-box>=7.0.0",
-    "rich>=13.0.0",
-    "fire>=0.5.0",
-]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.0",
-    "pytest-cov>=4.0",
-    "pytest-mock>=3.10",
-    "pytest-xdist>=3.0",
-    "ruff>=0.1.0",
-    "mypy>=1.5.0",
-    "bandit>=1.7.0",
-    "pre-commit>=3.0.0",
-    "coverage>=7.0",
-]
-docs = [
-    "mkdocs>=1.5.0",
-    "mkdocs-material>=9.0.0",
-    "mkdocstrings[python]>=0.20.0",
-]
-test = [
-    "pytest>=7.0",
-    "pytest-cov>=4.0",
-    "pytest-mock>=3.10",
-    "pytest-xdist>=3.0",
-    "hypothesis>=6.0",
-]
-
-[project.urls]
-Homepage = "https://github.com/terragonlabs/topl"
-Documentation = "https://topl.readthedocs.io"
-Repository = "https://github.com/terragonlabs/topl"
-Issues = "https://github.com/terragonlabs/topl/issues"
-Changelog = "https://github.com/terragonlabs/topl/blob/main/CHANGELOG.md"
-
-[project.scripts]
-topl = "topl.__main__:main"
-
-[tool.hatch.version]
-source = "vcs"
-
-[tool.hatch.build.hooks.vcs]
-version-file = "src/topl/_version.py"
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/topl"]
-
-[tool.hatch.build.targets.sdist]
-include = [
-    "/src",
-    "/tests",
-    "/docs",
-    "/README.md",
-    "/CHANGELOG.md",
-    "/LICENSE",
-    "/pyproject.toml",
-]
-
-# Tool configurations
-[tool.ruff]
-target-version = "py311"
-line-length = 88
-src = ["src", "tests"]
-
-[tool.ruff.lint]
-select = [
-    "E",   # pycodestyle errors
-    "W",   # pycodestyle warnings
-    "F",   # pyflakes
-    "I",   # isort
-    "B",   # flake8-bugbear
-    "C4",  # flake8-comprehensions
-    "UP",  # pyupgrade
-    "RUF", # ruff-specific rules
-]
-ignore = [
-    "E501", # line too long, handled by black
-    "B008", # do not perform function calls in argument defaults
-]
-
-[tool.ruff.lint.per-file-ignores]
-"tests/**/*" = ["B018", "RUF012"]
-
-[tool.ruff.lint.isort]
-known-first-party = ["topl"]
-
-[tool.mypy]
-python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
-warn_unreachable = true
-strict_equality = true
-
-[[tool.mypy.overrides]]
-module = "tests.*"
-disallow_untyped_defs = false
-
-[[tool.mypy.overrides]]
-module = "fire.*"
-ignore_missing_imports = true
-
-[tool.pytest.ini_options]
-minversion = "7.0"
-addopts = [
-    "--strict-markers",
-    "--strict-config",
-    "--cov=topl",
-    "--cov-branch",
-    "--cov-report=term-missing",
-    "--cov-report=html",
-    "--cov-report=xml",
-]
-testpaths = ["tests"]
-filterwarnings = [
-    "error",
-    "ignore::UserWarning",
-    "ignore::DeprecationWarning",
-]
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests",
-]
-
-[tool.coverage.run]
-source = ["src"]
-branch = true
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if 0:",
-    "if __name__ == .__main__.:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
-]
-
-[tool.bandit]
-exclude_dirs = ["tests"]
-skips = ["B101", "B601"]
-</document_content>
-</document>
-
-# File: /Volumes/adam/Developer/vcs/github.twardoch/pub/topl/src/repo/__init__.py
-# Language: python
-
-def main(()) -> None:
-
-
-# File: /Volumes/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/__init__.py
-# Language: python
-
-from ._version import __version__
-from .core import TOPLConfig, resolve_placeholders
-from .exceptions import (
-    CircularReferenceError,
-    FileNotFoundError,
-    InvalidTOMLError,
-    PlaceholderResolutionError,
-    TOPLError,
-)
-from .types import ConfigMapping, PlaceholderParams, TOMLData
-
-
-# File: /Volumes/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/__main__.py
-# Language: python
-
-import fire
-from .cli import main_cli
-
-def main(()) -> None:
-    """Entry point for the CLI using Fire."""
-
-
-# File: /Volumes/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/_version.py
-# Language: python
-
-from typing import Tuple
-from typing import Union
-
-
-# File: /Volumes/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/cli.py
-# Language: python
-
-import logging
-import sys
-import tomllib
-from pathlib import Path
-from typing import Any
-from rich.console import Console
-from rich.logging import RichHandler
-from .core import resolve_placeholders
-from .exceptions import FileNotFoundError as TOPLFileNotFoundError
-from .exceptions import InvalidTOMLError
-
-def configure_logging((verbose: bool = False)) -> None:
-    """Configure logging with Rich formatting."""
-
-def load_toml_file((path: Path)) -> dict[str, Any]:
-    """Load and parse a TOML file."""
-
-def main_cli((path: str, verbose: bool = False, **params: str)) -> None:
-    """Main CLI function for processing TOML files with placeholders."""
-
-
-# File: /Volumes/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/constants.py
-# Language: python
-
-import re
-
-
-# File: /Volumes/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/core.py
-# Language: python
-
-import logging
-from types import MappingProxyType
-from typing import Any
-from box import Box
-from .constants import MAX_INTERNAL_PASSES, PLACEHOLDER_PATTERN
-from .exceptions import CircularReferenceError
-from .types import ConfigMapping
-from .utils import iter_box_strings, resolve_external, resolve_internal_once
-
-class TOPLConfig:
-    """Wrapper class for resolved TOML configuration with placeholder support."""
-    def __init__((self, data: Box, unresolved_placeholders: list[str] | None = None)):
-        """Initialize with resolved data and optional unresolved placeholders."""
-    def to_dict((self)) -> dict[str, Any]:
-        """Convert to plain dictionary."""
-    def __getattr__((self, name: str)) -> Any:
-        """Delegate attribute access to the underlying Box."""
-    def __getitem__((self, key: str)) -> Any:
-        """Delegate item access to the underlying Box."""
-    def __repr__((self)) -> str:
-        """String representation showing unresolved count."""
-
-def __init__((self, data: Box, unresolved_placeholders: list[str] | None = None)):
-    """Initialize with resolved data and optional unresolved placeholders."""
-
-def data((self)) -> Box:
-    """Access the underlying Box data."""
-
-def unresolved_placeholders((self)) -> list[str]:
-    """List of placeholders that couldn't be resolved."""
-
-def has_unresolved((self)) -> bool:
-    """Check if there are any unresolved placeholders."""
-
-def to_dict((self)) -> dict[str, Any]:
-    """Convert to plain dictionary."""
-
-def __getattr__((self, name: str)) -> Any:
-    """Delegate attribute access to the underlying Box."""
-
-def __getitem__((self, key: str)) -> Any:
-    """Delegate item access to the underlying Box."""
-
-def __repr__((self)) -> str:
-    """String representation showing unresolved count."""
-
-def resolve_placeholders((data: ConfigMapping, **params: str)) -> TOPLConfig:
-    """Resolve placeholders inside data and return a TOPLConfig instance."""
-
-
-# File: /Volumes/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/exceptions.py
-# Language: python
-
-class TOPLError(E, x, c, e, p, t, i, o, n):
-    """Base exception for all topl-related errors."""
-
-class CircularReferenceError(T, O, P, L, E, r, r, o, r):
-    """Raised when circular placeholder references are detected."""
-
-class PlaceholderResolutionError(T, O, P, L, E, r, r, o, r):
-    """Raised when placeholder resolution fails."""
-
-class InvalidTOMLError(T, O, P, L, E, r, r, o, r):
-    """Raised when TOML parsing fails."""
-
-class FileNotFoundError(T, O, P, L, E, r, r, o, r):
-    """Raised when a TOML file cannot be found."""
-
-
-# File: /Volumes/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/types.py
-# Language: python
-
-from collections.abc import Mapping
-from typing import Any
-
-
-# File: /Volumes/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/utils.py
-# Language: python
-
-import re
-from collections.abc import Generator, Mapping
-from typing import Any
-from box import Box
-from .constants import PLACEHOLDER_PATTERN
-from .types import PlaceholderParams
-
-class SafeDict(d, i, c, t):
-    """Dict that leaves unknown placeholders unchanged."""
-    def __missing__((self, key: str)) -> str:
-
-def get_by_path((box: Box, dotted_path: str)) -> Any:
-    """Return value at dotted_path or None if the path is invalid."""
-
-def resolve_internal_once((s: str, root: Box)) -> str:
-    """Replace one pass of internal placeholders in string s."""
-
-def repl((match: re.Match[str])) -> str:
-
-def resolve_external((s: str, params: PlaceholderParams)) -> str:
-    """Replace external placeholders using string formatting."""
-
-def __missing__((self, key: str)) -> str:
-
-def iter_box_strings((box: Box)) -> Generator[tuple[str, Box], None, None]:
-    """Yield (key, parent_box) pairs for every string leaf in box."""
-
-
-# File: /Volumes/adam/Developer/vcs/github.twardoch/pub/topl/tests/conftest.py
-# Language: python
-
-from pathlib import Path
-from typing import Any
-import pytest
-
-def sample_toml_data(()) -> dict[str, Any]:
-    """Simple TOML data for testing."""
-
-def circular_ref_data(()) -> dict[str, Any]:
-    """TOML data with circular references."""
-
-def external_placeholder_data(()) -> dict[str, Any]:
-    """TOML data requiring external parameters."""
-
-def mixed_placeholder_data(()) -> dict[str, Any]:
-    """TOML data with both internal and external placeholders."""
-
-def temp_toml_file((tmp_path: Path)) -> Path:
-    """Create a temporary TOML file."""
-
-def invalid_toml_file((tmp_path: Path)) -> Path:
-    """Create a temporary invalid TOML file."""
-
-
-# File: /Volumes/adam/Developer/vcs/github.twardoch/pub/topl/tests/integration/test_end_to_end.py
-# Language: python
-
-import subprocess
-import sys
-from pathlib import Path
-
-class TestCLIIntegration:
-    """Integration tests for the CLI interface."""
-    def test_cli_via_python_module((self, temp_toml_file)):
-        """Test running CLI via python -m topl."""
-    def test_cli_with_parameters((self, tmp_path)):
-        """Test CLI with external parameters."""
-    def test_cli_verbose_mode((self, temp_toml_file)):
-        """Test CLI verbose mode."""
-    def test_cli_error_handling((self, tmp_path)):
-        """Test CLI error handling for missing files."""
-
-class TestComplexResolution:
-    """Integration tests for complex placeholder resolution scenarios."""
-    def test_multi_level_nesting((self, tmp_path)):
-        """Test deeply nested placeholder resolution."""
-    def test_recursive_resolution((self, tmp_path)):
-        """Test multi-pass recursive resolution."""
-
-def test_cli_via_python_module((self, temp_toml_file)):
-    """Test running CLI via python -m topl."""
-
-def test_cli_with_parameters((self, tmp_path)):
-    """Test CLI with external parameters."""
-
-def test_cli_verbose_mode((self, temp_toml_file)):
-    """Test CLI verbose mode."""
-
-def test_cli_error_handling((self, tmp_path)):
-    """Test CLI error handling for missing files."""
-
-def test_multi_level_nesting((self, tmp_path)):
-    """Test deeply nested placeholder resolution."""
-
-def test_recursive_resolution((self, tmp_path)):
-    """Test multi-pass recursive resolution."""
-
-
-# File: /Volumes/adam/Developer/vcs/github.twardoch/pub/topl/tests/unit/test_cli.py
-# Language: python
-
-import pytest
-from topl.cli import configure_logging, load_toml_file, main_cli
-from topl.exceptions import FileNotFoundError as TOPLFileNotFoundError
-from topl.exceptions import InvalidTOMLError
-
-class TestConfigureLogging:
-    """Tests for logging configuration."""
-    def test_default_logging((self)):
-        """Test default logging configuration."""
-    def test_verbose_logging((self)):
-        """Test verbose logging configuration."""
-
-class TestLoadTOMLFile:
-    """Tests for TOML file loading."""
-    def test_load_valid_toml((self, temp_toml_file)):
-        """Test loading a valid TOML file."""
-    def test_load_missing_file((self, tmp_path)):
-        """Test loading a non-existent file."""
-    def test_load_invalid_toml((self, invalid_toml_file)):
-        """Test loading an invalid TOML file."""
-
-class TestMainCLI:
-    """Tests for the main CLI function."""
-    def test_successful_processing((self, temp_toml_file, capsys)):
-        """Test successful TOML processing."""
-    def test_with_external_params((self, tmp_path, capsys)):
-        """Test processing with external parameters."""
-    def test_verbose_mode((self, temp_toml_file, capsys)):
-        """Test verbose mode logging."""
-    def test_missing_file_error((self, tmp_path)):
-        """Test error handling for missing file."""
-    def test_invalid_toml_error((self, invalid_toml_file)):
-        """Test error handling for invalid TOML."""
-    def test_unresolved_placeholders_exit((self, tmp_path)):
-        """Test exit code when placeholders remain unresolved."""
-    def test_path_expansion((self, tmp_path, monkeypatch)):
-        """Test path expansion (~ and relative paths)."""
-
-def test_default_logging((self)):
-    """Test default logging configuration."""
-
-def test_verbose_logging((self)):
-    """Test verbose logging configuration."""
-
-def test_load_valid_toml((self, temp_toml_file)):
-    """Test loading a valid TOML file."""
-
-def test_load_missing_file((self, tmp_path)):
-    """Test loading a non-existent file."""
-
-def test_load_invalid_toml((self, invalid_toml_file)):
-    """Test loading an invalid TOML file."""
-
-def test_successful_processing((self, temp_toml_file, capsys)):
-    """Test successful TOML processing."""
-
-def test_with_external_params((self, tmp_path, capsys)):
-    """Test processing with external parameters."""
-
-def test_verbose_mode((self, temp_toml_file, capsys)):
-    """Test verbose mode logging."""
-
-def test_missing_file_error((self, tmp_path)):
-    """Test error handling for missing file."""
-
-def test_invalid_toml_error((self, invalid_toml_file)):
-    """Test error handling for invalid TOML."""
-
-def test_unresolved_placeholders_exit((self, tmp_path)):
-    """Test exit code when placeholders remain unresolved."""
-
-def test_path_expansion((self, tmp_path, monkeypatch)):
-    """Test path expansion (~ and relative paths)."""
-
-
-# File: /Volumes/adam/Developer/vcs/github.twardoch/pub/topl/tests/unit/test_core.py
-# Language: python
-
-import pytest
-from topl import CircularReferenceError, resolve_placeholders
-
-class TestResolvePlaceholders:
-    """Tests for the resolve_placeholders function."""
-    def test_simple_internal_resolution((self, sample_toml_data)):
-        """Test basic internal placeholder resolution."""
-    def test_external_parameters((self, external_placeholder_data)):
-        """Test external parameter resolution."""
-    def test_mixed_resolution((self, mixed_placeholder_data)):
-        """Test mixed internal and external resolution."""
-    def test_circular_reference_detection((self)):
-        """Test detection of circular references."""
-    def test_unresolved_placeholders((self)):
-        """Test handling of unresolved placeholders."""
-    def test_no_placeholders((self)):
-        """Test data without any placeholders."""
-
-class TestTOPLConfig:
-    """Tests for the TOPLConfig wrapper class."""
-    def test_config_creation((self, sample_toml_data)):
-        """Test basic config creation and access."""
-    def test_to_dict_conversion((self, sample_toml_data)):
-        """Test conversion to plain dictionary."""
-    def test_unresolved_tracking((self)):
-        """Test tracking of unresolved placeholders."""
-    def test_repr_with_unresolved((self)):
-        """Test string representation with unresolved placeholders."""
-    def test_repr_without_unresolved((self, sample_toml_data)):
-        """Test string representation without unresolved placeholders."""
-
-def test_simple_internal_resolution((self, sample_toml_data)):
-    """Test basic internal placeholder resolution."""
-
-def test_external_parameters((self, external_placeholder_data)):
-    """Test external parameter resolution."""
-
-def test_mixed_resolution((self, mixed_placeholder_data)):
-    """Test mixed internal and external resolution."""
-
-def test_circular_reference_detection((self)):
-    """Test detection of circular references."""
-
-def test_unresolved_placeholders((self)):
-    """Test handling of unresolved placeholders."""
-
-def test_no_placeholders((self)):
-    """Test data without any placeholders."""
-
-def test_config_creation((self, sample_toml_data)):
-    """Test basic config creation and access."""
-
-def test_to_dict_conversion((self, sample_toml_data)):
-    """Test conversion to plain dictionary."""
-
-def test_unresolved_tracking((self)):
-    """Test tracking of unresolved placeholders."""
-
-def test_repr_with_unresolved((self)):
-    """Test string representation with unresolved placeholders."""
-
-def test_repr_without_unresolved((self, sample_toml_data)):
-    """Test string representation without unresolved placeholders."""
-
-
-# File: /Volumes/adam/Developer/vcs/github.twardoch/pub/topl/tests/unit/test_utils.py
-# Language: python
-
-from box import Box
-from topl.utils import (
-    get_by_path,
-    iter_box_strings,
-    resolve_external,
-    resolve_internal_once,
-)
-
-class TestGetByPath:
-    """Tests for the get_by_path utility function."""
-    def test_simple_path((self)):
-        """Test retrieving simple path."""
-    def test_nested_path((self)):
-        """Test retrieving nested path."""
-    def test_missing_path((self)):
-        """Test retrieving non-existent path."""
-    def test_partial_path((self)):
-        """Test path that exists partially."""
-
-class TestResolveInternalOnce:
-    """Tests for the resolve_internal_once function."""
-    def test_simple_replacement((self)):
-        """Test simple placeholder replacement."""
-    def test_nested_replacement((self)):
-        """Test nested placeholder replacement."""
-    def test_missing_placeholder((self)):
-        """Test placeholder that doesn't exist."""
-    def test_multiple_placeholders((self)):
-        """Test multiple placeholders in one string."""
-
-class TestResolveExternal:
-    """Tests for the resolve_external function."""
-    def test_simple_external((self)):
-        """Test simple external parameter replacement."""
-    def test_missing_external((self)):
-        """Test missing external parameter."""
-    def test_empty_params((self)):
-        """Test with no external parameters."""
-    def test_multiple_external((self)):
-        """Test multiple external parameters."""
-
-class TestIterBoxStrings:
-    """Tests for the iter_box_strings function."""
-    def test_flat_strings((self)):
-        """Test iteration over flat string values."""
-    def test_nested_strings((self)):
-        """Test iteration over nested string values."""
-    def test_mixed_types((self)):
-        """Test iteration with mixed value types."""
-
-def test_simple_path((self)):
-    """Test retrieving simple path."""
-
-def test_nested_path((self)):
-    """Test retrieving nested path."""
-
-def test_missing_path((self)):
-    """Test retrieving non-existent path."""
-
-def test_partial_path((self)):
-    """Test path that exists partially."""
-
-def test_simple_replacement((self)):
-    """Test simple placeholder replacement."""
-
-def test_nested_replacement((self)):
-    """Test nested placeholder replacement."""
-
-def test_missing_placeholder((self)):
-    """Test placeholder that doesn't exist."""
-
-def test_multiple_placeholders((self)):
-    """Test multiple placeholders in one string."""
-
-def test_simple_external((self)):
-    """Test simple external parameter replacement."""
-
-def test_missing_external((self)):
-    """Test missing external parameter."""
-
-def test_empty_params((self)):
-    """Test with no external parameters."""
-
-def test_multiple_external((self)):
-    """Test multiple external parameters."""
-
-def test_flat_strings((self)):
-    """Test iteration over flat string values."""
-
-def test_nested_strings((self)):
-    """Test iteration over nested string values."""
-
-def test_mixed_types((self)):
-    """Test iteration with mixed value types."""
-
-
-</documents>
-</document_content>
-</document>
-
-<document index="12">
-<source>pyproject.toml</source>
-<document_content>
-[build-system]
-requires = ["hatchling", "hatch-vcs"]
-build-backend = "hatchling.build"
-
-[project]
-name = "topl"
-dynamic = ["version"]
-description = "TOML extended with placeholders - two-phase placeholder resolution"
-readme = "README.md"
-license = {text = "MIT"}
-authors = [
-    {name = "Terragon Labs", email = "dev@terragonlabs.com"}
-]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: System :: Systems Administration",
-    "Topic :: Utilities",
-]
-keywords = ["toml", "configuration", "placeholders", "templates"]
-requires-python = ">=3.11"
-dependencies = [
-    "python-box>=7.0.0",
-    "rich>=13.0.0",
-    "fire>=0.5.0",
-]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.0",
-    "pytest-cov>=4.0",
-    "pytest-mock>=3.10",
-    "pytest-xdist>=3.0",
-    "ruff>=0.1.0",
-    "mypy>=1.5.0",
-    "bandit>=1.7.0",
-    "pre-commit>=3.0.0",
-    "coverage>=7.0",
-]
-docs = [
-    "mkdocs>=1.5.0",
-    "mkdocs-material>=9.0.0",
-    "mkdocstrings[python]>=0.20.0",
-]
-test = [
-    "pytest>=7.0",
-    "pytest-cov>=4.0",
-    "pytest-mock>=3.10",
-    "pytest-xdist>=3.0",
-    "hypothesis>=6.0",
-]
-
-[project.urls]
-Homepage = "https://github.com/terragonlabs/topl"
-Documentation = "https://topl.readthedocs.io"
-Repository = "https://github.com/terragonlabs/topl"
-Issues = "https://github.com/terragonlabs/topl/issues"
-Changelog = "https://github.com/terragonlabs/topl/blob/main/CHANGELOG.md"
-
-[project.scripts]
-topl = "topl.__main__:main"
-
-[tool.hatch.version]
-source = "vcs"
-
-[tool.hatch.build.hooks.vcs]
-version-file = "src/topl/_version.py"
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/topl"]
-
-[tool.hatch.build.targets.sdist]
-include = [
-    "/src",
-    "/tests",
-    "/docs",
-    "/README.md",
-    "/CHANGELOG.md",
-    "/LICENSE",
-    "/pyproject.toml",
-]
-
-# Tool configurations
-[tool.ruff]
-target-version = "py311"
-line-length = 88
-src = ["src", "tests"]
-
-[tool.ruff.lint]
-select = [
-    "E",   # pycodestyle errors
-    "W",   # pycodestyle warnings
-    "F",   # pyflakes
-    "I",   # isort
-    "B",   # flake8-bugbear
-    "C4",  # flake8-comprehensions
-    "UP",  # pyupgrade
-    "RUF", # ruff-specific rules
-]
-ignore = [
-    "E501", # line too long, handled by black
-    "B008", # do not perform function calls in argument defaults
-]
-
-[tool.ruff.lint.per-file-ignores]
-"tests/**/*" = ["B018", "RUF012"]
-
-[tool.ruff.lint.isort]
-known-first-party = ["topl"]
-
-[tool.mypy]
-python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
-warn_unreachable = true
-strict_equality = true
-
-[[tool.mypy.overrides]]
-module = "tests.*"
-disallow_untyped_defs = false
-
-[[tool.mypy.overrides]]
-module = "fire.*"
-ignore_missing_imports = true
-
-[tool.pytest.ini_options]
-minversion = "7.0"
-addopts = [
-    "--strict-markers",
-    "--strict-config",
-    "--cov=topl",
-    "--cov-branch",
-    "--cov-report=term-missing",
-    "--cov-report=html",
-    "--cov-report=xml",
-]
-testpaths = ["tests"]
-filterwarnings = [
-    "error",
-    "ignore::UserWarning",
-    "ignore::DeprecationWarning",
-]
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests",
-]
-
-[tool.coverage.run]
-source = ["src"]
-branch = true
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if 0:",
-    "if __name__ == .__main__.:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
-]
-
-[tool.bandit]
-exclude_dirs = ["tests"]
-skips = ["B101", "B601"]
-</document_content>
-</document>
-
-# File: /Users/adam/Developer/vcs/github.twardoch/pub/topl/src/repo/__init__.py
-# Language: python
-
-def main(()) -> None:
-
-
-# File: /Users/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/__init__.py
-# Language: python
-
-from ._version import __version__
-from .core import TOPLConfig, resolve_placeholders
-from .exceptions import (
-    CircularReferenceError,
-    FileNotFoundError,
-    InvalidTOMLError,
-    PlaceholderResolutionError,
-    TOPLError,
-)
-from .types import ConfigMapping, PlaceholderParams, TOMLData
-
-
-# File: /Users/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/__main__.py
-# Language: python
-
-import fire
-from .cli import main_cli
-
-def main(()) -> None:
-    """Entry point for the CLI using Fire."""
-
-
-# File: /Users/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/_version.py
-# Language: python
-
-from typing import Tuple
-from typing import Union
-
-
-# File: /Users/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/cli.py
-# Language: python
-
-import logging
-import sys
-import tomllib
-from pathlib import Path
-from typing import Any
-from rich.console import Console
-from rich.logging import RichHandler
-from .core import resolve_placeholders
-from .exceptions import FileNotFoundError as TOPLFileNotFoundError
-from .exceptions import InvalidTOMLError
-
-def configure_logging((verbose: bool = False)) -> None:
-    """Configure logging with Rich formatting."""
-
-def load_toml_file((path: Path)) -> dict[str, Any]:
-    """Load and parse a TOML file."""
-
-def main_cli((path: str, verbose: bool = False, **params: str)) -> None:
-    """Main CLI function for processing TOML files with placeholders."""
-
-
-# File: /Users/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/constants.py
-# Language: python
-
-import re
-
-
-# File: /Users/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/core.py
-# Language: python
-
-import logging
-from types import MappingProxyType
-from typing import Any
-from box import Box
-from .constants import MAX_INTERNAL_PASSES, PLACEHOLDER_PATTERN
-from .exceptions import CircularReferenceError
-from .types import ConfigMapping
-from .utils import iter_box_strings, resolve_external, resolve_internal_once
-
-class TOPLConfig:
-    """Wrapper class for resolved TOML configuration with placeholder support."""
-    def __init__((self, data: Box, unresolved_placeholders: list[str] | None = None)):
-        """Initialize with resolved data and optional unresolved placeholders."""
-    def to_dict((self)) -> dict[str, Any]:
-        """Convert to plain dictionary."""
-    def __getattr__((self, name: str)) -> Any:
-        """Delegate attribute access to the underlying Box."""
-    def __getitem__((self, key: str)) -> Any:
-        """Delegate item access to the underlying Box."""
-    def __repr__((self)) -> str:
-        """String representation showing unresolved count."""
-
-def __init__((self, data: Box, unresolved_placeholders: list[str] | None = None)):
-    """Initialize with resolved data and optional unresolved placeholders."""
-
-def data((self)) -> Box:
-    """Access the underlying Box data."""
-
-def unresolved_placeholders((self)) -> list[str]:
-    """List of placeholders that couldn't be resolved."""
-
-def has_unresolved((self)) -> bool:
-    """Check if there are any unresolved placeholders."""
-
-def to_dict((self)) -> dict[str, Any]:
-    """Convert to plain dictionary."""
-
-def __getattr__((self, name: str)) -> Any:
-    """Delegate attribute access to the underlying Box."""
-
-def __getitem__((self, key: str)) -> Any:
-    """Delegate item access to the underlying Box."""
-
-def __repr__((self)) -> str:
-    """String representation showing unresolved count."""
-
-def resolve_placeholders((data: ConfigMapping, **params: str)) -> TOPLConfig:
-    """Resolve placeholders inside data and return a TOPLConfig instance."""
-
-
-# File: /Users/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/exceptions.py
-# Language: python
-
-class TOPLError(E, x, c, e, p, t, i, o, n):
-    """Base exception for all topl-related errors."""
-
-class CircularReferenceError(T, O, P, L, E, r, r, o, r):
-    """Raised when circular placeholder references are detected."""
-
-class PlaceholderResolutionError(T, O, P, L, E, r, r, o, r):
-    """Raised when placeholder resolution fails."""
-
-class InvalidTOMLError(T, O, P, L, E, r, r, o, r):
-    """Raised when TOML parsing fails."""
-
-class FileNotFoundError(T, O, P, L, E, r, r, o, r):
-    """Raised when a TOML file cannot be found."""
-
-
-# File: /Users/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/types.py
-# Language: python
-
-from collections.abc import Mapping
-from typing import Any
-
-
-# File: /Users/adam/Developer/vcs/github.twardoch/pub/topl/src/topl/utils.py
-# Language: python
-
-import re
-from collections.abc import Generator, Mapping
-from typing import Any
-from box import Box
-from .constants import PLACEHOLDER_PATTERN
-from .types import PlaceholderParams
-
-class SafeDict(d, i, c, t):
-    """Dict that leaves unknown placeholders unchanged."""
-    def __missing__((self, key: str)) -> str:
-
-def get_by_path((box: Box, dotted_path: str)) -> Any:
-    """Return value at dotted_path or None if the path is invalid."""
-
-def resolve_internal_once((s: str, root: Box)) -> str:
-    """Replace one pass of internal placeholders in string s."""
-
-def repl((match: re.Match[str])) -> str:
-
-def resolve_external((s: str, params: PlaceholderParams)) -> str:
-    """Replace external placeholders using string formatting."""
-
-def __missing__((self, key: str)) -> str:
-
-def iter_box_strings((box: Box)) -> Generator[tuple[str, Box], None, None]:
-    """Yield (key, parent_box) pairs for every string leaf in box."""
-
-
-# File: /Users/adam/Developer/vcs/github.twardoch/pub/topl/tests/conftest.py
-# Language: python
-
-from pathlib import Path
-from typing import Any
-import pytest
-
-def sample_toml_data(()) -> dict[str, Any]:
-    """Simple TOML data for testing."""
-
-def circular_ref_data(()) -> dict[str, Any]:
-    """TOML data with circular references."""
-
-def external_placeholder_data(()) -> dict[str, Any]:
-    """TOML data requiring external parameters."""
-
-def mixed_placeholder_data(()) -> dict[str, Any]:
-    """TOML data with both internal and external placeholders."""
-
-def temp_toml_file((tmp_path: Path)) -> Path:
-    """Create a temporary TOML file."""
-
-def invalid_toml_file((tmp_path: Path)) -> Path:
-    """Create a temporary invalid TOML file."""
-
-
-# File: /Users/adam/Developer/vcs/github.twardoch/pub/topl/tests/integration/test_end_to_end.py
-# Language: python
-
-import subprocess
-import sys
-from pathlib import Path
-
-class TestCLIIntegration:
-    """Integration tests for the CLI interface."""
-    def test_cli_via_python_module((self, temp_toml_file)):
-        """Test running CLI via python -m topl."""
-    def test_cli_with_parameters((self, tmp_path)):
-        """Test CLI with external parameters."""
-    def test_cli_verbose_mode((self, temp_toml_file)):
-        """Test CLI verbose mode."""
-    def test_cli_error_handling((self, tmp_path)):
-        """Test CLI error handling for missing files."""
-
-class TestComplexResolution:
-    """Integration tests for complex placeholder resolution scenarios."""
-    def test_multi_level_nesting((self, tmp_path)):
-        """Test deeply nested placeholder resolution."""
-    def test_recursive_resolution((self, tmp_path)):
-        """Test multi-pass recursive resolution."""
-
-def test_cli_via_python_module((self, temp_toml_file)):
-    """Test running CLI via python -m topl."""
-
-def test_cli_with_parameters((self, tmp_path)):
-    """Test CLI with external parameters."""
-
-def test_cli_verbose_mode((self, temp_toml_file)):
-    """Test CLI verbose mode."""
-
-def test_cli_error_handling((self, tmp_path)):
-    """Test CLI error handling for missing files."""
-
-def test_multi_level_nesting((self, tmp_path)):
-    """Test deeply nested placeholder resolution."""
-
-def test_recursive_resolution((self, tmp_path)):
-    """Test multi-pass recursive resolution."""
-
-
-# File: /Users/adam/Developer/vcs/github.twardoch/pub/topl/tests/unit/test_cli.py
-# Language: python
-
-import pytest
-from topl.cli import configure_logging, load_toml_file, main_cli
-from topl.exceptions import FileNotFoundError as TOPLFileNotFoundError
-from topl.exceptions import InvalidTOMLError
-
-class TestConfigureLogging:
-    """Tests for logging configuration."""
-    def test_default_logging((self)):
-        """Test default logging configuration."""
-    def test_verbose_logging((self)):
-        """Test verbose logging configuration."""
-
-class TestLoadTOMLFile:
-    """Tests for TOML file loading."""
-    def test_load_valid_toml((self, temp_toml_file)):
-        """Test loading a valid TOML file."""
-    def test_load_missing_file((self, tmp_path)):
-        """Test loading a non-existent file."""
-    def test_load_invalid_toml((self, invalid_toml_file)):
-        """Test loading an invalid TOML file."""
-
-class TestMainCLI:
-    """Tests for the main CLI function."""
-    def test_successful_processing((self, temp_toml_file, capsys)):
-        """Test successful TOML processing."""
-    def test_with_external_params((self, tmp_path, capsys)):
-        """Test processing with external parameters."""
-    def test_verbose_mode((self, temp_toml_file, capsys)):
-        """Test verbose mode logging."""
-    def test_missing_file_error((self, tmp_path)):
-        """Test error handling for missing file."""
-    def test_invalid_toml_error((self, invalid_toml_file)):
-        """Test error handling for invalid TOML."""
-    def test_unresolved_placeholders_exit((self, tmp_path)):
-        """Test exit code when placeholders remain unresolved."""
-    def test_path_expansion((self, tmp_path, monkeypatch)):
-        """Test path expansion (~ and relative paths)."""
-
-def test_default_logging((self)):
-    """Test default logging configuration."""
-
-def test_verbose_logging((self)):
-    """Test verbose logging configuration."""
-
-def test_load_valid_toml((self, temp_toml_file)):
-    """Test loading a valid TOML file."""
-
-def test_load_missing_file((self, tmp_path)):
-    """Test loading a non-existent file."""
-
-def test_load_invalid_toml((self, invalid_toml_file)):
-    """Test loading an invalid TOML file."""
-
-def test_successful_processing((self, temp_toml_file, capsys)):
-    """Test successful TOML processing."""
-
-def test_with_external_params((self, tmp_path, capsys)):
-    """Test processing with external parameters."""
-
-def test_verbose_mode((self, temp_toml_file, capsys)):
-    """Test verbose mode logging."""
-
-def test_missing_file_error((self, tmp_path)):
-    """Test error handling for missing file."""
-
-def test_invalid_toml_error((self, invalid_toml_file)):
-    """Test error handling for invalid TOML."""
-
-def test_unresolved_placeholders_exit((self, tmp_path)):
-    """Test exit code when placeholders remain unresolved."""
-
-def test_path_expansion((self, tmp_path, monkeypatch)):
-    """Test path expansion (~ and relative paths)."""
-
-
-# File: /Users/adam/Developer/vcs/github.twardoch/pub/topl/tests/unit/test_core.py
-# Language: python
-
-import pytest
-from topl import CircularReferenceError, resolve_placeholders
-
-class TestResolvePlaceholders:
-    """Tests for the resolve_placeholders function."""
-    def test_simple_internal_resolution((self, sample_toml_data)):
-        """Test basic internal placeholder resolution."""
-    def test_external_parameters((self, external_placeholder_data)):
-        """Test external parameter resolution."""
-    def test_mixed_resolution((self, mixed_placeholder_data)):
-        """Test mixed internal and external resolution."""
-    def test_circular_reference_detection((self)):
-        """Test detection of circular references."""
-    def test_unresolved_placeholders((self)):
-        """Test handling of unresolved placeholders."""
-    def test_no_placeholders((self)):
-        """Test data without any placeholders."""
-
-class TestTOPLConfig:
-    """Tests for the TOPLConfig wrapper class."""
-    def test_config_creation((self, sample_toml_data)):
-        """Test basic config creation and access."""
-    def test_to_dict_conversion((self, sample_toml_data)):
-        """Test conversion to plain dictionary."""
-    def test_unresolved_tracking((self)):
-        """Test tracking of unresolved placeholders."""
-    def test_repr_with_unresolved((self)):
-        """Test string representation with unresolved placeholders."""
-    def test_repr_without_unresolved((self, sample_toml_data)):
-        """Test string representation without unresolved placeholders."""
-
-def test_simple_internal_resolution((self, sample_toml_data)):
-    """Test basic internal placeholder resolution."""
-
-def test_external_parameters((self, external_placeholder_data)):
-    """Test external parameter resolution."""
-
-def test_mixed_resolution((self, mixed_placeholder_data)):
-    """Test mixed internal and external resolution."""
-
-def test_circular_reference_detection((self)):
-    """Test detection of circular references."""
-
-def test_unresolved_placeholders((self)):
-    """Test handling of unresolved placeholders."""
-
-def test_no_placeholders((self)):
-    """Test data without any placeholders."""
-
-def test_config_creation((self, sample_toml_data)):
-    """Test basic config creation and access."""
-
-def test_to_dict_conversion((self, sample_toml_data)):
-    """Test conversion to plain dictionary."""
-
-def test_unresolved_tracking((self)):
-    """Test tracking of unresolved placeholders."""
-
-def test_repr_with_unresolved((self)):
-    """Test string representation with unresolved placeholders."""
-
-def test_repr_without_unresolved((self, sample_toml_data)):
-    """Test string representation without unresolved placeholders."""
-
-
-# File: /Users/adam/Developer/vcs/github.twardoch/pub/topl/tests/unit/test_utils.py
-# Language: python
-
-from box import Box
-from topl.utils import (
-    get_by_path,
-    iter_box_strings,
-    resolve_external,
-    resolve_internal_once,
-)
-
-class TestGetByPath:
-    """Tests for the get_by_path utility function."""
-    def test_simple_path((self)):
-        """Test retrieving simple path."""
-    def test_nested_path((self)):
-        """Test retrieving nested path."""
-    def test_missing_path((self)):
-        """Test retrieving non-existent path."""
-    def test_partial_path((self)):
-        """Test path that exists partially."""
-
-class TestResolveInternalOnce:
-    """Tests for the resolve_internal_once function."""
-    def test_simple_replacement((self)):
-        """Test simple placeholder replacement."""
-    def test_nested_replacement((self)):
-        """Test nested placeholder replacement."""
-    def test_missing_placeholder((self)):
-        """Test placeholder that doesn't exist."""
-    def test_multiple_placeholders((self)):
-        """Test multiple placeholders in one string."""
-
-class TestResolveExternal:
-    """Tests for the resolve_external function."""
-    def test_simple_external((self)):
-        """Test simple external parameter replacement."""
-    def test_missing_external((self)):
-        """Test missing external parameter."""
-    def test_empty_params((self)):
-        """Test with no external parameters."""
-    def test_multiple_external((self)):
-        """Test multiple external parameters."""
-
-class TestIterBoxStrings:
-    """Tests for the iter_box_strings function."""
-    def test_flat_strings((self)):
-        """Test iteration over flat string values."""
-    def test_nested_strings((self)):
-        """Test iteration over nested string values."""
-    def test_mixed_types((self)):
-        """Test iteration with mixed value types."""
-
-def test_simple_path((self)):
-    """Test retrieving simple path."""
-
-def test_nested_path((self)):
-    """Test retrieving nested path."""
-
-def test_missing_path((self)):
-    """Test retrieving non-existent path."""
-
-def test_partial_path((self)):
-    """Test path that exists partially."""
-
-def test_simple_replacement((self)):
-    """Test simple placeholder replacement."""
-
-def test_nested_replacement((self)):
-    """Test nested placeholder replacement."""
-
-def test_missing_placeholder((self)):
-    """Test placeholder that doesn't exist."""
-
-def test_multiple_placeholders((self)):
-    """Test multiple placeholders in one string."""
-
-def test_simple_external((self)):
-    """Test simple external parameter replacement."""
-
-def test_missing_external((self)):
-    """Test missing external parameter."""
-
-def test_empty_params((self)):
-    """Test with no external parameters."""
-
-def test_multiple_external((self)):
-    """Test multiple external parameters."""
-
-def test_flat_strings((self)):
-    """Test iteration over flat string values."""
-
-def test_nested_strings((self)):
-    """Test iteration over nested string values."""
-
-def test_mixed_types((self)):
-    """Test iteration with mixed value types."""
-
-
-</documents>
-</document_content>
-</document>
-
-<document index="18">
 <source>pyproject.toml</source>
 <document_content>
 [build-system]
@@ -19568,13 +15777,13 @@ skips = ["B101", "B601"]
 </document_content>
 </document>
 
-# File: /Users/Shared/lmstudio/lmstrix/ref/topl/src/repo/__init__.py
+# File: /Users/Shared/lmstudio/lmstrix/_keep_this/topl/src/repo/__init__.py
 # Language: python
 
 def main(()) -> None:
 
 
-# File: /Users/Shared/lmstudio/lmstrix/ref/topl/src/topl/__init__.py
+# File: /Users/Shared/lmstudio/lmstrix/_keep_this/topl/src/topl/__init__.py
 # Language: python
 
 from ._version import __version__
@@ -19589,7 +15798,7 @@ from .exceptions import (
 from .types import ConfigMapping, PlaceholderParams, TOMLData
 
 
-# File: /Users/Shared/lmstudio/lmstrix/ref/topl/src/topl/__main__.py
+# File: /Users/Shared/lmstudio/lmstrix/_keep_this/topl/src/topl/__main__.py
 # Language: python
 
 import fire
@@ -19599,7 +15808,7 @@ def main(()) -> None:
     """Entry point for the CLI using Fire."""
 
 
-# File: /Users/Shared/lmstudio/lmstrix/ref/topl/src/topl/cli.py
+# File: /Users/Shared/lmstudio/lmstrix/_keep_this/topl/src/topl/cli.py
 # Language: python
 
 import logging
@@ -19627,13 +15836,13 @@ def main_cli((path: str, verbose: bool = False, **params: str)) -> None:
     """Main CLI function for processing TOML files with placeholders."""
 
 
-# File: /Users/Shared/lmstudio/lmstrix/ref/topl/src/topl/constants.py
+# File: /Users/Shared/lmstudio/lmstrix/_keep_this/topl/src/topl/constants.py
 # Language: python
 
 import re
 
 
-# File: /Users/Shared/lmstudio/lmstrix/ref/topl/src/topl/core.py
+# File: /Users/Shared/lmstudio/lmstrix/_keep_this/topl/src/topl/core.py
 # Language: python
 
 import logging
@@ -19687,7 +15896,7 @@ def resolve_placeholders((data: ConfigMapping, **params: str)) -> TOPLConfig:
     """Resolve placeholders inside data and return a TOPLConfig instance."""
 
 
-# File: /Users/Shared/lmstudio/lmstrix/ref/topl/src/topl/exceptions.py
+# File: /Users/Shared/lmstudio/lmstrix/_keep_this/topl/src/topl/exceptions.py
 # Language: python
 
 class TOPLError(E, x, c, e, p, t, i, o, n):
@@ -19706,7 +15915,7 @@ class FileNotFoundError(T, O, P, L, E, r, r, o, r):
     """Raised when a TOML file cannot be found."""
 
 
-# File: /Users/Shared/lmstudio/lmstrix/ref/topl/src/topl/types.py
+# File: /Users/Shared/lmstudio/lmstrix/_keep_this/topl/src/topl/types.py
 # Language: python
 
 from collections.abc import Mapping
@@ -19714,7 +15923,7 @@ from types import MappingProxyType
 from typing import Any
 
 
-# File: /Users/Shared/lmstudio/lmstrix/ref/topl/src/topl/utils.py
+# File: /Users/Shared/lmstudio/lmstrix/_keep_this/topl/src/topl/utils.py
 # Language: python
 
 import re
@@ -19747,7 +15956,7 @@ def iter_box_strings((box: Box)) -> Generator[tuple[str | int, Any], None, None]
 def _iter_container((container: Any)) -> Generator[tuple[str | int, Any], None, None]:
 
 
-# File: /Users/Shared/lmstudio/lmstrix/ref/topl/tests/conftest.py
+# File: /Users/Shared/lmstudio/lmstrix/_keep_this/topl/tests/conftest.py
 # Language: python
 
 from pathlib import Path
@@ -19773,7 +15982,7 @@ def invalid_toml_file((tmp_path: Path)) -> Path:
     """Create a temporary invalid TOML file."""
 
 
-# File: /Users/Shared/lmstudio/lmstrix/ref/topl/tests/integration/test_end_to_end.py
+# File: /Users/Shared/lmstudio/lmstrix/_keep_this/topl/tests/integration/test_end_to_end.py
 # Language: python
 
 import subprocess
@@ -19817,7 +16026,7 @@ def test_recursive_resolution((self, tmp_path)):
     """Test multi-pass recursive resolution."""
 
 
-# File: /Users/Shared/lmstudio/lmstrix/ref/topl/tests/unit/test_cli.py
+# File: /Users/Shared/lmstudio/lmstrix/_keep_this/topl/tests/unit/test_cli.py
 # Language: python
 
 import pytest
@@ -19895,7 +16104,7 @@ def test_path_expansion((self, tmp_path, monkeypatch)):
     """Test path expansion (~ and relative paths)."""
 
 
-# File: /Users/Shared/lmstudio/lmstrix/ref/topl/tests/unit/test_core.py
+# File: /Users/Shared/lmstudio/lmstrix/_keep_this/topl/tests/unit/test_core.py
 # Language: python
 
 import pytest
@@ -19978,7 +16187,7 @@ def test_repr_without_unresolved((self, sample_toml_data)):
     """Test string representation without unresolved placeholders."""
 
 
-# File: /Users/Shared/lmstudio/lmstrix/ref/topl/tests/unit/test_utils.py
+# File: /Users/Shared/lmstudio/lmstrix/_keep_this/topl/tests/unit/test_utils.py
 # Language: python
 
 from box import Box
@@ -22495,17 +18704,17 @@ warning: The following rule may cause conflicts when used with the formatter: `C
 <source>cleanup.sh</source>
 <document_content>
 #!/usr/bin/env bash
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit
 
 fd -e py -x uvx autoflake -i {}
 fd -e py -x uvx pyupgrade --py312-plus {}
 fd -e py -x uvx ruff check --output-format=github --fix --unsafe-fixes {}
 fd -e py -x uvx ruff format --respect-gitignore --target-version py312 {}
 llms . "llms.txt"
-hatch clean
-gitnextver
-hatch build
-hatch publish
+uvx hatch clean
+gitnextvers .
+uvx hatch build
+uvx hatch publish
 
 </document_content>
 </document>
@@ -23184,6 +19393,93 @@ description = "Answers a question based on a provided context."
 </document_content>
 </document>
 
+<document index="51">
+<source>examples/prompts.toml</source>
+<document_content>
+# Example prompt templates for LMStrix
+# Demonstrates placeholder resolution and template reuse
+
+# Simple greeting prompts
+[greetings]
+formal = "Good day, {{name}}. How may I assist you with {{topic}}?"
+casual = "Hey {{name}}! What's up with {{topic}}?"
+professional = "Hello {{name}}, I'm here to help you with {{topic}}. Please describe your requirements."
+
+# Templates for different use cases
+[templates]
+base = "You are an expert assistant specializing in {{domain}}."
+instruction = """{{templates.base}}
+
+Please provide a {{style}} explanation of {{concept}}.
+Your response should be appropriate for someone with {{level}} knowledge."""
+
+# Code-related prompts
+[code]
+review = """You are a code reviewer. Please review the following {{language}} code:
+
+{{code}}
+
+Focus on:
+1. Code quality and best practices
+2. Potential bugs or issues
+3. Performance considerations
+4. Security concerns"""
+
+explain = "Explain this {{language}} code in simple terms: {{code}}"
+
+# Research prompts
+[research]
+summarize = """Please summarize the following text about {{topic}}:
+
+{{text}}
+
+Provide a {{length}} summary focusing on the key points."""
+
+analyze = """Analyze the following information about {{subject}}:
+
+{{content}}
+
+Consider the following aspects:
+- {{aspect1}}
+- {{aspect2}}
+- {{aspect3}}"""
+
+# Math and science prompts
+[math]
+solve = "Solve this {{difficulty}} math problem step by step: {{problem}}"
+explain_concept = "Explain the concept of {{concept}} in {{field}} using {{approach}} approach."
+
+# Creative writing prompts
+[creative]
+story = "Write a {{genre}} story about {{character}} who {{situation}}. The story should be {{length}} and include {{elements}}."
+poem = "Create a {{style}} poem about {{theme}} that incorporates {{imagery}}."
+
+# Question answering
+[qa]
+simple = "{{question}}"
+detailed = """Question: {{question}}
+
+Please provide a comprehensive answer that includes:
+- Direct answer
+- Explanation
+- Examples where relevant
+- Any important caveats or exceptions"""
+
+# System prompts
+[system]
+assistant = """You are a helpful AI assistant. Your traits:
+- {{personality}}
+- Knowledge level: {{expertise}}
+- Communication style: {{style}}
+- Primary language: {{language}}"""
+
+chatbot = """You are {{bot_name}}, a {{bot_type}} chatbot.
+Your purpose: {{purpose}}
+Your tone: {{tone}}
+Special instructions: {{instructions}}"""
+</document_content>
+</document>
+
 # File: /Users/Shared/lmstudio/lmstrix/examples/python/__init__.py
 # Language: python
 
@@ -23231,7 +19527,7 @@ def main(()) -> None:
     """Demonstrates custom inference workflows with the LMStrix Python API."""
 
 
-<document index="51">
+<document index="52">
 <source>examples/run_all_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -23303,7 +19599,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="52">
+<document index="53">
 <source>issues/101.txt</source>
 <document_content>
 examples/python/batch_processing.py:67:16: BLE001 Do not catch blind exception: `Exception`
@@ -23770,7 +20066,7 @@ tests/test_integration/test_cli_integration.py:10:30: N814 Camelcase `LMStrixCLI
 </document_content>
 </document>
 
-<document index="53">
+<document index="54">
 <source>issues/102.txt</source>
 <document_content>
 Note: `@` is used as an indicator that what follows is a path. `@` is never part of the actual path!
@@ -23906,7 +20202,32 @@ Then, if we gave `--flash=True` (or just `--flash`) in our `lmstrix save` comman
 </document_content>
 </document>
 
-<document index="54">
+<document index="55">
+<source>issues/103.txt</source>
+<document_content>
+`lmstrix infer` should have:
+
+- `--in_ctx INT` should be used to specify at which 'max tokens' to LOAD THE MODEL. If I specify `0`, then it should load the model without specified max tokens. If I specify `--in_ctx`, then we unload all models and always load the specified model. If I don't specify `--in_ctx`, then it should not unload the model if it's already loaded, and only load it if it's not loaded (and then unload all)
+- `--out_ctx INT` should replace `--max_tokens` as the maximum tokens to generate
+
+</document_content>
+</document>
+
+<document index="56">
+<source>issues/104.txt</source>
+<document_content>
+With `lmstrix infer`, I want an extra parameter --file_prompt
+
+If specified, we load the prompts from the specified file (a TOML). The TOML file needs to be parsed with @_keep_this/toml-topl.txt and the placeholders resolved.
+
+The --prompt parameter in that case refers to the prompt name in the TOML file, and the --file_prompt is the TOML file to load.
+
+Then the optional --dict parameter should be used to specify the dictionary of variables to resolve in the TOML file.
+
+</document_content>
+</document>
+
+<document index="57">
 <source>pyproject.toml</source>
 <document_content>
 [build-system]
@@ -23953,7 +20274,7 @@ classifiers = [
   "Typing :: Typed",
 ]
 dependencies = [
-  "fire>=0.5",
+  "fire>=0.7.0",
   "httpx>=0.24",
   "lmstudio>=1.4.1",
   "loguru>=0.7",
@@ -24258,7 +20579,7 @@ class LMStrix:
         self,
         model_id: str,
         prompt: str,
-        max_tokens: int = -1,
+        out_ctx: int = -1,
         temperature: float = 0.7,
     )) -> InferenceResult:
         """Runs inference on a specified model."""
@@ -24279,7 +20600,7 @@ def infer((
         self,
         model_id: str,
         prompt: str,
-        max_tokens: int = -1,
+        out_ctx: int = -1,
         temperature: float = 0.7,
     )) -> InferenceResult:
     """Runs inference on a specified model."""
@@ -24329,13 +20650,17 @@ class LMStudioClient:
         """Load a model with a specific context length using model path."""
     def load_model_by_id((self, model_id: str, context_len: int)) -> Any:
         """Load a model with a specific context length using model ID."""
+    def get_loaded_models((self)) -> list[dict[str, Any]]:
+        """Get information about currently loaded models."""
+    def is_model_loaded((self, model_id: str)) -> tuple[bool, int | None]:
+        """Check if a specific model is currently loaded."""
     def unload_all_models((self)) -> None:
         """Unload all currently loaded models to free up resources."""
     def completion((
         self,
         llm: Any,  # The loaded model object from lmstudio.llm
         prompt: str,
-        max_tokens: int = -1,  # -1 for unlimited
+        out_ctx: int = -1,  # -1 for unlimited
         temperature: float = 0.7,  # Temperature for generation
         model_id: str | None = None,  # Pass model_id separately
         **kwargs: Any,  # Accept additional parameters
@@ -24354,6 +20679,12 @@ def load_model((self, model_path: str, context_len: int, unload_all: bool = True
 def load_model_by_id((self, model_id: str, context_len: int)) -> Any:
     """Load a model with a specific context length using model ID."""
 
+def get_loaded_models((self)) -> list[dict[str, Any]]:
+    """Get information about currently loaded models."""
+
+def is_model_loaded((self, model_id: str)) -> tuple[bool, int | None]:
+    """Check if a specific model is currently loaded."""
+
 def unload_all_models((self)) -> None:
     """Unload all currently loaded models to free up resources."""
 
@@ -24361,7 +20692,7 @@ def completion((
         self,
         llm: Any,  # The loaded model object from lmstudio.llm
         prompt: str,
-        max_tokens: int = -1,  # -1 for unlimited
+        out_ctx: int = -1,  # -1 for unlimited
         temperature: float = 0.7,  # Temperature for generation
         model_id: str | None = None,  # Pass model_id separately
         **kwargs: Any,  # Accept additional parameters
@@ -24525,6 +20856,8 @@ from lmstrix.loaders.model_loader import (
 )
 from lmstrix.utils import get_context_test_log_path, setup_logging
 from lmstrix.utils.paths import get_default_models_file, get_lmstudio_path
+from pathlib import Path
+from lmstrix.loaders.prompt_loader import load_single_prompt
 import sys
 
 class LMStrixCLI:
@@ -24549,7 +20882,11 @@ class LMStrixCLI:
         self,
         prompt: str,
         model_id: str,
-        max_tokens: int = -1,
+        out_ctx: int = -1,
+        in_ctx: int | None = None,
+        reload: bool = False,
+        file_prompt: str | None = None,
+        dict: str | None = None,
         temperature: float = 0.7,
         verbose: bool = False,
     )) -> None:
@@ -24622,7 +20959,11 @@ def infer((
         self,
         prompt: str,
         model_id: str,
-        max_tokens: int = -1,
+        out_ctx: int = -1,
+        in_ctx: int | None = None,
+        reload: bool = False,
+        file_prompt: str | None = None,
+        dict: str | None = None,
         temperature: float = 0.7,
         verbose: bool = False,
     )) -> None:
@@ -25048,6 +21389,7 @@ def test_all_models((
 
 import time
 from typing import Any
+import lmstudio
 from loguru import logger
 from pydantic import BaseModel, Field
 from lmstrix.api.client import LMStudioClient
@@ -25074,7 +21416,8 @@ class InferenceEngine:
         self,
         model_id: str,
         prompt: str,
-        max_tokens: int = -1,  # Use -1 for unlimited as per new client
+        in_ctx: int | None = None,
+        out_ctx: int = -1,  # Use -1 for unlimited as per new client
         temperature: float = 0.7,
         **kwargs: Any,
     )) -> InferenceResult:
@@ -25101,7 +21444,8 @@ def infer((
         self,
         model_id: str,
         prompt: str,
-        max_tokens: int = -1,  # Use -1 for unlimited as per new client
+        in_ctx: int | None = None,
+        out_ctx: int = -1,  # Use -1 for unlimited as per new client
         temperature: float = 0.7,
         **kwargs: Any,
     )) -> InferenceResult:
@@ -25318,7 +21662,7 @@ class PromptResolver:
         prompt: str,
         context: str,
         context_placeholder: str = "{{text}}",
-        max_tokens: int | None = None,
+        out_ctx: int | None = None,
     )) -> str:
         """Inject context into a prompt, with optional truncation."""
 
@@ -25375,7 +21719,7 @@ def inject_context((
         prompt: str,
         context: str,
         context_placeholder: str = "{{text}}",
-        max_tokens: int | None = None,
+        out_ctx: int | None = None,
     )) -> str:
     """Inject context into a prompt, with optional truncation."""
 
@@ -25462,7 +21806,7 @@ def estimate_tokens((
 
 def load_context_with_limit((
     file_path: str | Path,
-    max_tokens: int,
+    out_ctx: int,
     encoding: str = "utf-8",
     model_encoding: str = "cl100k_base",
     verbose: bool = False,
@@ -25569,7 +21913,7 @@ def save_prompts((
     """Save prompts to a TOML file."""
 
 
-<document index="55">
+<document index="58">
 <source>src/lmstrix/py.typed</source>
 <document_content>
 # This file indicates that the package supports type hints
@@ -25633,6 +21977,31 @@ def get_contexts_dir(()) -> Path:
 
 def get_lmstrix_log_path(()) -> Path:
     """Get the path to the lmstrix.log.txt file."""
+
+
+# File: /Users/Shared/lmstudio/lmstrix/test_issue_103.py
+# Language: python
+
+import subprocess
+import sys
+import time
+
+def run_command((cmd)):
+    """Run a command and return output"""
+
+def main(()) -> int:
+
+
+# File: /Users/Shared/lmstudio/lmstrix/test_issue_104.py
+# Language: python
+
+import subprocess
+import sys
+
+def run_command((cmd)):
+    """Run a command and return output"""
+
+def main(()) -> int:
 
 
 # File: /Users/Shared/lmstudio/lmstrix/tests/__init__.py
@@ -26015,12 +22384,12 @@ def test_infer_with_untested_model((
     )) -> None:
     """Test inference with model that hasn't been context tested."""
 
-def test_infer_with_max_tokens((
+def test_infer_with_out_ctx((
         self: "TestInferenceEngine",
         mock_lmstudio_client: Mock,
         mock_llm: Mock,
     )) -> None:
-    """Test inference with custom max_tokens."""
+    """Test inference with custom out_ctx."""
 
 def test_infer_load_failure((
         self: "TestInferenceEngine",

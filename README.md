@@ -1,14 +1,16 @@
 LMStrix is a professional, installable Python toolkit designed to supercharge your interaction with [LM Studio](https://lmstudio.ai/). It provides a powerful command-line interface (CLI) and a clean Python API for managing, testing, and running local language models, with a standout feature: the **Adaptive Context Optimizer**.
 
+**Current version: 1.0.53** - Enhanced CLI features, full synchronous architecture, and improved safety controls.
+
 **For the full documentation, please visit the [LMStrix GitHub Pages site](https://twardoch.github.io/lmstrix/).**
 
 ## Key Features
 
-- **Automatic Context Optimization**: Discover the true context limit of any model with the `test` command.
-- **Full Model Management**: Programmatically `list` available models and `scan` for newly downloaded ones.
+- **Automatic Context Optimization**: Discover the true context limit of any model with the `test` command, featuring safety thresholds and batch testing.
+- **Full Model Management**: Programmatically `list` available models with sorting and multiple output formats, and `scan` for newly downloaded ones.
 - **Flexible Inference Engine**: Run inference with a powerful two-phase prompt templating system that separates prompt structure from its content.
 - **Rich CLI**: A beautiful and intuitive command-line interface built with `rich` and `fire`.
-- **Modern Python API**: An `async`-first API designed for high-performance, concurrent applications.
+- **Modern Python API**: A fully synchronous API for reliable and straightforward integration.
 
 ## Installation
 
@@ -45,6 +47,8 @@ lmstrix test --all --ctx 32768
 # Sort and filter model listings
 lmstrix list --sort size_gb  # Sort by model size descending
 lmstrix list --show json --sort name  # Export as JSON sorted by model name
+lmstrix list --show id  # Get plain list of model IDs
+lmstrix list --show path  # Get newline-delimited paths
 
 # Run inference on a model
 lmstrix infer "Your prompt here" --model "model-id" --max-tokens 150

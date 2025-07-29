@@ -524,21 +524,94 @@ class LMStrixCLI:
         self,
         prompt: str,
         model_id: str,
-        max_tokens: int = -1,
+        out_ctx: int = -1,
+        in_ctx: int | None = None,
+        reload: bool = False,
+        file_prompt: str | None = None,
+        dict: str | None = None,
         temperature: float = 0.7,
         verbose: bool = False,
     ) -> None:
         """Run inference on a specified model.
 
         Args:
-            prompt: The text prompt to send to the model.
+            prompt: The text prompt to send to the model. If file_prompt is specified,
+                   this refers to the prompt name in the TOML file.
             model_id: The ID of the model to use for inference.
-            max_tokens: Maximum tokens to generate (-1 for unlimited).
+            out_ctx: Maximum tokens to generate (-1 for unlimited).
+            in_ctx: Context size at which to load the model. If 0, load without specified context.
+                   If not specified, reuse existing loaded model if available.
+            reload: Force reload the model even if already loaded.
+            file_prompt: Path to TOML file containing prompt templates.
+            dict: Dictionary parameters as key=value pairs (e.g., "name=Alice,topic=AI").
             temperature: The sampling temperature.
             verbose: Enable verbose output.
         """
         # Configure logging based on verbose flag
         setup_logging(verbose=verbose)
+
+        if not out_ctx:
+            out_ctx = -1  # Default to unlimited
+
+        # Handle prompt file loading if specified
+        actual_prompt = prompt
+        if file_prompt:
+            from pathlib import Path
+
+            from lmstrix.loaders.prompt_loader import load_single_prompt
+
+            # Parse dictionary parameters
+            prompt_params = {}
+            if dict:
+                # Support both comma-separated and space-separated formats
+                if "," in dict:
+                    # Format: "key1=value1,key2=value2"
+                    pairs = dict.split(",")
+                else:
+                    # Format: "key1=value1 key2=value2" (fire might split this)
+                    # For now, assume comma-separated
+                    pairs = dict.split(",")
+
+                for pair in pairs:
+                    pair = pair.strip()
+                    if "=" in pair:
+                        key, value = pair.split("=", 1)
+                        prompt_params[key.strip()] = value.strip()
+                    else:
+                        console.print(
+                            f"[yellow]Warning: Invalid parameter format '{pair}'. Expected 'key=value'.[/yellow]",
+                        )
+
+            # Load and resolve prompt from TOML file
+            try:
+                prompt_path = Path(file_prompt).expanduser()
+                if not prompt_path.exists():
+                    console.print(f"[red]Error: Prompt file not found: {file_prompt}[/red]")
+                    return
+
+                resolved_prompt = load_single_prompt(
+                    toml_path=prompt_path,
+                    prompt_name=prompt,  # Now refers to prompt name in TOML
+                    verbose=verbose,
+                    **prompt_params,
+                )
+
+                actual_prompt = resolved_prompt.resolved
+
+                if verbose:
+                    console.print(f"[dim]Loaded prompt '{prompt}' from {file_prompt}[/dim]")
+                    if resolved_prompt.placeholders_resolved:
+                        console.print(
+                            f"[dim]Resolved placeholders: {', '.join(resolved_prompt.placeholders_resolved)}[/dim]",
+                        )
+                    if resolved_prompt.placeholders_unresolved:
+                        console.print(
+                            f"[yellow]Warning: Unresolved placeholders: {', '.join(resolved_prompt.placeholders_unresolved)}[/yellow]",
+                        )
+
+            except Exception as e:
+                console.print(f"[red]Error loading prompt from file: {e}[/red]")
+                return
 
         registry = load_model_registry(verbose=verbose)
         model = registry.find_model(model_id)
@@ -546,13 +619,22 @@ class LMStrixCLI:
             console.print(f"[red]Error: Model '{model_id}' not found in registry.[/red]")
             return
 
+        # Handle reload by setting in_ctx to optimal if not specified
+        if reload and in_ctx is None:
+            # Force reload with optimal context
+            in_ctx = model.tested_max_context or model.context_limit
+            console.print(
+                f"[yellow]Force reload requested, loading with context {in_ctx:,}[/yellow]",
+            )
+
         engine = InferenceEngine(model_registry=registry, verbose=verbose)
 
         with console.status(f"Running inference on {model.id}..."):
             result = engine.infer(
                 model_id=model.id,  # Use the full ID for inference
-                prompt=prompt,
-                max_tokens=max_tokens,
+                prompt=actual_prompt,  # Use the resolved prompt
+                in_ctx=in_ctx,
+                out_ctx=out_ctx,
                 temperature=temperature,
             )
 
@@ -742,8 +824,12 @@ def show_help() -> None:
     console.print("")
     console.print("  [green]infer[/green]           Run inference on a model")
     console.print("    [dim]PROMPT MODEL_ID   Required prompt and model[/dim]")
-    console.print("    [dim]--max_tokens NUM  Maximum tokens to generate[/dim]")
+    console.print("    [dim]--out_ctx NUM     Maximum tokens to generate[/dim]")
+    console.print("    [dim]--in_ctx NUM      Context size for loading model[/dim]")
+    console.print("    [dim]--file_prompt PATH Load prompt from TOML file[/dim]")
+    console.print("    [dim]--dict PARAMS     Parameters as key=value pairs[/dim]")
     console.print("    [dim]--temperature NUM Temperature for generation[/dim]")
+    console.print("    [dim]--reload          Force reload model[/dim]")
     console.print("    [dim]--verbose         Enable verbose output[/dim]")
     console.print("")
     console.print("  [green]health[/green]          Check database health and backups")

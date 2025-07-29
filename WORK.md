@@ -1,28 +1,89 @@
-# Work Progress
+# WORK.md - Issue #103 Implementation
 
-## 🎉 **LATEST IMPROVEMENT - GRACEFUL MODEL LOAD ERROR HANDLING** 🎉
+## Current Tasks
 
-### **CRITICAL ISSUE RESOLVED** ✅
+### Implementing Enhanced Infer Context Control
+
+1. **Add CLI parameters** - Add --in_ctx and --out_ctx to infer command
+2. **Update InferenceEngine** - Modify to support new context control
+3. **Implement smart loading** - Check if model already loaded
+4. **Handle edge cases** - in_ctx=0, backward compatibility
+5. **Test implementation** - Verify all scenarios work correctly
+
+## Progress
+
+- [x] Modify cli/main.py to add new parameters
+- [x] Update InferenceEngine.infer() method
+- [x] Add model loading state detection
+- [x] Implement conditional loading logic
+- [x] Test and validate changes
+
+## Implementation Complete! ✅
+
+### Changes Made:
+
+1. **CLI Enhancement (cli/main.py)**:
+   - Added `--in_ctx` parameter for controlling model loading context
+   - Added `--out_ctx` parameter to replace deprecated `--max_tokens`
+   - Maintained backward compatibility with deprecation warning
+   - Parameter validation and precedence handling
+
+2. **InferenceEngine Updates (core/inference.py)**:
+   - Added `in_ctx` parameter to `infer()` method
+   - Implemented conditional loading logic:
+     - When `in_ctx` specified: Always unload existing and reload
+     - When `in_ctx=0`: Load without context specification
+     - When `in_ctx` not specified: Load with optimal context
+   - Smart unloading: Only unload if explicitly loaded with `in_ctx`
+
+3. **Key Features Implemented**:
+   - ✅ `--in_ctx INT`: Controls model loading context
+   - ✅ `--in_ctx 0`: Loads model without specified context
+   - ✅ No `--in_ctx`: Uses optimal context (tested or declared)
+   - ✅ `--out_ctx INT`: Replaces `--max_tokens` for generation
+   - ✅ Backward compatibility with deprecation warnings
+
+### Usage Examples:
+
+```bash
+# Load model with specific context
+lmstrix infer "Hello" model-id --in_ctx 8192 --out_ctx 100
+
+# Load model with default context (no specification)
+lmstrix infer "Hello" model-id --in_ctx 0 --out_ctx 100
+
+# Reuse existing loaded model
+lmstrix infer "Hello" model-id --out_ctx 100
+
+# Backward compatibility (deprecated)
+lmstrix infer "Hello" model-id --max_tokens 100
+```
+
+## Previous Work Progress
+
+### 🎉 **LATEST IMPROVEMENT - GRACEFUL MODEL LOAD ERROR HANDLING** 🎉
+
+#### **CRITICAL ISSUE RESOLVED** ✅
 
 **Issue**: User encountered `LMStudioServerError: Model get/load error: Model not found: lucy-128k` during model testing, causing the entire `lmstrix test --all` process to crash.
 
 **Root Cause**: Models that exist in the LMStrix registry but are no longer available in LM Studio (deleted, unloaded, or moved) would cause a crash during the model loading phase, preventing the testing process from continuing.
 
-### **COMPREHENSIVE SOLUTION IMPLEMENTED** ✅
+#### **COMPREHENSIVE SOLUTION IMPLEMENTED** ✅
 
-#### **1. Enhanced Client Model Load Error Handling**
+##### **1. Enhanced Client Model Load Error Handling**
 - ✅ Added `LMStudioServerError` handling to `load_model` method in `src/lmstrix/api/client.py`
 - ✅ Specific detection for "model not found" and "path not found" errors
 - ✅ Converts `LMStudioServerError` to descriptive `ModelLoadError` with context
 
-#### **2. Intelligent Context Tester Model Load Recovery**
+##### **2. Intelligent Context Tester Model Load Recovery**
 - ✅ Enhanced ModelLoadError handler in `src/lmstrix/core/context_tester.py`
 - ✅ **Automatic Bad Model Detection**: Identifies models not found in LM Studio
 - ✅ **Registry Status Updates**: Marks bad models as FAILED in the database
 - ✅ **Detailed Logging**: Logs with "MODEL_NOT_FOUND" category for tracking
 - ✅ **Graceful Continuation**: Testing continues with remaining models
 
-#### **3. Robust Model Status Management**
+##### **3. Robust Model Status Management**
 - ✅ **Automatic Model Marking**: Models not found are marked as FAILED status
 - ✅ **Database Updates**: Registry automatically updated with failure information
 - ✅ **Clear Error Classification**: Distinguishes between load errors and not-found errors
@@ -419,3 +480,129 @@ graph TD
 - [x] Implement --fast mode for test command
 
 **Status**: ✅ **COMPLETE - New context testing strategy, database protection, memory/cache error handling, smart sorting, and fast mode testing fully operational**
+
+---
+
+## 🎉 **LATEST UPDATE - PROMPT FILE SUPPORT WITH TOML** 🎉
+
+### **Issue #104 Implementation** ✅ (2025-07-29)
+
+**Feature**: Added support for loading prompts from TOML files with parameter resolution.
+
+### **Implementation Details** ✅
+
+#### **1. New CLI Parameters**
+- ✅ Added `--file_prompt PATH` to specify TOML file containing prompts
+- ✅ Added `--dict PARAMS` for key=value parameter pairs
+- ✅ Modified `--prompt` behavior: when used with `--file_prompt`, refers to prompt name in TOML
+
+#### **2. Parameter Resolution**
+- ✅ Supports comma-separated format: `--dict "name=Alice,topic=AI"`
+- ✅ Integrates with existing PromptResolver for placeholder resolution
+- ✅ Handles nested placeholders and internal references
+- ✅ Reports unresolved placeholders with warnings
+
+#### **3. File Loading**
+- ✅ Path expansion for ~ and relative paths
+- ✅ Validates TOML file existence
+- ✅ Clear error messages for missing files or prompts
+- ✅ Verbose mode shows resolution details
+
+#### **4. Example TOML Structure**
+```toml
+[greetings]
+formal = "Good day, {{name}}. How may I assist you with {{topic}}?"
+casual = "Hey {{name}}! What's up with {{topic}}?"
+
+[templates]
+base = "You are an expert in {{domain}}."
+instruction = "{{templates.base}} Please explain {{concept}} in {{style}} terms."
+```
+
+### **Usage Examples** 📝
+
+```bash
+# Simple greeting with parameters
+lmstrix infer greetings.casual model-id \
+  --file_prompt prompts.toml \
+  --dict "name=Alice,topic=AI"
+
+# Nested template resolution
+lmstrix infer templates.instruction model-id \
+  --file_prompt prompts.toml \
+  --dict "domain=Python,concept=decorators,style=simple"
+
+# Multiple parameters
+lmstrix infer code.review model-id \
+  --file_prompt examples/prompts.toml \
+  --dict "language=Python,code=def hello(): pass"
+```
+
+### **Benefits** 🎯
+
+1. **✅ Reusable Prompts**: Store prompts in version-controlled files
+2. **✅ Dynamic Templates**: Use placeholders for flexible prompts
+3. **✅ Better Organization**: Separate prompt logic from code
+4. **✅ Team Collaboration**: Share prompt libraries
+5. **✅ Complex Prompts**: Support nested templates and references
+
+---
+
+## 🎉 **PREVIOUS UPDATE - ENHANCED INFERENCE IMPROVEMENTS** 🎉
+
+### **Features Implemented** ✅ (2025-07-29)
+
+**Enhancement**: Improved `lmstrix infer` command with smart model loading and better user feedback.
+
+### **Implementation Details** ✅
+
+#### **1. Smart Model State Detection**
+- ✅ Added `get_loaded_models()` and `is_model_loaded()` methods to LMStudioClient
+- ✅ Checks if model is already loaded before reloading
+- ✅ Reuses existing loaded model when no explicit context specified
+- ✅ Shows clear status messages about model reuse vs reload
+
+#### **2. Force Reload Option**
+- ✅ Added `--force-reload` flag to force model reload
+- ✅ Automatically uses optimal context when force reloading
+- ✅ Useful for refreshing model state or changing context
+
+#### **3. Context Validation**
+- ✅ Validates requested context against model's declared limit
+- ✅ Warns when context exceeds tested maximum
+- ✅ Suggests using tested maximum for best results
+- ✅ Prevents common errors before attempting to load
+
+#### **4. Enhanced Status Messages**
+- ✅ Shows when model is being reused vs reloaded
+- ✅ Displays current loaded context information
+- ✅ Clear warnings for context size issues
+- ✅ Better error messages with actionable hints
+
+### **Usage Examples** 📝
+
+```bash
+# First run - loads model
+lmstrix infer "Hello" model-id --out_ctx 100
+# Output: Loading model with optimal context 32,768...
+
+# Second run - reuses loaded model
+lmstrix infer "Hello again" model-id --out_ctx 100
+# Output: Model already loaded with context 32,768, reusing...
+
+# Force reload with different context
+lmstrix infer "Hello" model-id --in_ctx 16384 --out_ctx 100
+# Output: Model currently loaded with context 32,768, will reload with new context
+
+# Force reload without specific context
+lmstrix infer "Hello" model-id --force-reload --out_ctx 100
+# Output: Force reload requested, loading with context 32,768
+```
+
+### **Benefits** 🎯
+
+1. **✅ Better Performance**: Avoids unnecessary model reloads
+2. **✅ Clear Feedback**: Users know exactly what's happening
+3. **✅ Safer Loading**: Context validation prevents common errors
+4. **✅ More Control**: Force reload when needed
+5. **✅ Smarter Defaults**: Optimal behavior without flags
