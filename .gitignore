@@ -97,3 +97,4 @@ venv/
 wheels/
 llms.txt
 CLEANUP.txt
+src/lmstrix/_version.py
