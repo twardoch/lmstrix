@@ -9,6 +9,7 @@ from rich.console import Console
 from rich.table import Table
 
 from lmstrix.api.exceptions import APIConnectionError, ModelRegistryError
+from lmstrix.core.concrete_config import ConcreteConfigManager
 from lmstrix.core.context_tester import ContextTester
 from lmstrix.core.inference import InferenceEngine
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
@@ -17,7 +18,7 @@ from lmstrix.loaders.model_loader import (
     scan_and_update_registry,
 )
 from lmstrix.utils import get_context_test_log_path, setup_logging
-from lmstrix.utils.paths import get_default_models_file
+from lmstrix.utils.paths import get_default_models_file, get_lmstudio_path
 
 console = Console()
 
@@ -645,6 +646,70 @@ class LMStrixCLI:
         else:
             console.print("[yellow]No backup files found[/yellow]")
 
+    def save(self, flash: bool = False, verbose: bool = False) -> None:
+        """Save tested context limits to LM Studio concrete config files.
+
+        This command reads the lmstrix.json database and creates or updates
+        concrete JSON configuration files in LM Studio's .internal directory
+        for each model that has a tested_max_context value.
+
+        Args:
+            flash: Enable flash attention for GGUF models.
+            verbose: Enable verbose output.
+        """
+        setup_logging(verbose=verbose)
+
+        # Load the model registry
+        registry = load_model_registry(verbose=verbose)
+        models = registry.list_models()
+
+        # Filter models with tested context
+        models_with_context = [m for m in models if m.tested_max_context]
+
+        if not models_with_context:
+            console.print("[yellow]No models with tested context limits found.[/yellow]")
+            console.print("[dim]Run 'lmstrix test' to test model context limits first.[/dim]")
+            return
+
+        console.print(
+            f"[blue]Found {len(models_with_context)} models with tested context limits[/blue]",
+        )
+
+        # Get LM Studio path
+        try:
+            lms_path = get_lmstudio_path()
+        except Exception as e:
+            console.print(f"[red]Failed to find LM Studio installation: {e}[/red]")
+            return
+
+        # Create concrete config manager
+        config_manager = ConcreteConfigManager(lms_path)
+
+        # Save configurations
+        with console.status("Saving concrete configurations..."):
+            successful, failed = config_manager.save_all_configs(
+                models_with_context,
+                enable_flash=flash,
+            )
+
+        # Report results
+        if successful > 0:
+            console.print(
+                f"[green]✓ Successfully saved {successful} model configurations[/green]",
+            )
+
+        if failed > 0:
+            console.print(
+                f"[red]✗ Failed to save {failed} model configurations[/red]",
+            )
+
+        if flash:
+            gguf_count = sum(1 for m in models_with_context if str(m.path).endswith(".gguf"))
+            if gguf_count > 0:
+                console.print(
+                    f"[blue]Flash attention enabled for {gguf_count} GGUF models[/blue]",
+                )
+
 
 def show_help() -> None:
     """Show comprehensive help text."""
@@ -684,12 +749,17 @@ def show_help() -> None:
     console.print("  [green]health[/green]          Check database health and backups")
     console.print("    [dim]--verbose         Show detailed health information[/dim]")
     console.print("")
+    console.print("  [green]save[/green]            Save tested contexts to LM Studio configs")
+    console.print("    [dim]--flash           Enable flash attention for GGUF models[/dim]")
+    console.print("    [dim]--verbose         Enable verbose output[/dim]")
+    console.print("")
     console.print("[dim]Examples:[/dim]")
     console.print("  [dim]lmstrix scan --verbose[/dim]")
     console.print("  [dim]lmstrix list --sort ctx[/dim]")
     console.print("  [dim]lmstrix test --all[/dim]")
     console.print("  [dim]lmstrix test my-model --ctx 8192[/dim]")
     console.print('  [dim]lmstrix infer "Hello world" my-model[/dim]')
+    console.print("  [dim]lmstrix save --flash[/dim]")
 
 
 def main() -> None:

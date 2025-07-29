@@ -14,6 +14,7 @@ Project Structure:
 │   ├── 📄 test22.command
 │   ├── 📄 test23.command
 │   ├── 📄 test31.sh
+│   ├── 📄 test32.sh
 │   ├── 📄 test_english--elo_liczby--llama-3-2-3b-instruct.txt
 │   ├── 📄 test_english--elo_liczby--sarcasmll-1b.txt
 │   ├── 📄 test_english.txt
@@ -52,7 +53,8 @@ Project Structure:
 │   ├── 📄 README.md
 │   └── 📄 run_all_examples.sh
 ├── 📁 issues
-│   └── 📄 101.txt
+│   ├── 📄 101.txt
+│   └── 📄 102.txt
 ├── 📁 results
 ├── 📁 src
 │   ├── 📁 lmstrix
@@ -65,6 +67,7 @@ Project Structure:
 │   │   │   └── 📄 main.py
 │   │   ├── 📁 core
 │   │   │   ├── 📄 __init__.py
+│   │   │   ├── 📄 concrete_config.py
 │   │   │   ├── 📄 context.py
 │   │   │   ├── 📄 context_tester.py
 │   │   │   ├── 📄 inference.py
@@ -12895,13 +12898,25 @@ done
 </document>
 
 <document index="21">
+<source>_keep_this/test32.sh</source>
+<document_content>
+for c in 40000 50000 55000 60000 70000 80000 85000 90000 100000 110000 120000; do
+	for m in deepseek-moe-4x8b-r1-distill-llama-3.1-deep-thinker-uncensored-24b llama-3.2-4x3b-moe-hell-california-uncensored-10b llama-3.2-8x3b-moe-dark-champion-instruct-uncensored-abliterated-18.4b qwen3-128k-30b-a3b-neo-max-imatrix kernelllm openreasoning-nemotron-14b deepseek/deepseek-r1-0528-qwen3-8b deepseek-r1-0528-qwen3-8b deepseek-r1-distill-qwen-14b huihui-mistral-small-3.2-24b-instruct-2506-abliterated-llamacppfixed-i1 magistral-small-2507-rebased-vision-i1 qwen2.5-microsoft-nextcoder-brainstorm20x-128k-ctx-12b-i1 ultron-summarizer-8b llama-3.1-8b-sarcasm summllama3.1-8b qwen3-8b-128k qwen3-8b-256k-context-8x-grand-i1@q6_k qwen3-8b-320k-context-10x-massive llama-3-8b-instruct-gradient-1048k wemake-llama-3-8b-instruct-v41-1048k llama-3.1-1-million-ctx-deephermes-deep-reasoning-8b; do
+		echo; echo; echo; echo ">>>>> $c $m"
+		lmstrix test -c $c -m $m; 
+	done;
+done
+</document_content>
+</document>
+
+<document index="22">
 <source>_keep_this/test_english--elo_liczby--llama-3-2-3b-instruct.txt</source>
 <document_content>
 [ERROR: Completion error: Metal error: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory), Metal error: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)]
 </document_content>
 </document>
 
-<document index="22">
+<document index="23">
 <source>_keep_this/test_english--elo_liczby--sarcasmll-1b.txt</source>
 <document_content>
 [ERROR: RPC error: 
@@ -12920,7 +12935,7 @@ done
 </document_content>
 </document>
 
-<document index="23">
+<document index="24">
 <source>_keep_this/test_english.txt</source>
 <document_content>
 Test with 5 cats and 3 dogs.
@@ -12928,7 +12943,7 @@ Test with 5 cats and 3 dogs.
 </document_content>
 </document>
 
-<document index="24">
+<document index="25">
 <source>_keep_this/test_short--elo_liczby--llama-3-2-3b-instruct.txt</source>
 <document_content>
 into <text>One hundred and twenty-three numbers are here.</text>
@@ -12946,7 +12961,7 @@ The final answer is: $\boxed{One hundred and twenty-three}$
 </document_content>
 </document>
 
-<document index="25">
+<document index="26">
 <source>_keep_this/test_short--elo_liczby--sarcasmll-1b.txt</source>
 <document_content>
 Convert to words:
@@ -12958,7 +12973,7 @@ Answer: Test, numbers, here.
 </document_content>
 </document>
 
-<document index="26">
+<document index="27">
 <source>_keep_this/test_short.txt</source>
 <document_content>
 Test 123 numbers here.
@@ -12966,7 +12981,7 @@ Test 123 numbers here.
 </document_content>
 </document>
 
-<document index="27">
+<document index="28">
 <source>_keep_this/toml-topl.txt</source>
 <document_content>
 Project Structure:
@@ -20068,7 +20083,7 @@ def test_strings_in_lists((self)):
 </document_content>
 </document>
 
-<document index="28">
+<document index="29">
 <source>_keep_this/wieszanie/rymkiewicz-wieszanie.md</source>
 <document_content>
 JAROSŁAW MAREK RYMKIEWICZ. "Wieszanie". 
@@ -20952,7 +20967,7 @@ Na tych pytaniach kończy się ta historia i nic już więcej nie wiadomo, bo da
 </document_content>
 </document>
 
-<document index="29">
+<document index="30">
 <source>_keep_this/wieszanie/rymkiewicz-wieszanie1.md</source>
 <document_content>
 Przeczytałem ponownie poznańskie wydanie (z roku 1865) "Drugiego rozbioru Polski" z "Pamiętników" Sieversa (są to nie tyle pamiętniki Johanna Jakoba Sieversa, ile zbiór różnych materiałów, listów oraz raportów, które z rodzinnego archiwum Sieversów opublikował, w połowie XIX wieku, niemiecki historyk Karl Ludwig Blum) i wydaje mi się teraz, że Tadeusz Korzon, opisując grodzieńskie dochody Stanisława Augusta; czyli to, co król dostał od rosyjskiej carycy za współudział w przeprowadzeniu drugiego rozbioru; mógł się jednak trochę mylić. Wygląda bowiem na to, że autor Wewnętrznych dziejów Polski za Stanisława Augusta, oceniając królewskie dochody, właśnie te z roku 1793, na podstawie dokumentów zachowanych w archiwum Sieversów, dokonywał obliczeń, których można by dokonać w inny sposób. Mówiąc inaczej, to, co dla Korzona było całkowicie pewne, jest (jeśli wnikniemy w informacje podawane przez Sieversa i ujmiemy je w inny sposób) bardzo niepewne; te informacje mogą być rozumiane tak, jak rozumiał je Korzon, ale mogą też być rozumiane inaczej. Nie znaczy to, że król za udział w Sejmie Grodzieńskim (i za przyjazną tam współpracę z rosyjskim ambasadorem) dostał od carycy mniej, niż uważał Korzon. Może nawet dostał więcej; tyle że chyba nie da się tego ostatecznie wyjaśnić. Oto dwa przykłady, które pokazują, że obliczenia, mające za punkt wyjścia wiadomości z Drugiego rozbioru Polski, mogłyby dać inny rezultat. Według Korzona, na początku roku 1793 Stanisław August popadł "w zupełną recydywę podłości”. Na podróż z Warszawy do Białegostoku, a potem do Grodna; w pierwszych dniach kwietnia 1793 roku; wziął od rosyjskiego ambasadora wprzód 20 000 dukatów, a potem jeszcze 10 000 dukatów. Pieniądze na podróż, które faktycznie były zapłatą za wyrażenie zgody na drugi rozbiór Polski (powiedzmy, że pierwszą ratą takiej zapłaty), wziął wtedy nie tylko król; zachęcani w ten sposób do wyjazdu byli także różni wysocy urzędnicy Rzeczypospolitej. Królewskim dygnitarzom rosyjski ambasador płacił jednak znacznie gorzej; na koszty podróży z Warszawy do Grodna dostali oni wówczas dziesięć, dwadzieścia, nawet trzydzieści razy mniej. "Myślę zatem; pisał Sievers do Płatona Zubowa; że aby pozyskać wielkiego kanclerza Małachowskiego, podkanclerzego Chreptowicza i marszałka nadwornego Raczyńskiego, byłoby dobrze ofiarować każdemu tysiąc do dwóch i trzech tysięcy dukatów na drogę jako sekretny podarunek”. Ale czy ówczesny "sekretny podarunek” dla króla wynosił rzeczywiście 30 000 dukatów?
@@ -20962,7 +20977,7 @@ Czy chodzi tu o te pierwsze 20 000 dukatów? Może, ale niekoniecznie. W tymże 
 </document_content>
 </document>
 
-<document index="30">
+<document index="31">
 <source>build.log.txt</source>
 <document_content>
 Running linter and formatter...
@@ -22225,7 +22240,7 @@ Found 124 errors.
 </document_content>
 </document>
 
-<document index="31">
+<document index="32">
 <source>build.sh</source>
 <document_content>
 #!/bin/bash
@@ -22263,7 +22278,7 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 </document_content>
 </document>
 
-<document index="32">
+<document index="33">
 <source>cleanup.log.txt</source>
 <document_content>
 Rewriting ./src/lmstrix/core/context.py
@@ -22468,7 +22483,7 @@ warning: The following rule may cause conflicts when used with the formatter: `C
 </document_content>
 </document>
 
-<document index="33">
+<document index="34">
 <source>cleanup.sh</source>
 <document_content>
 #!/usr/bin/env bash
@@ -22487,7 +22502,7 @@ hatch publish
 </document_content>
 </document>
 
-<document index="34">
+<document index="35">
 <source>docs/_config.yml</source>
 <document_content>
 title: LMStrix
@@ -22509,7 +22524,7 @@ plugins:
 </document_content>
 </document>
 
-<document index="35">
+<document index="36">
 <source>docs/api.md</source>
 <document_content>
 ---
@@ -22558,7 +22573,7 @@ Represents the response from an inference request.
 </document_content>
 </document>
 
-<document index="36">
+<document index="37">
 <source>docs/how-it-works.md</source>
 <document_content>
 ---
@@ -22597,7 +22612,7 @@ The command saves the results of the test to a local registry, so you only need 
 </document_content>
 </document>
 
-<document index="37">
+<document index="38">
 <source>docs/index.md</source>
 <document_content>
 ---
@@ -22642,7 +22657,7 @@ This gives you a reliable, empirical measurement of the model's true capabilitie
 </document_content>
 </document>
 
-<document index="38">
+<document index="39">
 <source>docs/installation.md</source>
 <document_content>
 ---
@@ -22682,7 +22697,7 @@ pip install -e .[dev]
 </document_content>
 </document>
 
-<document index="39">
+<document index="40">
 <source>docs/usage.md</source>
 <document_content>
 ---
@@ -22803,7 +22818,7 @@ if __name__ == "__main__":
 </document_content>
 </document>
 
-<document index="40">
+<document index="41">
 <source>examples/README.md</source>
 <document_content>
 # LMStrix Usage Examples
@@ -22872,7 +22887,7 @@ python3 python/basic_usage.py
 </document_content>
 </document>
 
-<document index="41">
+<document index="42">
 <source>examples/cli/basic_workflow.sh</source>
 <document_content>
 #!/bin/bash
@@ -22932,7 +22947,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="42">
+<document index="43">
 <source>examples/cli/inference_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -22994,7 +23009,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="43">
+<document index="44">
 <source>examples/cli/model_testing.sh</source>
 <document_content>
 #!/bin/bash
@@ -23052,7 +23067,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="44">
+<document index="45">
 <source>examples/data/sample_context.txt</source>
 <document_content>
 This is a sample text file designed for context length testing in LMStrix. The purpose of this file is to provide a sufficiently large and repetitive block of text that can be used to fill the context window of a large language model. By feeding a model a long prompt composed of this text, we can determine the maximum number of tokens it can process before it fails to load or produce a coherent response. This process is crucial for understanding the true operational limits of a model, which may differ from the limits advertised by its developers. The text itself is not intended to be meaningful, but rather to serve as a consistent and measurable filler for the model's context buffer. The repetition ensures that the content is uniform and does not introduce unexpected variables into the testing process.
@@ -23068,7 +23083,7 @@ This is a sample text file designed for context length testing in LMStrix. The p
 </document_content>
 </document>
 
-<document index="45">
+<document index="46">
 <source>examples/data/test_questions.json</source>
 <document_content>
 [
@@ -23080,7 +23095,7 @@ This is a sample text file designed for context length testing in LMStrix. The p
 </document_content>
 </document>
 
-<document index="46">
+<document index="47">
 <source>examples/prompts/analysis.toml</source>
 <document_content>
 # examples/prompts/analysis.toml
@@ -23101,7 +23116,7 @@ description = "Analyzes the sentiment of a given text."
 </document_content>
 </document>
 
-<document index="47">
+<document index="48">
 <source>examples/prompts/coding.toml</source>
 <document_content>
 # examples/prompts/coding.toml
@@ -23123,7 +23138,7 @@ description = "Explains a snippet of code."
 </document_content>
 </document>
 
-<document index="48">
+<document index="49">
 <source>examples/prompts/creative.toml</source>
 <document_content>
 # examples/prompts/creative.toml
@@ -23140,7 +23155,7 @@ description = "Generates a story idea from a genre and character."
 </document_content>
 </document>
 
-<document index="49">
+<document index="50">
 <source>examples/prompts/qa.toml</source>
 <document_content>
 # examples/prompts/qa.toml
@@ -23208,7 +23223,7 @@ def main(()) -> None:
     """Demonstrates custom inference workflows with the LMStrix Python API."""
 
 
-<document index="50">
+<document index="51">
 <source>examples/run_all_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -23280,7 +23295,7 @@ echo -e "
 </document_content>
 </document>
 
-<document index="51">
+<document index="52">
 <source>issues/101.txt</source>
 <document_content>
 examples/python/batch_processing.py:67:16: BLE001 Do not catch blind exception: `Exception`
@@ -23747,7 +23762,143 @@ tests/test_integration/test_cli_integration.py:10:30: N814 Camelcase `LMStrixCLI
 </document_content>
 </document>
 
-<document index="52">
+<document index="53">
+<source>issues/102.txt</source>
+<document_content>
+Note: `@` is used as an indicator that what follows is a path. `@` is never part of the actual path!
+
+Our @lmstrix.json may have an entry like this for an MLX model:
+
+```json
+"google/gemma-3n-e4b": {
+"id": "google/gemma-3n-e4b",
+"short_id": "gemma-3n-e4b",
+"path": "google/gemma-3n-e4b",
+"size_bytes": 5858917459,
+"ctx_in": 32768,
+"ctx_out": 4096,
+"has_tools": false,
+"has_vision": true,
+"tested_max_context": 27000,
+"loadable_max_context": null,
+"last_known_good_context": 27000,
+"last_known_bad_context": 30000,
+"context_test_status": "completed",
+"context_test_log": "/Users/Shared/lmstudio/lmstrix/context_tests/google_gemma-3n-e4b_context_test.log",
+"context_test_date": "2025-07-29 20:42:27.325888",
+"failed": false,
+"error_msg": ""
+},
+```
+
+and for a GGUF model:
+
+```json
+"mradermacher/Meta-Llama-3-8B-Instruct-64k-GGUF/Meta-Llama-3-8B-Instruct-64k.Q8_0.gguf": {
+"id": "meta-llama-3-8b-instruct-64k",
+"short_id": "Meta-Llama-3-8B-Instruct-64k.Q8_0",
+"path": "mradermacher/Meta-Llama-3-8B-Instruct-64k-GGUF/Meta-Llama-3-8B-Instruct-64k.Q8_0.gguf",
+"size_bytes": 8541283584,
+"ctx_in": 65536,
+"ctx_out": 4096,
+"has_tools": false,
+"has_vision": false,
+"tested_max_context": 65536,
+"loadable_max_context": null,
+"last_known_good_context": 65536,
+"last_known_bad_context": null,
+"context_test_status": "completed",
+"context_test_log": "/Users/Shared/lmstudio/lmstrix/context_tests/meta-llama-3-8b-instruct-64k_context_test.log",
+"context_test_date": "2025-07-27 23:37:28.002544",
+"failed": false,
+"error_msg": ""
+},
+```
+
+The main difference between the model types is that a GGUF `path` attribute ends with `.gguf` and consists of f"{vendor_folder}/{model_folder}/{model_gguf_file}" while an MLX `path` attribute only has f"{vendor_folder}/{model_folder}" (because multiple files exist in the folder).
+
+Our main LMStudio data folder typically has an `.internal` folder and inside there is a `user-concrete-model-default-config` folder.
+
+Now inside that @.internal/user-concrete-model-default-config is an optional tree of "Concrete JSON" files that is organized using the model paths like so:
+
+- If the model is MLX and has the path `google/gemma-3n-e4b` then we may have `.internal/user-concrete-model-default-config/google/gemma-3n-e4b.json`
+- If the model is GGUF and has the path `mradermacher/Meta-Llama-3-8B-Instruct-64k-GGUF/Meta-Llama-3-8B-Instruct-64k.Q8_0.gguf` then we may have `.internal/user-concrete-model-default-config/mradermacher/Meta-Llama-3-8B-Instruct-64k-GGUF/Meta-Llama-3-8B-Instruct-64k.Q8_0.gguf.json`
+
+These "Concrete JSON" files hold user per-model configurations.
+
+If I only modify the default context size at which LM Studio should load the model with, the file will look like so:
+
+```json
+{
+"preset": "",
+"operation": {
+"fields": []
+},
+"load": {
+"fields": [
+{
+"key": "llm.load.contextLength",
+"value": 27000
+}
+]
+}
+}
+```
+
+In addition, of interest is the Flash Attention setting which is only of interest for GGUF models:
+
+```json
+{
+"preset": "",
+"operation": {
+"fields": []
+},
+"load": {
+"fields": [
+{
+"key": "llm.load.contextLength",
+"value": 65536
+},
+{
+"key": "llm.load.llama.flashAttention",
+"value": true
+}
+]
+}
+}
+```
+
+Note: The JSON may have other settings.
+
+TASK:
+
+When I do `lmstrix save`, the tool should read our database (lmstrix.json), and for each model that has a `tested_max_context` value it should CREATE or UPDATE the Concrete JSON file inside the `.internal/user-concrete-model-default-config` folder in the LM Studio data folder — the Concrete JSON file that corresponds to the model (= `path` attr of the model + `.json` extension)
+
+We should create in memory the skeleton structure:
+
+```
+{
+"preset": "",
+"operation": {
+"fields": []
+},
+"load": {
+"fields": [
+]
+}
+}
+```
+
+We should read the Concrete JSON data structure if it exists, and MERGE-OVERWRITE it onto our skeleton structure
+
+Then in the `load["fields"]` list, we should check if a dict exists with the key `"key"` and the value `"llm.load.contextLength"` and if so, we should update that very dict, or otherwise create it. In that dict, we add the `"value"` key with the value equal to the model's `tested_max_context`.
+
+Then, if we gave `--flash=True` (or just `--flash`) in our `lmstrix save` command, then (ONLY FOR GGUF MODELS!!!) in the `load["fields"]` list, we should check if a dict exists with the key `"key"` and the value `"llm.load.llama.flashAttention"` and if so, we should update that very dict, or otherwise create it. In that dict, we add the `"value"` key with the value `true`.
+
+</document_content>
+</document>
+
+<document index="54">
 <source>pyproject.toml</source>
 <document_content>
 [build-system]
@@ -24356,6 +24507,7 @@ import fire
 from rich.console import Console
 from rich.table import Table
 from lmstrix.api.exceptions import APIConnectionError, ModelRegistryError
+from lmstrix.core.concrete_config import ConcreteConfigManager
 from lmstrix.core.context_tester import ContextTester
 from lmstrix.core.inference import InferenceEngine
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
@@ -24364,7 +24516,7 @@ from lmstrix.loaders.model_loader import (
     scan_and_update_registry,
 )
 from lmstrix.utils import get_context_test_log_path, setup_logging
-from lmstrix.utils.paths import get_default_models_file
+from lmstrix.utils.paths import get_default_models_file, get_lmstudio_path
 import sys
 
 class LMStrixCLI:
@@ -24396,6 +24548,8 @@ class LMStrixCLI:
         """Run inference on a specified model."""
     def health((self, verbose: bool = False)) -> None:
         """Check database health and backup status."""
+    def save((self, flash: bool = False, verbose: bool = False)) -> None:
+        """Save tested context limits to LM Studio concrete config files."""
 
 def _get_models_to_test((
     registry: ModelRegistry,
@@ -24469,6 +24623,9 @@ def infer((
 def health((self, verbose: bool = False)) -> None:
     """Check database health and backup status."""
 
+def save((self, flash: bool = False, verbose: bool = False)) -> None:
+    """Save tested context limits to LM Studio concrete config files."""
+
 def show_help(()) -> None:
     """Show comprehensive help text."""
 
@@ -24484,6 +24641,49 @@ from lmstrix.core.context_tester import ContextTester, ContextTestResult
 from lmstrix.core.inference import InferenceEngine, InferenceResult
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 from lmstrix.core.prompts import PromptResolver, ResolvedPrompt
+
+
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/core/concrete_config.py
+# Language: python
+
+import json
+from pathlib import Path
+from typing import Any
+from loguru import logger
+from lmstrix.core.models import Model
+
+class ConcreteConfigManager:
+    """Manages LM Studio concrete model configurations."""
+    def __init__((self, lms_path: Path)):
+        """Initialize the concrete config manager."""
+    def _get_config_path((self, model: Model)) -> Path:
+        """Get the path for a model's concrete config file."""
+    def _create_skeleton_config((self)) -> dict[str, Any]:
+        """Create the skeleton structure for a concrete config."""
+    def _update_field((self, fields: list[dict[str, Any]], key: str, value: Any)) -> None:
+        """Update or add a field in the fields list."""
+    def save_model_config((self, model: Model, enable_flash: bool = False)) -> bool:
+        """Save a model's tested context limit to its concrete config."""
+    def save_all_configs((self, models: list[Model], enable_flash: bool = False)) -> tuple[int, int]:
+        """Save concrete configs for all models with tested contexts."""
+
+def __init__((self, lms_path: Path)):
+    """Initialize the concrete config manager."""
+
+def _get_config_path((self, model: Model)) -> Path:
+    """Get the path for a model's concrete config file."""
+
+def _create_skeleton_config((self)) -> dict[str, Any]:
+    """Create the skeleton structure for a concrete config."""
+
+def _update_field((self, fields: list[dict[str, Any]], key: str, value: Any)) -> None:
+    """Update or add a field in the fields list."""
+
+def save_model_config((self, model: Model, enable_flash: bool = False)) -> bool:
+    """Save a model's tested context limit to its concrete config."""
+
+def save_all_configs((self, models: list[Model], enable_flash: bool = False)) -> tuple[int, int]:
+    """Save concrete configs for all models with tested contexts."""
 
 
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context.py
@@ -24933,6 +25133,8 @@ class Model(B, a, s, e, M, o, d, e, l):
         """Get the short_id, computing it from path if not set."""
     def to_registry_dict((self)) -> dict[str, Any]:
         """Convert to dictionary format for registry storage."""
+    def reset_test_data((self)) -> None:
+        """Reset all context testing data."""
     def validate_integrity((self)) -> bool:
         """Validate model data integrity."""
 
@@ -24997,6 +25199,9 @@ def get_short_id((self)) -> str:
 
 def to_registry_dict((self)) -> dict[str, Any]:
     """Convert to dictionary format for registry storage."""
+
+def reset_test_data((self)) -> None:
+    """Reset all context testing data."""
 
 def validate_integrity((self)) -> bool:
     """Validate model data integrity."""
@@ -25356,7 +25561,7 @@ def save_prompts((
     """Save prompts to a TOML file."""
 
 
-<document index="53">
+<document index="55">
 <source>src/lmstrix/py.typed</source>
 <document_content>
 # This file indicates that the package supports type hints

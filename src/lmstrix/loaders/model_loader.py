@@ -146,6 +146,17 @@ def _update_existing_model(
         logger.info(f"Clearing test data for failed model {existing_model.path} (--failed flag)")
         existing_model.reset_test_data()
 
+    # Fix status for models where tested_max_context equals context_limit but status is still "testing"
+    if (
+        existing_model.tested_max_context is not None
+        and existing_model.tested_max_context == existing_model.context_limit
+        and existing_model.context_test_status == ContextTestStatus.TESTING
+    ):
+        logger.info(
+            f"Fixing status for {existing_model.path}: tested_max_context equals context_limit, changing status from 'testing' to 'completed'",
+        )
+        existing_model.context_test_status = ContextTestStatus.COMPLETED
+
     return existing_model
 
 
