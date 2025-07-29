@@ -28,9 +28,10 @@ def _get_models_to_test(
     ctx: int | None,
     model_id: str | None,
     reset: bool = False,
+    fast_mode: bool = False,
 ) -> list[Model]:
     """Filter and return a list of models to be tested."""
-    tester = ContextTester()  # Create a temporary tester for _is_embedding_model
+    tester = ContextTester(fast_mode=fast_mode)  # Create a temporary tester for _is_embedding_model
 
     if not test_all:
         if not model_id:
@@ -180,7 +181,7 @@ def _test_all_models_at_ctx(
         print(f"[{i}/{len(models_to_test)}] Testing {model.id}...")
 
         if i > 1:
-            print("  ⏳ Waiting 3 seconds before next model (resource cleanup)...")
+            print("\n\n  ⏳ Waiting 3 seconds before next model (resource cleanup)...")
             time.sleep(3.0)
 
         log_path = get_context_test_log_path(model.id)
@@ -285,7 +286,7 @@ class LMStrixCLI:
             with console.status("Scanning for models..."):
                 registry = scan_and_update_registry(
                     rescan_failed=failed,
-                    rereset=reset,
+                    rescan_all=reset,
                     verbose=verbose,
                 )
 
@@ -314,7 +315,7 @@ class LMStrixCLI:
         """List all models from the registry with their test status.
 
         Args:
-            sort: Sort order. Options: id, idd, ctx, ctxd, dtx, dtxd, size, sized (d = descending).
+            sort: Sort order. Options: id, idd, ctx, ctxd, dtx, dtxd, size, sized, smart, smartd (d = descending).
             show: Output format. Options: id (plain IDs), path (relative paths), json (JSON array).
             verbose: Enable verbose output.
         """
@@ -342,6 +343,14 @@ class LMStrixCLI:
             sorted_models = sorted(models, key=lambda m: m.context_limit, reverse=reverse)
         elif sort_key in ("size", "sized"):
             sorted_models = sorted(models, key=lambda m: m.size, reverse=reverse)
+        elif sort_key in ("smart", "smartd"):
+            # Use the same smart sorting as 'test --all': size + context_limit * 100,000
+            # This prioritizes smaller models first, then lower context within similar sizes
+            sorted_models = sorted(
+                models,
+                key=lambda m: m.size + (m.context_limit * 100_000),
+                reverse=reverse,
+            )
         else:
             console.print(f"[red]Invalid sort option: {sort}. Using default (id).[/red]")
             sorted_models = sorted(models, key=lambda m: m.id)
@@ -412,6 +421,7 @@ class LMStrixCLI:
         threshold: int = 31744,
         ctx: int | None = None,
         sort: str = "id",
+        fast: bool = False,
         verbose: bool = False,
     ) -> None:
         """Test the context limits for models.
@@ -424,6 +434,7 @@ class LMStrixCLI:
                       Prevents system crashes from very large contexts.
             ctx: Test only this specific context value (skips if > declared context).
             sort: Sort order (only used for single model tests). --all always sorts by size.
+            fast: Skip semantic verification - only test if inference completes technically.
             verbose: Enable verbose output.
         """
         setup_logging(verbose=verbose)
@@ -436,7 +447,7 @@ class LMStrixCLI:
             console.print("[red]Error: Cannot use --all and specify a model ID together.[/red]")
             return
 
-        models_to_test = _get_models_to_test(registry, test_all_models, ctx, model_id, reset)
+        models_to_test = _get_models_to_test(registry, test_all_models, ctx, model_id, reset, fast)
         if not models_to_test:
             return
 
@@ -457,7 +468,7 @@ class LMStrixCLI:
 
         if test_all_models:
             # Filter out embedding models for --all flag
-            tester = ContextTester(verbose=verbose)
+            tester = ContextTester(verbose=verbose, fast_mode=fast)
             models_to_test = tester._filter_models_for_testing(models_to_test)
             if not models_to_test:
                 console.print(
@@ -474,7 +485,7 @@ class LMStrixCLI:
                 "[cyan]Sorting models by optimal testing order (size + context priority).[/cyan]",
             )
 
-        tester = ContextTester(verbose=verbose)
+        tester = ContextTester(verbose=verbose, fast_mode=fast)
 
         if ctx is not None:
             if test_all_models:
@@ -635,9 +646,69 @@ class LMStrixCLI:
             console.print("[yellow]No backup files found[/yellow]")
 
 
+def show_help() -> None:
+    """Show comprehensive help text."""
+    console.print("[bold cyan]LMStrix - LM Studio Model Testing Toolkit[/bold cyan]")
+    console.print("\n[cyan]Available commands:[/cyan]")
+    console.print("  [green]scan[/green]            Scan for LM Studio models and update registry")
+    console.print("    [dim]--failed          Re-scan only previously failed models[/dim]")
+    console.print("    [dim]--reset           Re-scan all models (clear test data)[/dim]")
+    console.print("    [dim]--verbose         Enable verbose output[/dim]")
+    console.print("")
+    console.print("  [green]list[/green]            List all models with their test status")
+    console.print(
+        "    [dim]--sort id|ctx|dtx|size|smart  Sort by: id, tested context, declared context, size, smart[/dim]",
+    )
+    console.print("    [dim]--show id|path|json     Output format[/dim]")
+    console.print("    [dim]--verbose         Enable verbose output[/dim]")
+    console.print("")
+    console.print("  [green]test[/green]            Test model context limits")
+    console.print("    [dim]MODEL_ID          Test specific model[/dim]")
+    console.print("    [dim]--all             Test all untested models[/dim]")
+    console.print("    [dim]--reset           Re-test all models[/dim]")
+    console.print("    [dim]--ctx SIZE        Test specific context size[/dim]")
+    console.print(
+        "    [dim]--threshold SIZE  Max context for initial testing (default: 31744)[/dim]",
+    )
+    console.print(
+        "    [dim]--fast            Skip semantic verification (only test if inference completes)[/dim]",
+    )
+    console.print("    [dim]--verbose         Enable verbose output[/dim]")
+    console.print("")
+    console.print("  [green]infer[/green]           Run inference on a model")
+    console.print("    [dim]PROMPT MODEL_ID   Required prompt and model[/dim]")
+    console.print("    [dim]--max_tokens NUM  Maximum tokens to generate[/dim]")
+    console.print("    [dim]--temperature NUM Temperature for generation[/dim]")
+    console.print("    [dim]--verbose         Enable verbose output[/dim]")
+    console.print("")
+    console.print("  [green]health[/green]          Check database health and backups")
+    console.print("    [dim]--verbose         Show detailed health information[/dim]")
+    console.print("")
+    console.print("[dim]Examples:[/dim]")
+    console.print("  [dim]lmstrix scan --verbose[/dim]")
+    console.print("  [dim]lmstrix list --sort ctx[/dim]")
+    console.print("  [dim]lmstrix test --all[/dim]")
+    console.print("  [dim]lmstrix test my-model --ctx 8192[/dim]")
+    console.print('  [dim]lmstrix infer "Hello world" my-model[/dim]')
+
+
 def main() -> None:
     """Main entry point for the CLI."""
-    fire.Fire(LMStrixCLI)
+    import sys
+
+    # Check for help flags first
+    if len(sys.argv) > 1 and sys.argv[1] in ("--help", "-h", "help"):
+        show_help()
+        return
+
+    try:
+        fire.Fire(LMStrixCLI)
+    except TypeError as e:
+        if "Inspector.__init__()" in str(e) and "theme_name" in str(e):
+            # Handle Fire/IPython compatibility issue - show our custom help
+            show_help()
+        else:
+            raise
 
 
 if __name__ == "__main__":
