@@ -108,7 +108,8 @@ class TestInferenceManager:
         mock_lmstudio_client.load_model.return_value = mock_llm
         mock_lmstudio_client.is_model_loaded.return_value = (False, 0)
         mock_lmstudio_client.completion.return_value = Mock(
-            content="Test response", usage={"total_tokens": 15}
+            content="Test response",
+            usage={"total_tokens": 15},
         )
 
         manager = InferenceManager(client=mock_lmstudio_client, registry=mock_registry)

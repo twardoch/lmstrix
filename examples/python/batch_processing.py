@@ -99,7 +99,7 @@ def main() -> None:
                     "model": model.id,
                     "response": result.response,
                     "time": result.inference_time,
-                }
+                },
             )
 
         except Exception as e:
@@ -109,7 +109,7 @@ def main() -> None:
                     "model": model.id,
                     "response": f"[Error: {e}]",
                     "time": 0.0,
-                }
+                },
             )
 
     # 4. Performance Comparison

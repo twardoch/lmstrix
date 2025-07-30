@@ -694,7 +694,7 @@ class LMStrixCLI:
                 parsed_out_ctx = parse_out_ctx(out_ctx, max_context)
                 if verbose:
                     console.print(
-                        f"[dim]Parsed out_ctx '{out_ctx}' as {parsed_out_ctx} tokens[/dim]"
+                        f"[dim]Parsed out_ctx '{out_ctx}' as {parsed_out_ctx} tokens[/dim]",
                     )
                 out_ctx = parsed_out_ctx
             except ValueError as e:
@@ -911,7 +911,7 @@ def show_help() -> None:
     console.print("  [green]infer[/green]           Run inference on a model")
     console.print("    [dim]PROMPT MODEL_ID   Required prompt and model[/dim]")
     console.print(
-        "    [dim]--out_ctx NUM|%   Maximum tokens to generate (e.g., 500 or '80%')[/dim]"
+        "    [dim]--out_ctx NUM|%   Maximum tokens to generate (e.g., 500 or '80%')[/dim]",
     )
     console.print("    [dim]--in_ctx NUM      Context size for loading model[/dim]")
     console.print("    [dim]--file_prompt PATH Load prompt from TOML file[/dim]")

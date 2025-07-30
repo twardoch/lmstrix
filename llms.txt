@@ -9,100 +9,217 @@ Project Structure:
 ├── 📁 docs
 │   ├── 📄 _config.yml
 │   ├── 📄 api.md
-│   ├── 📄 how-it-works.md
+│   ├── 📄 
+│   │   how-it-works.md
 │   ├── 📄 index.md
-│   ├── 📄 installation.md
+│   ├── 📄 
+│   │   installation.md
 │   └── 📄 usage.md
 ├── 📁 examples
 │   ├── 📁 cli
-│   │   ├── 📄 basic_workflow.sh
 │   │   ├── 📄 
-│   │   │   context_control_examples.sh
-│   │   ├── 📄 inference_examples.sh
-│   │   ├── 📄 model_state_demo.sh
-│   │   └── 📄 model_testing.sh
+│   │   │   basic_workfl
+│   │   │   ow.sh
+│   │   ├── 📄 
+│   │   │   context_cont
+│   │   │   rol_examples
+│   │   │   .sh
+│   │   ├── 📄 
+│   │   │   inference_ex
+│   │   │   amples.sh
+│   │   ├── 📄 
+│   │   │   model_state_
+│   │   │   demo.sh
+│   │   └── 📄 
+│   │       model_testin
+│   │       g.sh
 │   ├── 📁 data
-│   │   ├── 📄 fontlab8.md
-│   │   ├── 📄 sample_context.txt
-│   │   └── 📄 test_questions.json
+│   │   ├── 📄 
+│   │   │   fontlab8.md
+│   │   ├── 📄 
+│   │   │   sample_conte
+│   │   │   xt.txt
+│   │   └── 📄 
+│   │       test_questio
+│   │       ns.json
 │   ├── 📁 prompts
-│   │   ├── 📄 analysis.toml
-│   │   ├── 📄 coding.toml
-│   │   ├── 📄 creative.toml
+│   │   ├── 📄 
+│   │   │   analysis.tom
+│   │   │   l
+│   │   ├── 📄 
+│   │   │   coding.toml
+│   │   ├── 📄 
+│   │   │   creative.tom
+│   │   │   l
 │   │   └── 📄 qa.toml
 │   ├── 📁 python
-│   │   ├── 📄 __init__.py
-│   │   ├── 📄 advanced_testing.py
-│   │   ├── 📄 basic_usage.py
-│   │   ├── 📄 batch_processing.py
-│   │   ├── 📄 custom_inference.py
-│   │   └── 📄 prompt_templates_demo.py
+│   │   ├── 📄 
+│   │   │   __init__.py
+│   │   ├── 📄 
+│   │   │   advanced_tes
+│   │   │   ting.py
+│   │   ├── 📄 
+│   │   │   basic_usage.
+│   │   │   py
+│   │   ├── 📄 
+│   │   │   batch_proces
+│   │   │   sing.py
+│   │   ├── 📄 
+│   │   │   custom_infer
+│   │   │   ence.py
+│   │   └── 📄 
+│   │       prompt_templ
+│   │       ates_demo.py
 │   ├── 📁 specialized
-│   │   └── 📄 elo_liczby.py
+│   │   └── 📄 
+│   │       elo_liczby.p
+│   │       y
 │   ├── 📄 prompts.toml
 │   ├── 📄 README.md
-│   └── 📄 run_all_examples.sh
+│   └── 📄 
+│       run_all_examples
+│       .sh
 ├── 📁 issues
 │   └── 📄 105.txt
 ├── 📁 results
 ├── 📁 src
 │   ├── 📁 lmstrix
 │   │   ├── 📁 api
-│   │   │   ├── 📄 __init__.py
-│   │   │   ├── 📄 client.py
-│   │   │   └── 📄 exceptions.py
+│   │   │   ├── 📄 
+│   │   │   │   __init__
+│   │   │   │   .py
+│   │   │   ├── 📄 
+│   │   │   │   client.p
+│   │   │   │   y
+│   │   │   └── 📄 
+│   │   │       exceptio
+│   │   │       ns.py
 │   │   ├── 📁 cli
-│   │   │   ├── 📄 __init__.py
-│   │   │   └── 📄 main.py
+│   │   │   ├── 📄 
+│   │   │   │   __init__
+│   │   │   │   .py
+│   │   │   └── 📄 
+│   │   │       main.py
 │   │   ├── 📁 core
-│   │   │   ├── 📄 __init__.py
-│   │   │   ├── 📄 concrete_config.py
-│   │   │   ├── 📄 context.py
-│   │   │   ├── 📄 context_tester.py
-│   │   │   ├── 📄 inference.py
-│   │   │   ├── 📄 inference_manager.py
-│   │   │   ├── 📄 models.py
-│   │   │   ├── 📄 prompts.py
-│   │   │   └── 📄 scanner.py
+│   │   │   ├── 📄 
+│   │   │   │   __init__
+│   │   │   │   .py
+│   │   │   ├── 📄 
+│   │   │   │   concrete
+│   │   │   │   _config.
+│   │   │   │   py
+│   │   │   ├── 📄 
+│   │   │   │   context.
+│   │   │   │   py
+│   │   │   ├── 📄 
+│   │   │   │   context_
+│   │   │   │   tester.p
+│   │   │   │   y
+│   │   │   ├── 📄 
+│   │   │   │   inferenc
+│   │   │   │   e.py
+│   │   │   ├── 📄 
+│   │   │   │   inferenc
+│   │   │   │   e_manage
+│   │   │   │   r.py
+│   │   │   ├── 📄 
+│   │   │   │   models.p
+│   │   │   │   y
+│   │   │   ├── 📄 
+│   │   │   │   prompts.
+│   │   │   │   py
+│   │   │   └── 📄 
+│   │   │       scanner.
+│   │   │       py
 │   │   ├── 📁 loaders
-│   │   │   ├── 📄 __init__.py
-│   │   │   ├── 📄 context_loader.py
-│   │   │   ├── 📄 model_loader.py
-│   │   │   └── 📄 prompt_loader.py
+│   │   │   ├── 📄 
+│   │   │   │   __init__
+│   │   │   │   .py
+│   │   │   ├── 📄 
+│   │   │   │   context_
+│   │   │   │   loader.p
+│   │   │   │   y
+│   │   │   ├── 📄 
+│   │   │   │   model_lo
+│   │   │   │   ader.py
+│   │   │   └── 📄 
+│   │   │       prompt_l
+│   │   │       oader.py
 │   │   ├── 📁 utils
-│   │   │   ├── 📄 __init__.py
-│   │   │   ├── 📄 context_parser.py
-│   │   │   ├── 📄 logging.py
-│   │   │   ├── 📄 paths.py
-│   │   │   └── 📄 state.py
-│   │   ├── 📄 __init__.py
-│   │   ├── 📄 __main__.py
+│   │   │   ├── 📄 
+│   │   │   │   __init__
+│   │   │   │   .py
+│   │   │   ├── 📄 
+│   │   │   │   context_
+│   │   │   │   parser.p
+│   │   │   │   y
+│   │   │   ├── 📄 
+│   │   │   │   logging.
+│   │   │   │   py
+│   │   │   ├── 📄 
+│   │   │   │   paths.py
+│   │   │   └── 📄 
+│   │   │       state.py
+│   │   ├── 📄 
+│   │   │   __init__.py
+│   │   ├── 📄 
+│   │   │   __main__.py
 │   │   └── 📄 py.typed
-│   ├── 📁 lmstrix.egg-info
-│   └── 📁 topl
+│   └── 📁 
+│       lmstrix.egg-info
 ├── 📁 tests
 │   ├── 📁 test_api
-│   │   ├── 📄 __init__.py
-│   │   ├── 📄 test_client.py
-│   │   └── 📄 test_exceptions.py
+│   │   ├── 📄 
+│   │   │   __init__.py
+│   │   ├── 📄 
+│   │   │   test_client.
+│   │   │   py
+│   │   └── 📄 
+│   │       test_excepti
+│   │       ons.py
 │   ├── 📁 test_core
-│   │   ├── 📄 __init__.py
-│   │   ├── 📄 test_context_tester.py
-│   │   ├── 📄 test_inference.py
-│   │   ├── 📄 test_models.py
-│   │   ├── 📄 test_prompts.py
-│   │   └── 📄 test_scanner.py
-│   ├── 📁 test_integration
-│   │   ├── 📄 __init__.py
-│   │   └── 📄 test_cli_integration.py
+│   │   ├── 📄 
+│   │   │   __init__.py
+│   │   ├── 📄 
+│   │   │   test_context
+│   │   │   _tester.py
+│   │   ├── 📄 
+│   │   │   test_inferen
+│   │   │   ce.py
+│   │   ├── 📄 
+│   │   │   test_models.
+│   │   │   py
+│   │   ├── 📄 
+│   │   │   test_prompts
+│   │   │   .py
+│   │   └── 📄 
+│   │       test_scanner
+│   │       .py
+│   ├── 📁 
+│   │   test_integration
+│   │   ├── 📄 
+│   │   │   __init__.py
+│   │   └── 📄 
+│   │       test_cli_int
+│   │       egration.py
 │   ├── 📁 test_loaders
-│   │   ├── 📄 __init__.py
-│   │   ├── 📄 test_context_loader.py
-│   │   ├── 📄 test_model_loader.py
-│   │   └── 📄 test_prompt_loader.py
+│   │   ├── 📄 
+│   │   │   __init__.py
+│   │   ├── 📄 
+│   │   │   test_context
+│   │   │   _loader.py
+│   │   ├── 📄 
+│   │   │   test_model_l
+│   │   │   oader.py
+│   │   └── 📄 
+│   │       test_prompt_
+│   │       loader.py
 │   ├── 📁 test_utils
-│   │   ├── 📄 __init__.py
-│   │   └── 📄 test_paths.py
+│   │   ├── 📄 
+│   │   │   __init__.py
+│   │   └── 📄 
+│   │       test_paths.p
+│   │       y
 │   ├── 📄 __init__.py
 │   ├── 📄 conftest.py
 │   └── 📄 run_tests.py
@@ -6729,9 +6846,9 @@ from typing import Any
 import tomllib
 import tomli as tomllib
 from loguru import logger
+from topl.core import resolve_placeholders
 from lmstrix.api.exceptions import ConfigurationError
 from lmstrix.core.prompts import PromptResolver, ResolvedPrompt
-from topl.core import resolve_placeholders
 import tomli_w
 import tomlkit
 import toml

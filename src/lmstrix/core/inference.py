@@ -264,7 +264,7 @@ class InferenceEngine:
                     llm_model_key = getattr(loaded_llm, "model_key", "")
 
                     logger.debug(
-                        f"Checking loaded model: id='{llm_id}', model_key='{llm_model_key}'"
+                        f"Checking loaded model: id='{llm_id}', model_key='{llm_model_key}'",
                     )
 
                     # Match by exact ID or model_key, or if model.id appears in either

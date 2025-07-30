@@ -202,15 +202,11 @@ class LMStudioClient:
         if hasattr(llm, "config") and hasattr(llm.config, "contextLength"):
             logger.info(f"📏 CONTEXT: {llm.config.contextLength:,} tokens")
 
-        # Log prompt with truncation and line count
+        # Log full prompt in verbose mode
         prompt_lines = prompt.count("\n") + 1
         prompt_chars = len(prompt)
-        if prompt_chars <= 100:
-            logger.info(f"📝 PROMPT ({prompt_lines} lines, {prompt_chars} chars): {prompt}")
-        else:
-            logger.info(f"📝 PROMPT ({prompt_lines} lines, {prompt_chars} chars):")
-            logger.info(f"   First 100 chars: {prompt[:100]}...")
-            logger.info(f"   Last 100 chars: ...{prompt[-100:]}")
+        logger.info(f"📝 PROMPT ({prompt_lines} lines, {prompt_chars} chars):")
+        logger.info(prompt)
 
         logger.info("═" * 60)
 

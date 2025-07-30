@@ -51,7 +51,7 @@ def parse_out_ctx(
 
                 if not effective_max or effective_max <= 0:
                     raise ValueError(
-                        "No valid maximum context available for percentage calculation"
+                        "No valid maximum context available for percentage calculation",
                     )
 
                 # Calculate token count from percentage

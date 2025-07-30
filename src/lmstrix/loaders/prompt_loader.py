@@ -11,10 +11,10 @@ except ImportError:
     import tomli as tomllib
 
 from loguru import logger
+from topl.core import resolve_placeholders
 
 from lmstrix.api.exceptions import ConfigurationError
 from lmstrix.core.prompts import PromptResolver, ResolvedPrompt
-from topl.core import resolve_placeholders
 
 
 def load_prompts(
