@@ -149,12 +149,12 @@ class TestLMStudioClient:
         assert "Failed to load model" in str(exc_info.value)
         assert "Model not found" in str(exc_info.value)
 
-    def test_acompletion_success(
+    def test_completion_success(
         self: "TestLMStudioClient",
         mock_llm: Mock,
         mock_completion_response: CompletionResponse,
     ) -> None:
-        """Test successful async completion."""
+        """Test successful completion."""
         mock_llm.complete = Mock(return_value=mock_completion_response)
 
         client = LMStudioClient()
@@ -174,11 +174,11 @@ class TestLMStudioClient:
             config={"maxTokens": 100},
         )
 
-    def test_acompletion_failure(
+    def test_completion_failure(
         self: "TestLMStudioClient",
         mock_llm: Mock,
     ) -> None:
-        """Test async completion failure."""
+        """Test completion failure."""
         mock_llm.complete = Mock(side_effect=Exception("Inference failed"))
         mock_llm.model_id = "test-model"
 
@@ -189,12 +189,12 @@ class TestLMStudioClient:
         assert "test-model" in str(exc_info.value)
         assert "Inference failed" in str(exc_info.value)
 
-    def test_acompletion_with_defaults(
+    def test_completion_with_defaults(
         self: "TestLMStudioClient",
         mock_llm: Mock,
         mock_completion_response: CompletionResponse,
     ) -> None:
-        """Test async completion with default parameters."""
+        """Test completion with default parameters."""
         mock_llm.complete = Mock(return_value=mock_completion_response)
 
         client = LMStudioClient()

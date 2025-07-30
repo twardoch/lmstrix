@@ -269,13 +269,9 @@ def scan_and_update_registry(
                     rescan_failed,
                 )
 
-                # Validate the updated model before committing
-                if updated_model.validate_integrity():
-                    registry.update_model(model_path, updated_model)
-                    updates_made += 1
-                else:
-                    logger.error(f"Updated model {model_path} failed integrity check, skipping")
-                    errors_encountered += 1
+                # Update the model in registry using model path as key (preserving original structure)
+                registry.update_model(model_path, updated_model)
+                updates_made += 1
             else:
                 new_model = _add_new_model(model_data)
                 if new_model:

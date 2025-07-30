@@ -1,608 +1,73 @@
-# WORK.md - Issue #103 Implementation
-
-## Current Tasks
-
-### Implementing Enhanced Infer Context Control
-
-1. **Add CLI parameters** - Add --in_ctx and --out_ctx to infer command
-2. **Update InferenceEngine** - Modify to support new context control
-3. **Implement smart loading** - Check if model already loaded
-4. **Handle edge cases** - in_ctx=0, backward compatibility
-5. **Test implementation** - Verify all scenarios work correctly
-
-## Progress
-
-- [x] Modify cli/main.py to add new parameters
-- [x] Update InferenceEngine.infer() method
-- [x] Add model loading state detection
-- [x] Implement conditional loading logic
-- [x] Test and validate changes
-
-## Implementation Complete! ✅
-
-### Changes Made:
-
-1. **CLI Enhancement (cli/main.py)**:
-   - Added `--in_ctx` parameter for controlling model loading context
-   - Added `--out_ctx` parameter to replace deprecated `--max_tokens`
-   - Maintained backward compatibility with deprecation warning
-   - Parameter validation and precedence handling
-
-2. **InferenceEngine Updates (core/inference.py)**:
-   - Added `in_ctx` parameter to `infer()` method
-   - Implemented conditional loading logic:
-     - When `in_ctx` specified: Always unload existing and reload
-     - When `in_ctx=0`: Load without context specification
-     - When `in_ctx` not specified: Load with optimal context
-   - Smart unloading: Only unload if explicitly loaded with `in_ctx`
-
-3. **Key Features Implemented**:
-   - ✅ `--in_ctx INT`: Controls model loading context
-   - ✅ `--in_ctx 0`: Loads model without specified context
-   - ✅ No `--in_ctx`: Uses optimal context (tested or declared)
-   - ✅ `--out_ctx INT`: Replaces `--max_tokens` for generation
-   - ✅ Backward compatibility with deprecation warnings
-
-### Usage Examples:
-
-```bash
-# Load model with specific context
-lmstrix infer "Hello" model-id --in_ctx 8192 --out_ctx 100
-
-# Load model with default context (no specification)
-lmstrix infer "Hello" model-id --in_ctx 0 --out_ctx 100
-
-# Reuse existing loaded model
-lmstrix infer "Hello" model-id --out_ctx 100
-
-# Backward compatibility (deprecated)
-lmstrix infer "Hello" model-id --max_tokens 100
-```
-
-## Previous Work Progress
-
-### 🎉 **LATEST IMPROVEMENT - GRACEFUL MODEL LOAD ERROR HANDLING** 🎉
-
-#### **CRITICAL ISSUE RESOLVED** ✅
-
-**Issue**: User encountered `LMStudioServerError: Model get/load error: Model not found: lucy-128k` during model testing, causing the entire `lmstrix test --all` process to crash.
-
-**Root Cause**: Models that exist in the LMStrix registry but are no longer available in LM Studio (deleted, unloaded, or moved) would cause a crash during the model loading phase, preventing the testing process from continuing.
-
-#### **COMPREHENSIVE SOLUTION IMPLEMENTED** ✅
-
-##### **1. Enhanced Client Model Load Error Handling**
-- ✅ Added `LMStudioServerError` handling to `load_model` method in `src/lmstrix/api/client.py`
-- ✅ Specific detection for "model not found" and "path not found" errors
-- ✅ Converts `LMStudioServerError` to descriptive `ModelLoadError` with context
-
-##### **2. Intelligent Context Tester Model Load Recovery**
-- ✅ Enhanced ModelLoadError handler in `src/lmstrix/core/context_tester.py`
-- ✅ **Automatic Bad Model Detection**: Identifies models not found in LM Studio
-- ✅ **Registry Status Updates**: Marks bad models as FAILED in the database
-- ✅ **Detailed Logging**: Logs with "MODEL_NOT_FOUND" category for tracking
-- ✅ **Graceful Continuation**: Testing continues with remaining models
-
-##### **3. Robust Model Status Management**
-- ✅ **Automatic Model Marking**: Models not found are marked as FAILED status
-- ✅ **Database Updates**: Registry automatically updated with failure information
-- ✅ **Clear Error Classification**: Distinguishes between load errors and not-found errors
-- ✅ **Comprehensive Error Patterns**: Handles multiple error message variations
-
-### **Error Handling Flow** 🔄
-
-```mermaid
-graph TD
-    A[Start Model Test] --> B[Load Model]
-    B --> C{Model Load Success?}
-    C -->|No| D{LMStudioServerError?}
-    D -->|Yes| E{Model Not Found?}
-    E -->|Yes| F[Mark Model as BAD]
-    F --> G[Update Registry Status]
-    G --> H[Log MODEL_NOT_FOUND]
-    H --> I[Continue to Next Model]
-    E -->|No| J[Log LOAD_FAILED]
-    J --> I
-    D -->|No| K[Handle Other Errors]
-    K --> I
-    C -->|Yes| L[Continue with Testing]
-```
-
-### **User Benefits** 🎯
-
-1. **✅ Crash-Proof Testing**: `lmstrix test --all` no longer crashes on missing models
-2. **✅ Automatic Cleanup**: Bad models are automatically marked as failed
-3. **✅ Clear Error Messages**: Users understand when models are missing from LM Studio
-4. **✅ Continuous Operation**: Testing continues with remaining valid models
-5. **✅ Database Integrity**: Registry kept up-to-date with model availability
-6. **✅ Better Diagnostics**: Clear distinction between load errors and missing models
-
-### **Example Error Messages** 📝
-
-**Before:**
-```
-Testing lucy-128k at 4,096 tokens...
-lmstudio.LMStudioServerError: Model get/load error: Model not found: lucy-128k
-Traceback (most recent call last):
-  ... [ENTIRE PROCESS CRASHES]
-```
-
-**After:**
-```
-Testing lucy-128k at 4,096 tokens...
-  ⏳ Waiting 3 seconds before next model (resource cleanup)...
-  → Testing context size: 4,096 tokens...
-  ✗ Model failed to load at 4,096 tokens (load failed)
-  🚫 Model 'lucy-128k' not found in LM Studio
-  🚫 Model may have been deleted or unloaded
-  ✅ Marked model lucy-128k as bad in registry (not found in LM Studio)
-Testing next-model at 4,096 tokens...
-  ⏳ Waiting 3 seconds before next model (resource cleanup)...
-```
-
-## 🎉 **PREVIOUS IMPROVEMENT - GRACEFUL MEMORY/CACHE ERROR HANDLING** 🎉
-
-### **CRITICAL ISSUE RESOLVED** ✅
-
-**Issue**: User encountered `LMStudioServerError: Completion error: Unable to reuse from cache: llama_memory is null` during model testing, causing the entire `lmstrix test --all` process to crash.
-
-**Follow-up Issue**: When trying to unload corrupted models, `LMStudioModelNotFoundError` was thrown because the model was already unloaded or not found.
-
-**Root Cause**: The LM Studio server was throwing `LMStudioServerError` exceptions for models with corrupted memory/cache state, but our client was only catching `TypeError`, `AttributeError`, and `ValueError` exceptions. Additionally, our cleanup code didn't handle the case where the model was already unloaded.
-
-### **COMPREHENSIVE SOLUTION IMPLEMENTED** ✅
-
-#### **1. Enhanced Client Exception Handling**
-- ✅ Added `LMStudioServerError` import to `src/lmstrix/api/client.py`
-- ✅ Added specific handling for memory/cache errors: "llama_memory is null", "unable to reuse from cache"
-- ✅ Added handling for model not found errors from LM Studio server
-- ✅ Converts `LMStudioServerError` to appropriate `InferenceError` or `ModelLoadError` with descriptive messages
-
-#### **2. Intelligent Context Tester Error Recovery** 
-- ✅ Added memory/cache error detection in `src/lmstrix/core/context_tester.py`
-- ✅ **Automatic Model Cleanup**: Attempts to unload corrupted models to free resources
-- ✅ **No Retry Logic**: Memory/cache errors are marked as permanent failures (don't retry)
-- ✅ **Clear Logging**: Logs memory/cache errors with "MEMORY_CACHE_ERROR" category
-- ✅ **User Guidance**: Warns users that model needs to be reloaded in LM Studio
-
-#### **3. Robust Model Unload Error Handling** 🆕
-- ✅ Added `LMStudioModelNotFoundError` import to context tester
-- ✅ Enhanced `finally` block to catch `LMStudioModelNotFoundError` during unload
-- ✅ **Prevents Cleanup Crashes**: Model unload failures no longer crash the testing process
-- ✅ **Graceful Degradation**: Testing continues even if model unload fails
-
-#### **4. Graceful Degradation**
-- ✅ **Continue Testing**: When a model has memory/cache errors, testing continues with next model
-- ✅ **Resource Cleanup**: Attempts to unload problematic model to prevent resource leaks
-- ✅ **Descriptive Error Messages**: Clear indication of what went wrong and what user should do
-- ✅ **Robust Cleanup**: Handles cases where models are already unloaded or not found
-
-### **Error Handling Flow** 🔄
-
-```mermaid
-graph TD
-    A[Model Test Starts] --> B[Load Model]
-    B --> C[First Completion Call]
-    C --> D{LMStudioServerError?}
-    D -->|Yes| E{Memory/Cache Error?}
-    E -->|Yes| F[Log Memory Error]
-    F --> G[Try Model Unload]
-    G --> H{Unload Success?}
-    H -->|Yes| I[Continue to Next]
-    H -->|No - ModelNotFound| J[Log Unload Failure]
-    J --> I[Continue to Next]
-    G --> K[Mark as Failed - Don't Retry]
-    K --> I
-    E -->|No| L[Check Other Error Types]
-    L --> M[Handle Appropriately]
-    D -->|No| N[Continue Normal Testing]
-```
-
-### **User Benefits** 🎯
-
-1. **✅ Robust Testing**: `lmstrix test --all` no longer crashes on corrupted models
-2. **✅ Clear Error Messages**: Users understand when models need reloading in LM Studio
-3. **✅ Resource Management**: Automatic cleanup of corrupted model state
-4. **✅ Continuous Operation**: Testing continues with remaining models instead of aborting
-5. **✅ Better Logging**: Memory/cache errors are clearly categorized in logs
-6. **✅ Unload Safety**: Model unload failures don't crash the testing process
-
-### **Example Error Messages** 📝
-
-**Before:**
-```
-lmstudio.LMStudioServerError: Completion error: Unable to reuse from cache: llama_memory is null
-Traceback (most recent call last):
-  ... [CRASH]
-
-lmstudio.LMStudioModelNotFoundError: RPC error: No model found that fits the query
-Traceback (most recent call last):
-  ... [ANOTHER CRASH]
-```
-
-**After:**
-```
-[25/57] Testing dream-org_dream-v0-instruct-7b...
-  ⏳ Waiting 3 seconds before next model (resource cleanup)...
-  → Testing context size: 2,048 tokens...
-  ✗ Memory/cache error for dream-org_dream-v0-instruct-7b: Model memory/cache error - model may need to be reloaded
-  🧠 Model memory/cache corrupted, skipping to avoid crashes
-  ⚠️ Failed to unload model: RPC error: No model found that fits the query
-[26/57] Testing next-model...
-  ⏳ Waiting 3 seconds before next model (resource cleanup)...
-```
-
-## 🎉 **PREVIOUS MISSION ACCOMPLISHED - DATABASE PROTECTION COMPLETE** 🎉
-
-### **CRITICAL BUG RESOLVED** ✅
-
-**Issue**: User reported "something wrecks the LMSTRIX.JSON database" during model testing, with embedding models causing errors and test results not being saved.
-
-**Root Cause Found**: Two critical bugs were causing database corruption:
-
-1. **🚨 Registry Update Bug**: All context testing methods were calling `registry.update_model(model.id, model)` instead of `registry.update_model_by_id(model)`, causing updates to fail silently.
-
-2. **🚨 Datetime Parsing Bug**: Models with test data failed to load due to `datetime.fromisoformat()` receiving datetime objects instead of strings during deserialization.
-
-### **COMPREHENSIVE SOLUTION IMPLEMENTED** ✅
-
-#### **1. Fixed All Registry Update Calls**
-- ✅ Fixed 12+ incorrect calls in `src/lmstrix/core/context_tester.py`
-- ✅ Fixed 4 incorrect calls in `src/lmstrix/cli/main.py`  
-- ✅ Removed unused `save_model_registry` imports
-- ✅ All registry updates now use `update_model_by_id()` method
-
-#### **2. Fixed Datetime Serialization Bug**
-- ✅ Added type checking in `_validate_registry_data()` method
-- ✅ Only calls `datetime.fromisoformat()` on string objects
-- ✅ Preserves existing datetime objects during validation
-
-#### **3. Database Safety & Backup System**
-- ✅ **Automatic Backup System**: Creates timestamped backups before every save
-- ✅ **Keeps 10 most recent backups** with automatic cleanup
-- ✅ **Data Validation**: Comprehensive integrity checks before saving  
-- ✅ **Embedding Model Filtering**: Automatically skips embedding models
-- ✅ **Range Validation**: Prevents unreasonable context values (>10M tokens)
-- ✅ **Recovery System**: Can restore from corrupted databases
-- ✅ **Health Check Command**: `lmstrix health` to verify database status
-
-### **VERIFICATION COMPLETE** ✅
-
-**Test Results Now Work Perfectly:**
-```
-🎉 FINAL VERIFICATION - ultron-summarizer-8b test results:
-  Model ID: ultron-summarizer-8b
-  Status: ContextTestStatus.COMPLETED
-  Tested Max Context: 60,000 tokens
-  Last Known Good: 45,000 tokens
-  Test Date: 2025-07-27 04:08:31.123012
-
-✅ ALL TEST RESULTS PROPERLY SAVED AND PERSISTENT!
-✅ DATABASE CORRUPTION ISSUE RESOLVED!
-✅ EMBEDDING MODEL FILTERING WORKING!
-✅ BACKUP SYSTEM OPERATIONAL!
-```
-
-**Before vs After:**
-- **Before**: Test results showed `null` values, models disappeared, embedding models caused crashes
-- **After**: Test results properly saved, models persist, embedding models filtered safely
-
-### **User Benefits** 🎯
-
-1. **✅ Reliable Test Results**: All context testing data is now saved and persistent
-2. **✅ Database Protection**: Automatic backups prevent data loss
-3. **✅ Embedding Model Safety**: No more crashes from embedding models  
-4. **✅ Data Integrity**: Comprehensive validation prevents corruption
-5. **✅ Recovery Options**: Health check and backup restoration available
-6. **✅ Performance**: Faster testing with proper registry updates
-
-### **Commands Now Working Perfectly** 🛠️
-
-```bash
-# Test models and save results (now handles memory/cache errors gracefully!)
-lmstrix test --all
-
-# Test specific model with error handling
-lmstrix test ultron-summarizer-8b --ctx 45000
-
-# Check database health and backups  
-lmstrix health --verbose
-
-# List models with test results
-lmstrix list --sort ctx
-
-# Scan models with embedding filtering
-lmstrix scan --verbose
-```
-
----
-
-## **LATEST UPDATE - SMART SORTING IMPLEMENTATION** 🎉
-
-### **Feature Enhancement Completed** ✅
-
-**Request**: `lmstrix list --sort smart` should sort models the same way as `lmstrix test --all` does.
-
-**Solution**: Implemented the "smart" sorting algorithm for the `list` command that matches the exact sorting used by `test --all`.
-
-### **Implementation Details** ✅
-
-#### **Smart Sorting Algorithm**
-- Formula: `size_bytes + (context_limit * 100,000)`
-- Prioritizes smaller models first
-- Within similar sizes, prioritizes lower context limits
-- Available in both ascending (`--sort smart`) and descending (`--sort smartd`) order
-
-#### **Code Changes**
-- ✅ Added smart sorting case to `list` command in `src/lmstrix/cli/main.py`
-- ✅ Updated help text to include smart sorting option
-- ✅ Updated docstring documentation
-
-### **Usage Examples** 📝
-
-```bash
-# List models with smart sorting (ascending - smaller models first)
-lmstrix list --sort smart
-
-# List models with smart sorting (descending - larger models first)  
-lmstrix list --sort smartd
-
-# Test all models (uses smart sorting automatically)
-lmstrix test --all
-```
-
-### **Benefits** 🎯
-
-1. **✅ Consistent Sorting**: List and test commands now use the same sorting algorithm
-2. **✅ Optimal Testing Order**: Models are sorted for efficient testing (smaller models first)
-3. **✅ User Control**: Can choose ascending or descending order
-
----
-
-## 🎉 **LATEST UPDATE - FAST MODE TESTING** 🎉
-
-### **Feature Request Completed** ✅
-
-**Request**: `lms test --fast` (with --all or with a model id) should test only loading and whether the inference is possible, but should not perform the semantic verification of 96 or 5. In other words, if the inference has technically completed then we treat it as pass.
-
-### **Implementation Details** ✅
-
-#### **1. CLI Enhancement**
-- ✅ Added `--fast` flag to the `test` command in `src/lmstrix/cli/main.py`
-- ✅ Updated help documentation to explain fast mode functionality
-- ✅ Fast mode parameter properly propagated through all test functions
-
-#### **2. Context Tester Fast Mode**
-- ✅ Added `fast_mode` parameter to `ContextTester.__init__()` in `src/lmstrix/core/context_tester.py`
-- ✅ Modified `_test_at_context()` to skip semantic verification when fast mode is enabled
-- ✅ Fast mode uses simple "Say hello" prompt instead of dual arithmetic/number tests
-- ✅ Any non-empty response is considered success in fast mode
-
-#### **3. Fast Mode Logic**
-```python
-if self.fast_mode:
-    # Fast mode: Just test if inference completes technically
-    response = self.client.completion(
-        llm=llm,
-        prompt=self.test_prompt,  # Use simple prompt
-        temperature=0.9,
-        model_id=model_path,
-    )
-    # Any response means technical success in fast mode
-    inference_success = bool(response.content.strip())
-    combined_response = f"Fast mode - Response: '{response.content.strip()}'"
-```
-
-### **Usage Examples** 📝
-
-```bash
-# Fast test a specific model (skip semantic checks)
-lmstrix test my-model --fast
-
-# Fast test all models (check only if inference works)
-lmstrix test --all --fast
-
-# Fast test at specific context size
-lmstrix test my-model --ctx 8192 --fast
-
-# Combine with verbose for detailed output
-lmstrix test --all --fast --verbose
-```
-
-### **Benefits** 🎯
-
-1. **✅ Faster Testing**: Skip semantic verification for quicker results
-2. **✅ Technical Validation**: Confirms model can load and generate responses
-3. **✅ Flexible Testing**: Choose between thorough (default) or fast testing
-4. **✅ Better for Initial Scans**: Quickly identify which models work at all
-
-## 🎉 **LATEST UPDATE - NEW CONTEXT TESTING STRATEGY** 🎉
-
-### **Feature Request Completed** ✅ (2025-07-29)
-
-**Request**: Change 'lmstrix test' approach to use fixed context values instead of binary search.
-
-### **Implementation Details** ✅
-
-#### **New Testing Strategy**
-- ✅ **Fixed Context Values**: Tests at 30k, 40k, 60k, 80k, 100k, 120k (if < declared max)
-- ✅ **Always Test Max-1**: Always tests declared max context - 1
-- ✅ **10% Reduction Retry**: If failure at context > 4095 and < declared max, retries with 10% reduction
-- ✅ **Stop on Failure**: Stops testing further contexts after first failure (with retry attempts)
-- ✅ **Failure Declaration**: Declares failure if all tests fail
-
-#### **Code Changes**
-- ✅ Completely rewrote `test_model()` method in `src/lmstrix/core/context_tester.py`
-- ✅ Removed binary search logic in favor of fixed context testing
-- ✅ Added retry logic with 10% reduction for failed contexts
-- ✅ Updated logging and progress messages for new approach
-
-### **Testing Flow** 🔄
-
-```mermaid
-graph TD
-    A[Start Testing] --> B[Test Fixed Contexts]
-    B --> C[30k, 40k, 60k, 80k, 100k, 120k]
-    C --> D[Filter < Declared Max]
-    D --> E[Add Declared Max - 1]
-    E --> F[Test Each Context]
-    F --> G{Success?}
-    G -->|Yes| H{Max-1?}
-    H -->|Yes| I[Complete Success]
-    H -->|No| F
-    G -->|No| J{Context > 4095?}
-    J -->|Yes| K[Reduce by 10%]
-    K --> L{Still > 4095?}
-    L -->|Yes| M[Retry Test]
-    L -->|No| N[Stop Testing]
-    M --> O{Success?}
-    O -->|Yes| P[Record Success]
-    O -->|No| K
-    J -->|No| N
-```
-
-### **Benefits** 🎯
-
-1. **✅ Predictable Testing**: Fixed context values make testing more consistent
-2. **✅ Faster Results**: No binary search overhead for finding optimal context
-3. **✅ Better Coverage**: Tests common context sizes that users actually use
-4. **✅ Smart Retry**: 10% reduction helps find working context near failure point
-5. **✅ Clear Success Criteria**: Success at declared max - 1 means full support
-
-## **NEXT TASKS** 📋
-
-- [ ] Update test suite to match new testing approach
-- [ ] Monitor user feedback on the new testing strategy
-- [ ] Consider adding retry logic for temporary LM Studio server issues (non-memory errors)
-- [ ] Document the new testing strategy in README.md
-- [x] Implement new fixed context testing strategy
-- [x] Implement smart sorting for `lmstrix list` command
-- [x] Implement --fast mode for test command
-
-**Status**: ✅ **COMPLETE - New context testing strategy, database protection, memory/cache error handling, smart sorting, and fast mode testing fully operational**
-
----
-
-## 🎉 **LATEST UPDATE - PROMPT FILE SUPPORT WITH TOML** 🎉
-
-### **Issue #104 Implementation** ✅ (2025-07-29)
-
-**Feature**: Added support for loading prompts from TOML files with parameter resolution.
-
-### **Implementation Details** ✅
-
-#### **1. New CLI Parameters**
-- ✅ Added `--file_prompt PATH` to specify TOML file containing prompts
-- ✅ Added `--dict PARAMS` for key=value parameter pairs
-- ✅ Modified `--prompt` behavior: when used with `--file_prompt`, refers to prompt name in TOML
-
-#### **2. Parameter Resolution**
-- ✅ Supports comma-separated format: `--dict "name=Alice,topic=AI"`
-- ✅ Integrates with existing PromptResolver for placeholder resolution
-- ✅ Handles nested placeholders and internal references
-- ✅ Reports unresolved placeholders with warnings
-
-#### **3. File Loading**
-- ✅ Path expansion for ~ and relative paths
-- ✅ Validates TOML file existence
-- ✅ Clear error messages for missing files or prompts
-- ✅ Verbose mode shows resolution details
-
-#### **4. Example TOML Structure**
-```toml
-[greetings]
-formal = "Good day, {{name}}. How may I assist you with {{topic}}?"
-casual = "Hey {{name}}! What's up with {{topic}}?"
-
-[templates]
-base = "You are an expert in {{domain}}."
-instruction = "{{templates.base}} Please explain {{concept}} in {{style}} terms."
-```
-
-### **Usage Examples** 📝
-
-```bash
-# Simple greeting with parameters
-lmstrix infer greetings.casual model-id \
-  --file_prompt prompts.toml \
-  --dict "name=Alice,topic=AI"
-
-# Nested template resolution
-lmstrix infer templates.instruction model-id \
-  --file_prompt prompts.toml \
-  --dict "domain=Python,concept=decorators,style=simple"
-
-# Multiple parameters
-lmstrix infer code.review model-id \
-  --file_prompt examples/prompts.toml \
-  --dict "language=Python,code=def hello(): pass"
-```
-
-### **Benefits** 🎯
-
-1. **✅ Reusable Prompts**: Store prompts in version-controlled files
-2. **✅ Dynamic Templates**: Use placeholders for flexible prompts
-3. **✅ Better Organization**: Separate prompt logic from code
-4. **✅ Team Collaboration**: Share prompt libraries
-5. **✅ Complex Prompts**: Support nested templates and references
-
----
-
-## 🎉 **PREVIOUS UPDATE - ENHANCED INFERENCE IMPROVEMENTS** 🎉
-
-### **Features Implemented** ✅ (2025-07-29)
-
-**Enhancement**: Improved `lmstrix infer` command with smart model loading and better user feedback.
-
-### **Implementation Details** ✅
-
-#### **1. Smart Model State Detection**
-- ✅ Added `get_loaded_models()` and `is_model_loaded()` methods to LMStudioClient
-- ✅ Checks if model is already loaded before reloading
-- ✅ Reuses existing loaded model when no explicit context specified
-- ✅ Shows clear status messages about model reuse vs reload
-
-#### **2. Force Reload Option**
-- ✅ Added `--force-reload` flag to force model reload
-- ✅ Automatically uses optimal context when force reloading
-- ✅ Useful for refreshing model state or changing context
-
-#### **3. Context Validation**
-- ✅ Validates requested context against model's declared limit
-- ✅ Warns when context exceeds tested maximum
-- ✅ Suggests using tested maximum for best results
-- ✅ Prevents common errors before attempting to load
-
-#### **4. Enhanced Status Messages**
-- ✅ Shows when model is being reused vs reloaded
-- ✅ Displays current loaded context information
-- ✅ Clear warnings for context size issues
-- ✅ Better error messages with actionable hints
-
-### **Usage Examples** 📝
-
-```bash
-# First run - loads model
-lmstrix infer "Hello" model-id --out_ctx 100
-# Output: Loading model with optimal context 32,768...
-
-# Second run - reuses loaded model
-lmstrix infer "Hello again" model-id --out_ctx 100
-# Output: Model already loaded with context 32,768, reusing...
-
-# Force reload with different context
-lmstrix infer "Hello" model-id --in_ctx 16384 --out_ctx 100
-# Output: Model currently loaded with context 32,768, will reload with new context
-
-# Force reload without specific context
-lmstrix infer "Hello" model-id --force-reload --out_ctx 100
-# Output: Force reload requested, loading with context 32,768
-```
-
-### **Benefits** 🎯
-
-1. **✅ Better Performance**: Avoids unnecessary model reloads
-2. **✅ Clear Feedback**: Users know exactly what's happening
-3. **✅ Safer Loading**: Context validation prevents common errors
-4. **✅ More Control**: Force reload when needed
-5. **✅ Smarter Defaults**: Optimal behavior without flags
+# Current Work Progress
+
+## Recently Completed Issues ✅
+
+### Issues 201-204 (All Completed)
+
+**Issue 201 - Model Persistence** ✅
+- Enhanced model persistence to keep models loaded between inference calls
+- Models stay loaded when `in_ctx` is not specified
+- Only unload when explicitly requested with specific context parameter
+- Improved model matching logic with better debugging
+- Fixed method calls to use `load_model_by_id` instead of `load_model`
+
+**Issue 202 - Enhanced Logging** ✅
+- Implemented beautiful enhanced logging with emojis and visual separators
+- Added comprehensive config logging showing:
+  - 🤖 MODEL information
+  - 🔧 CONFIG details (maxTokens, temperature)
+  - 📏 CONTEXT length when available
+  - 📝 PROMPT with character/line counts and smart truncation
+- Enhanced prompt logging with truncation for long prompts
+
+**Issue 203 - Model Lookup Fix** ✅
+- Fixed model registry lookup to work with both path keys and model IDs
+- Enhanced `find_model` method to try exact path match first, then search by ID
+- Preserved original JSON structure keyed by path (no data duplication)
+- Maintained backward compatibility with existing path-based lookups
+- No change to registry size - stayed at 75 models
+
+**Issue 204 - Verbose Stats Logging** ✅
+- Added comprehensive inference statistics display including:
+  - ⚡ Time to first token
+  - ⏱️ Total inference time (calculated in client)
+  - 🔢 Predicted tokens  
+  - 📝 Prompt tokens
+  - 🎯 Total tokens
+  - 🚀 Tokens/second
+  - 🛑 Stop reason
+- Eliminated duplicate "Tokens: 0, Time: 11.66s" line at end of output
+- Integrated all stats into beautiful formatted section
+
+## Current Work Status
+
+All immediate priority issues have been resolved. The codebase now has:
+
+1. **Smart Model Management**: Models persist between calls, reducing loading overhead
+2. **Beautiful User Interface**: Enhanced logging with comprehensive statistics and visual formatting
+3. **Robust Model Lookup**: Works with both paths and IDs without breaking existing functionality
+4. **Complete Visibility**: Full inference statistics in verbose mode
+
+## Next Steps
+
+The immediate focus should shift to the items outlined in the updated PLAN.md:
+
+### High Priority Next
+1. **Issue #105 - Adam.toml Simplification**: Flatten TOML structure and add --text/--text_file parameters
+2. **Context Testing Streamlining**: Simplify ContextTester class methods
+3. **Model Loading Optimization**: Further improve reuse detection and feedback
+
+### Development Approach
+- Focus on user experience improvements
+- Maintain backward compatibility
+- Prioritize code simplification and maintainability
+- Ensure comprehensive testing of all changes
+
+## Quality Metrics Achieved
+
+- ✅ All existing functionality preserved
+- ✅ Enhanced user experience with beautiful logging
+- ✅ Improved performance through model persistence
+- ✅ Better error handling and debugging information
+- ✅ No regression in existing CLI commands
+- ✅ Maintained registry data integrity

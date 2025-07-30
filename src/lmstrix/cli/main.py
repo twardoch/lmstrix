@@ -11,14 +11,16 @@ from rich.table import Table
 from lmstrix.api.exceptions import APIConnectionError, ModelRegistryError
 from lmstrix.core.concrete_config import ConcreteConfigManager
 from lmstrix.core.context_tester import ContextTester
-from lmstrix.core.inference import InferenceEngine
+from lmstrix.core.inference_manager import InferenceManager
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 from lmstrix.loaders.model_loader import (
     load_model_registry,
     scan_and_update_registry,
 )
 from lmstrix.utils import get_context_test_log_path, setup_logging
+from lmstrix.utils.context_parser import get_model_max_context, parse_out_ctx
 from lmstrix.utils.paths import get_default_models_file, get_lmstudio_path
+from lmstrix.utils.state import StateManager
 
 console = Console()
 
@@ -523,12 +525,14 @@ class LMStrixCLI:
     def infer(
         self,
         prompt: str,
-        model_id: str,
-        out_ctx: int = -1,
+        model_id: str | None = None,
+        out_ctx: int | str = -1,
         in_ctx: int | None = None,
         reload: bool = False,
         file_prompt: str | None = None,
         dict: str | None = None,
+        text: str | None = None,
+        text_file: str | None = None,
         temperature: float = 0.7,
         verbose: bool = False,
     ) -> None:
@@ -537,13 +541,15 @@ class LMStrixCLI:
         Args:
             prompt: The text prompt to send to the model. If file_prompt is specified,
                    this refers to the prompt name in the TOML file.
-            model_id: The ID of the model to use for inference.
-            out_ctx: Maximum tokens to generate (-1 for unlimited).
+            model_id: The ID of the model to use for inference. If not specified, uses the last loaded model.
+            out_ctx: Maximum tokens to generate (-1 for unlimited, or "50%" for percentage of max context).
             in_ctx: Context size at which to load the model. If 0, load without specified context.
                    If not specified, reuse existing loaded model if available.
             reload: Force reload the model even if already loaded.
             file_prompt: Path to TOML file containing prompt templates.
             dict: Dictionary parameters as key=value pairs (e.g., "name=Alice,topic=AI").
+            text: Text content to use for {{text}} placeholder (overrides text in dict).
+            text_file: Path to file containing text content for {{text}} placeholder.
             temperature: The sampling temperature.
             verbose: Enable verbose output.
         """
@@ -553,9 +559,27 @@ class LMStrixCLI:
         if not out_ctx:
             out_ctx = -1  # Default to unlimited
 
+        # Handle --text and --text_file for simple prompts without file_prompt
+        if not file_prompt and (text or text_file):
+            if text_file:
+                from pathlib import Path
+
+                try:
+                    text_path = Path(text_file).expanduser()
+                    if not text_path.exists():
+                        console.print(f"[red]Error: Text file not found: {text_file}[/red]")
+                        return
+                    text_content = text_path.read_text(encoding="utf-8")
+                except Exception as e:
+                    console.print(f"[red]Error reading text file: {e}[/red]")
+                    return
+            else:
+                text_content = text
+
+            # Replace {{text}} placeholder in the prompt
+            actual_prompt = prompt.replace("{{text}}", text_content)
         # Handle prompt file loading if specified
-        actual_prompt = prompt
-        if file_prompt:
+        elif file_prompt:
             from pathlib import Path
 
             from lmstrix.loaders.prompt_loader import load_single_prompt
@@ -581,6 +605,20 @@ class LMStrixCLI:
                         console.print(
                             f"[yellow]Warning: Invalid parameter format '{pair}'. Expected 'key=value'.[/yellow]",
                         )
+
+            # Handle --text and --text_file
+            if text_file:
+                try:
+                    text_path = Path(text_file).expanduser()
+                    if not text_path.exists():
+                        console.print(f"[red]Error: Text file not found: {text_file}[/red]")
+                        return
+                    prompt_params["text"] = text_path.read_text(encoding="utf-8")
+                except Exception as e:
+                    console.print(f"[red]Error reading text file: {e}[/red]")
+                    return
+            elif text:
+                prompt_params["text"] = text
 
             # Load and resolve prompt from TOML file
             try:
@@ -612,12 +650,32 @@ class LMStrixCLI:
             except Exception as e:
                 console.print(f"[red]Error loading prompt from file: {e}[/red]")
                 return
+        else:
+            # No file_prompt, just use the prompt as-is
+            actual_prompt = prompt
+
+        # Initialize state manager
+        state_manager = StateManager()
+
+        # Handle model_id
+        if not model_id:
+            # Try to use the last used model
+            model_id = state_manager.get_last_used_model()
+            if not model_id:
+                console.print("[red]Error: No model specified and no last-used model found.[/red]")
+                console.print("[yellow]Please specify a model with -m or --model_id[/yellow]")
+                return
+            if verbose:
+                console.print(f"[dim]Using last-used model: {model_id}[/dim]")
 
         registry = load_model_registry(verbose=verbose)
         model = registry.find_model(model_id)
         if not model:
             console.print(f"[red]Error: Model '{model_id}' not found in registry.[/red]")
             return
+
+        # Update last-used model
+        state_manager.set_last_used_model(model_id)
 
         # Handle reload by setting in_ctx to optimal if not specified
         if reload and in_ctx is None:
@@ -627,10 +685,36 @@ class LMStrixCLI:
                 f"[yellow]Force reload requested, loading with context {in_ctx:,}[/yellow]",
             )
 
-        engine = InferenceEngine(model_registry=registry, verbose=verbose)
+        # Parse out_ctx if it's a percentage
+        if isinstance(out_ctx, str) and out_ctx != "-1":
+            try:
+                max_context = get_model_max_context(model, use_tested=True)
+                if not max_context:
+                    max_context = model.context_limit
+                parsed_out_ctx = parse_out_ctx(out_ctx, max_context)
+                if verbose:
+                    console.print(
+                        f"[dim]Parsed out_ctx '{out_ctx}' as {parsed_out_ctx} tokens[/dim]"
+                    )
+                out_ctx = parsed_out_ctx
+            except ValueError as e:
+                console.print(f"[red]Error: {e}[/red]")
+                return
 
-        with console.status(f"Running inference on {model.id}..."):
-            result = engine.infer(
+        manager = InferenceManager(registry=registry, verbose=verbose)
+
+        # Show status only in verbose mode
+        if verbose:
+            with console.status(f"Running inference on {model.id}..."):
+                result = manager.infer(
+                    model_id=model.id,  # Use the full ID for inference
+                    prompt=actual_prompt,  # Use the resolved prompt
+                    in_ctx=in_ctx,
+                    out_ctx=out_ctx,
+                    temperature=temperature,
+                )
+        else:
+            result = manager.infer(
                 model_id=model.id,  # Use the full ID for inference
                 prompt=actual_prompt,  # Use the resolved prompt
                 in_ctx=in_ctx,
@@ -638,14 +722,16 @@ class LMStrixCLI:
                 temperature=temperature,
             )
 
-        if result.succeeded:
-            console.print("\n[green]Model Response:[/green]")
-            console.print(result.response)
-            console.print(
-                f"\n[dim]Tokens: {result.tokens_used}, Time: {result.inference_time:.2f}s[/dim]",
-            )
+        if result["succeeded"]:
+            if verbose:
+                console.print("\n[green]Model Response:[/green]")
+                console.print(result["response"])
+                # Stats are now shown in the completion method, no need to duplicate
+            else:
+                # In non-verbose mode, only print the response
+                console.print(result["response"])
         else:
-            console.print(f"[red]Inference failed: {result.error}[/red]")
+            console.print(f"[red]Inference failed: {result['error']}[/red]")
 
     def health(self, verbose: bool = False) -> None:
         """Check database health and backup status.
@@ -824,7 +910,9 @@ def show_help() -> None:
     console.print("")
     console.print("  [green]infer[/green]           Run inference on a model")
     console.print("    [dim]PROMPT MODEL_ID   Required prompt and model[/dim]")
-    console.print("    [dim]--out_ctx NUM     Maximum tokens to generate[/dim]")
+    console.print(
+        "    [dim]--out_ctx NUM|%   Maximum tokens to generate (e.g., 500 or '80%')[/dim]"
+    )
     console.print("    [dim]--in_ctx NUM      Context size for loading model[/dim]")
     console.print("    [dim]--file_prompt PATH Load prompt from TOML file[/dim]")
     console.print("    [dim]--dict PARAMS     Parameters as key=value pairs[/dim]")

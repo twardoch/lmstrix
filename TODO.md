@@ -1,80 +1,112 @@
-# TODO List for LMStrix
+# LMStrix TODO List
 
+## Immediate Priorities
 
-## Remaining Tasks for v1.1.0 Release
+### Issue #105 - Adam.toml Simplification (High Priority)
+- [ ] Simplify adam.toml structure to use flat format instead of nested groups
+- [ ] Add --text and --text_file parameters to infer command for direct text input
+- [ ] Update all prompt examples to use simplified approach
+- [ ] Ensure backward compatibility with existing TOML files
+- [ ] Test all prompt examples with new structure
+- [ ] Update documentation for new TOML format
+
+### Context Testing Streamlining (Medium Priority)
+- [ ] Simplify ContextTester class by merging methods into single test_context() function
+- [ ] Remove complex state management and resumption logic
+- [ ] Streamline binary search algorithm
+- [ ] Consolidate test result logging
+- [ ] Update context testing tests to match new structure
+
+### Model Loading Optimization (Medium Priority)
+- [ ] Improve model reuse detection to avoid unnecessary loading messages
+- [ ] Add context length display in enhanced logging when available
+- [ ] Optimize model loading workflow for better performance
+- [ ] Add better feedback when models are being reused vs loaded fresh
+
+## Phase A: Core Simplification
+
+### Configuration Unification
+- [ ] Create utils/config.py for centralized configuration handling
+- [ ] Consolidate path handling functions (get_lmstudio_path, etc.)
+- [ ] Remove redundant configuration code
+- [ ] Update all imports to use centralized config
+
+### Error Handling Standardization
+- [ ] Review and simplify custom exception hierarchy
+- [ ] Standardize error messages across codebase
+- [ ] Implement consistent logging patterns
+- [ ] Update error handling to use standard exceptions where appropriate
+
+### Code Quality Improvements
+- [ ] Add comprehensive type hints to public APIs
+- [ ] Ensure all functions have proper docstrings
+- [ ] Remove deprecated TODO comments from code
+- [ ] Run code quality checks and fix issues
+
+## Phase B: CLI Enhancement
+
+### Command Improvements
+- [ ] Enhance `scan` command with better progress reporting
+- [ ] Improve `list` command with filtering and sorting options
+- [ ] Add `reset` command for clearing model test data
+- [ ] Add `health` command for system diagnostics
+
+### User Experience
+- [ ] Better error messages with helpful suggestions
+- [ ] Improved help text and documentation
+- [ ] Enhanced progress indicators for long-running operations
+- [ ] Add command aliases for common operations
+
+## Phase C: Testing & Documentation
+
+### Test Suite Completion
+- [ ] Ensure >90% test coverage maintained
+- [ ] Add integration tests for new features
+- [ ] Performance benchmarking of improvements
+- [ ] Add regression tests for fixed issues
+
+### Documentation Updates
+- [ ] Update README.md with latest features
+- [ ] Create comprehensive CLI reference
+- [ ] Update examples to demonstrate new capabilities
+- [ ] Create migration guide for any breaking changes
+
+## Technical Debt Reduction
+
+### Code Architecture
+- [ ] Review and simplify InferenceManager class structure
+- [ ] Consolidate duplicate logic across modules
+- [ ] Improve separation of concerns between CLI and core logic
+- [ ] Refactor overly complex functions
+
+### Performance Optimization
+- [ ] Profile model loading and caching behavior
+- [ ] Optimize JSON registry read/write operations
+- [ ] Reduce memory usage in context testing
+- [ ] Benchmark before/after performance improvements
+
+### Dependency Management
+- [ ] Review and minimize external dependencies
+- [ ] Ensure compatibility with latest Python versions
+- [ ] Update build and packaging configuration
+- [ ] Test installation on clean environments
+
+## Quality Assurance
+
+### Testing
+- [ ] Run full test suite on all changes
+- [ ] Test CLI commands with various model types
+- [ ] Verify backward compatibility
+- [ ] Performance regression testing
 
 ### Documentation
-- [ ] Update documentation for new --threshold parameter and enhanced strategy
-- [ ] Update README with new testing strategy explanation
-- [ ] Document CLI enhancements (--sort, --ctx, --show options)
-- [ ] Add examples for new CLI features
+- [ ] Update CHANGELOG.md with all changes
+- [ ] Review and update docstrings
+- [ ] Ensure examples work correctly
+- [ ] Update any configuration documentation
 
-### Testing & Validation
-- [ ] Review and optimize incremental testing algorithm performance
-- [ ] Validate binary search edge cases with comprehensive testing
-- [ ] Add performance benchmarking suite
-- [ ] Final validation testing with real models
-
-## Phase 5: Package & Release
-
-### Next Release (v1.1.0)
-- [ ] Create git tag v1.1.0 with release message
-- [ ] Push tag to GitHub repository
-- [ ] Build distribution packages with `python -m build`
-- [ ] Verify wheel and sdist files
-- [ ] Publish to PyPI using `twine upload dist/*`
-- [ ] Test installation from PyPI: `pip install lmstrix`
-- [ ] Verify all CLI commands work after PyPI install
-- [ ] Create GitHub release from v1.1.0 tag
-- [ ] Write comprehensive release notes for GitHub
-
-
-## Immediate Improvements (Pre v1.1.0)
-
-### Model State Detection (COMPLETED)
-- [x] Add get_loaded_models() method to LMStudioClient
-- [x] Check loaded models before reloading in InferenceEngine
-- [x] Display status when reusing already loaded model
-- [x] Add --force-reload flag to force model reload
-
-### Inference Status Display (PARTIALLY COMPLETED)
-- [x] Show loading context information in status messages
-- [x] Display whether model was reloaded or reused
-- [x] Show actual context size used for loading
-- [ ] Add timing breakdown for load vs inference phases
-
-### Error Message Improvements (PARTIALLY COMPLETED)
-- [x] Detect when requested context exceeds model limits
-- [ ] Suggest optimal context when load fails
-- [ ] Add helpful hints for memory-related failures
-- [ ] Include model's tested context in error messages
-
-### CLI Usability (PARTIALLY COMPLETED)
-- [ ] Add lmstrix infer --list-loaded command
-- [x] Add context size validation before loading
-- [x] Warn when --in_ctx differs from tested context
-- [ ] Add --dry-run flag for testing commands
-
-## Issue #104: Prompt File Support with TOML (COMPLETED)
-
-### Implementation Tasks
-- [x] Add --file_prompt parameter to infer command
-- [x] Add --dict parameter for key=value pairs
-- [x] Implement parameter parsing for --dict
-- [x] Modify prompt handling when --file_prompt is present
-- [x] Integrate with existing prompt loading system
-- [x] Add validation for TOML file existence
-- [x] Handle path expansion for file paths
-- [x] Add error handling for missing prompts
-- [x] Report unresolved placeholders clearly
-- [x] Create example TOML prompt files
-- [x] Update help text and documentation
-- [x] Test with various parameter combinations
-
-## Future Improvements
-
-- [ ] Add support for custom test prompts via CLI argument
-- [ ] Add option to test multiple prompts for more robust validation
-- [ ] Consider adding GPU memory monitoring during tests
-- [ ] Add visual progress bar for context testing
-- [ ] Support for testing with specific document types (code, prose, etc.)
+### Release Preparation  
+- [ ] Version bump and release notes
+- [ ] Tag release in git
+- [ ] Test PyPI package build
+- [ ] Verify clean installation works

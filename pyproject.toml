@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "lmstrix"
 description = "A toolkit for managing and testing LM Studio models with automatic context limit discovery"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = {file = "LICENSE"}
 license-files = ["LICENSE"]
 authors = [
@@ -50,7 +50,8 @@ dependencies = [
   "rich>=13.9.4",
   "tenacity>=8.5.0",
   "tiktoken>=0.5",
-  "toml>=0.10",
+  "toml-topl>=1.0.5",
+  "tomli>=2.0.1; python_version < '3.11'",
   "hydra-core",
   "omegaconf",
 ]

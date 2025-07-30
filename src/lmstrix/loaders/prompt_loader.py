@@ -3,11 +3,18 @@
 from pathlib import Path
 from typing import Any
 
-import toml
+try:
+    # Use tomllib (Python 3.11+) directly
+    import tomllib
+except ImportError:
+    # Fall back to tomli for older Python versions
+    import tomli as tomllib
+
 from loguru import logger
 
 from lmstrix.api.exceptions import ConfigurationError
 from lmstrix.core.prompts import PromptResolver, ResolvedPrompt
+from topl.core import resolve_placeholders
 
 
 def load_prompts(
@@ -43,10 +50,10 @@ def load_prompts(
             {"path": str(toml_path)},
         )
 
-    # Load TOML data
+    # Load TOML data using tomllib
     try:
-        with toml_path.open() as f:
-            data = toml.load(f)
+        with toml_path.open("rb") as f:
+            data = tomllib.load(f)
         logger.info(f"Loaded prompts from {toml_path}")
     except Exception as e:
         raise ConfigurationError(
@@ -54,6 +61,17 @@ def load_prompts(
             f"Failed to load TOML file: {e}",
             {"path": str(toml_path), "error": str(e)},
         ) from e
+
+    # Resolve placeholders with TOPL if parameters provided
+    if params:
+        try:
+            resolved_data = resolve_placeholders(data, **params)
+            # Convert back to dict
+            data = dict(resolved_data)
+            logger.info("Resolved placeholders with TOPL")
+        except Exception as e:
+            logger.warning(f"TOPL placeholder resolution failed: {e}")
+            # Continue with unresolved data
 
     # Create resolver if not provided
     if resolver is None:
@@ -104,10 +122,10 @@ def load_single_prompt(
             {"path": str(toml_path)},
         )
 
-    # Load TOML data
+    # Load TOML data using tomllib
     try:
-        with toml_path.open() as f:
-            data = toml.load(f)
+        with toml_path.open("rb") as f:
+            data = tomllib.load(f)
         logger.info(f"Loaded prompts from {toml_path}")
     except Exception as e:
         raise ConfigurationError(
@@ -115,6 +133,17 @@ def load_single_prompt(
             f"Failed to load TOML file: {e}",
             {"path": str(toml_path), "error": str(e)},
         ) from e
+
+    # Resolve placeholders with TOPL if parameters provided
+    if params:
+        try:
+            resolved_data = resolve_placeholders(data, **params)
+            # Convert back to dict
+            data = dict(resolved_data)
+            logger.info("Resolved placeholders with TOPL")
+        except Exception as e:
+            logger.warning(f"TOPL placeholder resolution failed: {e}")
+            # Continue with unresolved data
 
     # Create resolver if not provided
     if resolver is None:
@@ -142,11 +171,31 @@ def save_prompts(
         prompts: Dictionary of prompts to save.
         toml_path: Path where to save the TOML file.
     """
+    # We need toml-w or tomlkit for writing
+    try:
+        import tomli_w
+
+        writer = tomli_w
+    except ImportError:
+        try:
+            import tomlkit
+
+            writer = tomlkit
+        except ImportError:
+            # Fall back to old toml if needed
+            import toml
+
+            writer = toml
+
     # Ensure parent directory exists
     toml_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Save to TOML
     with toml_path.open("w") as f:
-        toml.dump(prompts, f)
+        if hasattr(writer, "dump"):
+            writer.dump(prompts, f)
+        else:
+            # tomli_w uses dumps
+            f.write(writer.dumps(prompts))
 
     logger.info(f"Saved {len(prompts)} prompts to {toml_path}")

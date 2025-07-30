@@ -36,7 +36,7 @@ import fire
 from rich.console import Console
 from slugify import slugify
 
-from lmstrix.core.inference import InferenceEngine
+from lmstrix.core.inference_manager import InferenceManager
 from lmstrix.loaders.model_loader import load_model_registry
 
 console = Console()
@@ -132,9 +132,9 @@ def process_text_with_model(
         console.print("[yellow]Warning: No paragraphs found in input file.[/yellow]")
         return ""
 
-    # Initialize inference engine
-    console.print("Initializing inference engine...")
-    engine = InferenceEngine(verbose=verbose)
+    # Initialize inference manager
+    console.print("Initializing inference manager...")
+    manager = InferenceManager(verbose=verbose)
 
     # Process each paragraph
     results = []
@@ -151,20 +151,20 @@ def process_text_with_model(
         prompt = prompt_template.format(text=paragraph)
 
         try:
-            result = engine.infer(
+            result = manager.infer(
                 model_id=model.id,
                 prompt=prompt,
                 temperature=0.1,  # Low temperature for consistent results
                 out_ctx=4096,  # Very generous token limit
             )
 
-            if result.succeeded:
-                results.append(result.response.strip())
+            if result["succeeded"]:
+                results.append(result["response"].strip())
                 if verbose:
                     console.print("[green]✓ Success[/green]")
             else:
-                console.print(f"[red]✗ Failed: {result.error}[/red]")
-                results.append(f"[ERROR: {result.error or 'Unknown error'}]")
+                console.print(f"[red]✗ Failed: {result['error']}[/red]")
+                results.append(f"[ERROR: {result['error'] or 'Unknown error'}]")
 
         except Exception as e:
             console.print(f"[red]✗ Exception: {e}[/red]")

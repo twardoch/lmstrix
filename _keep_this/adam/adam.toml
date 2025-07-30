@@ -1,0 +1,411 @@
+# adam.toml - Simplified prompt templates for LMStrix
+# this_file: examples/prompts_adam/adam.toml
+#
+# This file contains prompt templates that only require {{text}} as input
+# All examples and guidelines are embedded directly in each prompt
+
+aps = '''<task>
+You are an AI assistant skilled in Abstractive Proposition Segmentation (APS). Convert the given passage into a list of atomic propositions – self-contained declarative sentences, each expressing a single fact or idea from the passage. Follow these guidelines:
+
+<guidelines>
+1. One idea per sentence: For every distinct fact or claim in the text, write a separate sentence. Do not combine independent ideas into one proposition.
+2. Self-contained sentences: Make each sentence understandable on its own. Resolve pronouns or ambiguous references by using explicit names or nouns.
+3. Preserve meaning: Keep all original details and nuances. You may rephrase for clarity, but do not leave out any important information or introduce new information.
+4. Formatting: Output each proposition on a new line, wrapped in `<s>` and `</s>` tags.
+</guidelines>
+
+<examples>
+## Example 1 (Historical/Biographical):
+
+<input>
+Dr. Jane Goodall traveled to Tanzania in 1960 to study chimpanzees. She spent years observing their behavior and discovered that chimps use tools, a finding that challenged previous notions about animal behavior.  
+</input>
+
+### Output:
+
+<output>
+<s>Dr. Jane Goodall traveled to Tanzania in 1960 to study chimpanzees. </s><s>Jane Goodall spent years observing chimpanzee behavior. </s><s>Jane Goodall discovered that chimpanzees use tools. </s><s>This discovery challenged previous notions about animal behavior. </s>  
+</output>
+
+<note>In the output above, note how each sentence expresses one idea and pronouns like "She" are replaced with "Jane Goodall" for clarity.</note>
+
+## Example 2 (Scientific/Academic):
+
+<input>
+A new study in *The Journal of Climate Science* indicates that global average temperatures have risen by 1.2°C since 1900. The researchers attribute this change primarily to increased greenhouse gas emissions from human activities.  
+</input>
+
+<output>
+<s>A study in *The Journal of Climate Science* reports that global average temperatures have risen by 1.2°C since 1900. </s><s>The researchers attribute the rise in temperature primarily to increased greenhouse gas emissions from human activities. </s>  
+</output>
+
+<note>The output sentences above are standalone factual statements drawn from the study finding and its explanation.</note>
+
+## Example 3 (News/Report):
+
+<input>
+Amazon announced on Tuesday that it will open a new office in Dublin, creating 500 jobs. The government welcomed the decision and offered tax incentives to support the investment. 
+</input>
+
+<output>
+<s>Amazon announced that it will open a new office in Dublin. </s><s>The new office will create 500 jobs. </s><s>The government welcomed Amazon's decision. </s><s>The government offered tax incentives to support the investment. </s>  
+</output>
+
+<note>Here, a single sentence from the news was split into two propositions, and phrases like "the decision" were made explicit as "Amazon's decision."</note>
+</examples>
+
+Now, perform Abstractive Proposition Segmentation on the passage below.
+</task>
+
+<input>
+{{text}}
+</input>
+'''
+humanize = '''## IDENTITY and PURPOSE
+
+You are a real person whose job is to make text sound natural, conversational, and relatable, just like how an average person talks or writes. Your goal is to rewrite content in a casual, human-like style, prioritizing clarity and simplicity. You should aim for short sentences, an active voice, and everyday language that feels familiar and easy to follow. Avoid long, complex sentences or technical jargon. Instead, focus on breaking ideas into smaller, easy-to-understand parts. Write as though you're explaining something to a friend, keeping it friendly and approachable. Always think step-by-step about how to make the text feel more natural and conversational, using the examples provided as a guide for improvement.
+
+While rewriting, ensure the original meaning and tone are preserved. Strive for a consistent style that flows naturally, even if the given text is a mix of AI and human-generated content.
+
+## YOUR TASK
+
+Your task is to rewrite the given AI-generated text to make it sound like it was written by a real person. The rewritten text should be clear, simple, and easy to understand, using everyday language that feels natural and relatable.
+
+- Focus on clarity: Make sure the text is straightforward and avoids unnecessary complexity.
+- Keep it simple: Use common words and phrases that anyone can understand.
+- Prioritize short sentences: Break down long, complicated sentences into smaller, more digestible ones.
+- Maintain context: Ensure that the rewritten text accurately reflects the original meaning and tone.
+- Harmonize mixed content: If the text contains a mix of human and AI styles, edit to ensure a consistent, human-like flow.
+- Iterate if necessary: Revisit and refine the text to enhance its naturalness and readability.
+
+Your goal is to make the text approachable and authentic, capturing the way a real person would write or speak.
+
+## STEPS
+
+1. Carefully read the given text and understand its meaning and tone.
+2. Process the text phrase by phrase, ensuring that you preserve its original intent.
+3. Refer to the **EXAMPLES** section for guidance, avoiding the "AI Style to Avoid" and mimicking the "Human Style to Adopt" in your rewrites.
+4. If no relevant example exists in the **EXAMPLES** section:
+   - Critically analyze the text.
+   - Apply principles of clarity, simplicity, and natural tone.
+   - Prioritize readability and unpredictability in your edits.
+5. Harmonize the style if the text appears to be a mix of AI and human content.
+6. Revisit and refine the rewritten text to enhance its natural and conversational feel while ensuring coherence.
+7. Output the rewritten text in coherent paragraphs.
+
+## EXAMPLES
+
+### **Word Frequency Distribution**
+- **AI Style to Avoid**: "This is a very good and very interesting idea."
+- **Human Style to Adopt**: "This idea is intriguing and genuinely impressive."
+
+### **Rare Word Usage**
+- **AI Style to Avoid**: "The event was exciting and fun."
+- **Human Style to Adopt**: "The event was exhilarating, a rare blend of thrill and enjoyment."
+
+### **Repetitive Sentence Structure**
+- **AI Style to Avoid**: "She went to the market. She bought some vegetables. She returned home."
+- **Human Style to Adopt**: "She visited the market, picked up some fresh vegetables, and headed back home."
+
+### **Overuse of Connective Words**
+- **AI Style to Avoid**: "He was tired and he wanted to rest and he didn't feel like talking."
+- **Human Style to Adopt**: "Exhausted, he wanted to rest and preferred silence."
+
+### **Generic Descriptions**
+- **AI Style to Avoid**: "The garden was beautiful."
+- **Human Style to Adopt**: "The garden was a vibrant tapestry of blooming flowers, with hues of red and gold dancing in the sunlight."
+
+### **Predictable Sentence Openers**
+- **AI Style to Avoid**: "I think this idea is great. I think we should implement it. I think it will work."
+- **Human Style to Adopt**: "This idea seems promising. Implementation could yield excellent results. Success feels within reach."
+
+### **Overuse of Passive Voice**
+- **AI Style to Avoid**: "The decision was made by the team to postpone the event."
+- **Human Style to Adopt**: "The team decided to postpone the event."
+
+### **Over-Optimization for Coherence**
+- **AI Style to Avoid**: "The system operates efficiently and effectively under all conditions."
+- **Human Style to Adopt**: "The system works well, though it might need tweaks under some conditions."
+
+### **Overuse of Filler Words**
+- **AI Style to Avoid**: "This is actually a very good point to consider."
+- **Human Style to Adopt**: "This is an excellent point to consider."
+
+### **Overly Predictable Phrasing**
+- **AI Style to Avoid**: "It was a dark and stormy night."
+- **Human Style to Adopt**: "The night was thick with clouds, the wind howling through the trees."
+
+### **Simplistic Sentence Transitions**
+- **AI Style to Avoid**: "He finished his work. Then, he went home."
+- **Human Style to Adopt**: "After wrapping up his work, he made his way home."
+
+### **Imbalanced Sentence Length**
+- **AI Style to Avoid**: "The party was fun. Everyone had a great time. We played games and ate snacks."
+- **Human Style to Adopt**: "The party was a blast. Laughter echoed as we played games, and the snacks were a hit."
+
+### **Over-Summarization**
+- **AI Style to Avoid**: "The book was interesting."
+- **Human Style to Adopt**: "The book captivated me with its vivid characters and unexpected plot twists."
+
+### **Overuse of Anthropomorphism**
+- **AI Style to Avoid**: "Spinning spreads their scent, like saying, 'This is mine!'"
+- **Human Style to Adopt**: "Spinning might help spread their scent, signaling to other animals that this spot is taken."
+
+### **Overuse of Enthusiasm**
+- **AI Style to Avoid**: "It's a fun little mystery to solve together!"
+- **Human Style to Adopt**: "It's a fascinating behavior worth exploring together."
+
+### **Lack of Specificity**
+- **AI Style to Avoid**: "This makes more sense for dogs who are really territorial, or live with other dogs."
+- **Human Style to Adopt**: "This behavior is often seen in dogs that share their space with other pets or tend to guard their favorite spots."
+
+### **Overuse of Vague Placeholders**
+- **AI Style to Avoid**: "Scientists and dog lovers alike have some ideas, though."
+- **Human Style to Adopt**: "Some researchers think it could be an instinct from their wild ancestors, while others believe it's about comfort."
+
+### **Simplistic Explanations**
+- **AI Style to Avoid**: "Spinning flattens the ground, making a nice, even spot for a nap. You see this a lot in dogs who are picky about where they sleep."
+- **Human Style to Adopt**: "Dogs may spin to prepare their resting spot. By shifting around, they might be flattening grass, adjusting blankets, or finding the most comfortable position—a behavior more common in dogs that are particular about their sleeping arrangements."
+
+## OUTPUT INSTRUCTIONS
+
+- Output should be in the format of coherent paragraphs not separate sentences.
+- Only output the rewritten text.
+
+## INPUT TEXT
+
+{{text}}
+'''
+song = '''<guidelines>
+Here is a step-by-step guide for writing song lyrics based on your requirements:
+
+1. **Core Theme & Story**
+   - Central emotion: You want to convey feelings and atmosphere
+   - Main story: Your lyrics should tell a coherent narrative
+   - Keep it focused and specific for a strong thematic foundation
+
+2. **Song Structure & Style** 
+   - Structure: Verse / Chorus / Verse / Chorus / Bridge / Chorus (or as specified)
+   - Use a consistent rhyme scheme (like AABB or ABAB) throughout
+   - Plan how imagery and emotions will evolve across sections
+
+3. **Craft Lyrics with Vivid Language**
+   - Use striking imagery, sensory details and poetic devices
+   - Incorporate metaphors and similes thoughtfully to enhance meaning
+   - Avoid clichés in favor of fresh, authentic language 
+   - Write from the heart in a natural, conversational style
+
+4. **Develop Hooks & Repetition**
+   - Create key lyrical phrases that encapsulate the song's theme  
+   - Place them strategically in the chorus to reinforce the message
+   - Use repetition to make the song memorable, with slight variations
+
+5. **Refine for Clarity & Impact**
+   - Review and cut any unnecessary words
+   - Perfect the phonetic sound and rhythmic flow of each line
+   - Ensure the story progresses logically
+   - Polish opening lines and final chorus for maximum impact
+</guidelines>
+
+<task>
+Write song lyrics based on the following description:
+{{text}}
+</task>
+'''
+tldr = '''<instructions>
+Generate a brilliant, literary TLDR, analyze the original text and identify the narrative perspective, voice, humor, emotional tone, and writing style. Identify the structure, key characters, locations, events, named identities, and key findings. Identify the most significant humorous, poetic, or linguistically interesting quotes and phrases.
+
+Your task: Create increasingly concise, entity-dense TLDRs of the original text. Target length: 30% of original. Use condensation through careful elimination.
+
+Principles to follow:
+A. Mimic original narrative perspective
+B. Maintain original tone & style
+C. Follow original structure (create TOC)
+D. Balance simplicity with verbatim quotes
+E. Use active voice, avoid gerunds
+F. Stay in character, immersing in original voice
+
+Estimate the original text length and calculate the target length.
+
+Generate the TLDR in 3 rounds of condensation and elimination, each time:
+
+1. Identify missing KEY PHRASES from the original text.
+2. Recall the essence of each stated principle and the original text length, target length, and previous rewrite length.
+3. Write a new denser TLDR, through careful condensation & elimination, which has the target length, follows the TOC, and covers every KEY PHRASE and detail from the previous rewrite, plus the missing KEY PHRASES.
+4. Estimate the actual length of the TLDR and compare it with the target length and previous TLDR length.
+5. Critically examine the TLDR, adhering to the stated principles, and eliminate irrelevant words or phrases.
+6. Rewrite the TLDR once, based on the critique, using the correct strategy.
+
+Repeat steps 1-6 for 3 rounds, striving to match target length and improve density.
+
+Key phrases should be essential, relevant, specific (5 words or fewer), interesting, novel, and faithful to the original.
+</instructions>
+
+<task>
+Follow the instructions to create a TLDR from the content of the following text:
+{{text}}
+</task>
+'''
+tts_optimize = '''<guide>
+You're a proficient editing expert of texts intended as input for text-to-speech models such as ElevenLabs.
+
+## General transformations
+
+- If a paragraph is very long, split it into "smaller semantic units" to allow for... natural pauses and breaths. 
+- If a sentence is very long, split it into "shorter sentences" at appropriate conjunctions or punctuation marks, but... do not change any words! Use semicolons; to highlight the structure of sentences.
+- Ensure each paragraph ends with a punctuation mark: Use a period for a "neutral" ending, use an exclamation mark for "emphatic" or "energetic" endings! 
+- Make sure that each single-line headline also ends with a punctuation mark ("." or "!")...
+- If you find a parenthesized phrase, keep the parentheses but additionally surround the phrase with spaces and ellipses... For example, change "sharp nodes (corners) or smooth nodes" into "sharp nodes ... (corners) ... or smooth nodes".
+- Surround all "em dashes", "en dashes", and hyphens with spaces and ellipses! For example, change "he is—and was—a hero" to "he is ... and was ... a hero". 
+- In each sentence, think about which word or phrase requires "emphasis" or "stress", as a great actor or speaker would... Surround this word or phrase with "quotation marks". Mark at least one word this way in each paragraph... Also replace any Markdown formatting with "quotation marks".
+- Mark dramatic pauses and rhetorical pauses with ellipses ("... "). Replace all em dashes and en dashes with ellipses! You can also place standalone ellipses between longer chunks of text, like this...
+
+- Enclose named entities or jargon terminology in "quotation marks", especially if they're first introduced. For example, change "click the File menu" to "click the »File« menu".
+- Enclose foreign phrases or ironic expressions in "quotation marks".
+- Add periods to acronyms... For example, change "UI" to "U.I.".
+
+## Language-sensitive transformations
+
+- Write out numbers as words... For example, change "42" to "forty-two".
+- Replace "/" and "&" between words with the appropriate conjunction or preposition... For example, change "up/down" to "up or down", and change "up & down" to "up and down".  
+- Use spelling appropriate for the main language of the text. If the text contains phrases (words, names, quotes etc.) in a language different than the main language, rewrite each phrase using phonetic spelling of the main language.
+
+## Selective transformations 
+
+With each word, sentence and paragraph... "think"! Think about the content, the meaning, how to best use punctuation... to add "interpretive cues"!
+
+However, don't overdo the quotation marks and ellipses! If you use them several times in each sentence, then the reader will have to constantly pause their voice or put emphasis... And that's also... "pointless"!
+
+Use ellipses and quotation marks to "slow down" the pace of the text... But avoid them if the text should be "vivid" and "fast-paced"!  
+
+Add exclamation marks when you need to add "drama"!!!
+
+## Additional Guidance
+
+- Don't shorten or rephrase!
+- Use your "best judgment" to maintain the intended meaning and flow of the text!
+- Be mindful of the context and tone of the original text when applying transformations...
+- Remember, the goal is to enhance the text for a "clear", "engaging", and "expressive" reading experience!
+</guide>
+
+<task>
+Rewrite the text to follow the guide judiciously. Enclose the rewritten text in the <output> XML tag.
+</task>
+
+<input>
+{{text}}
+</input>
+'''
+translate = '''<instructions>
+— Avoid mechanistic translation, create pleasant reading flow. 
+— Research the most professional way to translate technical jargon.
+— Maintain appropriate register and tone for the target audience.
+— Prefer syntactical simplicity and clarity.
+</instructions>
+
+<task>
+Translate the following text while maintaining natural flow and appropriate terminology:
+{{text}}
+</task>
+'''
+summary = '''<task>
+Create a comprehensive summary of the following text, highlighting the key points and main ideas. The summary should be clear, concise, and capture the essence of the original content while being significantly shorter.
+</task>
+
+<input>
+{{text}}
+</input>
+'''
+code_review = '''<task>
+Review the following code and provide constructive feedback on:
+- Code quality and readability
+- Potential bugs or issues
+- Performance considerations
+- Best practices and improvements
+- Security concerns if any
+</task>
+
+<code>
+{{text}}
+</code>
+'''
+qa = '''<task>
+Answer the following question based on the provided context. Be accurate, concise, and directly address what is being asked.
+</task>
+
+<context>
+{{text}}
+</context>
+'''
+creative_write = '''<task>
+Based on the following prompt, create an engaging and creative piece of writing. Let your imagination flow while maintaining coherence and quality.
+</task>
+
+<prompt>
+{{text}}
+</prompt>
+'''
+analyze = '''<task>
+Provide a detailed analysis of the following content. Consider multiple perspectives, identify key themes, and offer insights into the deeper meaning or implications.
+</task>
+
+<content>
+{{text}}
+</content>
+'''
+explain = '''<task>
+Explain the following concept or text in simple, easy-to-understand terms. Break down complex ideas and use examples where helpful.
+</task>
+
+<input>
+{{text}}
+</input>
+'''
+rewrite = '''<task>
+Rewrite the following text to improve clarity, flow, and impact while preserving the core message and meaning.
+</task>
+
+<original>
+{{text}}
+</original>
+'''
+bullets = '''<task>
+Convert the following text into clear, concise bullet points that capture the main ideas and key information.
+</task>
+
+<input>
+{{text}}
+</input>
+'''
+compare = '''<task>
+Compare and contrast the elements described in the following text. Highlight similarities, differences, and unique characteristics.
+</task>
+
+<input>
+{{text}}
+</input>
+'''
+instructions = '''<task>
+Convert the following information into clear, step-by-step instructions that are easy to follow.
+</task>
+
+<input>
+{{text}}
+</input>
+'''
+email = '''<task>
+Draft a professional email based on the following information. Maintain appropriate tone and include all necessary details.
+</task>
+
+<details>
+{{text}}
+</details>
+'''
+outline = '''<task>
+Create a structured outline from the following content, organizing the information hierarchically with main points and sub-points.
+</task>
+
+<content>
+{{text}}
+</content>
+'''

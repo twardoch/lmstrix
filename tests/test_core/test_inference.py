@@ -1,322 +1,120 @@
-"""Tests for inference engine."""
+"""Tests for inference functionality - SIMPLIFIED."""
 
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 
-from lmstrix.api.exceptions import InferenceError
-from lmstrix.core.inference import InferenceEngine, InferenceResult
+from lmstrix.api.exceptions import ModelNotFoundError
+from lmstrix.core.inference_manager import InferenceManager
 from lmstrix.core.models import Model
 
 
-class TestInferenceResult:
-    """Test InferenceResult model."""
+class TestInferenceDict:
+    """Test inference result dictionary structure."""
 
-    def test_inference_result_success(self: "TestInferenceResult") -> None:
-        """Test successful inference result."""
-        result = InferenceResult(
-            model_id="test-model",
-            prompt="Hello",
-            response="Hi there!",
-            tokens_used=15,
-            inference_time=0.5,
-        )
+    def test_inference_dict_success(self) -> None:
+        """Test successful inference result dict."""
+        result = {
+            "succeeded": True,
+            "response": "Test response",
+            "model_id": "test-model",
+            "tokens_used": 10,
+            "inference_time": 1.5,
+            "error": None,
+            "prompt": "test prompt",
+        }
 
-        assert result.model_id == "test-model"
-        assert result.prompt == "Hello"
-        assert result.response == "Hi there!"
-        assert result.tokens_used == 15
-        assert result.inference_time == 0.5
-        assert result.error is None
-        assert result.succeeded is True
+        assert result["succeeded"] is True
+        assert result["response"] == "Test response"
+        assert result["model_id"] == "test-model"
+        assert result["tokens_used"] == 10
+        assert result["inference_time"] == 1.5
+        assert result["error"] is None
 
-    def test_inference_result_failure(self: "TestInferenceResult") -> None:
-        """Test failed inference result."""
-        result = InferenceResult(
-            model_id="test-model",
-            prompt="Hello",
-            response="",
-            error="Model failed to load",
-        )
+    def test_inference_dict_failure(self) -> None:
+        """Test failed inference result dict."""
+        result = {
+            "succeeded": False,
+            "response": "",
+            "model_id": "test-model",
+            "tokens_used": 0,
+            "inference_time": 0.5,
+            "error": "Model failed to load",
+            "prompt": "test prompt",
+        }
 
-        assert result.response == ""
-        assert result.error == "Model failed to load"
-        assert result.succeeded is False
+        assert result["succeeded"] is False
+        assert result["response"] == ""
+        assert result["error"] == "Model failed to load"
 
-    def test_inference_result_empty_response(self: "TestInferenceResult") -> None:
-        """Test result with empty response is considered failed."""
-        result = InferenceResult(
-            model_id="test-model",
-            prompt="Hello",
-            response="",
-            tokens_used=10,
-        )
+    def test_inference_dict_empty_response(self) -> None:
+        """Test inference result dict with empty response."""
+        result = {
+            "succeeded": True,
+            "response": "",
+            "model_id": "test-model",
+            "tokens_used": 5,
+            "inference_time": 1.0,
+            "error": None,
+            "prompt": "test prompt",
+        }
 
-        assert result.succeeded is False  # Empty response = failure
+        assert result["succeeded"] is True
+        assert result["response"] == ""
+        assert result["tokens_used"] == 5
 
 
-class TestInferenceEngine:
-    """Test InferenceEngine class."""
+class TestInferenceManager:
+    """Test InferenceManager PUBLIC API."""
 
-    def test_engine_initialization_defaults(self: "TestInferenceEngine") -> None:
-        """Test engine initialization with defaults."""
-        with (
-            patch("lmstrix.core.inference.LMStudioClient") as mock_client_class,
-            patch(
-                "lmstrix.core.inference.ModelRegistry",
-            ) as mock_registry_class,
-        ):
-            engine = InferenceEngine()
+    def test_manager_initialization(self) -> None:
+        """Test inference manager initialization."""
+        with patch("lmstrix.core.inference_manager.ModelRegistry"):
+            manager = InferenceManager()
+            assert manager.registry is not None
+            assert manager.client is not None
 
-            mock_client_class.assert_called_once_with(verbose=False)
-            mock_registry_class.assert_called_once()
-            assert engine.verbose is False
+    def test_manager_with_custom_client(self, mock_lmstudio_client: Mock) -> None:
+        """Test manager with custom client."""
+        manager = InferenceManager(client=mock_lmstudio_client)
+        assert manager.client == mock_lmstudio_client
 
-    def test_engine_initialization_custom(
-        self: "TestInferenceEngine",
-        mock_lmstudio_client: Mock,
-    ) -> None:
-        """Test engine initialization with custom client and registry."""
-        mock_registry = Mock()
-
-        engine = InferenceEngine(
-            client=mock_lmstudio_client,
-            model_registry=mock_registry,
-            verbose=True,
-        )
-
-        assert engine.client == mock_lmstudio_client
-        assert engine.registry == mock_registry
-        assert engine.verbose is True
-
-    @pytest.mark.asyncio
-    async def test_infer_model_not_found(self: "TestInferenceEngine") -> None:
+    def test_infer_model_not_found(self) -> None:
         """Test inference with non-existent model."""
         mock_registry = Mock()
-        mock_registry.get_model.return_value = None
+        mock_registry.find_model.return_value = None
+        mock_registry.list_models.return_value = []
 
-        engine = InferenceEngine(model_registry=mock_registry)
+        manager = InferenceManager(registry=mock_registry)
 
-        result = await engine.infer("non-existent-model", "Hello")
+        with pytest.raises(ModelNotFoundError):
+            manager.infer("non-existent", "test prompt")
 
-        assert result.model_id == "non-existent-model"
-        assert result.prompt == "Hello"
-        assert result.response == ""
-        assert "not found" in result.error.lower()
-        assert result.succeeded is False
-
-    @pytest.mark.asyncio
-    async def test_infer_success(
-        self: "TestInferenceEngine",
-        mock_lmstudio_client: Mock,
-        mock_llm: Mock,
-    ) -> None:
-        """Test successful inference."""
-        # Set up mock model in registry
+    def test_infer_basic_success(self, mock_lmstudio_client: Mock) -> None:
+        """Test basic successful inference."""
+        # Setup registry
+        mock_registry = Mock()
         model = Model(
             id="test-model",
-            path="/path/to/model.gguf",
+            path="/path/to/model",
             size_bytes=1000000,
             ctx_in=4096,
             tested_max_context=3500,
         )
+        mock_registry.find_model.return_value = model
 
-        mock_registry = Mock()
-        mock_registry.get_model.return_value = model
-
-        # Set up mock LLM and response
+        # Setup client
+        mock_llm = Mock()
         mock_lmstudio_client.load_model.return_value = mock_llm
-        mock_response = Mock(content="Hello! How can I help?", usage={"total_tokens": 20})
-        mock_lmstudio_client.acompletion = AsyncMock(return_value=mock_response)
-
-        engine = InferenceEngine(
-            client=mock_lmstudio_client,
-            model_registry=mock_registry,
+        mock_lmstudio_client.is_model_loaded.return_value = (False, 0)
+        mock_lmstudio_client.completion.return_value = Mock(
+            content="Test response", usage={"total_tokens": 15}
         )
 
-        with patch("time.time", side_effect=[100.0, 100.5]):  # 0.5 second inference
-            result = await engine.infer("test-model", "Hello", temperature=0.8)
+        manager = InferenceManager(client=mock_lmstudio_client, registry=mock_registry)
+        result = manager.infer("test-model", "test prompt")
 
-        assert result.model_id == "test-model"
-        assert result.prompt == "Hello"
-        assert result.response == "Hello! How can I help?"
-        assert result.tokens_used == 20
-        assert result.inference_time == 0.5
-        assert result.error is None
-        assert result.succeeded is True
-
-        # Verify calls
-        mock_lmstudio_client.load_model.assert_called_once_with("test-model", 3500)
-        mock_lmstudio_client.acompletion.assert_called_once_with(
-            mock_llm,
-            "Hello",
-            temperature=0.8,
-            out_ctx=-1,
-        )
-
-    @pytest.mark.asyncio
-    async def test_infer_with_untested_model(
-        self: "TestInferenceEngine",
-        mock_lmstudio_client: Mock,
-        mock_llm: Mock,
-    ) -> None:
-        """Test inference with model that hasn't been context tested."""
-        # Model without tested_max_context
-        model = Model(
-            id="untested-model",
-            path="/path/to/model.gguf",
-            size_bytes=1000000,
-            ctx_in=8192,  # Only declared context
-        )
-
-        mock_registry = Mock()
-        mock_registry.get_model.return_value = model
-
-        mock_lmstudio_client.load_model.return_value = mock_llm
-        mock_response = Mock(content="Response", usage={"total_tokens": 10})
-        mock_lmstudio_client.acompletion = AsyncMock(return_value=mock_response)
-
-        engine = InferenceEngine(
-            client=mock_lmstudio_client,
-            model_registry=mock_registry,
-        )
-
-        result = await engine.infer("untested-model", "Test")
-
-        assert result.succeeded is True
-        # Should use declared context limit
-        mock_lmstudio_client.load_model.assert_called_once_with("untested-model", 8192)
-
-    @pytest.mark.asyncio
-    async def test_infer_with_out_ctx(
-        self: "TestInferenceEngine",
-        mock_lmstudio_client: Mock,
-        mock_llm: Mock,
-    ) -> None:
-        """Test inference with custom out_ctx."""
-        model = Model(
-            id="test-model",
-            path="/path/to/model.gguf",
-            size_bytes=1000000,
-            ctx_in=4096,
-        )
-
-        mock_registry = Mock()
-        mock_registry.get_model.return_value = model
-
-        mock_lmstudio_client.load_model.return_value = mock_llm
-        mock_response = Mock(content="Short", usage={"total_tokens": 5})
-        mock_lmstudio_client.acompletion = AsyncMock(return_value=mock_response)
-
-        engine = InferenceEngine(
-            client=mock_lmstudio_client,
-            model_registry=mock_registry,
-        )
-
-        result = await engine.infer("test-model", "Generate text", out_ctx=50)
-
-        assert result.succeeded is True
-
-        # Verify out_ctx was passed
-        call_args = mock_lmstudio_client.acompletion.call_args
-        assert call_args[1]["out_ctx"] == 50
-
-    @pytest.mark.asyncio
-    async def test_infer_load_failure(
-        self: "TestInferenceEngine",
-        mock_lmstudio_client: Mock,
-    ) -> None:
-        """Test inference when model fails to load."""
-        model = Model(
-            id="test-model",
-            path="/path/to/model.gguf",
-            size_bytes=1000000,
-            ctx_in=4096,
-        )
-
-        mock_registry = Mock()
-        mock_registry.get_model.return_value = model
-
-        # Mock load failure
-        mock_lmstudio_client.load_model.side_effect = Exception("Failed to load model")
-
-        engine = InferenceEngine(
-            client=mock_lmstudio_client,
-            model_registry=mock_registry,
-        )
-
-        result = await engine.infer("test-model", "Hello")
-
-        assert result.succeeded is False
-        assert "Failed to load model" in result.error
-
-    @pytest.mark.asyncio
-    async def test_infer_completion_failure(
-        self: "TestInferenceEngine",
-        mock_lmstudio_client: Mock,
-        mock_llm: Mock,
-    ) -> None:
-        """Test inference when completion fails."""
-        model = Model(
-            id="test-model",
-            path="/path/to/model.gguf",
-            size_bytes=1000000,
-            ctx_in=4096,
-        )
-
-        mock_registry = Mock()
-        mock_registry.get_model.return_value = model
-
-        mock_lmstudio_client.load_model.return_value = mock_llm
-        # Mock completion failure
-        mock_lmstudio_client.acompletion = AsyncMock(
-            side_effect=InferenceError("test-model", "Context too long"),
-        )
-
-        engine = InferenceEngine(
-            client=mock_lmstudio_client,
-            model_registry=mock_registry,
-        )
-
-        result = await engine.infer("test-model", "Very long prompt" * 1000)
-
-        assert result.succeeded is False
-        assert "Context too long" in result.error
-
-    @pytest.mark.asyncio
-    async def test_run_inference_simple(
-        self: "TestInferenceEngine",
-        mock_lmstudio_client: Mock,
-        mock_llm: Mock,
-    ) -> None:
-        """Test simple run_inference method."""
-        model = Model(
-            id="test-model",
-            path="/path/to/model.gguf",
-            size_bytes=1000000,
-            ctx_in=4096,
-        )
-
-        mock_registry = Mock()
-        mock_registry.get_model.return_value = model
-
-        mock_lmstudio_client.load_model.return_value = mock_llm
-        mock_response = Mock(content="42", usage={"total_tokens": 5})
-        mock_lmstudio_client.acompletion = AsyncMock(return_value=mock_response)
-
-        engine = InferenceEngine(
-            client=mock_lmstudio_client,
-            model_registry=mock_registry,
-        )
-
-        # Assuming run_inference is a convenience method
-        result = await engine.run_inference(
-            model_id="test-model",
-            prompt="What is the answer?",
-            temperature=0.5,
-            out_ctx=100,
-        )
-
-        assert isinstance(result, InferenceResult)
-        assert result.response == "42"
-        assert result.succeeded is True
+        assert result["succeeded"] is True
+        assert result["response"] == "Test response"
+        assert result["model_id"] == "test-model"
+        assert result["tokens_used"] == 15

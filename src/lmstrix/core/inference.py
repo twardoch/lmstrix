@@ -256,18 +256,33 @@ class InferenceEngine:
                 # Model already loaded, get a reference to it
                 # Note: We need to get the loaded model reference
                 loaded_models = lmstudio.list_loaded_models()
+                logger.debug(f"Found {len(loaded_models)} loaded models, searching for {model.id}")
+
                 for loaded_llm in loaded_models:
-                    # Try to match by model ID
-                    if (hasattr(loaded_llm, "id") and loaded_llm.id == model.id) or (
-                        hasattr(loaded_llm, "model_key") and loaded_llm.model_key == model.id
+                    # Try multiple matching strategies for better model identification
+                    llm_id = getattr(loaded_llm, "id", "")
+                    llm_model_key = getattr(loaded_llm, "model_key", "")
+
+                    logger.debug(
+                        f"Checking loaded model: id='{llm_id}', model_key='{llm_model_key}'"
+                    )
+
+                    # Match by exact ID or model_key, or if model.id appears in either
+                    if (
+                        model.id in (llm_id, llm_model_key)
+                        or model.id in llm_id
+                        or model.id in llm_model_key
                     ):
                         llm = loaded_llm
+                        logger.info(f"✓ Found matching loaded model: {llm_id or llm_model_key}")
                         break
+
                 if llm is None:
                     # Fallback: couldn't find the loaded model, load it anyway
                     logger.warning("Could not find reference to loaded model, loading anyway...")
                     context_to_use = model.tested_max_context or model.context_limit
                     llm = self.client.load_model_by_id(model.id, context_len=context_to_use)
+                    model_was_reused = False  # Mark as not reused since we had to load it
             elif context_to_use is None and in_ctx == 0:
                 # Load without context specification (for in_ctx=0 case)
                 llm = lmstudio.llm(model.id)

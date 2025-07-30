@@ -4,13 +4,14 @@ from importlib.metadata import PackageNotFoundError, version
 
 from lmstrix.api.exceptions import ModelNotFoundError
 from lmstrix.core.context_tester import ContextTester
-from lmstrix.core.inference import InferenceEngine, InferenceResult
+from lmstrix.core.inference_manager import InferenceManager
 from lmstrix.core.models import Model
 from lmstrix.loaders.model_loader import (
     load_model_registry,
     save_model_registry,
     scan_and_update_registry,
 )
+from lmstrix.utils.context_parser import get_model_max_context, parse_out_ctx
 
 try:
     from lmstrix._version import __version__
@@ -119,23 +120,42 @@ class LMStrix:
         self,
         model_id: str,
         prompt: str,
-        out_ctx: int = -1,
+        out_ctx: int | str = -1,
         temperature: float = 0.7,
-    ) -> InferenceResult:
+    ) -> dict:
         """Runs inference on a specified model.
 
         Args:
             model_id: The ID of the model to use.
             prompt: The prompt to send to the model.
-            out_ctx: The maximum number of tokens to generate.
+            out_ctx: The maximum number of tokens to generate (-1 for unlimited, or "50%" for percentage).
             temperature: The sampling temperature.
 
         Returns:
-            An InferenceResult object with the response and metadata.
+            A dictionary with inference results:
+                - model_id: str
+                - prompt: str
+                - response: str
+                - tokens_used: int
+                - inference_time: float
+                - error: str | None
+                - succeeded: bool
         """
         registry = load_model_registry(verbose=self.verbose)
-        engine = InferenceEngine(model_registry=registry, verbose=self.verbose)
-        return engine.infer(
+
+        # Parse out_ctx if it's a percentage
+        if isinstance(out_ctx, str) and out_ctx != "-1":
+            model = registry.find_model(model_id)
+            if not model:
+                raise ModelNotFoundError(model_id, [m.id for m in registry.list_models()])
+
+            max_context = get_model_max_context(model, use_tested=True)
+            if not max_context:
+                max_context = model.context_limit
+            out_ctx = parse_out_ctx(out_ctx, max_context)
+
+        manager = InferenceManager(registry=registry, verbose=self.verbose)
+        return manager.infer(
             model_id=model_id,
             prompt=prompt,
             out_ctx=out_ctx,
@@ -144,7 +164,6 @@ class LMStrix:
 
 
 __all__ = [
-    "InferenceResult",
     "LMStrix",
     "Model",
     "__version__",

@@ -1,0 +1,15 @@
+```json
+{
+    "key1": "value1",
+    "key2": "value2"
+}
+```
+
+The TOML equivalence: 
+
+```toml
+key1 = "value1"
+key2 = "value2"
+```
+
+So we don't need the `[groups]` in adam.toml. Rewrite it to simplify the nesting. Make sure that we only need to resolve `{text}`. Also `--text` (string) and `--text_file` (path) should be supported in `lmstrix infer`. `--text_file` would be loaded as content, and `--text` would be passed as a string, and it would then be equivalent to --dict with `text` as a key and the value as value. So it would be used for the `{text}` placeholder. Rewrite all prompts in adam.toml and in @examples/prompts_adam/demo_adam_prompts_cli.sh to use this approach. Remove the unneeded files from @examples/prompts_adam

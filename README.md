@@ -1,16 +1,16 @@
-LMStrix is a professional, installable Python toolkit designed to supercharge your interaction with [LM Studio](https://lmstudio.ai/). It provides a powerful command-line interface (CLI) and a clean Python API for managing, testing, and running local language models, with a standout feature: the **Adaptive Context Optimizer**.
+# LMStrix
 
-**Current version: 1.0.53** - Enhanced CLI features, full synchronous architecture, and improved safety controls.
-
-**For the full documentation, please visit the [LMStrix GitHub Pages site](https://twardoch.github.io/lmstrix/).**
+LMStrix is a professional Python toolkit designed to supercharge your interaction with [LM Studio](https://lmstudio.ai/). It provides a powerful command-line interface (CLI) and Python API for managing, testing, and running local language models, with a standout feature: **Adaptive Context Optimization**.
 
 ## Key Features
 
-- **Automatic Context Optimization**: Discover the true context limit of any model with the `test` command, featuring safety thresholds and batch testing.
-- **Full Model Management**: Programmatically `list` available models with sorting and multiple output formats, and `scan` for newly downloaded ones.
-- **Flexible Inference Engine**: Run inference with a powerful two-phase prompt templating system that separates prompt structure from its content.
-- **Rich CLI**: A beautiful and intuitive command-line interface built with `rich` and `fire`.
-- **Modern Python API**: A fully synchronous API for reliable and straightforward integration.
+- **🔍 Automatic Context Discovery**: Binary search algorithm to find the true operational context limit of any model
+- **📊 Beautiful Verbose Logging**: Enhanced stats display with emojis showing inference metrics, timing, and token usage
+- **🚀 Smart Model Management**: Models persist between calls to reduce loading overhead
+- **🎯 Flexible Inference Engine**: Run inference with powerful prompt templating and percentage-based output control
+- **📋 Comprehensive Model Registry**: Track models, their context limits, and test results with JSON persistence
+- **🛡️ Safety Controls**: Configurable thresholds and fail-safes to prevent system crashes
+- **💻 Rich CLI Interface**: Beautiful terminal output with progress indicators and formatted tables
 
 ## Installation
 
@@ -22,111 +22,216 @@ pip install lmstrix
 uv pip install lmstrix
 ```
 
-**For more detailed installation instructions, see the [Installation page](https://twardoch.github.io/lmstrix/installation/).**
-
 ## Quick Start
 
-### Command-Line Interface (CLI)
+### Command-Line Interface
 
 ```bash
-# First, scan for available models in LM Studio
+# Scan for available models in LM Studio
 lmstrix scan
 
-# List all models with their test status
+# List all models with their context limits and test status
 lmstrix list
 
-# Test the context limit for a specific model
-lmstrix test "model-id-here"
+# Test context limit for a specific model
+lmstrix test llama-3.2-3b-instruct
 
-# Test all untested models with enhanced safety controls
+# Test all untested models with safety threshold
 lmstrix test --all --threshold 102400
 
-# Test all models at a specific context size
-lmstrix test --all --ctx 32768
+# Run inference with enhanced verbose logging
+lmstrix infer "What is the capital of Poland?" -m llama-3.2-3b-instruct --verbose
 
-# Sort and filter model listings
-lmstrix list --sort size_gb  # Sort by model size descending
-lmstrix list --show json --sort name  # Export as JSON sorted by model name
-lmstrix list --show id  # Get plain list of model IDs
-lmstrix list --show path  # Get newline-delimited paths
+# Run inference with percentage-based output tokens
+lmstrix infer "Explain quantum computing" -m llama-3.2-3b-instruct --out_ctx "25%"
 
-# Run inference on a model
-lmstrix infer "Your prompt here" --model "model-id" --max-tokens 150
+# Use file-based prompts with templates
+lmstrix infer summary -m llama-3.2-3b-instruct --file_prompt adam.toml --text_file document.txt
+
+# Direct text input for prompts
+lmstrix infer "Summarize: {{text}}" -m llama-3.2-3b-instruct --text "Your content here"
+```
+
+### Enhanced Verbose Output
+
+When using `--verbose`, LMStrix provides comprehensive statistics:
+
+```
+════════════════════════════════════════════════════════════
+🤖 MODEL: llama-3.2-3b-instruct
+🔧 CONFIG: maxTokens=26214, temperature=0.7
+📝 PROMPT (1 lines, 18 chars): Capital of Poland?
+════════════════════════════════════════════════════════════
+⠸ Running inference...
+════════════════════════════════════════════════════════════
+📊 INFERENCE STATS
+⚡ Time to first token: 0.82s
+⏱️  Total inference time: 11.66s
+🔢 Predicted tokens: 338
+📝 Prompt tokens: 5
+🎯 Total tokens: 343
+🚀 Tokens/second: 32.04
+🛑 Stop reason: eosFound
+════════════════════════════════════════════════════════════
 ```
 
 ### Python API
 
 ```python
-import asyncio
-from lmstrix import LMStrix
+from lmstrix.loaders.model_loader import load_model_registry
+from lmstrix.core.inference_manager import InferenceManager
 
-async def main():
-    # Initialize the client
-    lms = LMStrix()
-    
-    # Scan for available models
-    lms.scan_models()
-    
-    # List all models
-    models = lms.list_models()
-    print(models)
-    
-    # Test a specific model's context limits
-    model_id = models[0].id if models else None
-    if model_id:
-        result = lms.test_model(model_id)
-        print(result)
-    
-    # Run inference
-    if model_id:
-        response = await lms.infer(
-            prompt="What is the meaning of life?",
-            model_id=model_id,
-            max_tokens=100
-        )
-        print(response.content)
+# Load model registry
+registry = load_model_registry()
 
-if __name__ == "__main__":
-    asyncio.run(main())
+# List available models
+models = registry.list_models()
+print(f"Available models: {len(models)}")
+
+# Run inference
+manager = InferenceManager(verbose=True)
+result = manager.infer(
+    model_id="llama-3.2-3b-instruct",
+    prompt="What is the meaning of life?",
+    out_ctx=100,
+    temperature=0.7
+)
+
+if result["succeeded"]:
+    print(f"Response: {result['response']}")
+    print(f"Tokens used: {result['tokens_used']}")
+    print(f"Time: {result['inference_time']:.2f}s")
 ```
 
-**For more detailed usage instructions and examples, see the [Usage page](https://twardoch.github.io/lmstrix/usage/) and the [API Reference](https://twardoch.github.io/lmstrix/api/).**
+## Context Testing & Optimization
 
-## Enhanced Testing Strategy
-
-LMStrix uses a sophisticated testing algorithm to safely and efficiently discover true model context limits:
+LMStrix uses a sophisticated binary search algorithm to discover true model context limits:
 
 ### Safety Features
-- **Threshold Protection**: Default 102,400 token limit prevents system crashes from oversized contexts.
+- **Threshold Protection**: Configurable maximum context size to prevent system crashes
+- **Progressive Testing**: Starts with small contexts and increases safely
+- **Persistent Results**: Saves test results to avoid re-testing
 
-### Testing Algorithm
-1. **Initial Verification**: Tests at a small context size (1024) to verify the model loads correctly.
-2. **Threshold Test**: Tests at the `min(threshold, declared_limit)` to safely assess the initial context window.
-3. **Binary Search**: If the threshold test fails, it performs an efficient binary search to find the exact context limit.
-4. **Progress Persistence**: Saves results after each test for resumable operations.
+### Testing Commands
+```bash
+# Test specific model
+lmstrix test llama-3.2-3b-instruct
 
-### Multi-Model Optimization
-- **Batch Processing**: The `--all` flag allows for testing multiple models sequentially.
-- **Rich Output**: Displays results in a clear table, showing the tested context size and status.
+# Test all models with custom threshold
+lmstrix test --all --threshold 65536
+
+# Test at specific context size
+lmstrix test --all --ctx 32768
+
+# Reset and re-test a model
+lmstrix test llama-3.2-3b-instruct --reset
+```
+
+## Model Management
+
+### Registry Commands
+```bash
+# Scan for new models
+lmstrix scan --verbose
+
+# List models with different sorting
+lmstrix list --sort size        # Sort by size
+lmstrix list --sort ctx         # Sort by tested context
+lmstrix list --show json        # Export as JSON
+
+# Check system health
+lmstrix health --verbose
+```
+
+### Model Persistence
+Models stay loaded between inference calls for improved performance:
+- When no explicit context is specified, models remain loaded
+- Last-used model is remembered for subsequent calls
+- Explicit context changes trigger model reloading
+
+## Prompt Templating
+
+LMStrix supports flexible prompt templating with TOML files:
+
+```toml
+# adam.toml
+[aps]
+prompt = """
+You are an AI assistant skilled in Abstractive Proposition Segmentation.
+Convert the following text: {{text}}
+"""
+
+[summary] 
+prompt = "Create a comprehensive summary: {{text}}"
+```
+
+Use with CLI:
+```bash
+lmstrix infer aps --file_prompt adam.toml --text "Your text here"
+lmstrix infer summary --file_prompt adam.toml --text_file document.txt
+```
 
 ## Development
 
 ```bash
-# Clone the repository
-git clone https://github.com/twardoch/lmstrix
+# Clone repository
+git clone https://github.com/twardoch/lmstrix.git
 cd lmstrix
 
-# Install in development mode with all dependencies
+# Install for development
 pip install -e ".[dev]"
 
-# Run the test suite
+# Run tests
 pytest
+
+# Run linting
+hatch run lint:all
 ```
 
-## Changelog
+## Project Structure
 
-All notable changes to this project are documented in the [CHANGELOG.md](https://twardoch.github.io/lmstrix/changelog) file.
+```
+src/lmstrix/
+├── cli/main.py              # CLI interface
+├── core/
+│   ├── inference_manager.py # Unified inference engine
+│   ├── models.py            # Model registry
+│   └── context_tester.py    # Context limit testing
+├── api/client.py            # LM Studio API client
+├── loaders/                 # Data loading utilities
+└── utils/                   # Helper utilities
+```
+
+## Features in Detail
+
+### Adaptive Context Optimizer
+- Binary search algorithm for efficient context limit discovery
+- Safety thresholds to prevent system crashes
+- Automatic persistence of test results
+- Resume capability for interrupted tests
+
+### Enhanced Logging
+- Beautiful emoji-rich output in verbose mode
+- Comprehensive inference statistics
+- Progress indicators for long operations
+- Clear error messages with context
+
+### Smart Model Management
+- Automatic model discovery from LM Studio
+- Persistent registry with JSON storage
+- Model state tracking (loaded/unloaded)
+- Batch operations for multiple models
+
+## Requirements
+
+- Python 3.11+
+- LM Studio installed and configured
+- Models downloaded in LM Studio
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+Contributions welcome! Please read our contributing guidelines and submit pull requests for any improvements.

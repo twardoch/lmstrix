@@ -190,11 +190,73 @@ class LMStudioClient:
         # LM Studio's complete() method accepts a config dict
         # Pass maxTokens (camelCase) to prevent models from generating indefinitely
         config = {"maxTokens": out_ctx if out_ctx > 0 else 100, "temperature": temperature}
-        logger.debug(f"Calling llm.complete with config: {config}, prompt: {prompt[:50]}...")
+
+        # Enhanced logging with beautiful formatting
+        logger.info("═" * 60)
+        logger.info(f"🤖 MODEL: {model_id or 'unknown'}")
+        logger.info(
+            f"🔧 CONFIG: maxTokens={config['maxTokens']}, temperature={config['temperature']}",
+        )
+
+        # Log model context information if available
+        if hasattr(llm, "config") and hasattr(llm.config, "contextLength"):
+            logger.info(f"📏 CONTEXT: {llm.config.contextLength:,} tokens")
+
+        # Log prompt with truncation and line count
+        prompt_lines = prompt.count("\n") + 1
+        prompt_chars = len(prompt)
+        if prompt_chars <= 100:
+            logger.info(f"📝 PROMPT ({prompt_lines} lines, {prompt_chars} chars): {prompt}")
+        else:
+            logger.info(f"📝 PROMPT ({prompt_lines} lines, {prompt_chars} chars):")
+            logger.info(f"   First 100 chars: {prompt[:100]}...")
+            logger.info(f"   Last 100 chars: ...{prompt[-100:]}")
+
+        logger.info("═" * 60)
+
+        import time
+
+        start_time = time.time()
 
         try:
             # Direct synchronous call - no threading or async
             response = llm.complete(prompt, config=config)
+
+            # Calculate total inference time
+            total_inference_time = time.time() - start_time
+
+            # Extract and log performance stats in verbose mode
+            if hasattr(response, "stats") and response.stats:
+                stats = response.stats
+                logger.info("═" * 60)
+                logger.info("📊 INFERENCE STATS")
+
+                # Time to first token
+                if hasattr(stats, "time_to_first_token_sec"):
+                    logger.info(f"⚡ Time to first token: {stats.time_to_first_token_sec:.2f}s")
+
+                # Total inference time
+                logger.info(f"⏱️  Total inference time: {total_inference_time:.2f}s")
+
+                # Token counts
+                if hasattr(stats, "predicted_tokens_count"):
+                    logger.info(f"🔢 Predicted tokens: {stats.predicted_tokens_count:,}")
+
+                if hasattr(stats, "prompt_tokens_count"):
+                    logger.info(f"📝 Prompt tokens: {stats.prompt_tokens_count:,}")
+
+                if hasattr(stats, "total_tokens_count"):
+                    logger.info(f"🎯 Total tokens: {stats.total_tokens_count:,}")
+
+                # Tokens per second
+                if hasattr(stats, "tokens_per_second"):
+                    logger.info(f"🚀 Tokens/second: {stats.tokens_per_second:.2f}")
+
+                # Stop reason
+                if hasattr(stats, "stop_reason"):
+                    logger.info(f"🛑 Stop reason: {stats.stop_reason}")
+
+                logger.info("═" * 60)
         except LMStudioServerError as e:
             # Handle specific LM Studio server errors
             error_message = str(e).lower()

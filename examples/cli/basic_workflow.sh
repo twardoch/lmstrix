@@ -2,9 +2,9 @@
 #
 # This script demonstrates the complete, basic workflow of LMStrix.
 # 1. Scan for downloaded models.
-# 2. List the models found.
+# 2. List the models found with various display options.
 # 3. Test the context length of a specific model.
-# 4. Run inference with the tested model.
+# 4. Run inference with the tested model using new features.
 #
 
 # Exit immediately if a command exits with a non-zero status.
@@ -15,40 +15,45 @@ echo "### LMStrix Basic Workflow Demo ###"
 # Step 1: Scan for models
 # This command discovers all models downloaded in your LM Studio installation
 # and updates the local registry file (lmstrix.json).
-echo -e "
---- Step 1: Scanning for models ---"
-lmstrix scan
+echo -e "\n--- Step 1: Scanning for models ---"
+lmstrix scan --verbose
 echo "Scan complete. Model registry updated."
 
-# Step 2: List models
-# This command displays the models found in the registry, along with any
-# test results or metadata.
-echo -e "
---- Step 2: Listing available models ---"
+# Step 2: List models with different display options
+# This demonstrates the new --show and --sort options
+echo -e "\n--- Step 2a: Listing models (default view) ---"
 lmstrix list
-echo "Model list displayed."
+echo -e "\n--- Step 2b: Listing models sorted by context size ---"
+lmstrix list --sort ctx
+echo -e "\n--- Step 2c: Showing just model IDs ---"
+lmstrix list --show id
+echo "Model listing demonstrations complete."
 
 # Step 3: Test a model's context length
-# Replace "model-identifier" with a unique part of your model's path from the list.
-# For example, if you have "gemma-2b-it-q8_0.gguf", you can use "gemma-2b".
-# This test will determine the maximum context size the model can handle.
-echo -e "
---- Step 3: Testing a model's context length ---"
+# We'll use a common model identifier that users might have
+echo -e "\n--- Step 3: Testing a model's context length ---"
 echo "Note: This may take several minutes depending on the model and your hardware."
-# We will use a placeholder model identifier here.
-# In a real scenario, you would replace 'phi' with a model you have.
-MODEL_ID="ultron-summarizer-1b" # <--- CHANGE THIS to a model you have downloaded
-echo "Testing model: $MODEL_ID"
-lmstrix test --model_id "$MODEL_ID"
+# Common model patterns users might have:
+# "llama", "mistral", "qwen", "phi", "gemma", "codellama"
+MODEL_ID="llama" # <--- CHANGE THIS to match a model you have downloaded
+echo "Looking for models matching: $MODEL_ID"
+# Show models matching the pattern
+lmstrix list --show id | grep -i "$MODEL_ID" || echo "No models found matching '$MODEL_ID'"
+echo -e "\nTesting model: $MODEL_ID"
+lmstrix test --model_id "$MODEL_ID" --verbose
 echo "Context test complete."
 
-# Step 4: Run inference
-# Use the same model identifier to run a simple inference task.
-echo -e "
---- Step 4: Running inference ---"
-lmstrix infer "What is the capital of France?" "$MODEL_ID"
-echo -e "
-Inference complete."
+# Step 4: Run inference with new context control features
+# Demonstrates --out_ctx instead of deprecated --max_tokens
+echo -e "\n--- Step 4a: Running basic inference ---"
+lmstrix infer "What is the capital of France?" "$MODEL_ID" --out_ctx 50
 
-echo -e "
-### Workflow Demo Finished ###"
+echo -e "\n--- Step 4b: Running inference with specific loading context ---"
+lmstrix infer "Explain quantum computing in simple terms." "$MODEL_ID" --in_ctx 4096 --out_ctx 200
+
+echo -e "\n--- Step 4c: Checking if model is already loaded (reuse demo) ---"
+lmstrix infer "What is 2+2?" "$MODEL_ID" --out_ctx 10
+
+echo -e "\nInference demonstrations complete."
+
+echo -e "\n### Workflow Demo Finished ###"

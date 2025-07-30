@@ -1,6 +1,0 @@
-Convert to words:
-1. Test
-2. Numbers
-3. Here
-
-Answer: Test, numbers, here.

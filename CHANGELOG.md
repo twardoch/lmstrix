@@ -7,7 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Major Improvements & Bug Fixes
+
+#### Issues 201-204 (Completed)
+- **Issue 201**: Enhanced model persistence - models now stay loaded between inference calls when no explicit context is specified
+- **Issue 202**: Beautiful enhanced logging with emojis, model info, config details, and prompt statistics  
+- **Issue 203**: Fixed model lookup to find by both path and ID without changing JSON structure
+- **Issue 204**: Added comprehensive verbose stats logging including time to first token, predicted tokens, tokens/second, and total inference time
+
+#### Model Registry Improvements
+- Fixed smart model lookup that works with both model paths and IDs
+- Preserved original JSON structure keyed by path
+- No data duplication - registry size maintained
+- Backward compatible with existing path-based lookups
+
+#### Enhanced Logging & Statistics
+- Beautiful formatted logging with visual separators and emojis
+- Complete inference statistics display including:
+  - ⚡ Time to first token
+  - ⏱️ Total inference time  
+  - 🔢 Predicted tokens
+  - 📝 Prompt tokens
+  - 🎯 Total tokens
+  - 🚀 Tokens/second
+  - 🛑 Stop reason
+- Eliminated duplicate stats display at end of output
+
 ### Added
+
+- **Context Parameter Percentage Support**
+  - `--out_ctx` parameter now supports percentage notation (e.g., "80%")
+  - Created `utils/context_parser.py` for parsing context parameters
+  - Percentage calculated from model's tested or declared maximum context
+
+- **Improved CLI Output**
+  - Non-verbose mode for `infer` command now shows only model response
+  - Removed extra formatting and status information in quiet mode
 
 - **Prompt File Support with TOML (Issue #104)**
   - Added `--file_prompt` parameter to load prompts from TOML files
@@ -30,6 +65,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Reuses existing loaded models when no explicit context specified
   - Added `--force-reload` flag to force model reload even if already loaded
   - Shows clear status messages about model reuse vs reload
+
+- **Model State Persistence (Issue #201)**
+  - Models now stay loaded between `infer` calls when `--in_ctx` is not specified
+  - Added StateManager to track last-used model across sessions
+  - Model ID parameter (`-m`) is now optional - uses last-used model when omitted
+  - Significantly improves performance by avoiding repeated model loading/unloading
+  - Created `examples/cli/model_state_demo.sh` demonstrating the feature
 
 - **Context Validation**
   - Validates requested context against model's declared and tested limits
