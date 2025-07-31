@@ -171,7 +171,7 @@ class TestLMStudioClient:
 
         mock_llm.complete.assert_called_once_with(
             "2+2=",
-            config={"maxTokens": 100},
+            config={"maxTokens": 100, "temperature": 0.7},
         )
 
     def test_completion_failure(

@@ -3,6 +3,7 @@
 This module consolidates inference logic from cli/main.py and core/inference.py
 into a single, streamlined interface.
 """
+
 # this_file: src/lmstrix/core/inference_manager.py
 
 import builtins
@@ -47,7 +48,11 @@ class InferenceManager:
         prompt: str,
         in_ctx: int | None = None,
         out_ctx: int = -1,
-        temperature: float = 0.7,
+        temperature: float = 0.8,
+        top_k: int = 40,
+        top_p: float = 0.95,
+        repeat_penalty: float = 1.1,
+        min_p: float = 0.05,
         **kwargs: Any,
     ) -> dict[str, Any]:
         """Run inference on a model.
@@ -80,7 +85,6 @@ class InferenceManager:
 
         start_time = time.time()
         llm = None
-        should_unload_after = False
 
         # Check if model is already loaded
         is_loaded, loaded_context = self.client.is_model_loaded(model_id)
@@ -100,16 +104,13 @@ class InferenceManager:
                     logger.warning(f"Failed to unload existing models: {e}")
 
             context_to_use = None if in_ctx == 0 else in_ctx
-            should_unload_after = True  # Only unload if explicitly loaded with context
         # No explicit context - try to reuse or load optimal
         elif is_loaded:
             logger.info(f"Model already loaded with context {loaded_context:,}, reusing...")
             context_to_use = None  # Signal to skip loading
-            should_unload_after = False  # Keep model loaded for subsequent calls
         else:
             context_to_use = model.tested_max_context or model.context_limit
             logger.info(f"Loading with optimal context {context_to_use:,}...")
-            should_unload_after = False  # Keep model loaded for subsequent calls
 
         try:
             # Load model if needed
@@ -165,6 +166,10 @@ class InferenceManager:
                 prompt=prompt,
                 out_ctx=out_ctx,
                 temperature=temperature,
+                top_k=top_k,
+                top_p=top_p,
+                repeat_penalty=repeat_penalty,
+                min_p=min_p,
                 model_id=model_id,
                 model_context_length=model.tested_max_context or model.context_limit,
                 **kwargs,
@@ -240,15 +245,6 @@ class InferenceManager:
                 "error": error_str,
                 "succeeded": False,
             }
-
-        finally:
-            # Only unload if we explicitly loaded with in_ctx
-            if llm and should_unload_after:
-                try:
-                    logger.info(f"Unloading model {model_id}...")
-                    llm.unload()
-                except Exception as e:
-                    logger.warning(f"Failed to unload model: {e}")
 
     def test_inference_capability(self, model: Model, context_len: int) -> tuple[bool, str]:
         """Test if model can do basic inference at given context length.

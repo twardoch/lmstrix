@@ -1,11 +1,7 @@
 """API client and exceptions for LMStrix."""
 
 from lmstrix.api.client import CompletionResponse, LMStudioClient
-from lmstrix.utils.logging import logger
-
 from lmstrix.api.exceptions import (
-from lmstrix.utils.logging import logger
-
     APIConnectionError,
     ConfigurationError,
     ContextLimitExceededError,
@@ -14,6 +10,7 @@ from lmstrix.utils.logging import logger
     ModelLoadError,
     ModelNotFoundError,
 )
+from lmstrix.utils.logging import logger
 
 __all__ = [
     "APIConnectionError",

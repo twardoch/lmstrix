@@ -37,11 +37,8 @@ from rich.console import Console
 from slugify import slugify
 
 from lmstrix.core.inference_manager import InferenceManager
-from lmstrix.utils.logging import logger
-
 from lmstrix.loaders.model_loader import load_model_registry
 from lmstrix.utils.logging import logger
-
 
 console = Console()
 
@@ -73,7 +70,7 @@ def process_text_with_model(
     registry = load_model_registry(verbose=verbose)
 
     if not registry._models:
-        logger.error(f"No models found in registry. Run 'lmstrix scan' first.")
+        logger.error("No models found in registry. Run 'lmstrix scan' first.")
         return ""
 
     # Select model
@@ -92,7 +89,7 @@ def process_text_with_model(
                 model = matching_models[0]
                 logger.success(f"Found matching model: {model.id}")
             elif len(matching_models) > 1:
-                logger.debug(f"[yellow]Multiple models found matching '{model_id}':[/yellow]")
+                logger.debug(f"Multiple models found matching '{model_id}':")
                 for m in matching_models[:5]:  # Show first 5 matches
                     logger.debug(f"  - {m.id}")
                 if len(matching_models) > 5:
@@ -101,7 +98,7 @@ def process_text_with_model(
             else:
                 logger.error(f"No model found matching '{model_id}'.")
                 available_models = [m.id for m in registry.list_models()]
-                logger.debug(f"[yellow]Available models: {len(available_models)} total[/yellow]")
+                logger.debug(f"Available models: {len(available_models)} total")
                 return ""
     else:
         # Use first available model with tested context
@@ -112,7 +109,7 @@ def process_text_with_model(
             # Fallback to any available model
             all_models = registry.list_models()
             if not all_models:
-                logger.error(f"No models available.")
+                logger.error("No models available.")
                 return ""
             model = all_models[0]
         else:
@@ -125,7 +122,7 @@ def process_text_with_model(
     try:
         text_content = input_path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
-        logger.error(f"Could not read file as UTF-8. Please check file encoding.")
+        logger.error("Could not read file as UTF-8. Please check file encoding.")
         return ""
 
     # Split into paragraphs (separated by two empty lines)
@@ -133,7 +130,7 @@ def process_text_with_model(
     logger.debug(f"Found {len(paragraphs)} paragraphs to process")
 
     if not paragraphs:
-        logger.debug("[yellow]Warning: No paragraphs found in input file.[/yellow]")
+        logger.debug("Warning: No paragraphs found in input file.")
         return ""
 
     # Initialize inference manager
@@ -149,7 +146,7 @@ def process_text_with_model(
 
         if verbose:
             logger.debug(
-                f"[dim]Input: {paragraph[:100]}{'...' if len(paragraph) > 100 else ''}[/dim]",
+                f"Input: {paragraph[:100]}{'...' if len(paragraph) > 100 else ''}",
             )
 
         prompt = prompt_template.format(text=paragraph)
@@ -165,13 +162,13 @@ def process_text_with_model(
             if result["succeeded"]:
                 results.append(result["response"].strip())
                 if verbose:
-                    logger.success(f"✓ Succes")
+                    logger.success("✓ Succes")
             else:
-                logger.debug(f"[red]✗ Failed: {result['error']}[/red]")
+                logger.debug(f"✗ Failed: {result['error']}")
                 results.append(f"[ERROR: {result['error'] or 'Unknown error'}]")
 
         except Exception as e:
-            logger.debug(f"[red]✗ Exception: {e}[/red]")
+            logger.debug(f"✗ Exception: {e}")
             results.append(f"[ERROR: {e}]")
 
     # Generate output filename
@@ -187,10 +184,10 @@ def process_text_with_model(
     try:
         output_path.write_text(output_content, encoding="utf-8")
         logger.success(f"✓ Successfully processed {len(paragraphs)} paragraph")
-        logger.success(f"✓ Output saved to: {output_path")
+        logger.success(f"✓ Output saved to: {output_path}")
         return str(output_path)
     except Exception as e:
-        logger.debug(f"[red]Error writing output file: {e}[/red]")
+        logger.debug(f"Error writing output file: {e}")
         return ""
 
 

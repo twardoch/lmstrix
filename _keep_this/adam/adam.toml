@@ -394,16 +394,14 @@ variable font = font zmienny ≠ czcionka zmienna
 layout feature = funkcja zecerska
 feature = funkcja zecerska
 web fonts = fonty webowe ≠ czcionki webowe
-small caps = kapitaliki ≠ małe kapitaliki
+small caps = kapitaliki ≠ małe kapitaliki
 double-click = dwuklik—dwukliknąć ≠ podwójne kliknięcie
 oldstyle numerals = cyfry nautyczne
-typeface = krój pisma—krój
+typeface = krój pisma | krój
 stem = kreska główna
-hint = hint—hintować ≠ wskazówka
+hint = hint | hintować ≠ wskazówka
 hinting = hinting
 </vocabulary>
-
-{{think}}
 
 <task>
 Translate the following input. Follow translation-instructions and vocabulary.

@@ -1,46 +1,29 @@
-"""Command-line interface for LMStrix."""
+"""Main API service layer for LMStrix CLI operations."""
 
 import json
+import sys
 import time
 from datetime import datetime
+from pathlib import Path
 
-import fire
 from rich.console import Console
 from rich.table import Table
 
 from lmstrix.api.exceptions import APIConnectionError, ModelRegistryError
-from lmstrix.utils.logging import logger
-
 from lmstrix.core.concrete_config import ConcreteConfigManager
-from lmstrix.utils.logging import logger
-
 from lmstrix.core.context_tester import ContextTester
-from lmstrix.utils.logging import logger
-
 from lmstrix.core.inference_manager import InferenceManager
-from lmstrix.utils.logging import logger
-
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
-from lmstrix.utils.logging import logger
-
 from lmstrix.loaders.model_loader import (
-from lmstrix.utils.logging import logger
-
     load_model_registry,
     scan_and_update_registry,
 )
+from lmstrix.loaders.prompt_loader import load_single_prompt
 from lmstrix.utils import get_context_test_log_path, setup_logging
-from lmstrix.utils.logging import logger
-
 from lmstrix.utils.context_parser import get_model_max_context, parse_out_ctx
 from lmstrix.utils.logging import logger
-
 from lmstrix.utils.paths import get_default_models_file, get_lmstudio_path
-from lmstrix.utils.logging import logger
-
 from lmstrix.utils.state import StateManager
-from lmstrix.utils.logging import logger
-
 
 console = Console()
 
@@ -58,7 +41,7 @@ def _get_models_to_test(
 
     if not test_all:
         if not model_id:
-            logger.error(f"You must specify a model ID or use the --all flag.")
+            logger.error("You must specify a model ID or use the --all flag.")
             return []
         model = registry.find_model(model_id)
         if not model:
@@ -66,7 +49,7 @@ def _get_models_to_test(
             return []
         if tester._is_embedding_model(model):
             logger.debug(
-                f"[red]Error: Model '{model_id}' is an embedding model and cannot be tested as an LLM.[/red]",
+                f"Error: Model '{model_id}' is an embedding model and cannot be tested as an LLM.",
             )
             return []
         return [model]
@@ -93,20 +76,20 @@ def _get_models_to_test(
 
     if skipped_embedding > 0:
         logger.debug(
-            f"[yellow]Excluded {skipped_embedding} embedding models from testing.[/yellow]",
+            f"Excluded {skipped_embedding} embedding models from testing.",
         )
 
     if not models_to_test:
         if ctx is not None:
             logger.debug(
-                "[yellow]No LLM models found to test at the specified context size.[/yellow]",
+                "No LLM models found to test at the specified context size.",
             )
             logger.debug(
-                "[dim]Models may already be tested or context exceeds their limits.[/dim]",
+                "Models may already be tested or context exceeds their limits.",
             )
         elif reset:
             logger.debug(
-                "[yellow]No models found to test (check model availability).[/yellow]",
+                "No models found to test (check model availability).",
             )
         else:
             logger.debug(
@@ -128,7 +111,7 @@ def _sort_models(models: list[Model], sort_by: str) -> list[Model]:
     sort_attr = key_map.get(sort_key.rstrip("d"))
 
     if not sort_attr:
-        logger.debug(f"[red]Invalid sort option: {sort_by}. Using default (id).[/red]")
+        logger.debug(f"Invalid sort option: {sort_by}. Using default (id).")
         return sorted(models, key=lambda m: m.id)
 
     return sorted(models, key=lambda m: getattr(m, sort_attr) or 0, reverse=reverse)
@@ -143,24 +126,24 @@ def _test_single_model(
     """Test a single model at a specific context size."""
     if ctx > model.context_limit:
         logger.debug(
-            f"[yellow]Warning: Specified context ({ctx:,}) exceeds model's declared limit ({model.context_limit:,}). Skipping test.[/yellow]",
+            f"Warning: Specified context ({ctx:,}) exceeds model's declared limit ({model.context_limit:,}). Skipping test.",
         )
         return
 
     if model.last_known_bad_context and ctx >= model.last_known_bad_context:
         max_safe_context = int(model.last_known_bad_context * 0.75)
         logger.debug(
-            f"[red]Error: Specified context ({ctx:,}) is at or above the last known bad context ({model.last_known_bad_context:,}).[/red]",
+            f"Error: Specified context ({ctx:,}) is at or above the last known bad context ({model.last_known_bad_context:,}).",
         )
         logger.debug(
-            f"[yellow]The maximum safe context to test is {max_safe_context:,} (75% of last bad).[/yellow]",
+            f"The maximum safe context to test is {max_safe_context:,} (75% of last bad).",
         )
         return
 
     logger.debug(
         f"\n[bold cyan]Testing model: {model.id} at specific context: {ctx:,}[/bold cyan]",
     )
-    logger.debug(f"[dim]Declared context limit: {model.context_limit:,} tokens[/dim]")
+    logger.debug(f"Declared context limit: {model.context_limit:,} tokens")
 
     log_path = get_context_test_log_path(model.id)
 
@@ -172,15 +155,15 @@ def _test_single_model(
 
     if result.load_success and result.inference_success:
         logger.success(f"✓ Test successful at context {ctx:,}")
-        logger.debug(f"[dim]Response length: {len(result.response)} chars[/dim]")
+        logger.debug(f"Response length: {len(result.response)} chars")
         model.last_known_good_context = ctx
         if not model.tested_max_context or ctx > model.tested_max_context:
             model.tested_max_context = ctx
         model.context_test_status = ContextTestStatus.COMPLETED
     else:
         error_type = "load" if not result.load_success else "inference"
-        logger.debug(f"[red]✗ Test failed at context {ctx:,} ({error_type} failed)[/red]")
-        logger.debug(f"[dim]Error: {result.error}[/dim]")
+        logger.debug(f"✗ Test failed at context {ctx:,} ({error_type} failed)")
+        logger.debug(f"Error: {result.error}")
         model.last_known_bad_context = ctx
         model.context_test_status = ContextTestStatus.FAILED
 
@@ -244,7 +227,7 @@ def _test_all_models_optimized(
     logger.debug(
         f"[bold]Starting optimized batch testing for {len(models_to_test)} models[/bold]",
     )
-    logger.debug(f"[dim]Threshold: {threshold:,} tokens[/dim]\n")
+    logger.debug(f"Threshold: {threshold:,} tokens\n")
 
     return tester.test_all_models(
         models_to_test,
@@ -287,22 +270,15 @@ def _print_final_results(updated_models: list[Model]) -> None:
     logger.debug(table)
 
 
-class LMStrixCLI:
-    """A CLI for testing and managing LM Studio models."""
+class LMStrixService:
+    """Service layer for LMStrix operations."""
 
-    def scan(self, failed: bool = False, reset: bool = False, verbose: bool = False) -> None:
-        """Scan for LM Studio models and update the local registry.
-
-        Args:
-            failed: Re-scan only models that previously failed.
-            all: Re-scan all models (clear existing test data).
-            verbose: Enable verbose output.
-        """
-        # Configure logging based on verbose flag
+    def scan_models(self, failed: bool = False, reset: bool = False, verbose: bool = False) -> None:
+        """Scan for LM Studio models and update the local registry."""
         setup_logging(verbose=verbose)
 
         if failed and reset:
-            logger.error(f"Cannot use --failed and --all together.")
+            logger.error("Cannot use --failed and --all together.")
             return
 
         try:
@@ -313,7 +289,7 @@ class LMStrixCLI:
                     verbose=verbose,
                 )
 
-            logger.success(f"✓ Model scan complete")
+            logger.success("✓ Model scan complete")
 
             # Show summary of what was found
             models = registry.list_models()
@@ -321,28 +297,21 @@ class LMStrixCLI:
                 logger.debug(f"[blue]Found {len(models)} models in registry[/blue]")
             else:
                 logger.debug(
-                    "[yellow]No models found. Make sure LM Studio is running "
-                    "and has models downloaded.[/yellow]",
+                    "No models found. Make sure LM Studio is running and has models downloaded.",
                 )
 
         except (APIConnectionError, ModelRegistryError, OSError) as e:
-            logger.debug(f"[red]✗ Scan failed: {e}[/red]")
-            logger.debug("[yellow]Check that LM Studio is running and accessible.[/yellow]")
+            logger.debug(f"✗ Scan failed: {e}")
+            logger.debug("Check that LM Studio is running and accessible.")
             if verbose:
-                logger.debug(f"[dim]Error details: {e}[/dim]")
+                logger.debug(f"Error details: {e}")
             return
 
-        self.list()
+        # After scanning, list the models
+        self.list_models(verbose=verbose)
 
-    def list(self, sort: str = "id", show: str | None = None, verbose: bool = False) -> None:
-        """List all models from the registry with their test status.
-
-        Args:
-            sort: Sort order. Options: id, idd, ctx, ctxd, dtx, dtxd, size, sized, smart, smartd (d = descending).
-            show: Output format. Options: id (plain IDs), path (relative paths), json (JSON array).
-            verbose: Enable verbose output.
-        """
-        # Configure logging based on verbose flag
+    def list_models(self, sort: str = "id", show: str | None = None, verbose: bool = False) -> None:
+        """List all models from the registry with their test status."""
         setup_logging(verbose=verbose)
 
         registry = load_model_registry(verbose=verbose)
@@ -350,7 +319,7 @@ class LMStrixCLI:
 
         if not models:
             logger.debug(
-                "[yellow]No models found. Run 'lmstrix scan' to discover models.[/yellow]",
+                "No models found. Run 'lmstrix scan' to discover models.",
             )
             return
 
@@ -375,7 +344,7 @@ class LMStrixCLI:
                 reverse=reverse,
             )
         else:
-            logger.debug(f"[red]Invalid sort option: {sort}. Using default (id).[/red]")
+            logger.debug(f"Invalid sort option: {sort}. Using default (id).")
             sorted_models = sorted(models, key=lambda m: m.id)
 
         # Handle different show formats
@@ -397,18 +366,18 @@ class LMStrixCLI:
                     models_dict.append(model_data)
                 logger.info(json.dumps(models_dict, indent=2))
             else:
-                logger.debug(f"[red]Invalid show option: {show}. Options: id, path, json.[/red]")
+                logger.debug(f"Invalid show option: {show}. Options: id, path, json.")
                 return
             return
 
-        table = Table(title="LM Studio Models", show_lines=False)
-        table.add_column("Model ID", style="cyan", no_wrap=True)
-        table.add_column("Size\n(GB)", style="magenta", width=8)
-        table.add_column("Declared\nCtx", style="yellow", width=10)
-        table.add_column("Tested\nCtx", style="green", width=10)
-        table.add_column("Last\nGood", style="green", width=10)
-        table.add_column("Last\nBad", style="red", width=10)
-        table.add_column("Status", style="blue", width=12)
+        table = Table(title="LM Studio Models", show_lines=False, box=None)
+        table.add_column("Model ID", style="cyan", no_wrap=False)
+        table.add_column("Size(GB)", style="magenta", width=8)
+        table.add_column("Declared", style="yellow", width=10)
+        table.add_column("Tested", style="green", width=10)
+        table.add_column("Good", style="green", width=10)
+        table.add_column("Bad", style="red", width=10)
+        table.add_column("Status", style="blue", width=10)
 
         for model in sorted_models:
             tested_ctx = f"{model.tested_max_context:,}" if model.tested_max_context else "-"
@@ -418,12 +387,12 @@ class LMStrixCLI:
             last_bad = f"{model.last_known_bad_context:,}" if model.last_known_bad_context else "-"
 
             status_map = {
-                "untested": "[dim]Untested[/dim]",
-                "testing": "[yellow]Testing...[/yellow]",
+                "untested": "Untested",
+                "testing": "Testing...",
                 "completed": "[green]✓ Tested[/green]",
-                "failed": "[red]✗ Failed[/red]",
+                "failed": "✗ Failed",
             }
-            status = status_map.get(model.context_test_status.value, "[dim]Unknown[/dim]")
+            status = status_map.get(model.context_test_status.value, "Unknown")
 
             table.add_row(
                 model.id,
@@ -434,12 +403,12 @@ class LMStrixCLI:
                 last_bad,
                 status,
             )
-        logger.debug(table)
+        console.print(table)
 
-    def test(
+    def test_models(
         self,
         model_id: str | None = None,
-        all: bool = False,
+        test_all: bool = False,
         reset: bool = False,
         threshold: int = 31744,
         ctx: int | None = None,
@@ -447,36 +416,21 @@ class LMStrixCLI:
         fast: bool = False,
         verbose: bool = False,
     ) -> None:
-        """Test the context limits for models.
-
-        Args:
-            model_id: The specific model ID to test.
-            all: Test all untested or previously failed models.
-            reset: Re-test all models, including those already tested.
-            threshold: Maximum context size for initial testing (default: 31744).
-                      Prevents system crashes from very large contexts.
-            ctx: Test only this specific context value (skips if > declared context).
-            sort: Sort order (only used for single model tests). --all always sorts by size.
-            fast: Skip semantic verification - only test if inference completes technically.
-            verbose: Enable verbose output.
-        """
+        """Test the context limits for models."""
         setup_logging(verbose=verbose)
         registry = load_model_registry(verbose=verbose)
 
-        # Handle both --all and --test_all flags
-        test_all_models = all
-
-        if test_all_models and model_id:
-            logger.error(f"Cannot use --all and specify a model ID together.")
+        if test_all and model_id:
+            logger.error("Cannot use --all and specify a model ID together.")
             return
 
-        models_to_test = _get_models_to_test(registry, test_all_models, ctx, model_id, reset, fast)
+        models_to_test = _get_models_to_test(registry, test_all, ctx, model_id, reset, fast)
         if not models_to_test:
             return
 
         # If reset flag is used, clear test results for all models being tested
         if reset:
-            logger.debug("[yellow]Resetting test results for selected models...[/yellow]")
+            logger.debug("Resetting test results for selected models...")
             for model in models_to_test:
                 model.context_test_status = ContextTestStatus.UNTESTED
                 model.tested_max_context = None
@@ -489,13 +443,13 @@ class LMStrixCLI:
             registry.save()
             logger.success(f"Reset {len(models_to_test)} models for re-testing")
 
-        if test_all_models:
+        if test_all:
             # Filter out embedding models for --all flag
             tester = ContextTester(verbose=verbose, fast_mode=fast)
             models_to_test = tester._filter_models_for_testing(models_to_test)
             if not models_to_test:
                 logger.debug(
-                    "[yellow]No LLM models found to test after filtering embedding models.[/yellow]",
+                    "No LLM models found to test after filtering embedding models.",
                 )
                 return
             # Custom sorting for optimal testing: size_bytes + context_limit*100000
@@ -511,21 +465,21 @@ class LMStrixCLI:
         tester = ContextTester(verbose=verbose, fast_mode=fast)
 
         if ctx is not None:
-            if test_all_models:
+            if test_all:
                 updated_models = _test_all_models_at_ctx(tester, models_to_test, ctx, registry)
                 _print_final_results(updated_models)
             else:
                 _test_single_model(tester, models_to_test[0], ctx, registry)
             return
 
-        if test_all_models:
+        if test_all:
             updated_models = _test_all_models_optimized(tester, models_to_test, threshold, registry)
             _print_final_results(updated_models)
         else:
             model = models_to_test[0]
             logger.debug(f"\n[bold cyan]Testing model: {model.id}[/bold cyan]")
-            logger.debug(f"[dim]Declared context limit: {model.context_limit:,} tokens[/dim]")
-            logger.debug(f"[dim]Threshold: {threshold:,} tokens[/dim]")
+            logger.debug(f"Declared context limit: {model.context_limit:,} tokens")
+            logger.debug(f"Threshold: {threshold:,} tokens")
 
             max_test_context = min(threshold, model.context_limit)
             updated_model = tester.test_model(
@@ -540,9 +494,9 @@ class LMStrixCLI:
                 )
             else:
                 error_msg = getattr(updated_model, "error_msg", "Unknown error")
-                logger.debug(f"[red]✗ Test failed: {error_msg}[/red]")
+                logger.debug(f"✗ Test failed: {error_msg}")
 
-    def infer(
+    def run_inference(
         self,
         prompt: str,
         model_id: str | None = None,
@@ -550,30 +504,17 @@ class LMStrixCLI:
         in_ctx: int | str | None = None,
         reload: bool = False,
         file_prompt: str | None = None,
-        dict: str | None = None,
+        dict_params: str | None = None,
         text: str | None = None,
         text_file: str | None = None,
-        temperature: float = 0.7,
+        param_temp: float = 0.8,
+        param_top_k: int = 40,
+        param_top_p: float = 0.95,
+        param_repeat: float = 1.1,
+        param_min_p: float = 0.05,
         verbose: bool = False,
     ) -> None:
-        """Run inference on a specified model.
-
-        Args:
-            prompt: The text prompt to send to the model. If file_prompt is specified,
-                   this refers to the prompt name in the TOML file.
-            model_id: The ID of the model to use for inference. If not specified, uses the last loaded model.
-            out_ctx: Maximum tokens to generate (-1 for unlimited, or "50%" for percentage of max context).
-            in_ctx: Context size at which to load the model. If 0, load without specified context.
-                   If not specified, reuse existing loaded model if available.
-            reload: Force reload the model even if already loaded.
-            file_prompt: Path to TOML file containing prompt templates.
-            dict: Dictionary parameters as key=value pairs (e.g., "name=Alice,topic=AI").
-            text: Text content to use for {{text}} placeholder (overrides text in dict).
-            text_file: Path to file containing text content for {{text}} placeholder.
-            temperature: The sampling temperature.
-            verbose: Enable verbose output.
-        """
-        # Configure logging based on verbose flag
+        """Run inference on a specified model."""
         setup_logging(verbose=verbose)
 
         if not out_ctx:
@@ -582,8 +523,6 @@ class LMStrixCLI:
         # Handle --text and --text_file for simple prompts without file_prompt
         if not file_prompt and (text or text_file):
             if text_file:
-                from pathlib import Path
-
                 try:
                     text_path = Path(text_file).expanduser()
                     if not text_path.exists():
@@ -591,7 +530,7 @@ class LMStrixCLI:
                         return
                     text_content = text_path.read_text(encoding="utf-8")
                 except Exception as e:
-                    logger.debug(f"[red]Error reading text file: {e}[/red]")
+                    logger.debug(f"Error reading text file: {e}")
                     return
             else:
                 text_content = text
@@ -600,23 +539,17 @@ class LMStrixCLI:
             actual_prompt = prompt.replace("{{text}}", text_content)
         # Handle prompt file loading if specified
         elif file_prompt:
-            from pathlib import Path
-
-            from lmstrix.loaders.prompt_loader import load_single_prompt
-from lmstrix.utils.logging import logger
-
-
             # Parse dictionary parameters
             prompt_params = {}
-            if dict:
+            if dict_params:
                 # Support both comma-separated and space-separated formats
-                if "," in dict:
+                if "," in dict_params:
                     # Format: "key1=value1,key2=value2"
-                    pairs = dict.split(",")
+                    pairs = dict_params.split(",")
                 else:
                     # Format: "key1=value1 key2=value2" (fire might split this)
                     # For now, assume comma-separated
-                    pairs = dict.split(",")
+                    pairs = dict_params.split(",")
 
                 for pair in pairs:
                     pair = pair.strip()
@@ -625,7 +558,7 @@ from lmstrix.utils.logging import logger
                         prompt_params[key.strip()] = value.strip()
                     else:
                         logger.debug(
-                            f"[yellow]Warning: Invalid parameter format '{pair}'. Expected 'key=value'.[/yellow]",
+                            f"Warning: Invalid parameter format '{pair}'. Expected 'key=value'.",
                         )
 
             # Handle --text and --text_file
@@ -637,7 +570,7 @@ from lmstrix.utils.logging import logger
                         return
                     prompt_params["text"] = text_path.read_text(encoding="utf-8")
                 except Exception as e:
-                    logger.debug(f"[red]Error reading text file: {e}[/red]")
+                    logger.debug(f"Error reading text file: {e}")
                     return
             elif text:
                 prompt_params["text"] = text
@@ -649,28 +582,70 @@ from lmstrix.utils.logging import logger
                     logger.error(f"Prompt file not found: {file_prompt}")
                     return
 
-                resolved_prompt = load_single_prompt(
-                    toml_path=prompt_path,
-                    prompt_name=prompt,  # Now refers to prompt name in TOML
-                    verbose=verbose,
-                    **prompt_params,
-                )
+                # Check if prompt contains commas (multiple templates)
+                if "," in prompt:
+                    # Split by comma and load each template
+                    prompt_names = [name.strip() for name in prompt.split(",") if name.strip()]
+                    concatenated_prompts = []
+                    all_placeholders_resolved = []
+                    all_placeholders_unresolved = []
 
-                actual_prompt = resolved_prompt.resolved
+                    if verbose:
+                        logger.debug(f"Loading multiple prompts: {', '.join(prompt_names)}")
 
-                if verbose:
-                    logger.debug(f"[dim]Loaded prompt '{prompt}' from {file_prompt}[/dim]")
-                    if resolved_prompt.placeholders_resolved:
-                        logger.debug(
-                            f"[dim]Resolved placeholders: {', '.join(resolved_prompt.placeholders_resolved)}[/dim]",
+                    for prompt_name in prompt_names:
+                        resolved_prompt = load_single_prompt(
+                            toml_path=prompt_path,
+                            prompt_name=prompt_name,
+                            verbose=verbose,
+                            **prompt_params,
                         )
-                    if resolved_prompt.placeholders_unresolved:
-                        logger.debug(
-                            f"[yellow]Warning: Unresolved placeholders: {', '.join(resolved_prompt.placeholders_unresolved)}[/yellow]",
-                        )
+                        concatenated_prompts.append(resolved_prompt.resolved)
+                        all_placeholders_resolved.extend(resolved_prompt.placeholders_resolved)
+                        all_placeholders_unresolved.extend(resolved_prompt.placeholders_unresolved)
+
+                        if verbose:
+                            logger.debug(f"Loaded prompt '{prompt_name}' from {file_prompt}")
+
+                    # Concatenate all prompts with double newline separator
+                    actual_prompt = "\n\n".join(concatenated_prompts)
+
+                    if verbose:
+                        logger.debug(f"Concatenated {len(prompt_names)} prompts")
+                        if all_placeholders_resolved:
+                            unique_resolved = list(set(all_placeholders_resolved))
+                            logger.debug(
+                                f"Resolved placeholders: {', '.join(unique_resolved)}",
+                            )
+                        if all_placeholders_unresolved:
+                            unique_unresolved = list(set(all_placeholders_unresolved))
+                            logger.debug(
+                                f"Warning: Unresolved placeholders: {', '.join(unique_unresolved)}",
+                            )
+                else:
+                    # Single prompt - existing behavior
+                    resolved_prompt = load_single_prompt(
+                        toml_path=prompt_path,
+                        prompt_name=prompt,  # Now refers to prompt name in TOML
+                        verbose=verbose,
+                        **prompt_params,
+                    )
+
+                    actual_prompt = resolved_prompt.resolved
+
+                    if verbose:
+                        logger.debug(f"Loaded prompt '{prompt}' from {file_prompt}")
+                        if resolved_prompt.placeholders_resolved:
+                            logger.debug(
+                                f"Resolved placeholders: {', '.join(resolved_prompt.placeholders_resolved)}",
+                            )
+                        if resolved_prompt.placeholders_unresolved:
+                            logger.debug(
+                                f"Warning: Unresolved placeholders: {', '.join(resolved_prompt.placeholders_unresolved)}",
+                            )
 
             except Exception as e:
-                logger.debug(f"[red]Error loading prompt from file: {e}[/red]")
+                logger.debug(f"Error loading prompt from file: {e}")
                 return
         else:
             # No file_prompt, just use the prompt as-is
@@ -684,11 +659,11 @@ from lmstrix.utils.logging import logger
             # Try to use the last used model
             model_id = state_manager.get_last_used_model()
             if not model_id:
-                logger.error(f"No model specified and no last-used model found.")
-                logger.debug("[yellow]Please specify a model with -m or --model_id[/yellow]")
+                logger.error("No model specified and no last-used model found.")
+                logger.debug("Please specify a model with -m or --model_id")
                 return
             if verbose:
-                logger.debug(f"[dim]Using last-used model: {model_id}[/dim]")
+                logger.debug(f"Using last-used model: {model_id}")
 
         registry = load_model_registry(verbose=verbose)
         model = registry.find_model(model_id)
@@ -704,7 +679,7 @@ from lmstrix.utils.logging import logger
             # Force reload with optimal context
             in_ctx = model.tested_max_context or model.context_limit
             logger.debug(
-                f"[yellow]Force reload requested, loading with context {in_ctx:,}[/yellow]",
+                f"Force reload requested, loading with context {in_ctx:,}",
             )
 
         # Parse out_ctx if it's a percentage
@@ -716,7 +691,7 @@ from lmstrix.utils.logging import logger
                 parsed_out_ctx = parse_out_ctx(out_ctx, max_context)
                 if verbose:
                     logger.debug(
-                        f"[dim]Parsed out_ctx '{out_ctx}' as {parsed_out_ctx} tokens[/dim]",
+                        f"Parsed out_ctx '{out_ctx}' as {parsed_out_ctx} tokens",
                     )
                 out_ctx = parsed_out_ctx
             except ValueError as e:
@@ -732,7 +707,7 @@ from lmstrix.utils.logging import logger
                 parsed_in_ctx = parse_out_ctx(in_ctx, max_context)
                 if verbose:
                     logger.debug(
-                        f"[dim]Parsed in_ctx '{in_ctx}' as {parsed_in_ctx} tokens[/dim]",
+                        f"Parsed in_ctx '{in_ctx}' as {parsed_in_ctx} tokens",
                     )
                 in_ctx = parsed_in_ctx
             except ValueError as e:
@@ -749,7 +724,11 @@ from lmstrix.utils.logging import logger
                     prompt=actual_prompt,  # Use the resolved prompt
                     in_ctx=in_ctx,
                     out_ctx=out_ctx,
-                    temperature=temperature,
+                    temperature=param_temp,
+                    top_k=param_top_k,
+                    top_p=param_top_p,
+                    repeat_penalty=param_repeat,
+                    min_p=param_min_p,
                 )
         else:
             result = manager.infer(
@@ -757,26 +736,25 @@ from lmstrix.utils.logging import logger
                 prompt=actual_prompt,  # Use the resolved prompt
                 in_ctx=in_ctx,
                 out_ctx=out_ctx,
-                temperature=temperature,
+                temperature=param_temp,
+                top_k=param_top_k,
+                top_p=param_top_p,
+                repeat_penalty=param_repeat,
+                min_p=param_min_p,
             )
 
         if result["succeeded"]:
             if verbose:
-                logger.debug("\n[green]Model Response:[/green]")
-                logger.debug(result["response"])
-                # Stats are now shown in the completion method, no need to duplicate
-            else:
-                # In non-verbose mode, only print the response
-                logger.debug(result["response"])
+                # Use stderr for debug info to avoid parsing issues
+                print("\nModel Response:", file=sys.stderr)
+            # Always output the actual response to stdout
+            print(result["response"], file=sys.stdout)
         else:
-            logger.debug(f"[red]Inference failed: {result['error']}[/red]")
+            # Use stderr for error messages
+            print(f"Inference failed: {result['error']}", file=sys.stderr)
 
-    def health(self, verbose: bool = False) -> None:
-        """Check database health and backup status.
-
-        Args:
-            verbose: Enable verbose output.
-        """
+    def check_health(self, verbose: bool = False) -> None:
+        """Check database health and backup status."""
         setup_logging(verbose=verbose)
 
         models_file = get_default_models_file()
@@ -785,18 +763,18 @@ from lmstrix.utils.logging import logger
 
         # Check if registry exists
         if not models_file.exists():
-            logger.debug("[red]✗ Registry file not found[/red]")
+            logger.debug("✗ Registry file not found")
             return
 
-        logger.success(f"✓ Registry file exist")
+        logger.success("✓ Registry file exist")
 
         # Check if registry is valid JSON
         try:
             with models_file.open() as f:
                 json.load(f)
-            logger.success(f"✓ Registry file is valid JSO")
+            logger.success("✓ Registry file is valid JSO")
         except json.JSONDecodeError as e:
-            logger.debug(f"[red]✗ Registry file is corrupted: {e}[/red]")
+            logger.debug(f"✗ Registry file is corrupted: {e}")
 
         # Load with validation
         try:
@@ -812,16 +790,16 @@ from lmstrix.utils.logging import logger
 
             if invalid_models:
                 logger.debug(
-                    f"[yellow]⚠ Found {len(invalid_models)} models with integrity issues[/yellow]",
+                    f"⚠ Found {len(invalid_models)} models with integrity issues",
                 )
                 if verbose:
                     for model_path in invalid_models:
                         logger.debug(f"  - {model_path}")
             else:
-                logger.success(f"✓ All models pass integrity check")
+                logger.success("✓ All models pass integrity check")
 
         except (ModelRegistryError, OSError, json.JSONDecodeError) as e:
-            logger.debug(f"[red]✗ Failed to load registry: {e}[/red]")
+            logger.debug(f"✗ Failed to load registry: {e}")
 
         # Check backup files
         backup_pattern = f"{models_file.stem}.backup_*"
@@ -841,7 +819,7 @@ from lmstrix.utils.logging import logger
                         json.load(f)
                     status = "[green]✓[/green]"
                 except json.JSONDecodeError:
-                    status = "[red]✗[/red]"
+                    status = "✗"
 
                 logger.debug(
                     f"  {status} {backup_file.name} ({size_kb}KB, {mtime.strftime('%Y-%m-%d %H:%M')})",
@@ -850,19 +828,10 @@ from lmstrix.utils.logging import logger
             if len(backup_files) > 5:
                 logger.debug(f"  ... and {len(backup_files) - 5} more")
         else:
-            logger.debug("[yellow]No backup files found[/yellow]")
+            logger.debug("No backup files found")
 
-    def save(self, flash: bool = False, verbose: bool = False) -> None:
-        """Save tested context limits to LM Studio concrete config files.
-
-        This command reads the lmstrix.json database and creates or updates
-        concrete JSON configuration files in LM Studio's .internal directory
-        for each model that has a tested_max_context value.
-
-        Args:
-            flash: Enable flash attention for GGUF models.
-            verbose: Enable verbose output.
-        """
+    def save_configs(self, flash: bool = False, verbose: bool = False) -> None:
+        """Save tested context limits to LM Studio concrete config files."""
         setup_logging(verbose=verbose)
 
         # Load the model registry
@@ -873,8 +842,8 @@ from lmstrix.utils.logging import logger
         models_with_context = [m for m in models if m.tested_max_context]
 
         if not models_with_context:
-            logger.debug("[yellow]No models with tested context limits found.[/yellow]")
-            logger.debug("[dim]Run 'lmstrix test' to test model context limits first.[/dim]")
+            logger.debug("No models with tested context limits found.")
+            logger.debug("Run 'lmstrix test' to test model context limits first.")
             return
 
         logger.debug(
@@ -885,7 +854,7 @@ from lmstrix.utils.logging import logger
         try:
             lms_path = get_lmstudio_path()
         except Exception as e:
-            logger.debug(f"[red]Failed to find LM Studio installation: {e}[/red]")
+            logger.debug(f"Failed to find LM Studio installation: {e}")
             return
 
         # Create concrete config manager
@@ -906,7 +875,7 @@ from lmstrix.utils.logging import logger
 
         if failed > 0:
             logger.debug(
-                f"[red]✗ Failed to save {failed} model configurations[/red]",
+                f"✗ Failed to save {failed} model configurations",
             )
 
         if flash:
@@ -916,82 +885,60 @@ from lmstrix.utils.logging import logger
                     f"[blue]Flash attention enabled for {gguf_count} GGUF models[/blue]",
                 )
 
-
-def show_help() -> None:
-    """Show comprehensive help text."""
-    logger.debug("[bold cyan]LMStrix - LM Studio Model Testing Toolkit[/bold cyan]")
-    logger.debug("\n[cyan]Available commands:[/cyan]")
-    logger.debug("  [green]scan[/green]            Scan for LM Studio models and update registry")
-    logger.debug("    [dim]--failed          Re-scan only previously failed models[/dim]")
-    logger.debug("    [dim]--reset           Re-scan all models (clear test data)[/dim]")
-    logger.debug("    [dim]--verbose         Enable verbose output[/dim]")
-    logger.debug("")
-    logger.debug("  [green]list[/green]            List all models with their test status")
-    logger.debug(
-        "    [dim]--sort id|ctx|dtx|size|smart  Sort by: id, tested context, declared context, size, smart[/dim]",
-    )
-    logger.debug("    [dim]--show id|path|json     Output format[/dim]")
-    logger.debug("    [dim]--verbose         Enable verbose output[/dim]")
-    logger.debug("")
-    logger.debug("  [green]test[/green]            Test model context limits")
-    logger.debug("    [dim]MODEL_ID          Test specific model[/dim]")
-    logger.debug("    [dim]--all             Test all untested models[/dim]")
-    logger.debug("    [dim]--reset           Re-test all models[/dim]")
-    logger.debug("    [dim]--ctx SIZE        Test specific context size[/dim]")
-    logger.debug(
-        "    [dim]--threshold SIZE  Max context for initial testing (default: 31744)[/dim]",
-    )
-    logger.debug(
-        "    [dim]--fast            Skip semantic verification (only test if inference completes)[/dim]",
-    )
-    logger.debug("    [dim]--verbose         Enable verbose output[/dim]")
-    logger.debug("")
-    logger.debug("  [green]infer[/green]           Run inference on a model")
-    logger.debug("    [dim]PROMPT MODEL_ID   Required prompt and model[/dim]")
-    logger.debug(
-        "    [dim]--out_ctx NUM|%   Maximum tokens to generate (e.g., 500 or '80%')[/dim]",
-    )
-    logger.debug("    [dim]--in_ctx NUM      Context size for loading model[/dim]")
-    logger.debug("    [dim]--file_prompt PATH Load prompt from TOML file[/dim]")
-    logger.debug("    [dim]--dict PARAMS     Parameters as key=value pairs[/dim]")
-    logger.debug("    [dim]--temperature NUM Temperature for generation[/dim]")
-    logger.debug("    [dim]--reload          Force reload model[/dim]")
-    logger.debug("    [dim]--verbose         Enable verbose output[/dim]")
-    logger.debug("")
-    logger.debug("  [green]health[/green]          Check database health and backups")
-    logger.debug("    [dim]--verbose         Show detailed health information[/dim]")
-    logger.debug("")
-    logger.debug("  [green]save[/green]            Save tested contexts to LM Studio configs")
-    logger.debug("    [dim]--flash           Enable flash attention for GGUF models[/dim]")
-    logger.debug("    [dim]--verbose         Enable verbose output[/dim]")
-    logger.debug("")
-    logger.debug("[dim]Examples:[/dim]")
-    logger.debug("  [dim]lmstrix scan --verbose[/dim]")
-    logger.debug("  [dim]lmstrix list --sort ctx[/dim]")
-    logger.debug("  [dim]lmstrix test --all[/dim]")
-    logger.debug("  [dim]lmstrix test my-model --ctx 8192[/dim]")
-    logger.debug('  [dim]lmstrix infer "Hello world" my-model[/dim]')
-    logger.debug("  [dim]lmstrix save --flash[/dim]")
-
-
-def main() -> None:
-    """Main entry point for the CLI."""
-    import sys
-
-    # Check for help flags first
-    if len(sys.argv) > 1 and sys.argv[1] in ("--help", "-h", "help"):
-        show_help()
-        return
-
-    try:
-        fire.Fire(LMStrixCLI)
-    except TypeError as e:
-        if "Inspector.__init__()" in str(e) and "theme_name" in str(e):
-            # Handle Fire/IPython compatibility issue - show our custom help
-            show_help()
-        else:
-            raise
-
-
-if __name__ == "__main__":
-    main()
+    def show_help(self) -> None:
+        """Show comprehensive help text."""
+        logger.debug("[bold cyan]LMStrix - LM Studio Model Testing Toolkit[/bold cyan]")
+        logger.debug("\n[cyan]Available commands:[/cyan]")
+        logger.debug(
+            "  [green]scan[/green]            Scan for LM Studio models and update registry"
+        )
+        logger.debug("    --failed          Re-scan only previously failed models")
+        logger.debug("    --reset           Re-scan all models (clear test data)")
+        logger.debug("    --verbose         Enable verbose output")
+        logger.debug("")
+        logger.debug("  [green]list[/green]            List all models with their test status")
+        logger.debug(
+            "    --sort id|ctx|dtx|size|smart  Sort by: id, tested context, declared context, size, smart",
+        )
+        logger.debug("    --show id|path|json     Output format")
+        logger.debug("    --verbose         Enable verbose output")
+        logger.debug("")
+        logger.debug("  [green]test[/green]            Test model context limits")
+        logger.debug("    MODEL_ID          Test specific model")
+        logger.debug("    --all             Test all untested models")
+        logger.debug("    --reset           Re-test all models")
+        logger.debug("    --ctx SIZE        Test specific context size")
+        logger.debug(
+            "    --threshold SIZE  Max context for initial testing (default: 31744)",
+        )
+        logger.debug(
+            "    --fast            Skip semantic verification (only test if inference completes)",
+        )
+        logger.debug("    --verbose         Enable verbose output")
+        logger.debug("")
+        logger.debug("  [green]infer[/green]           Run inference on a model")
+        logger.debug("    PROMPT MODEL_ID   Required prompt and model")
+        logger.debug(
+            "    --out_ctx NUM|%   Maximum tokens to generate (e.g., 500 or '80%')",
+        )
+        logger.debug("    --in_ctx NUM      Context size for loading model")
+        logger.debug("    --file_prompt PATH Load prompt from TOML file")
+        logger.debug("    --dict PARAMS     Parameters as key=value pairs")
+        logger.debug("    --temperature NUM Temperature for generation")
+        logger.debug("    --reload          Force reload model")
+        logger.debug("    --verbose         Enable verbose output")
+        logger.debug("")
+        logger.debug("  [green]health[/green]          Check database health and backups")
+        logger.debug("    --verbose         Show detailed health information")
+        logger.debug("")
+        logger.debug("  [green]save[/green]            Save tested contexts to LM Studio configs")
+        logger.debug("    --flash           Enable flash attention for GGUF models")
+        logger.debug("    --verbose         Enable verbose output")
+        logger.debug("")
+        logger.debug("Examples:")
+        logger.debug("  lmstrix scan --verbose")
+        logger.debug("  lmstrix list --sort ctx")
+        logger.debug("  lmstrix test --all")
+        logger.debug("  lmstrix test my-model --ctx 8192")
+        logger.debug('  lmstrix infer "Hello world" my-model')
+        logger.debug("  lmstrix save --flash")

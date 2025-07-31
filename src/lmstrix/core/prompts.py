@@ -95,7 +95,9 @@ class PromptResolver:
             value = self._get_by_path(root, path)
             if value is not None:
                 resolved.append(path)
-                return str(value)
+                # Escape any braces in the resolved value to prevent format string issues
+                value_str = str(value)
+                return value_str.replace("{", "{{").replace("}", "}}")
             return match.group(0)
 
         new_text = self.PLACEHOLDER_RE.sub(repl, text)
@@ -122,18 +124,14 @@ class PromptResolver:
             def __missing__(self, key: str) -> str:
                 return f"{{{key}}}"
 
-        # Convert {{name}} → {name} for format_map
-        temp = self.PLACEHOLDER_RE.sub(lambda m: "{" + m.group(1).strip() + "}", text)
-
-        # Track which placeholders get resolved
-        for key in params:
-            if f"{{{key}}}" in temp:
+        # Instead of converting to Python format strings, do direct replacement
+        result = text
+        for key, value in params.items():
+            placeholder = f"{{{{{key}}}}}"
+            if placeholder in result:
                 resolved.append(key)
-
-        result = temp.format_map(_SafeDict(params))
-
-        # Convert back any remaining {name} → {{name}}
-        result = re.sub(r"\{([^{}]+)\}", r"{{\1}}", result)
+                # Replace the placeholder with the value
+                result = result.replace(placeholder, str(value))
 
         return result, resolved
 
@@ -238,7 +236,17 @@ class PromptResolver:
                     except ConfigurationError as e:
                         logger.error(f"Failed to resolve prompt '{full_key}': {e}")
                 elif isinstance(value, dict):
-                    process_prompts(value, f"{full_key}.")
+                    # Check if this dict has a 'template' key - if so, treat it as a prompt definition
+                    if "template" in value and isinstance(value["template"], str):
+                        try:
+                            results[full_key] = self.resolve_prompt(
+                                f"{full_key}.template", prompts_data, **params
+                            )
+                        except ConfigurationError as e:
+                            logger.error(f"Failed to resolve prompt '{full_key}': {e}")
+                    else:
+                        # Otherwise recurse into the dict
+                        process_prompts(value, f"{full_key}.")
 
         process_prompts(prompts_data)
         return results
@@ -307,3 +315,70 @@ class PromptResolver:
                 context = self.truncate_to_limit(context, available_tokens)
 
         return prompt.replace(context_placeholder, context)
+
+    def _resolve_phase(
+        self,
+        template: str,
+        context: dict[str, Any],
+    ) -> tuple[str, list[str], list[str], list[str]]:
+        """Resolve placeholders in a single phase.
+
+        This method is for backward compatibility with tests.
+
+        Args:
+            template: Template text with placeholders.
+            context: Context dictionary for resolution.
+
+        Returns:
+            Tuple of (resolved_text, found_placeholders, resolved_placeholders, unresolved_placeholders).
+        """
+        # Find all placeholders
+        found = self._find_placeholders(template)
+
+        # Try to resolve them
+        resolved_text, resolved_list = self._resolve_internal_once(template, context)
+
+        # Find remaining unresolved
+        unresolved = self._find_placeholders(resolved_text)
+
+        return resolved_text, found, resolved_list, unresolved
+
+    def resolve_template(
+        self,
+        name: str,
+        template: str,
+        prompt_context: dict[str, Any],
+        runtime_context: dict[str, Any],
+    ) -> ResolvedPrompt:
+        """Resolve a template with both prompt and runtime contexts.
+
+        This method is for backward compatibility with tests.
+
+        Args:
+            name: Name of the template.
+            template: Template text with placeholders.
+            prompt_context: Context from prompt data.
+            runtime_context: Runtime parameters.
+
+        Returns:
+            ResolvedPrompt object.
+        """
+        # Combine contexts, with runtime taking precedence
+
+        # Create a temporary prompts data structure
+        temp_data = {name: template}
+        temp_data.update(prompt_context)
+
+        # Use the main resolve_prompt method
+        return self.resolve_prompt(name, temp_data, **runtime_context)
+
+    def _count_tokens(self, text: str) -> int:
+        """Count tokens in text.
+
+        Args:
+            text: Text to count tokens for.
+
+        Returns:
+            Number of tokens.
+        """
+        return len(self.encoder.encode(text))

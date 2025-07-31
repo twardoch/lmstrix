@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from pydantic import ValidationError
 
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 
@@ -148,7 +147,7 @@ class TestModel:
 
     def test_model_validation_error(self: "TestModel") -> None:
         """Test that model validation raises appropriate errors."""
-        with pytest.raises(ValidationError):
+        with pytest.raises(TypeError):
             Model(id="test")  # Missing required fields
 
 

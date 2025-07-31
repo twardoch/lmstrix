@@ -1,4 +1,5 @@
 """State management utilities for LMStrix."""
+
 # this_file: src/lmstrix/utils/state.py
 
 import json

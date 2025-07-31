@@ -59,12 +59,16 @@ class ModelScanner:
         # Create model ID from path
         # The model ID is the relative path from the LM Studio models directory.
         # This allows using the path directly to load the model in LM Studio.
-        relative_path = model_path.relative_to(self.models_dir)
-        model_id = str(relative_path).replace("\\", "/")
+        try:
+            relative_path = model_path.relative_to(self.models_dir)
+            model_id = str(relative_path).replace("\\", "/")
+        except ValueError:
+            # Model path is not inside models_dir (e.g., during testing)
+            # Use the full path as the model ID
+            model_id = str(model_path)
 
         # Create a short ID by removing the file extension
-        if model_path.is_file():
-            str(relative_path.with_suffix(""))
+        model_path.stem if model_path.is_file() else model_path.name
 
         # Try to extract context info from filename or path
         # This is a heuristic - actual values come from model metadata
@@ -164,3 +168,43 @@ class ModelScanner:
         registry.save()
 
         return registry
+
+    def sync_with_registry(self, registry: ModelRegistry) -> tuple[list[str], list[str]]:
+        """Sync scanned models with registry.
+
+        Args:
+            registry: Model registry to sync with.
+
+        Returns:
+            Tuple of (new_model_ids, removed_model_ids).
+        """
+        # Get currently scanned models
+        scanned_models = self.scan_models()
+
+        # Get existing model IDs
+        existing_ids = {model.id for model in registry.list_models()}
+        scanned_ids = set(scanned_models.keys())
+
+        # Find differences
+        new_ids = list(scanned_ids - existing_ids)
+        removed_ids = list(existing_ids - scanned_ids)
+
+        # Remove models that no longer exist
+        for model_id in removed_ids:
+            logger.info(f"Removing non-existent model: {model_id}")
+            registry.remove_model(model_id)
+
+        # Add new models
+        for model_id in new_ids:
+            model_info = scanned_models[model_id]
+            try:
+                model = Model(**model_info)
+                registry.update_model(model_id, model)
+                logger.info(f"Added new model: {model_id}")
+            except (TypeError, KeyError) as e:
+                logger.error(f"Failed to add model {model_id}: {e}")
+
+        # Save the updated registry
+        registry.save()
+
+        return new_ids, removed_ids

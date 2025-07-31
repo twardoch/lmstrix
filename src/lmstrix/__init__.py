@@ -3,20 +3,10 @@
 from importlib.metadata import PackageNotFoundError, version
 
 from lmstrix.api.exceptions import ModelNotFoundError
-from lmstrix.utils.logging import logger
-
 from lmstrix.core.context_tester import ContextTester
-from lmstrix.utils.logging import logger
-
 from lmstrix.core.inference_manager import InferenceManager
-from lmstrix.utils.logging import logger
-
 from lmstrix.core.models import Model
-from lmstrix.utils.logging import logger
-
 from lmstrix.loaders.model_loader import (
-from lmstrix.utils.logging import logger
-
     load_model_registry,
     save_model_registry,
     scan_and_update_registry,
@@ -24,11 +14,8 @@ from lmstrix.utils.logging import logger
 from lmstrix.utils.context_parser import get_model_max_context, parse_out_ctx
 from lmstrix.utils.logging import logger
 
-
 try:
     from lmstrix._version import __version__
-from lmstrix.utils.logging import logger
-
 except ImportError:
     try:
         __version__ = version("lmstrix")

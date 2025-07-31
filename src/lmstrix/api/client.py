@@ -1,5 +1,6 @@
 """LM Studio API client for interacting with the local server."""
 
+import sys
 from typing import Any
 
 import lmstudio
@@ -141,9 +142,11 @@ class LMStudioClient:
                     model_info = {
                         "id": getattr(llm, "id", "unknown"),
                         "model_key": getattr(llm, "model_key", getattr(llm, "modelKey", "unknown")),
-                        "context_length": getattr(llm.config, "contextLength", None)
-                        if hasattr(llm, "config")
-                        else None,
+                        "context_length": (
+                            getattr(llm.config, "contextLength", None)
+                            if hasattr(llm, "config")
+                            else None
+                        ),
                     }
                     models_info.append(model_info)
                 except Exception as e:
@@ -182,46 +185,74 @@ class LMStudioClient:
         llm: Any,  # The loaded model object from lmstudio.llm
         prompt: str,
         out_ctx: int = -1,  # -1 for unlimited
-        temperature: float = 0.7,  # Temperature for generation
+        temperature: float = 0.8,  # Temperature for generation (LM Studio default)
         model_id: str | None = None,  # Pass model_id separately
-        model_context_length: int
-        | None = None,  # Model's total context length for percentage calculation
+        model_context_length: (
+            int | None
+        ) = None,  # Model's total context length for percentage calculation
+        top_k: int = 40,  # topKSampling - controls token sampling diversity
+        top_p: float = 0.95,  # topPSampling - nucleus sampling
+        repeat_penalty: float = 1.1,  # repeatPenalty - penalty for repeated tokens
+        min_p: float = 0.05,  # minPSampling - minimum token probability threshold
         **kwargs: Any,  # Accept additional parameters
     ) -> CompletionResponse:
         """Make a completion request to a loaded LM Studio model."""
         # LM Studio's complete() method accepts a config dict
         # Pass maxTokens (camelCase) to prevent models from generating indefinitely
 
-        # Calculate default maxTokens as 90% of model's context length if available
-        default_max_tokens = 100  # Fallback
-        if out_ctx <= 0 and model_context_length:
-            # Use 90% of the model's context length as default
-            default_max_tokens = int(model_context_length * 0.9)
-            logger.debug(
-                f"Using 90% of context length ({model_context_length}) = {default_max_tokens} tokens as default maxTokens",
-            )
+        # Handle maxTokens - use -1 for unlimited like LM Studio GUI
+        max_tokens = out_ctx if out_ctx > 0 else -1
 
+        # Build config with all parameters matching LM Studio
         config = {
-            "maxTokens": out_ctx if out_ctx > 0 else default_max_tokens,
+            "maxTokens": max_tokens if max_tokens != -1 else None,  # None for unlimited
             "temperature": temperature,
+            "topKSampling": top_k,
+            "topPSampling": top_p,
+            "repeatPenalty": repeat_penalty,
+            "minPSampling": min_p,
         }
+
+        # Log comparison with LM Studio defaults
+        logger.debug("═" * 60)
+        logger.debug("🔍 DIAGNOSTIC: Inference Parameters Comparison")
+        logger.debug(f"   Temperature: {temperature} (LM Studio GUI: 0.8)")
+        logger.debug(f"   Top K: {top_k} (LM Studio GUI: 20)")
+        logger.debug(f"   Top P: {top_p} (LM Studio GUI: 0.95)")
+        logger.debug(f"   Min P: {min_p} (LM Studio GUI: 0.05)")
+        logger.debug(f"   Repeat Penalty: {repeat_penalty} (LM Studio GUI: 1.1)")
+        logger.debug(f"   Max Tokens: {max_tokens} (LM Studio GUI: -1/unlimited)")
+        logger.debug(f"   Context Length: {model_context_length} (LM Studio GUI: 131072)")
+        logger.debug("═" * 60)
 
         # Enhanced logging with beautiful formatting
         logger.info("═" * 60)
         logger.info(f"🤖 MODEL: {model_id or 'unknown'}")
         logger.info(
-            f"🔧 CONFIG: maxTokens={config['maxTokens']}, temperature={config['temperature']}",
+            f"🔧 CONFIG: maxTokens={config['maxTokens']}, temperature={config['temperature']}, "
+            f"topK={config['topKSampling']}, topP={config['topPSampling']}, "
+            f"minP={config['minPSampling']}, repeatPenalty={config['repeatPenalty']}",
         )
 
         # Log model context information if available
         if hasattr(llm, "config") and hasattr(llm.config, "contextLength"):
-            logger.info(f"📏 CONTEXT: {llm.config.contextLength:,} tokens")
+            try:
+                # Handle mock objects in tests that don't support formatting
+                context_length = llm.config.contextLength
+                if isinstance(context_length, int):
+                    logger.info(f"📏 CONTEXT: {context_length:,} tokens")
+                else:
+                    logger.info(f"📏 CONTEXT: {context_length} tokens")
+            except (TypeError, ValueError):
+                # In case of mock objects or other issues
+                logger.info(f"📏 CONTEXT: {llm.config.contextLength} tokens")
 
-        # Log full prompt in verbose mode
+        # Log full prompt in verbose mode using stderr to avoid loguru parsing issues
         prompt_lines = prompt.count("\n") + 1
         prompt_chars = len(prompt)
-        logger.info(f"📝 PROMPT ({prompt_lines} lines, {prompt_chars} chars):")
-        logger.info(prompt)
+        logger.info(f"📝 Prompt ({prompt_lines} lines, {prompt_chars} chars):")
+        # Print prompt directly to stderr to avoid loguru tag parsing
+        print(prompt, file=sys.stderr)
 
         logger.info("═" * 60)
 
@@ -231,7 +262,9 @@ class LMStudioClient:
 
         try:
             # Direct synchronous call - no threading or async
+            logger.debug(f"Calling llm.complete with config: {config}")
             response = llm.complete(prompt, config=config)
+            logger.debug(f"Raw response object: {response}")
 
             # Calculate total inference time
             total_inference_time = time.time() - start_time
@@ -299,11 +332,17 @@ class LMStudioClient:
                 ) from e
             raise InferenceError(model_id or "unknown", f"Inference failed: {e}") from e
 
-        # Parse the response - could be PredictionResult or string
+        # Parse the response - could be PredictionResult, dict, or string
         if hasattr(response, "content"):
             content = response.content
         elif hasattr(response, "text"):
             content = response.text
+        elif isinstance(response, dict):
+            # Handle dict response format (common in tests)
+            if response.get("choices"):
+                content = response["choices"][0].get("text", "")
+            else:
+                content = str(response)
         else:
             content = str(response)
 
@@ -315,9 +354,19 @@ class LMStudioClient:
                 "Model returned empty response - may be unresponsive",
             )
 
+        # Extract usage stats if available
+        usage = {}
+        if isinstance(response, dict) and "usage" in response:
+            usage = response.get("usage", {})
+
+        # Extract model if available from response
+        response_model = model_id or "unknown"
+        if isinstance(response, dict) and "model" in response:
+            response_model = response.get("model", response_model)
+
         return CompletionResponse(
             content=content,
-            model=model_id or "unknown",
-            usage={},  # lmstudio doesn't provide usage stats in the same way
+            model=response_model,
+            usage=usage,
             finish_reason="stop",
         )

@@ -12,7 +12,8 @@ Project Structure:
 ├── 📁 examples
 │   ├── 📁 cli
 │   │   ├── 📄 basic_workflow.sh
-│   │   ├── 📄 context_control_examples.sh
+│   │   ├── 📄 
+│   │   │   context_control_examples.sh
 │   │   ├── 📄 inference_examples.sh
 │   │   ├── 📄 model_state_demo.sh
 │   │   └── 📄 model_testing.sh
@@ -37,15 +38,14 @@ Project Structure:
 │   ├── 📄 README.md
 │   └── 📄 run_all_examples.sh
 ├── 📁 issues
-│   └── 📄 301.txt
+│   ├── 📄 301.txt
+│   └── 📄 302.txt
 ├── 📁 src
 │   ├── 📁 lmstrix
 │   │   ├── 📁 api
 │   │   │   ├── 📄 __init__.py
 │   │   │   ├── 📄 client.py
-│   │   │   └── 📄 exceptions.py
-│   │   ├── 📁 cli
-│   │   │   ├── 📄 __init__.py
+│   │   │   ├── 📄 exceptions.py
 │   │   │   └── 📄 main.py
 │   │   ├── 📁 core
 │   │   │   ├── 📄 __init__.py
@@ -104,6 +104,7 @@ Project Structure:
 ├── 📄 CHANGELOG.md
 ├── 📄 CLAUDE.md
 ├── 📄 cleanup.sh
+├── 📄 cleanup.txt
 ├── 📄 GEMINI.md
 ├── 📄 LICENSE
 ├── 📄 PLAN.md
@@ -1807,27 +1808,169 @@ Recent issues 201-204 have been completed successfully:
 - ✅ Fixed model lookup to work with both paths and IDs
 - ✅ Integrated verbose stats display without duplication
 
+## CRITICAL: Issue #302 - Inference Output Mismatch
+
+### Problem Description
+When running the same translation prompt through LM Studio GUI vs lmstrix CLI, we get drastically different results:
+- **LM Studio GUI**: Produces proper Polish translation (639 tokens)
+- **lmstrix CLI**: Only outputs `</translate>` (4 tokens)
+
+### Root Cause Analysis
+
+#### Configuration Differences Found
+1. **Temperature**: GUI uses 0.8, CLI uses 0.7
+2. **top_k**: GUI uses 20, CLI uses 40  
+3. **Context Length**: GUI uses full 131072, CLI uses 65536 (reduced)
+4. **max_predict**: GUI uses -1 (unlimited), CLI calculates 117964
+5. **Sampling Parameters**: Multiple differences in repeat_penalty, min_p, etc.
+
+#### Potential Issues
+1. **Early Stop Token**: Model might be hitting a stop token immediately
+2. **Prompt Format**: The prompt might be wrapped or modified differently
+3. **Chat Template**: Possible incorrect chat template application
+4. **Parameter Mismatch**: Inference parameters not matching LM Studio defaults
+
+## CRITICAL: Test Suite Failures (cleanup.txt analysis)
+
+### Priority 0: Critical Test Failures - MUST FIX IMMEDIATELY
+
+#### 0.1 Missing Methods Causing AttributeErrors
+**Severity: CRITICAL - Breaks core functionality**
+
+1. **Model.validate_integrity() Missing**
+   - Location: src/lmstrix/loaders/model_loader.py:181
+   - Error: `AttributeError: 'Model' object has no attribute 'validate_integrity'`
+   - Impact: Prevents model loading and registry updates
+   - Fix: Add validate_integrity() method to Model class
+
+2. **PromptResolver Methods Missing**
+   - Errors: Multiple AttributeErrors for:
+     - `_resolve_phase` (private method)
+     - `resolve_template` (public method)
+     - `_count_tokens` (private method)
+   - Impact: Completely breaks prompt resolution
+   - Fix: Implement all missing methods in PromptResolver
+
+3. **ContextTester Methods Missing**
+   - Missing: `_test_at_context`, `test_model`
+   - Impact: Context testing non-functional
+   - Fix: Add methods to ContextTester class
+
+4. **ModelScanner.sync_with_registry() Missing**
+   - Impact: Cannot sync discovered models with registry
+   - Fix: Implement sync_with_registry method
+
+#### 0.2 Type and Format Errors
+**Severity: HIGH - Breaks tests and logging**
+
+1. **Mock Format String Errors**
+   - Location: src/lmstrix/api/client.py:221
+   - Error: `TypeError: unsupported format string passed to Mock.__format__`
+   - Cause: `logger.info(f"📏 CONTEXT: {llm.config.contextLength:,} tokens")`
+   - Fix: Handle None/Mock values in format strings
+
+2. **Invalid Format Specifier**
+   - Location: src/lmstrix/core/prompts.py:133
+   - Error: `ValueError: Invalid format specifier ' 'Important'' for object of type 'str'`
+   - Fix: Properly escape format strings in templates
+
+#### 0.3 Initialization and Path Issues
+**Severity: MEDIUM - Test failures**
+
+1. **Model Constructor Arguments**
+   - Error: `TypeError: Model.__init__() missing 3 required positional arguments`
+   - Fix: Update tests to provide required args: path, size_bytes, ctx_in
+
+2. **Path Handling in Scanner**
+   - Error: `ValueError: path is not in the subpath`
+   - Fix: Handle paths outside expected directory
+
 ## Immediate Priorities
 
-### 1. Issue #105 - Adam.toml Simplification
-**Priority: High**
+### 1. Fix Issue #302 - Inference Output Mismatch
+**Priority: CRITICAL**
+- This is blocking proper inference functionality
+- Users cannot get correct model outputs
+- Must be fixed before any other work
+
+#### Implementation Steps:
+
+##### Step 1: Add Diagnostic Logging
+- Log the exact prompt being sent (with escape sequences visible)
+- Log all inference parameters in detail
+- Log stop tokens being used
+- Add comparison with LM Studio expected values
+
+##### Step 2: Parameter Alignment
+- Change default temperature from 0.7 to 0.8
+- Add CLI parameters for all inference settings:
+  - `--top_k`, `--top_p`, `--min_p`
+  - `--repeat_penalty`, `--repeat_last_n`
+  - `--stop_tokens` (to override defaults)
+- Remove or make optional the maxTokens calculation
+
+##### Step 3: Context Length Fix
+- Fix context reduction from 131072 to 65536
+- Use full model context unless explicitly limited
+- Add warning when context is reduced
+
+##### Step 4: Stop Token Investigation  
+- Check why model stops at `</translate>`
+- Verify stop token configuration
+- Test with stop tokens disabled
+
+##### Step 5: Testing and Validation
+- Compare output with LM Studio for identical prompts
+- Ensure token counts match
+- Verify quality of translation output
+
+### 2. Fix All Critical Test Failures
+**Priority: HIGH** (after Issue #302)
+- See Priority 0 section below - required for stability
+- Estimated time: 2-3 days
+- Success metric: All tests passing
+
+### 2. Issue #105 - Adam.toml Simplification
+**Priority: High** (but AFTER test fixes)
 - Simplify adam.toml structure to use flat format instead of nested groups
 - Add --text and --text_file parameters to infer command for direct text input
 - Update all prompt examples to use simplified approach
 - Ensure backward compatibility with existing TOML files
 
-### 2. Context Testing Streamlining  
+### 3. Context Testing Streamlining  
 **Priority: Medium**
 - Simplify ContextTester class by merging methods into single test_context() function
 - Remove complex state management and resumption logic
 - Streamline binary search algorithm
 - Consolidate test result logging
 
-### 3. Model Loading Optimization
+### 4. Model Loading Optimization
 **Priority: Medium**  
 - Improve model reuse detection to avoid unnecessary loading messages
 - Add context length display in enhanced logging when available
 - Optimize model loading workflow for better performance
+
+## Implementation Order
+
+### Phase 0: CRITICAL FIX (Immediate - 2-3 days)
+1. **Day 1: Core Method Implementation**
+   - Add Model.validate_integrity() 
+   - Implement all PromptResolver missing methods
+   - Add ContextTester missing methods
+   - Add ModelScanner.sync_with_registry()
+
+2. **Day 2: Type/Format Fixes**
+   - Fix mock format string handling in client.py
+   - Fix prompt format specifier issues
+   - Update tests with proper model initialization
+
+3. **Day 3: Testing & Validation**
+   - Run full test suite
+   - Fix any remaining failures
+   - Ensure no regressions
+
+### Phase 1: Resume Normal Development (After tests pass)
+- Continue with priorities 2-4 above
 
 ## Future Development Phases
 
@@ -2316,7 +2459,68 @@ The test suite is designed to run in CI/CD pipelines:
 <document_content>
 # LMStrix TODO List
 
-## Immediate Priorities
+## CRITICAL: Issue #302 - Fix Inference Output Mismatch (Priority 0)
+
+### Diagnostic Investigation
+- [ ] Add detailed logging of exact prompt being sent to model
+- [ ] Log all inference parameters before sending request
+- [ ] Log stop tokens configuration
+- [ ] Add comparison mode to show differences from LM Studio defaults
+- [ ] Check if chat template is being applied incorrectly
+
+### Parameter Alignment  
+- [ ] Change default temperature from 0.7 to 0.8
+- [ ] Add CLI flags for all inference parameters (--top_k, --top_p, --min_p)
+- [ ] Add --repeat_penalty and --repeat_last_n flags
+- [ ] Add --stop_tokens flag to override defaults
+- [ ] Remove or make optional the maxTokens calculation (90% of context)
+
+### Context Length Fix
+- [ ] Fix context reduction from 131072 to 65536 issue
+- [ ] Use full model context unless explicitly limited by user
+- [ ] Add warning message when context is reduced
+- [ ] Ensure --in_ctx parameter works correctly
+
+### Stop Token Investigation
+- [ ] Investigate why model stops at `</translate>` 
+- [ ] Test with stop tokens disabled
+- [ ] Compare stop token handling with LM Studio
+- [ ] Add --no-stop-tokens flag for testing
+
+### Testing and Validation
+- [ ] Compare output with LM Studio for identical prompts
+- [ ] Ensure token counts match between lmstrix and LM Studio
+- [ ] Verify translation quality matches expected output
+- [ ] Create regression test for this issue
+
+## HIGH PRIORITY: Fix Test Suite Failures (After Issue #302)
+
+### Missing Methods - CRITICAL (COMPLETED)
+- [x] Add Model.validate_integrity() method to src/lmstrix/core/models.py
+- [x] Implement PromptResolver._resolve_phase() in src/lmstrix/core/prompts.py
+- [x] Implement PromptResolver.resolve_template() in src/lmstrix/core/prompts.py
+- [x] Implement PromptResolver._count_tokens() in src/lmstrix/core/prompts.py
+- [x] Add ContextTester._test_at_context() to src/lmstrix/core/context_tester.py
+- [x] Add ContextTester.test_model() to src/lmstrix/core/context_tester.py
+- [x] Implement ModelScanner.sync_with_registry() in src/lmstrix/core/scanner.py
+
+### Type/Format Errors - HIGH (COMPLETED)
+- [x] Fix Mock format string error in src/lmstrix/api/client.py:221
+- [x] Fix invalid format specifier in src/lmstrix/core/prompts.py:133
+- [x] Handle None/Mock values in logging format strings
+
+### Test Fixes - MEDIUM
+- [ ] Update Model initialization tests to provide required arguments
+- [ ] Fix path handling in ModelScanner for paths outside models directory
+- [ ] Fix JSON output in CLI list command
+- [ ] Update test expectations to match current implementation
+
+### Infrastructure - LOW
+- [ ] Fix loguru I/O closed file errors in tests
+- [ ] Address pkg_resources deprecation warnings
+- [ ] Configure pytest-golden in pytest.ini
+
+## Immediate Priorities (AFTER Issue #302 and test fixes)
 
 ### Issue #105 - Adam.toml Simplification (High Priority)
 - [ ] Simplify adam.toml structure to use flat format instead of nested groups
@@ -2434,77 +2638,68 @@ The test suite is designed to run in CI/CD pipelines:
 <document_content>
 # Current Work Progress
 
-## Recently Completed Issues ✅
+## ACTIVE: Issue #302 - Fix Inference Output Mismatch
 
-### Issues 201-204 (All Completed)
+### Problem Summary
+When running the same translation prompt:
+- **LM Studio GUI**: Produces proper Polish translation (639 tokens)
+- **lmstrix CLI**: Only outputs `</translate>` (4 tokens)
 
-**Issue 201 - Model Persistence** ✅
-- Enhanced model persistence to keep models loaded between inference calls
-- Models stay loaded when `in_ctx` is not specified
-- Only unload when explicitly requested with specific context parameter
-- Improved model matching logic with better debugging
-- Fixed method calls to use `load_model_by_id` instead of `load_model`
+### Root Cause Analysis
+Found several configuration differences:
+1. Temperature: GUI=0.8, CLI=0.7
+2. top_k: GUI=20, CLI=40
+3. Context: GUI=131072, CLI=65536 (reduced)
+4. max_predict: GUI=-1, CLI=117964
+5. Stop tokens configuration may differ
 
-**Issue 202 - Enhanced Logging** ✅
-- Implemented beautiful enhanced logging with emojis and visual separators
-- Added comprehensive config logging showing:
-  - 🤖 MODEL information
-  - 🔧 CONFIG details (maxTokens, temperature)
-  - 📏 CONTEXT length when available
-  - 📝 PROMPT with character/line counts and smart truncation
-- Enhanced prompt logging with truncation for long prompts
+### Current Work Items
 
-**Issue 203 - Model Lookup Fix** ✅
-- Fixed model registry lookup to work with both path keys and model IDs
-- Enhanced `find_model` method to try exact path match first, then search by ID
-- Preserved original JSON structure keyed by path (no data duplication)
-- Maintained backward compatibility with existing path-based lookups
-- No change to registry size - stayed at 75 models
+#### 1. Add Diagnostic Logging (IN PROGRESS)
+- [ ] Log exact prompt with escape sequences visible
+- [ ] Log all inference parameters in detail
+- [ ] Add comparison with LM Studio defaults
+- [ ] Log stop token configuration
 
-**Issue 204 - Verbose Stats Logging** ✅
-- Added comprehensive inference statistics display including:
-  - ⚡ Time to first token
-  - ⏱️ Total inference time (calculated in client)
-  - 🔢 Predicted tokens  
-  - 📝 Prompt tokens
-  - 🎯 Total tokens
-  - 🚀 Tokens/second
-  - 🛑 Stop reason
-- Eliminated duplicate "Tokens: 0, Time: 11.66s" line at end of output
-- Integrated all stats into beautiful formatted section
+#### 2. Parameter Alignment
+- [ ] Change default temperature to 0.8
+- [ ] Add CLI flags for inference parameters
+- [ ] Fix maxTokens calculation
+- [ ] Add stop token configuration
 
-## Current Work Status
+#### 3. Context Length Fix
+- [ ] Fix context reduction issue
+- [ ] Use full model context by default
+- [ ] Add warning for context reduction
 
-All immediate priority issues have been resolved. The codebase now has:
+#### 4. Testing
+- [ ] Compare with LM Studio output
+- [ ] Verify token counts match
+- [ ] Test translation quality
 
-1. **Smart Model Management**: Models persist between calls, reducing loading overhead
-2. **Beautiful User Interface**: Enhanced logging with comprehensive statistics and visual formatting
-3. **Robust Model Lookup**: Works with both paths and IDs without breaking existing functionality
-4. **Complete Visibility**: Full inference statistics in verbose mode
+### Implementation Progress
+Starting with diagnostic logging to understand the exact differences...
 
-## Next Steps
+## Recently Completed Work
 
-The immediate focus should shift to the items outlined in the updated PLAN.md:
+### Test Suite Fixes (Priority 0) ✅
+All critical AttributeError issues have been resolved:
+1. **Model.validate_integrity()** ✅
+2. **PromptResolver methods** ✅  
+3. **ContextTester methods** ✅
+4. **ModelScanner.sync_with_registry()** ✅
 
-### High Priority Next
-1. **Issue #105 - Adam.toml Simplification**: Flatten TOML structure and add --text/--text_file parameters
-2. **Context Testing Streamlining**: Simplify ContextTester class methods
-3. **Model Loading Optimization**: Further improve reuse detection and feedback
+### Issues 201-204 ✅
+- Model persistence between calls
+- Beautiful enhanced logging
+- Fixed model lookup for paths/IDs
+- Comprehensive inference statistics
 
-### Development Approach
-- Focus on user experience improvements
-- Maintain backward compatibility
-- Prioritize code simplification and maintainability
-- Ensure comprehensive testing of all changes
-
-## Quality Metrics Achieved
-
-- ✅ All existing functionality preserved
-- ✅ Enhanced user experience with beautiful logging
-- ✅ Improved performance through model persistence
-- ✅ Better error handling and debugging information
-- ✅ No regression in existing CLI commands
-- ✅ Maintained registry data integrity
+## Next Steps After Issue #302
+1. Complete remaining test fixes
+2. Issue #105 - Adam.toml simplification
+3. Context testing streamlining
+4. Model loading optimization
 </document_content>
 </document>
 
@@ -2566,6 +2761,925 @@ uvx hatch publish
 </document>
 
 <document index="16">
+<source>cleanup.txt</source>
+<document_content>
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
+  warnings.warn(
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
+  warnings.warn(
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
+  warnings.warn(
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
+  warnings.warn(
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
+  warnings.warn(
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
+  warnings.warn(
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
+  warnings.warn(
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
+  warnings.warn(
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
+  warnings.warn(
+============================= test session starts ==============================
+platform darwin -- Python 3.12.9, pytest-8.4.1, pluggy-1.6.0 -- /usr/local/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'default' -> database=DirectoryBasedExampleDatabase(PosixPath('/Users/Shared/lmstudio/lmstrix/.hypothesis/examples'))
+benchmark: 5.1.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)
+Fugue tests will be initialized with options:
+rootdir: /Users/Shared/lmstudio/lmstrix
+configfile: pyproject.toml
+testpaths: tests
+plugins: recording-0.13.2, cov-6.0.0, subtests-0.14.1, darkgraylib-1.0.0, instafail-0.5.0, anyio-4.9.0, enabler-3.3.0, ignore-flaky-2.2.1, integration-0.2.3, sugar-1.0.0, langchain-0.1.0, env-1.1.5, flaky-3.8.1, time-machine-2.16.0, memray-1.7.0, shutil-1.8.1, checkdocs-2.13.0, hypothesis-6.124.7, black-0.6.0, golden-0.2.2, ruff-0.4.1, benchmark-5.1.0, pmxbot-1122.17.0, virtualenv-1.8.1, jaxtyping-0.0.1, perf-0.15.0, rerunfailures-15.0, typeguard-4.4.4, fugue-0.9.2.dev1, timeout-2.3.1, mock-3.14.0, hydra-core-1.3.2, asyncio-1.0.0, xdist-3.6.1, depends-1.0.1, jaraco.mongodb-0.0.0, requests-mock-1.12.1
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+created: 8/8 workers
+8 workers [164 items]
+
+scheduling tests via LoadScheduling
+
+tests/__init__.py::ruff 
+tests/test_core/__init__.py::black 
+tests/test_api/__init__.py::ruff::format 
+tests/test_api/test_client.py::TestLMStudioClient::test_load_model_success 
+[gw4] [  0%] PASSED tests/test_api/test_client.py::TestLMStudioClient::test_load_model_success 
+tests/test_api/test_client.py::TestLMStudioClient::test_load_model_failure 
+[gw4] [  1%] FAILED tests/test_api/test_client.py::TestLMStudioClient::test_load_model_failure 
+tests/test_api/test_client.py::TestLMStudioClient::test_completion_success 
+[gw4] [  1%] FAILED tests/test_api/test_client.py::TestLMStudioClient::test_completion_success 
+tests/test_api/test_client.py::TestLMStudioClient::test_completion_failure 
+[gw4] [  2%] FAILED tests/test_api/test_client.py::TestLMStudioClient::test_completion_failure 
+tests/test_api/test_client.py::TestCompletionResponse::test_completion_response_creation 
+[gw3] [  3%] PASSED tests/test_api/test_client.py::TestCompletionResponse::test_completion_response_creation 
+tests/test_api/test_client.py::TestCompletionResponse::test_completion_response_minimal 
+[gw3] [  3%] PASSED tests/test_api/test_client.py::TestCompletionResponse::test_completion_response_minimal 
+tests/test_api/test_client.py::TestLMStudioClient::test_client_initialization 
+[gw3] [  4%] PASSED tests/test_api/test_client.py::TestLMStudioClient::test_client_initialization 
+tests/test_api/test_client.py::TestLMStudioClient::test_list_models_success 
+[gw3] [  4%] FAILED tests/test_api/test_client.py::TestLMStudioClient::test_list_models_success 
+tests/conftest.py::black 
+tests/test_api/test_exceptions.py::ruff 
+tests/test_api/test_client.py::TestLMStudioClient::test_list_models_failure 
+[gw2] [  5%] PASSED tests/test_api/__init__.py::ruff::format 
+[gw5] [  6%] PASSED tests/test_api/test_exceptions.py::ruff 
+tests/test_api/test_client.py::TestLMStudioClient::test_completion_with_defaults 
+tests/test_api/test_exceptions.py::TestAPIExceptions::test_model_load_error 
+[gw4] [  6%] FAILED tests/test_api/test_client.py::TestLMStudioClient::test_completion_with_defaults 
+tests/test_core/test_context_tester.py::TestContextTestResult::test_result_to_dict 
+[gw4] [  7%] PASSED tests/test_core/test_context_tester.py::TestContextTestResult::test_result_to_dict 
+tests/test_core/test_context_tester.py::TestContextTester::test_initialization 
+[gw4] [  7%] PASSED tests/test_core/test_context_tester.py::TestContextTester::test_initialization 
+tests/test_core/test_context_tester.py::TestContextTester::test_initialization_with_client 
+[gw4] [  8%] PASSED tests/test_core/test_context_tester.py::TestContextTester::test_initialization_with_client 
+tests/test_core/test_context_tester.py::TestContextTester::test_test_model_not_found 
+[gw4] [  9%] FAILED tests/test_core/test_context_tester.py::TestContextTester::test_test_model_not_found 
+tests/test_api/__init__.py::black 
+[gw6] [  9%] PASSED tests/test_api/test_exceptions.py::TestAPIExceptions::test_model_load_error 
+[gw3] [ 10%] PASSED tests/test_api/test_client.py::TestLMStudioClient::test_list_models_failure 
+[gw0] [ 10%] PASSED tests/__init__.py::ruff 
+tests/test_api/test_exceptions.py::TestAPIExceptions::test_inference_error 
+tests/test_api/test_exceptions.py::ruff::format 
+tests/test_core/test_inference.py::ruff 
+tests/__init__.py::ruff::format 
+tests/test_core/test_context_tester.py::TestContextTester::test_test_all_models 
+[gw5] [ 11%] PASSED tests/test_api/test_exceptions.py::ruff::format 
+[gw6] [ 12%] PASSED tests/test_api/test_exceptions.py::TestAPIExceptions::test_inference_error 
+tests/test_api/test_exceptions.py::TestAPIExceptions::test_exception_inheritance 
+[gw6] [ 12%] PASSED tests/test_api/test_exceptions.py::TestAPIExceptions::test_exception_inheritance 
+tests/test_core/__init__.py::ruff 
+[gw6] [ 13%] PASSED tests/test_core/__init__.py::ruff 
+[gw3] [ 14%] PASSED tests/test_core/test_inference.py::ruff 
+tests/test_core/test_inference.py::ruff::format 
+[gw0] [ 14%] PASSED tests/__init__.py::ruff::format 
+tests/test_api/test_exceptions.py::black 
+tests/__init__.py::black 
+[gw4] [ 15%] FAILED tests/test_core/test_context_tester.py::TestContextTester::test_test_all_models 
+tests/test_core/test_inference.py::TestInferenceDict::test_inference_dict_empty_response 
+[gw4] [ 15%] PASSED tests/test_core/test_inference.py::TestInferenceDict::test_inference_dict_empty_response 
+tests/test_core/test_inference.py::TestInferenceManager::test_manager_initialization 
+[gw4] [ 16%] PASSED tests/test_core/test_inference.py::TestInferenceManager::test_manager_initialization 
+tests/test_core/test_inference.py::TestInferenceManager::test_manager_with_custom_client 
+[gw4] [ 17%] PASSED tests/test_core/test_inference.py::TestInferenceManager::test_manager_with_custom_client 
+tests/test_core/test_inference.py::TestInferenceManager::test_infer_model_not_found 
+[gw4] [ 17%] PASSED tests/test_core/test_inference.py::TestInferenceManager::test_infer_model_not_found 
+tests/test_core/__init__.py::ruff::format 
+[gw3] [ 18%] PASSED tests/test_core/test_inference.py::ruff::format 
+tests/test_core/test_inference.py::black 
+tests/test_core/test_inference.py::TestInferenceManager::test_infer_basic_success 
+[gw4] [ 18%] PASSED tests/test_core/test_inference.py::TestInferenceManager::test_infer_basic_success 
+tests/test_core/test_models.py::TestModel::test_model_creation_minimal 
+[gw4] [ 19%] PASSED tests/test_core/test_models.py::TestModel::test_model_creation_minimal 
+tests/test_core/test_models.py::TestModel::test_model_creation_with_aliases 
+[gw4] [ 20%] PASSED tests/test_core/test_models.py::TestModel::test_model_creation_with_aliases 
+tests/test_core/test_models.py::TestModel::test_model_with_context_testing 
+[gw4] [ 20%] PASSED tests/test_core/test_models.py::TestModel::test_model_with_context_testing 
+[gw6] [ 21%] PASSED tests/test_core/__init__.py::ruff::format 
+tests/test_core/test_models.py::ruff 
+tests/test_core/test_models.py::TestModel::test_model_path_validation 
+[gw4] [ 21%] FAILED tests/test_core/test_models.py::TestModel::test_model_path_validation 
+tests/test_core/test_models.py::TestModel::test_model_sanitized_id 
+[gw4] [ 22%] PASSED tests/test_core/test_models.py::TestModel::test_model_sanitized_id 
+tests/test_core/test_models.py::TestModel::test_model_to_registry_dict 
+[gw4] [ 23%] PASSED tests/test_core/test_models.py::TestModel::test_model_to_registry_dict 
+tests/test_core/test_models.py::TestModel::test_model_validation_error 
+[gw4] [ 23%] FAILED tests/test_core/test_models.py::TestModel::test_model_validation_error 
+tests/test_core/test_models.py::TestModelRegistry::test_registry_initialization 
+[gw4] [ 24%] PASSED tests/test_core/test_models.py::TestModelRegistry::test_registry_initialization 
+tests/test_core/test_models.py::TestModelRegistry::test_registry_save_and_load 
+[gw4] [ 25%] PASSED tests/test_core/test_models.py::TestModelRegistry::test_registry_save_and_load 
+tests/test_core/test_models.py::TestModelRegistry::test_registry_get_model 
+[gw4] [ 25%] PASSED tests/test_core/test_models.py::TestModelRegistry::test_registry_get_model 
+tests/test_core/test_models.py::TestModelRegistry::test_registry_list_models 
+[gw4] [ 26%] PASSED tests/test_core/test_models.py::TestModelRegistry::test_registry_list_models 
+tests/test_core/test_models.py::TestModelRegistry::test_registry_remove_model 
+[gw4] [ 26%] PASSED tests/test_core/test_models.py::TestModelRegistry::test_registry_remove_model 
+tests/test_core/test_models.py::TestModelRegistry::test_registry_with_context_test_data 
+[gw4] [ 27%] PASSED tests/test_core/test_models.py::TestModelRegistry::test_registry_with_context_test_data 
+tests/test_core/test_models.py::TestModelRegistry::test_registry_json_format 
+[gw4] [ 28%] PASSED tests/test_core/test_models.py::TestModelRegistry::test_registry_json_format 
+tests/test_core/test_prompts.py::ruff 
+[gw6] [ 28%] PASSED tests/test_core/test_models.py::ruff 
+tests/test_core/test_models.py::ruff::format 
+[gw4] [ 29%] PASSED tests/test_core/test_prompts.py::ruff 
+[gw6] [ 29%] PASSED tests/test_core/test_models.py::ruff::format 
+tests/test_core/test_models.py::black 
+tests/test_core/test_prompts.py::ruff::format 
+[gw4] [ 30%] PASSED tests/test_core/test_prompts.py::ruff::format 
+tests/test_core/test_prompts.py::black 
+[gw7] [ 31%] PASSED tests/test_core/__init__.py::black 
+tests/test_core/test_context_tester.py::ruff 
+[gw1] [ 31%] PASSED tests/conftest.py::black 
+tests/run_tests.py::ruff 
+[gw5] [ 32%] PASSED tests/test_api/test_exceptions.py::black 
+tests/test_api/test_exceptions.py::TestAPIExceptions::test_api_error_base 
+[gw5] [ 32%] PASSED tests/test_api/test_exceptions.py::TestAPIExceptions::test_api_error_base 
+[gw0] [ 33%] PASSED tests/__init__.py::black 
+tests/test_api/test_exceptions.py::TestAPIExceptions::test_api_connection_error 
+[gw7] [ 34%] PASSED tests/test_core/test_context_tester.py::ruff 
+[gw2] [ 34%] PASSED tests/test_api/__init__.py::black 
+tests/conftest.py::ruff 
+tests/test_api/test_client.py::ruff 
+[gw5] [ 35%] PASSED tests/test_api/test_exceptions.py::TestAPIExceptions::test_api_connection_error 
+tests/test_core/test_prompts.py::TestPromptResolver::test_find_placeholders 
+tests/test_core/test_context_tester.py::ruff::format 
+[gw1] [ 35%] PASSED tests/run_tests.py::ruff 
+[gw3] [ 36%] PASSED tests/test_core/test_inference.py::black 
+[gw0] [ 37%] PASSED tests/conftest.py::ruff 
+tests/run_tests.py::ruff::format 
+[gw2] [ 37%] PASSED tests/test_api/test_client.py::ruff 
+[gw5] [ 38%] PASSED tests/test_core/test_prompts.py::TestPromptResolver::test_find_placeholders 
+tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_simple 
+tests/test_core/test_inference.py::TestInferenceDict::test_inference_dict_success 
+[gw3] [ 39%] PASSED tests/test_core/test_inference.py::TestInferenceDict::test_inference_dict_success 
+tests/test_api/test_client.py::ruff::format 
+[gw7] [ 39%] PASSED tests/test_core/test_context_tester.py::ruff::format 
+tests/test_core/test_context_tester.py::black 
+tests/test_core/test_inference.py::TestInferenceDict::test_inference_dict_failure 
+[gw3] [ 40%] PASSED tests/test_core/test_inference.py::TestInferenceDict::test_inference_dict_failure 
+tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_two_phase 
+[gw5] [ 40%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_simple 
+tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_missing_placeholder 
+[gw5] [ 41%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_missing_placeholder 
+tests/conftest.py::ruff::format 
+tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_extra_context 
+[gw5] [ 42%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_extra_context 
+tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_with_special_characters 
+[gw5] [ 42%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_with_special_characters 
+tests/test_core/test_scanner.py::ruff 
+[gw2] [ 43%] PASSED tests/test_api/test_client.py::ruff::format 
+[gw1] [ 43%] PASSED tests/run_tests.py::ruff::format 
+tests/run_tests.py::black 
+tests/test_api/test_client.py::black 
+[gw0] [ 44%] PASSED tests/conftest.py::ruff::format 
+tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_numeric_values 
+[gw3] [ 45%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_two_phase 
+tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_recursive 
+[gw5] [ 45%] PASSED tests/test_core/test_scanner.py::ruff 
+[gw3] [ 46%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_recursive 
+tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_circular_reference 
+[gw3] [ 46%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_circular_reference 
+tests/test_core/test_scanner.py::ruff::format 
+tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_no_placeholders 
+[gw3] [ 47%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_no_placeholders 
+tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_mlx_directory 
+[gw5] [ 48%] PASSED tests/test_core/test_scanner.py::ruff::format 
+tests/test_core/test_scanner.py::TestModelScanner::test_get_model_size_directory 
+[gw5] [ 48%] PASSED tests/test_core/test_scanner.py::TestModelScanner::test_get_model_size_directory 
+tests/test_core/test_scanner.py::TestModelScanner::test_get_model_size_nonexistent 
+[gw3] [ 49%] FAILED tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_mlx_directory 
+tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_hidden_file 
+[gw3] [ 50%] PASSED tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_hidden_file 
+[gw5] [ 50%] PASSED tests/test_core/test_scanner.py::TestModelScanner::test_get_model_size_nonexistent 
+tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_gguf_file 
+[gw0] [ 51%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_numeric_values 
+[gw5] [ 51%] FAILED tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_gguf_file 
+tests/test_integration/__init__.py::ruff 
+tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_empty_value 
+[gw0] [ 52%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_empty_value 
+tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_non_model_file 
+[gw3] [ 53%] PASSED tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_non_model_file 
+tests/test_core/test_scanner.py::TestModelScanner::test_scan_models 
+[gw3] [ 53%] FAILED tests/test_core/test_scanner.py::TestModelScanner::test_scan_models 
+tests/test_core/test_prompts.py::TestPromptResolver::test_count_tokens 
+[gw0] [ 54%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_count_tokens 
+tests/test_integration/__init__.py::black 
+tests/test_core/test_scanner.py::TestModelScanner::test_sync_with_registry 
+[gw3] [ 54%] FAILED tests/test_core/test_scanner.py::TestModelScanner::test_sync_with_registry 
+tests/test_integration/test_cli_integration.py::ruff::format 
+[gw5] [ 55%] PASSED tests/test_integration/__init__.py::ruff 
+[gw3] [ 56%] PASSED tests/test_integration/test_cli_integration.py::ruff::format 
+tests/test_integration/__init__.py::ruff::format 
+tests/test_integration/test_cli_integration.py::black 
+[gw5] [ 56%] PASSED tests/test_integration/__init__.py::ruff::format 
+tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_cli_initialization 
+[gw5] [ 57%] PASSED tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_cli_initialization 
+tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_list_command 
+[gw5] [ 57%] FAILED tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_list_command 
+tests/test_loaders/__init__.py::ruff 
+[gw5] [ 58%] PASSED tests/test_loaders/__init__.py::ruff 
+tests/test_loaders/__init__.py::ruff::format 
+[gw5] [ 59%] PASSED tests/test_loaders/__init__.py::ruff::format 
+tests/test_loaders/__init__.py::black 
+[gw4] [ 59%] PASSED tests/test_core/test_prompts.py::black 
+tests/test_core/test_prompts.py::TestResolvedPrompt::test_resolved_prompt_creation 
+[gw4] [ 60%] PASSED tests/test_core/test_prompts.py::TestResolvedPrompt::test_resolved_prompt_creation 
+tests/test_core/test_prompts.py::TestResolvedPrompt::test_resolved_prompt_minimal 
+[gw4] [ 60%] PASSED tests/test_core/test_prompts.py::TestResolvedPrompt::test_resolved_prompt_minimal 
+tests/test_core/test_prompts.py::TestPromptResolver::test_resolver_initialization 
+[gw6] [ 61%] PASSED tests/test_core/test_models.py::black 
+tests/test_core/test_models.py::TestContextTestStatus::test_enum_values 
+[gw6] [ 62%] PASSED tests/test_core/test_models.py::TestContextTestStatus::test_enum_values 
+tests/test_loaders/test_context_loader.py::black 
+[gw4] [ 62%] PASSED tests/test_core/test_prompts.py::TestPromptResolver::test_resolver_initialization 
+tests/test_loaders/test_context_loader.py::ruff::format 
+[gw4] [ 63%] PASSED tests/test_loaders/test_context_loader.py::ruff::format 
+tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_with_encoding 
+[gw4] [ 64%] PASSED tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_with_encoding 
+tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_nonexistent_file 
+[gw4] [ 64%] PASSED tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_nonexistent_file 
+tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_read_error 
+[gw4] [ 65%] PASSED tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_read_error 
+tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_string_path 
+[gw4] [ 65%] PASSED tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_string_path 
+tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_large_file 
+[gw4] [ 66%] PASSED tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_large_file 
+tests/test_loaders/test_model_loader.py::ruff 
+[gw4] [ 67%] PASSED tests/test_loaders/test_model_loader.py::ruff 
+tests/test_loaders/test_model_loader.py::ruff::format 
+[gw4] [ 67%] PASSED tests/test_loaders/test_model_loader.py::ruff::format 
+tests/test_loaders/test_model_loader.py::black 
+[gw0] [ 68%] PASSED tests/test_integration/__init__.py::black 
+tests/test_integration/test_cli_integration.py::ruff 
+[gw5] [ 68%] PASSED tests/test_loaders/__init__.py::black 
+[gw2] [ 69%] PASSED tests/test_api/test_client.py::black 
+tests/test_core/test_scanner.py::black 
+tests/test_loaders/test_context_loader.py::ruff 
+[gw5] [ 70%] PASSED tests/test_loaders/test_context_loader.py::ruff 
+tests/test_loaders/test_model_loader.py::TestModelLoader::test_load_model_registry_nonexistent_file 
+[gw5] [ 70%] PASSED tests/test_loaders/test_model_loader.py::TestModelLoader::test_load_model_registry_nonexistent_file 
+tests/test_loaders/test_model_loader.py::TestModelLoader::test_save_model_registry_default_path 
+[gw5] [ 71%] PASSED tests/test_loaders/test_model_loader.py::TestModelLoader::test_save_model_registry_default_path 
+tests/test_loaders/test_model_loader.py::TestModelLoader::test_save_model_registry_custom_path 
+[gw5] [ 71%] FAILED tests/test_loaders/test_model_loader.py::TestModelLoader::test_save_model_registry_custom_path 
+tests/test_loaders/test_model_loader.py::TestModelLoader::test_scan_and_update_models 
+[gw3] [ 72%] PASSED tests/test_integration/test_cli_integration.py::black 
+tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_list_json_format 
+[gw3] [ 73%] FAILED tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_list_json_format 
+[gw5] [ 73%] FAILED tests/test_loaders/test_model_loader.py::TestModelLoader::test_scan_and_update_models 
+tests/test_loaders/test_model_loader.py::TestModelLoader::test_scan_and_update_models_default_client 
+[gw5] [ 74%] PASSED tests/test_loaders/test_model_loader.py::TestModelLoader::test_scan_and_update_models_default_client 
+tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_infer_requires_parameters 
+tests/test_loaders/test_prompt_loader.py::ruff 
+[gw3] [ 75%] PASSED tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_infer_requires_parameters 
+[gw0] [ 75%] FAILED tests/test_integration/test_cli_integration.py::ruff 
+tests/test_loaders/test_prompt_loader.py::ruff::format 
+tests/test_loaders/test_model_loader.py::TestModelLoader::test_load_model_registry_custom_path 
+[gw0] [ 76%] PASSED tests/test_loaders/test_model_loader.py::TestModelLoader::test_load_model_registry_custom_path 
+tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_nonexistent_file 
+[gw0] [ 76%] PASSED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_nonexistent_file 
+tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_invalid_toml 
+[gw0] [ 77%] FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_invalid_toml 
+tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_nested_placeholders 
+[gw1] [ 78%] PASSED tests/run_tests.py::black 
+[gw0] [ 78%] FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_nested_placeholders 
+[gw5] [ 79%] PASSED tests/test_loaders/test_prompt_loader.py::ruff 
+[gw3] [ 79%] PASSED tests/test_loaders/test_prompt_loader.py::ruff::format 
+tests/test_api/__init__.py::ruff 
+tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_simple 
+tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_missing_params 
+[gw3] [ 80%] FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_simple 
+[gw0] [ 81%] FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_missing_params 
+tests/test_loaders/test_prompt_loader.py::black 
+[gw7] [ 81%] PASSED tests/test_core/test_context_tester.py::black 
+tests/test_utils/__init__.py::ruff 
+tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_custom_resolver 
+[gw0] [ 82%] FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_custom_resolver 
+tests/test_core/test_context_tester.py::TestContextTestResult::test_result_creation 
+[gw1] [ 82%] PASSED tests/test_api/__init__.py::ruff 
+tests/test_utils/test_paths.py::ruff 
+[gw7] [ 83%] PASSED tests/test_core/test_context_tester.py::TestContextTestResult::test_result_creation 
+tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_empty_file 
+tests/test_utils/test_paths.py::ruff::format 
+[gw3] [ 84%] PASSED tests/test_utils/__init__.py::ruff 
+tests/test_utils/__init__.py::black 
+[gw0] [ 84%] PASSED tests/test_utils/test_paths.py::ruff 
+[gw7] [ 85%] PASSED tests/test_utils/test_paths.py::ruff::format 
+tests/test_utils/test_paths.py::black 
+tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_fallback_locations 
+[gw7] [ 85%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_fallback_locations 
+tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstrix_data_dir 
+[gw7] [ 86%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstrix_data_dir 
+tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstrix_data_dir_exists 
+[gw7] [ 87%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstrix_data_dir_exists 
+tests/test_utils/test_paths.py::TestPathUtilities::test_get_default_models_file 
+[gw7] [ 87%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_default_models_file 
+tests/test_utils/test_paths.py::TestPathUtilities::test_get_context_tests_dir 
+[gw7] [ 88%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_context_tests_dir 
+[gw1] [ 89%] PASSED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_empty_file 
+tests/test_utils/test_paths.py::TestPathUtilities::test_get_context_test_log_path 
+[gw7] [ 89%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_context_test_log_path 
+tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_from_pointer 
+[gw1] [ 90%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_from_pointer 
+tests/test_utils/test_paths.py::TestPathUtilities::test_get_prompts_dir 
+tests/test_utils/test_paths.py::TestPathUtilities::test_get_contexts_dir 
+[gw1] [ 90%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_contexts_dir 
+[gw7] [ 91%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_prompts_dir 
+tests/test_utils/test_paths.py::TestPathUtilities::test_directory_creation_permissions_error 
+[gw7] [ 92%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_directory_creation_permissions_error 
+[gw6] [ 92%] PASSED tests/test_loaders/test_context_loader.py::black 
+tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_simple 
+[gw6] [ 93%] PASSED tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_simple 
+[gw4] [ 93%] PASSED tests/test_loaders/test_model_loader.py::black 
+tests/test_loaders/test_model_loader.py::TestModelLoader::test_load_model_registry_default_path 
+[gw4] [ 94%] PASSED tests/test_loaders/test_model_loader.py::TestModelLoader::test_load_model_registry_default_path 
+[gw2] [ 95%] PASSED tests/test_core/test_scanner.py::black 
+tests/test_core/test_scanner.py::TestModelScanner::test_scanner_initialization 
+[gw2] [ 95%] PASSED tests/test_core/test_scanner.py::TestModelScanner::test_scanner_initialization 
+tests/test_core/test_scanner.py::TestModelScanner::test_get_model_size_file 
+[gw2] [ 96%] PASSED tests/test_core/test_scanner.py::TestModelScanner::test_get_model_size_file 
+[gw5] [ 96%] PASSED tests/test_loaders/test_prompt_loader.py::black 
+tests/test_utils/__init__.py::ruff::format 
+[gw0] [ 97%] PASSED tests/test_utils/test_paths.py::black 
+tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_not_found 
+[gw0] [ 98%] FAILED tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_not_found 
+[gw5] [ 98%] PASSED tests/test_utils/__init__.py::ruff::format 
+[gw3] [ 99%] PASSED tests/test_utils/__init__.py::black 
+tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_shared_location 
+[gw3] [100%] FAILED tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_shared_location 
+
+=================================== FAILURES ===================================
+__________________ TestLMStudioClient.test_load_model_failure __________________
+[gw4] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_api/test_client.py:146: in test_load_model_failure
+    client.load_model("test-model", 4096)
+src/lmstrix/api/client.py:72: in load_model
+    return lmstudio.llm(model_path, config=config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1139: in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1143: in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1198: in _execute_mock_call
+    raise effect
+E   Exception: Model not found
+__________________ TestLMStudioClient.test_completion_success __________________
+[gw4] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_api/test_client.py:161: in test_completion_success
+    result = client.completion(
+src/lmstrix/api/client.py:221: in completion
+    logger.info(f"📏 CONTEXT: {llm.config.contextLength:,} tokens")
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: unsupported format string passed to Mock.__format__
+__________________ TestLMStudioClient.test_completion_failure __________________
+[gw4] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_api/test_client.py:187: in test_completion_failure
+    client.completion(mock_llm, "test prompt")
+src/lmstrix/api/client.py:221: in completion
+    logger.info(f"📏 CONTEXT: {llm.config.contextLength:,} tokens")
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: unsupported format string passed to Mock.__format__
+_________________ TestLMStudioClient.test_list_models_success __________________
+[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_api/test_client.py:109: in test_list_models_success
+    assert result == expected_result
+E   AssertionError: assert [{'architectu...': True, ...}] == [{'architectu...': True, ...}]
+E     
+E     At index 1 diff: {'id': 'model2', 'path': '/path/to/model2', 'size_bytes': 2000, 'context_length': 8192, 'display_name': 'Model Two', 'architecture': 'mistral', 'has_tools': True, 'has_vision': False, 'model_type': 'llm'} != {'id': 'model2', 'path': '/path/to/model2', 'size_bytes': 2000, 'context_length': 8192, 'display_name': 'Model Two', 'architecture': 'mistral', 'has_tools': True, 'has_vision': True, 'model_type': 'llm'}
+E     
+E     Full diff:
+E       [
+E           {
+E               'architecture': 'llama',...
+E     
+E     ...Full output truncated (24 lines hidden), use '-vv' to show
+_______________ TestLMStudioClient.test_completion_with_defaults _______________
+[gw4] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_api/test_client.py:201: in test_completion_with_defaults
+    client.completion(
+src/lmstrix/api/client.py:221: in completion
+    logger.info(f"📏 CONTEXT: {llm.config.contextLength:,} tokens")
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: unsupported format string passed to Mock.__format__
+_________________ TestContextTester.test_test_model_not_found __________________
+[gw4] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_context_tester.py:76: in test_test_model_not_found
+    with patch.object(tester, "_test_at_context") as mock_test:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1467: in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1437: in get_original
+    raise AttributeError(
+E   AttributeError: <lmstrix.core.context_tester.ContextTester object at 0x144403320> does not have the attribute '_test_at_context'
+____________________ TestContextTester.test_test_all_models ____________________
+[gw4] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_context_tester.py:107: in test_test_all_models
+    with patch.object(tester, "test_model") as mock_test:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1467: in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1437: in get_original
+    raise AttributeError(
+E   AttributeError: <lmstrix.core.context_tester.ContextTester object at 0x143bd68a0> does not have the attribute 'test_model'
+_____________________ TestModel.test_model_path_validation _____________________
+[gw4] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_models.py:94: in test_model_path_validation
+    assert isinstance(model.path, Path)
+E   AssertionError: assert False
+E    +  where False = isinstance('/string/path/model.gguf', Path)
+E    +    where '/string/path/model.gguf' = <lmstrix.core.models.Model object at 0x1444357c0>.path
+____________________ TestModel.test_model_validation_error _____________________
+[gw4] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_models.py:152: in test_model_validation_error
+    Model(id="test")  # Missing required fields
+    ^^^^^^^^^^^^^^^^
+E   TypeError: Model.__init__() missing 3 required positional arguments: 'path', 'size_bytes', and 'ctx_in'
+_________________ TestPromptResolver.test_resolve_phase_simple _________________
+[gw5] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_prompts.py:84: in test_resolve_phase_simple
+    resolved, found, resolved_list, unresolved = resolver._resolve_phase(template, context)
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'PromptResolver' object has no attribute '_resolve_phase'
+__________ TestPromptResolver.test_resolve_phase_missing_placeholder ___________
+[gw5] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_prompts.py:98: in test_resolve_phase_missing_placeholder
+    resolved, found, resolved_list, unresolved = resolver._resolve_phase(template, context)
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'PromptResolver' object has no attribute '_resolve_phase'
+_____________ TestPromptResolver.test_resolve_phase_extra_context ______________
+[gw5] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_prompts.py:112: in test_resolve_phase_extra_context
+    resolved, found, resolved_list, unresolved = resolver._resolve_phase(template, context)
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'PromptResolver' object has no attribute '_resolve_phase'
+___________ TestPromptResolver.test_resolve_with_special_characters ____________
+[gw5] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_prompts.py:232: in test_resolve_with_special_characters
+    result = resolver.resolve_template("special", template, context, {})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'PromptResolver' object has no attribute 'resolve_template'
+______________ TestPromptResolver.test_resolve_template_two_phase ______________
+[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_prompts.py:127: in test_resolve_template_two_phase
+    result = resolver.resolve_template("test", template, prompt_context, runtime_context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'PromptResolver' object has no attribute 'resolve_template'
+______________ TestPromptResolver.test_resolve_template_recursive ______________
+[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_prompts.py:147: in test_resolve_template_recursive
+    result = resolver.resolve_template("recursive", template, prompt_context, {})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'PromptResolver' object has no attribute 'resolve_template'
+_________ TestPromptResolver.test_resolve_template_circular_reference __________
+[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_prompts.py:164: in test_resolve_template_circular_reference
+    result = resolver.resolve_template("circular", template, prompt_context, {})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'PromptResolver' object has no attribute 'resolve_template'
+___________ TestPromptResolver.test_resolve_template_no_placeholders ___________
+[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_prompts.py:176: in test_resolve_template_no_placeholders
+    result = resolver.resolve_template("static", template, {}, {})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'PromptResolver' object has no attribute 'resolve_template'
+____________ TestModelScanner.test_extract_model_info_mlx_directory ____________
+[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_scanner.py:87: in test_extract_model_info_mlx_directory
+    info = scanner._extract_model_info(model_dir)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/lmstrix/core/scanner.py:62: in _extract_model_info
+    relative_path = model_path.relative_to(self.models_dir)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py:682: in relative_to
+    raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
+E   ValueError: '/private/var/folders/wd/jx_fxd9d7wg_py26vfx_tz080000gn/T/pytest-of-adam/pytest-3/popen-gw3/test_extract_model_info_mlx_di0/llama-7b-mlx' is not in the subpath of '/Users/Shared/lmstudio/models'
+___________ TestPromptResolver.test_resolve_template_numeric_values ____________
+[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_prompts.py:190: in test_resolve_template_numeric_values
+    result = resolver.resolve_template("numeric", template, context, {})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'PromptResolver' object has no attribute 'resolve_template'
+______________ TestModelScanner.test_extract_model_info_gguf_file ______________
+[gw5] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_scanner.py:69: in test_extract_model_info_gguf_file
+    info = scanner._extract_model_info(model_file)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/lmstrix/core/scanner.py:62: in _extract_model_info
+    relative_path = model_path.relative_to(self.models_dir)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py:682: in relative_to
+    raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
+E   ValueError: '/private/var/folders/wd/jx_fxd9d7wg_py26vfx_tz080000gn/T/pytest-of-adam/pytest-3/popen-gw5/test_extract_model_info_gguf_f0/llama-7b.gguf' is not in the subpath of '/Users/Shared/lmstudio/models'
+_____________ TestPromptResolver.test_resolve_template_empty_value _____________
+[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_prompts.py:202: in test_resolve_template_empty_value
+    result = resolver.resolve_template("empty", template, context, {})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'PromptResolver' object has no attribute 'resolve_template'
+______________________ TestModelScanner.test_scan_models _______________________
+[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_scanner.py:143: in test_scan_models
+    model_ids = [m["id"] for m in models]
+                 ^^^^^^^
+E   TypeError: string indices must be integers, not 'str'
+_____________________ TestPromptResolver.test_count_tokens _____________________
+[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_prompts.py:212: in test_count_tokens
+    count = resolver._count_tokens("Hello World!")
+            ^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'PromptResolver' object has no attribute '_count_tokens'
+___________________ TestModelScanner.test_sync_with_registry ___________________
+[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_core/test_scanner.py:176: in test_sync_with_registry
+    new_models, removed_models = scanner.sync_with_registry(mock_registry)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'ModelScanner' object has no attribute 'sync_with_registry'
+_____________________ TestCLIIntegration.test_list_command _____________________
+[gw5] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_integration/test_cli_integration.py:55: in test_list_command
+    assert "test-model" in captured.out
+E   AssertionError: assert 'test-model' in ''
+E    +  where '' = CaptureResult(out='', err='').out
+_____________ TestModelLoader.test_save_model_registry_custom_path _____________
+[gw5] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_loaders/test_model_loader.py:122: in test_save_model_registry_custom_path
+    assert custom_file.exists()
+E   AssertionError: assert False
+E    +  where False = exists()
+E    +    where exists = PosixPath('/private/var/folders/wd/jx_fxd9d7wg_py26vfx_tz080000gn/T/pytest-of-adam/pytest-3/popen-gw5/test_save_model_registry_custo0/custom.json').exists
+___________________ TestCLIIntegration.test_list_json_format ___________________
+[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_integration/test_cli_integration.py:68: in test_list_json_format
+    data = json.loads(captured.out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/decoder.py:338: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/decoder.py:356: in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+E   json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+_________________ TestModelLoader.test_scan_and_update_models __________________
+[gw5] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_loaders/test_model_loader.py:158: in test_scan_and_update_models
+    updated_registry = scan_and_update_registry(
+src/lmstrix/loaders/model_loader.py:275: in scan_and_update_registry
+    new_model = _add_new_model(model_data)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/lmstrix/loaders/model_loader.py:181: in _add_new_model
+    if not new_model.validate_integrity():
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'Model' object has no attribute 'validate_integrity'
+----------------------------- Captured stderr call -----------------------------
+--- Logging error in Loguru Handler #1 ---
+Record was: {'elapsed': datetime.timedelta(seconds=6, microseconds=96773), 'exception': None, 'extra': {}, 'file': (name='model_loader.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py'), 'function': 'scan_and_update_registry', 'level': (name='INFO', no=20, icon='ℹ️'), 'line': 234, 'message': 'Scanning for LM Studio models...', 'module': 'model_loader', 'name': 'lmstrix.loaders.model_loader', 'process': (id=17703, name='MainProcess'), 'thread': (id=8520598848, name='MainThread'), 'time': datetime(2025, 7, 31, 17, 10, 34, 542491, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 206, in emit
+    self._sink.write(str_record)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_simple_sinks.py", line 16, in write
+    self._stream.write(message)
+ValueError: I/O operation on closed file.
+--- End of logging error ---
+--- Logging error in Loguru Handler #1 ---
+Record was: {'elapsed': datetime.timedelta(seconds=6, microseconds=97821), 'exception': None, 'extra': {}, 'file': (name='model_loader.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py'), 'function': 'scan_and_update_registry', 'level': (name='INFO', no=20, icon='ℹ️'), 'line': 237, 'message': 'Found 1 models in LM Studio.', 'module': 'model_loader', 'name': 'lmstrix.loaders.model_loader', 'process': (id=17703, name='MainProcess'), 'thread': (id=8520598848, name='MainThread'), 'time': datetime(2025, 7, 31, 17, 10, 34, 543539, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 206, in emit
+    self._sink.write(str_record)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_simple_sinks.py", line 16, in write
+    self._stream.write(message)
+ValueError: I/O operation on closed file.
+--- End of logging error ---
+--- Logging error in Loguru Handler #1 ---
+Record was: {'elapsed': datetime.timedelta(seconds=6, microseconds=98214), 'exception': None, 'extra': {}, 'file': (name='model_loader.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py'), 'function': 'scan_and_update_registry', 'level': (name='INFO', no=20, icon='ℹ️'), 'line': 250, 'message': 'Processing 1 valid models (filtered from 1)', 'module': 'model_loader', 'name': 'lmstrix.loaders.model_loader', 'process': (id=17703, name='MainProcess'), 'thread': (id=8520598848, name='MainThread'), 'time': datetime(2025, 7, 31, 17, 10, 34, 543932, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 206, in emit
+    self._sink.write(str_record)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_simple_sinks.py", line 16, in write
+    self._stream.write(message)
+ValueError: I/O operation on closed file.
+--- End of logging error ---
+--- Logging error in Loguru Handler #1 ---
+Record was: {'elapsed': datetime.timedelta(seconds=6, microseconds=98573), 'exception': None, 'extra': {}, 'file': (name='model_loader.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py'), 'function': '_add_new_model', 'level': (name='INFO', no=20, icon='ℹ️'), 'line': 166, 'message': 'Discovered new model: /path/to/new-model.gguf', 'module': 'model_loader', 'name': 'lmstrix.loaders.model_loader', 'process': (id=17703, name='MainProcess'), 'thread': (id=8520598848, name='MainThread'), 'time': datetime(2025, 7, 31, 17, 10, 34, 544291, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 206, in emit
+    self._sink.write(str_record)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_simple_sinks.py", line 16, in write
+    self._stream.write(message)
+ValueError: I/O operation on closed file.
+--- End of logging error ---
+_________________________________ test session _________________________________
+[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/_pytest/runner.py:344: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/flaky/flaky_pytest_plugin.py:146: in <lambda>
+    lambda: ihook(item=item, **kwds), when=when, reraise=reraise
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_hooks.py:512: in __call__
+    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_manager.py:120: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:167: in _multicall
+    raise exception
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:139: in _multicall
+    teardown.throw(exception)
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/_pytest/logging.py:850: in pytest_runtest_call
+    yield
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:139: in _multicall
+    teardown.throw(exception)
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:53: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_result.py:103: in get_result
+    raise exc.with_traceback(tb)
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:38: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:139: in _multicall
+    teardown.throw(exception)
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/_pytest/capture.py:900: in pytest_runtest_call
+    return (yield)
+            ^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:139: in _multicall
+    teardown.throw(exception)
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:53: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_result.py:103: in get_result
+    raise exc.with_traceback(tb)
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:38: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:139: in _multicall
+    teardown.throw(exception)
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:53: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_result.py:103: in get_result
+    raise exc.with_traceback(tb)
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:38: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:139: in _multicall
+    teardown.throw(exception)
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/_pytest/skipping.py:263: in pytest_runtest_call
+    return (yield)
+            ^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:121: in _multicall
+    res = hook_impl.function(*args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/_pytest/runner.py:178: in pytest_runtest_call
+    item.runtest()
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_ruff/__init__.py:141: in runtest
+    self.handler(path=self.fspath)
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_ruff/__init__.py:151: in handler
+    return check_file(path)
+           ^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_ruff/__init__.py:101: in check_file
+    raise RuffError(stdout.decode())
+E   pytest_ruff.RuffError: tests/test_integration/test_cli_integration.py:47:75: ANN001 Missing type annotation for function argument `capsys`
+E      |
+E   46 |     @patch("lmstrix.cli.main.get_default_models_file")
+E   47 |     def test_list_command(self, mock_get_file: Mock, mock_registry: Path, capsys) -> None:
+E      |                                                                           ^^^^^^ ANN001
+E   48 |         """Test list command shows models."""
+E   49 |         mock_get_file.return_value = mock_registry
+E      |
+E   
+E   tests/test_integration/test_cli_integration.py:59:79: ANN001 Missing type annotation for function argument `capsys`
+E      |
+E   58 |     @patch("lmstrix.cli.main.get_default_models_file")
+E   59 |     def test_list_json_format(self, mock_get_file: Mock, mock_registry: Path, capsys) -> None:
+E      |                                                                               ^^^^^^ ANN001
+E   60 |         """Test list command with JSON output."""
+E   61 |         mock_get_file.return_value = mock_registry
+E      |
+_______________ TestPromptLoader.test_load_prompts_invalid_toml ________________
+[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_loaders/test_prompt_loader.py:68: in test_load_prompts_invalid_toml
+    assert "parse" in str(exc_info.value).lower()
+E   assert 'parse' in "configuration error for 'prompts_file': failed to load toml file: expected '=' after a key in a key/value pair (at line 1, column 6)"
+E    +  where "configuration error for 'prompts_file': failed to load toml file: expected '=' after a key in a key/value pair (at line 1, column 6)" = <built-in method lower of str object at 0x11fc87890>()
+E    +    where <built-in method lower of str object at 0x11fc87890> = "Configuration error for 'prompts_file': Failed to load TOML file: Expected '=' after a key in a key/value pair (at line 1, column 6)".lower
+E    +      where "Configuration error for 'prompts_file': Failed to load TOML file: Expected '=' after a key in a key/value pair (at line 1, column 6)" = str(ConfigurationError("Configuration error for 'prompts_file': Failed to load TOML file: Expected '=' after a key in a key/value pair (at line 1, column 6)"))
+E    +        where ConfigurationError("Configuration error for 'prompts_file': Failed to load TOML file: Expected '=' after a key in a key/value pair (at line 1, column 6)") = <ExceptionInfo ConfigurationError("Configuration error for 'prompts_file': Failed to load TOML file: Expected '=' after a key in a key/value pair (at line 1, column 6)") tblen=2>.value
+_________ TestPromptLoader.test_load_prompts_with_nested_placeholders __________
+[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_loaders/test_prompt_loader.py:89: in test_load_prompts_with_nested_placeholders
+    prompts = load_prompts(toml_file, content="Test message")
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/lmstrix/loaders/prompt_loader.py:80: in load_prompts
+    resolved_prompts = resolver.resolve_all_prompts(data, **params)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/lmstrix/core/prompts.py:243: in resolve_all_prompts
+    process_prompts(prompts_data)
+src/lmstrix/core/prompts.py:241: in process_prompts
+    process_prompts(value, f"{full_key}.")
+src/lmstrix/core/prompts.py:237: in process_prompts
+    results[full_key] = self.resolve_prompt(full_key, prompts_data, **params)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/lmstrix/core/prompts.py:196: in resolve_prompt
+    current_text, resolved = self._resolve_external(current_text, MappingProxyType(params))
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/lmstrix/core/prompts.py:133: in _resolve_external
+    result = temp.format_map(_SafeDict(params))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: Invalid format specifier ' 'Important'' for object of type 'str'
+__________________ TestPromptLoader.test_load_prompts_simple ___________________
+[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_loaders/test_prompt_loader.py:35: in test_load_prompts_simple
+    assert len(prompts) == 2
+E   AssertionError: assert 4 == 2
+E    +  where 4 = len({'greeting.description': ResolvedPrompt(name='greeting.description', template='A simple greeting', resolved='A simple greeting', tokens=3, placeholders_found=[], placeholders_resolved=[], placeholders_unresolved=[]), 'greeting.template': ResolvedPrompt(name='greeting.template', template='Hello World!', resolved='Hello World!', tokens=3, placeholders_found=[], placeholders_resolved=[], placeholders_unresolved=[]), 'question.description': ResolvedPrompt(name='question.description', template='Question template', resolved='Question template', tokens=2, placeholders_found=[], placeholders_resolved=[], placeholders_unresolved=[]), 'question.template': ResolvedPrompt(name='question.template', template='What is Python? Please provide a detailed answer.', resolved='What is Python? Please provide a detailed answer.', tokens=10, placeholders_found=[], placeholders_resolved=[], placeholders_unresolved=[])})
+----------------------------- Captured stderr call -----------------------------
+--- Logging error in Loguru Handler #1 ---
+Record was: {'elapsed': datetime.timedelta(seconds=6, microseconds=542690), 'exception': None, 'extra': {}, 'file': (name='prompt_loader.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py'), 'function': 'load_prompts', 'level': (name='INFO', no=20, icon='ℹ️'), 'line': 57, 'message': 'Loaded prompts from /private/var/folders/wd/jx_fxd9d7wg_py26vfx_tz080000gn/T/pytest-of-adam/pytest-3/popen-gw3/test_load_prompts_simple0/prompts.toml', 'module': 'prompt_loader', 'name': 'lmstrix.loaders.prompt_loader', 'process': (id=17701, name='MainProcess'), 'thread': (id=8520598848, name='MainThread'), 'time': datetime(2025, 7, 31, 17, 10, 34, 761208, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 206, in emit
+    self._sink.write(str_record)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_simple_sinks.py", line 16, in write
+    self._stream.write(message)
+ValueError: I/O operation on closed file.
+--- End of logging error ---
+--- Logging error in Loguru Handler #1 ---
+Record was: {'elapsed': datetime.timedelta(seconds=6, microseconds=544098), 'exception': None, 'extra': {}, 'file': (name='prompt_loader.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py'), 'function': 'load_prompts', 'level': (name='INFO', no=20, icon='ℹ️'), 'line': 70, 'message': 'Resolved placeholders with TOPL', 'module': 'prompt_loader', 'name': 'lmstrix.loaders.prompt_loader', 'process': (id=17701, name='MainProcess'), 'thread': (id=8520598848, name='MainThread'), 'time': datetime(2025, 7, 31, 17, 10, 34, 762616, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 206, in emit
+    self._sink.write(str_record)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_simple_sinks.py", line 16, in write
+    self._stream.write(message)
+ValueError: I/O operation on closed file.
+--- End of logging error ---
+--- Logging error in Loguru Handler #1 ---
+Record was: {'elapsed': datetime.timedelta(seconds=6, microseconds=546309), 'exception': None, 'extra': {}, 'file': (name='prompt_loader.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py'), 'function': 'load_prompts', 'level': (name='INFO', no=20, icon='ℹ️'), 'line': 82, 'message': 'Resolved 4 prompts', 'module': 'prompt_loader', 'name': 'lmstrix.loaders.prompt_loader', 'process': (id=17701, name='MainProcess'), 'thread': (id=8520598848, name='MainThread'), 'time': datetime(2025, 7, 31, 17, 10, 34, 764827, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 206, in emit
+    self._sink.write(str_record)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_simple_sinks.py", line 16, in write
+    self._stream.write(message)
+ValueError: I/O operation on closed file.
+--- End of logging error ---
+--- Logging error in Loguru Handler #1 ---
+Record was: {'elapsed': datetime.timedelta(seconds=6, microseconds=546653), 'exception': None, 'extra': {}, 'file': (name='prompt_loader.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py'), 'function': 'load_prompts', 'level': (name='INFO', no=20, icon='ℹ️'), 'line': 84, 'message': "Applied parameters: ['name', 'query']", 'module': 'prompt_loader', 'name': 'lmstrix.loaders.prompt_loader', 'process': (id=17701, name='MainProcess'), 'thread': (id=8520598848, name='MainThread'), 'time': datetime(2025, 7, 31, 17, 10, 34, 765171, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 206, in emit
+    self._sink.write(str_record)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_simple_sinks.py", line 16, in write
+    self._stream.write(message)
+ValueError: I/O operation on closed file.
+--- End of logging error ---
+____________ TestPromptLoader.test_load_prompts_with_missing_params ____________
+[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_loaders/test_prompt_loader.py:110: in test_load_prompts_with_missing_params
+    template1 = prompts["template1"]
+                ^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'template1'
+------------------------------ Captured log call -------------------------------
+WARNING  topl.core:core.py:155 Could not resolve 1 placeholder(s): {{city}}
+___________ TestPromptLoader.test_load_prompts_with_custom_resolver ____________
+[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_loaders/test_prompt_loader.py:130: in test_load_prompts_with_custom_resolver
+    assert prompts["test"].resolved == "Result: 42"
+           ^^^^^^^^^^^^^^^
+E   KeyError: 'test'
+______________ TestPathUtilities.test_get_lmstudio_path_not_found ______________
+[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_utils/test_paths.py:96: in test_get_lmstudio_path_not_found
+    with pytest.raises(RuntimeError) as exc_info:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE <class 'RuntimeError'>
+___________ TestPathUtilities.test_get_lmstudio_path_shared_location ___________
+[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
+tests/test_utils/test_paths.py:86: in test_get_lmstudio_path_shared_location
+    result = get_lmstudio_path()
+             ^^^^^^^^^^^^^^^^^^^
+src/lmstrix/utils/paths.py:21: in get_lmstudio_path
+    if home_pointer.exists():
+       ^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1139: in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1143: in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1204: in _execute_mock_call
+    result = effect(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: TestPathUtilities.test_get_lmstudio_path_shared_location.<locals>.exists_side_effect() missing 1 required positional argument: 'self'
+
+---------- coverage: platform darwin, python 3.12.9-final-0 ----------
+Name                                    Stmts   Miss Branch BrPart   Cover
+--------------------------------------------------------------------------
+src/lmstrix/__main__.py                     1      1      0      0   0.00%
+src/lmstrix/_version.py                    13      3      2      1  73.33%
+src/lmstrix/api/client.py                 154    103     50      3  28.43%
+src/lmstrix/api/exceptions.py              72     18      2      1  74.32%
+src/lmstrix/cli/main.py                   517    478    196      1   5.61%
+src/lmstrix/core/concrete_config.py        62     50     22      0  14.29%
+src/lmstrix/core/context.py                81     59     14      0  23.16%
+src/lmstrix/core/context_tester.py         27      1      0      0  96.30%
+src/lmstrix/core/inference.py             168    168     38      0   0.00%
+src/lmstrix/core/inference_manager.py     115     75     24      5  33.81%
+src/lmstrix/core/models.py                129     30     20      0  75.84%
+src/lmstrix/core/prompts.py               117     25     40      5  73.25%
+src/lmstrix/core/scanner.py                86     31     42      7  65.62%
+src/lmstrix/loaders/context_loader.py      63     39     12      0  37.33%
+src/lmstrix/loaders/model_loader.py       167     87     56     12  44.84%
+src/lmstrix/loaders/prompt_loader.py       77     42     18      0  45.26%
+src/lmstrix/utils/context_parser.py        32     28     14      0   8.70%
+src/lmstrix/utils/logging.py               23      6      4      2  70.37%
+src/lmstrix/utils/paths.py                 53      5     16      4  86.96%
+src/lmstrix/utils/state.py                 31     20      4      0  31.43%
+--------------------------------------------------------------------------
+TOTAL                                    1988   1269    574     41  33.10%
+
+=========================== short test summary info ============================
+FAILED tests/test_api/test_client.py::TestLMStudioClient::test_load_model_failure
+FAILED tests/test_api/test_client.py::TestLMStudioClient::test_completion_success
+FAILED tests/test_api/test_client.py::TestLMStudioClient::test_completion_failure
+FAILED tests/test_api/test_client.py::TestLMStudioClient::test_list_models_success
+FAILED tests/test_api/test_client.py::TestLMStudioClient::test_completion_with_defaults
+FAILED tests/test_core/test_context_tester.py::TestContextTester::test_test_model_not_found
+FAILED tests/test_core/test_context_tester.py::TestContextTester::test_test_all_models
+FAILED tests/test_core/test_models.py::TestModel::test_model_path_validation
+FAILED tests/test_core/test_models.py::TestModel::test_model_validation_error
+FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_simple
+FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_missing_placeholder
+FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_extra_context
+FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_with_special_characters
+FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_two_phase
+FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_recursive
+FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_circular_reference
+FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_no_placeholders
+FAILED tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_mlx_directory
+FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_numeric_values
+FAILED tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_gguf_file
+FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_empty_value
+FAILED tests/test_core/test_scanner.py::TestModelScanner::test_scan_models - ...
+FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_count_tokens
+FAILED tests/test_core/test_scanner.py::TestModelScanner::test_sync_with_registry
+FAILED tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_list_command
+FAILED tests/test_loaders/test_model_loader.py::TestModelLoader::test_save_model_registry_custom_path
+FAILED tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_list_json_format
+FAILED tests/test_loaders/test_model_loader.py::TestModelLoader::test_scan_and_update_models
+FAILED tests/test_integration/test_cli_integration.py::ruff - pytest_ruff.Ruf...
+FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_invalid_toml
+FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_nested_placeholders
+FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_simple
+FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_missing_params
+FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_custom_resolver
+FAILED tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_not_found
+FAILED tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_shared_location
+======================= 36 failed, 128 passed in 18.95s ========================
+
+</document_content>
+</document>
+
+<document index="17">
 <source>docs/_config.yml</source>
 <document_content>
 title: LMStrix
@@ -2587,7 +3701,7 @@ plugins:
 </document_content>
 </document>
 
-<document index="17">
+<document index="18">
 <source>docs/api.md</source>
 <document_content>
 ---
@@ -2636,7 +3750,7 @@ Represents the response from an inference request.
 </document_content>
 </document>
 
-<document index="18">
+<document index="19">
 <source>docs/how-it-works.md</source>
 <document_content>
 ---
@@ -2675,7 +3789,7 @@ The command saves the results of the test to a local registry, so you only need 
 </document_content>
 </document>
 
-<document index="19">
+<document index="20">
 <source>docs/index.md</source>
 <document_content>
 ---
@@ -2720,7 +3834,7 @@ This gives you a reliable, empirical measurement of the model's true capabilitie
 </document_content>
 </document>
 
-<document index="20">
+<document index="21">
 <source>docs/installation.md</source>
 <document_content>
 ---
@@ -2760,7 +3874,7 @@ pip install -e .[dev]
 </document_content>
 </document>
 
-<document index="21">
+<document index="22">
 <source>docs/usage.md</source>
 <document_content>
 ---
@@ -2881,7 +3995,7 @@ if __name__ == "__main__":
 </document_content>
 </document>
 
-<document index="22">
+<document index="23">
 <source>examples/README.md</source>
 <document_content>
 # LMStrix Usage Examples
@@ -3158,7 +4272,7 @@ For more help, see the main [LMStrix documentation](https://github.com/AdamAdli/
 </document_content>
 </document>
 
-<document index="23">
+<document index="24">
 <source>examples/cli/basic_workflow.sh</source>
 <document_content>
 #!/bin/bash
@@ -3223,7 +4337,7 @@ echo -e "\n### Workflow Demo Finished ###"
 </document_content>
 </document>
 
-<document index="24">
+<document index="25">
 <source>examples/cli/context_control_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -3325,7 +4439,7 @@ echo "- Test models first to find their true limits"
 </document_content>
 </document>
 
-<document index="25">
+<document index="26">
 <source>examples/cli/inference_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -3426,7 +4540,7 @@ echo "- Combine features for advanced use cases"
 </document_content>
 </document>
 
-<document index="26">
+<document index="27">
 <source>examples/cli/model_state_demo.sh</source>
 <document_content>
 #!/bin/bash
@@ -3484,7 +4598,7 @@ echo "- Third call: 'Using last-used model...'"
 </document_content>
 </document>
 
-<document index="27">
+<document index="28">
 <source>examples/cli/model_testing.sh</source>
 <document_content>
 #!/bin/bash
@@ -3586,7 +4700,7 @@ echo "- Tests automatically resume if interrupted"
 </document_content>
 </document>
 
-<document index="28">
+<document index="29">
 <source>examples/data/sample_context.txt</source>
 <document_content>
 This is a sample text file designed for context length testing in LMStrix. The purpose of this file is to provide a sufficiently large and repetitive block of text that can be used to fill the context window of a large language model. By feeding a model a long prompt composed of this text, we can determine the maximum number of tokens it can process before it fails to load or produce a coherent response. This process is crucial for understanding the true operational limits of a model, which may differ from the limits advertised by its developers. The text itself is not intended to be meaningful, but rather to serve as a consistent and measurable filler for the model's context buffer. The repetition ensures that the content is uniform and does not introduce unexpected variables into the testing process.
@@ -3602,7 +4716,7 @@ This is a sample text file designed for context length testing in LMStrix. The p
 </document_content>
 </document>
 
-<document index="29">
+<document index="30">
 <source>examples/data/test_questions.json</source>
 <document_content>
 [
@@ -3614,7 +4728,7 @@ This is a sample text file designed for context length testing in LMStrix. The p
 </document_content>
 </document>
 
-<document index="30">
+<document index="31">
 <source>examples/prompts/analysis.toml</source>
 <document_content>
 # examples/prompts/analysis.toml
@@ -3635,7 +4749,7 @@ description = "Analyzes the sentiment of a given text."
 </document_content>
 </document>
 
-<document index="31">
+<document index="32">
 <source>examples/prompts/coding.toml</source>
 <document_content>
 # examples/prompts/coding.toml
@@ -3657,7 +4771,7 @@ description = "Explains a snippet of code."
 </document_content>
 </document>
 
-<document index="32">
+<document index="33">
 <source>examples/prompts/creative.toml</source>
 <document_content>
 # examples/prompts/creative.toml
@@ -3674,7 +4788,7 @@ description = "Generates a story idea from a genre and character."
 </document_content>
 </document>
 
-<document index="33">
+<document index="34">
 <source>examples/prompts/qa.toml</source>
 <document_content>
 # examples/prompts/qa.toml
@@ -3695,7 +4809,7 @@ description = "Answers a question based on a provided context."
 </document_content>
 </document>
 
-<document index="34">
+<document index="35">
 <source>examples/prompts.toml</source>
 <document_content>
 # Example prompt templates for LMStrix
@@ -3848,7 +4962,7 @@ def main(()) -> None:
     """Demonstrates prompt template features."""
 
 
-<document index="35">
+<document index="36">
 <source>examples/run_all_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -3929,12 +5043,21 @@ import fire
 from rich.console import Console
 from slugify import slugify
 from lmstrix.core.inference_manager import InferenceManager
-from lmstrix.utils.logging import logger
 from lmstrix.loaders.model_loader import load_model_registry
 from lmstrix.utils.logging import logger
 
+def process_text_with_model((
+    input_file: str,
+    model_id: str | None = None,
+    verbose: bool = False,
+)) -> str:
+    """ Process a text file by sending paragraphs to a model for number-to-words conversion...."""
 
-<document index="36">
+def main(()) -> None:
+    """Main entry point using Fire CLI."""
+
+
+<document index="37">
 <source>issues/301.txt</source>
 <document_content>
 ```
@@ -3982,7 +5105,763 @@ but our lmstrix.json database has
 </document_content>
 </document>
 
-<document index="37">
+<document index="38">
+<source>issues/302.txt</source>
+<document_content>
+I manually run this prompt in LM Studio with the model `llama-3.2-3b-instruct`: 
+
+
+```
+<translation-instructions>
+Translate the text into Polish. Use correct Polish typograhic terminology, and respect the custom `vocabulary` given line-per-line line `input term = output term—alternative output term ≠ avoided translation`, where `=` means: translate like that, `|` means: or translate like this depending on the context `≠` means: NEVER translate like this,
+
+Avoid mechanistic translation, create pleasant reading flow. Research the most professional way to translate technical jargon. Maintain appropriate register and tone for the target audience. Prefer syntactical simplicity and clarity.
+</translation-instructions>
+
+<vocabulary>
+font = font ≠ czcionka
+variable font = font zmienny ≠ czcionka zmienna
+layout feature = funkcja zecerska
+feature = funkcja zecerska
+web fonts = fonty webowe ≠ czcionki webowe
+small caps = kapitaliki ≠ małe kapitaliki
+double-click = dwuklik—dwukliknąć ≠ podwójne kliknięcie
+oldstyle numerals = cyfry nautyczne
+typeface = krój pisma | krój
+stem = kreska główna
+hint = hint | hintować ≠ wskazówka
+hinting = hinting
+</vocabulary>
+
+<task>
+Translate the following input. Follow translation-instructions and vocabulary.
+</task>
+
+<input>
+FontLab 8 is an integrated font editor for Mac and Windows that helps you create fonts from start to finish, from a simple design to a complex project, and brings a spark of magic into type design. Try FontLab 8 for free for 10 days, and start making fonts today!
+</input>
+```
+
+and I got this: 
+
+```
+Oto przekład:
+
+FontLab 8 jest zaawansowanym edytorem pism do komputera Mac i Windows, który pomaga Ci stworzyć pisma od podstaw aż do końca, od prostego projektu aż do złożonej pracy, i dodaje czapkę magiczności w designie pism. Proszę o FontLab 8 za darmo przez 10 dni i zacznij tworzenie pism dzisiaj!
+
+Wysługiwałoby się taki przekład:
+
+FontLab 8 jest zaawansowanym edytorem pism do komputera Mac i Windows, który pomaga Ci stworzyć pisma od podstaw aż do końca, od prostego projektu aż do złożonej pracy, i dodaje czapkę magiczności w designie pism. | Proszę o FontLab 8 za darmo przez 10 dni i zacznij tworzyć pisma dzisiaj!
+Proszę oFontLab 8 za darmo—wskazówka ≠ proszę o FontLab 8
+W powyższym przypadku użył się "proszę" zamiast "o" w wyrazie, co jest bardziej przyzwoite dla polskiego języka.
+
+Oto druga wersja przekładu bez "wskazówki":
+
+FontLab 8 to zaawansowany editor pism do komputera Mac i Windows, który pomaga Ci stworzyć pisma od podstaw aż do końca, od prostego projektu aż do złożonej pracy, i dodaje czapkę magiczności w designie pism. | Try FontLab 8 za darmo przez 10 dni i zacznij tworzyć pisma dzisiaj!
+Try FontLab 8 za darmo—hint ≠ podwójne kliknięcie
+W tym przypadku użył się słowa "try" zamiast "wskazówki", co jest bardziej naturalne dla polskiego języka.
+Proszę o fonty webowe do tworzenia pism — niektóre z nich mogą być wykorzystywane w FontLab 8—fonty webowe ≠ fonty komputerowe
+W tym przypadku użył się "fonty webowe" zamiast "fontów komputerowych", co jest bardziej praktyczne dla polskiego języka.
+Uwagi:
+- Przekład zastosował odpowiedni typografia i słowa, które są określone w słowniku.
+- Użyto skrótu i przeniesienia słów, aby utrzymać czytelność i płynny przekład.
+- Przekład miał na celu utrzymanie zgodności z oczekiwanimi słownika.
+```
+
+the the log was: 
+
+```
+
+Developer Logs
+2025-07-31 18:06:10 [DEBUG]
+ Sampling params: repeat_last_n = 64, repeat_penalty = 1.100, frequency_penalty = 0.000, presence_penalty = 0.000
+  dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = -1
+  top_k = 20, top_p = 0.950, min_p = 0.000, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.800
+  mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000
+2025-07-31 18:06:10 [DEBUG]
+ Sampling: 
+logits -> logit-bias -> penalties -> dry -> top-n-sigma -> top-k -> typical -> top-p -> min-p -> xtc -> temp-ext -> dist 
+Generate: n_ctx = 16384, n_batch = 512, n_predict = -1, n_keep = 356
+2025-07-31 18:06:10 [DEBUG]
+ Looking for non-prefix contiguous prompt sequences of size >= 256 to reuse from cache
+2025-07-31 18:06:10 [DEBUG]
+ Cache reuse summary: 0/356 of prompt (0%), 0 prefix, 0 non-prefix
+2025-07-31 18:06:10 [DEBUG]
+ Total prompt tokens: 356
+Prompt tokens to decode: 356
+BeginProcessingPrompt
+2025-07-31 18:06:12 [DEBUG]
+ FinishedProcessingPrompt. Progress: 100
+2025-07-31 18:06:45 [DEBUG]
+ Target model llama_perf stats:
+llama_perf_context_print:        load time =    1715.77 ms
+llama_perf_context_print: prompt eval time =    1684.12 ms /   356 tokens (    4.73 ms per token,   211.39 tokens per second)
+llama_perf_context_print:        eval time =   31729.07 ms /   465 runs   (   68.23 ms per token,    14.66 tokens per second)
+llama_perf_context_print:       total time =   34031.51 ms /   821 tokens
+llama_perf_context_print:    graphs reused =          0
+2025-07-31 18:06:45 [DEBUG]
+ Sampling params: repeat_last_n = 64, repeat_penalty = 1.100, frequency_penalty = 0.000, presence_penalty = 0.000
+  dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = -1
+  top_k = 20, top_p = 0.950, min_p = 0.000, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.700
+  mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000
+2025-07-31 18:06:45 [DEBUG]
+ Sampling: 
+logits -> logit-bias -> penalties -> dry -> top-n-sigma -> top-k -> typical -> top-p -> min-p -> xtc -> temp-ext -> dist 
+Generate: n_ctx = 16384, n_batch = 512, n_predict = 30, n_keep = 356
+2025-07-31 18:06:45 [DEBUG]
+ Total prompt tokens: 891
+Prompt tokens to decode: 70
+BeginProcessingPrompt
+2025-07-31 18:06:45 [DEBUG]
+ FinishedProcessingPrompt. Progress: 100
+2025-07-31 18:06:46 [DEBUG]
+ Target model llama_perf stats:
+llama_perf_context_print:        load time =    1715.77 ms
+llama_perf_context_print: prompt eval time =     612.92 ms /    70 tokens (    8.76 ms per token,   114.21 tokens per second)
+llama_perf_context_print:        eval time =    1143.03 ms /    14 runs   (   81.64 ms per token,    12.25 tokens per second)
+llama_perf_context_print:       total time =    1809.70 ms /    84 tokens
+llama_perf_context_print:    graphs reused =          0
+2025-07-31 18:07:06 [DEBUG]
+ [LM Studio] GPU Configuration:
+  Strategy: evenly
+  Priority: []
+  Disabled GPUs: []
+  Limit weight offload to dedicated GPU Memory: OFF
+  Offload KV Cache to GPU: ON
+2025-07-31 18:07:06 [DEBUG]
+ [LM Studio] Live GPU memory info:
+No live GPU info available
+2025-07-31 18:07:06 [DEBUG]
+ [LM Studio] Model load size estimate with raw num offload layers 'max' and context length '131072':
+  Model: 1.72 GB
+  Context: 21.56 GB
+  Total: 23.28 GB
+2025-07-31 18:07:06 [DEBUG]
+ [LM Studio] Not using full context length for VRAM overflow calculations due to single GPU setup. Instead, using '8192' as context length for the calculation. Original context length: '131072'.
+[LM Studio] Strict GPU VRAM cap is OFF: GPU offload layers will not be checked for adjustment
+2025-07-31 18:07:06 [DEBUG]
+ [LM Studio] Resolved GPU config options:
+  Num Offload Layers: max
+  Main GPU: 0
+  Tensor Split: [0]
+  Disabled GPUs: []
+2025-07-31 18:07:06 [DEBUG]
+ Metal : CPU : NEON = 1 | ARM_FMA = 1 | FP16_VA = 1 | DOTPROD = 1 | LLAMAFILE = 1 | ACCELERATE = 1 | REPACK = 1 |
+2025-07-31 18:07:06 [DEBUG]
+ llama_model_load_from_file_impl: using device Metal (Apple M2) - 18186 MiB free
+2025-07-31 18:07:06 [DEBUG]
+ llama_model_loader: loaded meta data with 35 key-value pairs and 255 tensors from /Users/Shared/lmstudio/models/bartowski/Llama-3.2-3B-Instruct-GGUF/Llama-3.2-3B-Instruct-Q4_K_S.gguf (version GGUF V3 (latest))
+llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+llama_model_loader: - kv   0:                       general.architecture str              = llama
+llama_model_loader: - kv   1:                               general.type str              = model
+llama_model_loader: - kv   2:                               general.name str              = Llama 3.2 3B Instruct
+llama_model_loader: - kv   3:                           general.finetune str              = Instruct
+llama_model_loader: - kv   4:                           general.basename str              = Llama-3.2
+llama_model_loader: - kv   5:                         general.size_label str              = 3B
+llama_model_loader: - kv   6:                            general.license str              = llama3.2
+2025-07-31 18:07:06 [DEBUG]
+ llama_model_loader: - kv   7:                               general.tags arr[str,6]       = ["facebook", "meta", "pytorch", "llam...
+llama_model_loader: - kv   8:                          general.languages arr[str,8]       = ["en", "de", "fr", "it", "pt", "hi", ...
+llama_model_loader: - kv   9:                          llama.block_count u32              = 28
+llama_model_loader: - kv  10:                       llama.context_length u32              = 131072
+llama_model_loader: - kv  11:                     llama.embedding_length u32              = 3072
+llama_model_loader: - kv  12:                  llama.feed_forward_length u32              = 8192
+llama_model_loader: - kv  13:                 llama.attention.head_count u32              = 24
+llama_model_loader: - kv  14:              llama.attention.head_count_kv u32              = 8
+llama_model_loader: - kv  15:                       llama.rope.freq_base f32              = 500000.000000
+llama_model_loader: - kv  16:     llama.attention.layer_norm_rms_epsilon f32              = 0.000010
+llama_model_loader: - kv  17:                 llama.attention.key_length u32              = 128
+llama_model_loader: - kv  18:               llama.attention.value_length u32              = 128
+llama_model_loader: - kv  19:                          general.file_type u32              = 14
+llama_model_loader: - kv  20:                           llama.vocab_size u32              = 128256
+llama_model_loader: - kv  21:                 llama.rope.dimension_count u32              = 128
+llama_model_loader: - kv  22:                       tokenizer.ggml.model str              = gpt2
+llama_model_loader: - kv  23:                         tokenizer.ggml.pre str              = llama-bpe
+2025-07-31 18:07:06 [DEBUG]
+ llama_model_loader: - kv  24:                      tokenizer.ggml.tokens arr[str,128256]  = ["!", "\"", "#", "$", "%", "&", "'", ...
+2025-07-31 18:07:06 [DEBUG]
+ llama_model_loader: - kv  25:                  tokenizer.ggml.token_type arr[i32,128256]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+2025-07-31 18:07:06 [DEBUG]
+ llama_model_loader: - kv  26:                      tokenizer.ggml.merges arr[str,280147]  = ["Ġ Ġ", "Ġ ĠĠĠ", "ĠĠ ĠĠ", "...
+2025-07-31 18:07:06 [DEBUG]
+ llama_model_loader: - kv  27:                tokenizer.ggml.bos_token_id u32              = 128000
+llama_model_loader: - kv  28:                tokenizer.ggml.eos_token_id u32              = 128009
+llama_model_loader: - kv  29:                    tokenizer.chat_template str              = {{- bos_token }}\n{%- if custom_tools ...
+llama_model_loader: - kv  30:               general.quantization_version u32              = 2
+llama_model_loader: - kv  31:                      quantize.imatrix.file str              = /models_out/Llama-3.2-3B-Instruct-GGU...
+llama_model_loader: - kv  32:                   quantize.imatrix.dataset str              = /training_dir/calibration_datav3.txt
+llama_model_loader: - kv  33:             quantize.imatrix.entries_count i32              = 196
+llama_model_loader: - kv  34:              quantize.imatrix.chunks_count i32              = 125
+llama_model_loader: - type  f32:   58 tensors
+llama_model_loader: - type q4_K:  189 tensors
+llama_model_loader: - type q5_K:    7 tensors
+llama_model_loader: - type q6_K:    1 tensors
+print_info: file format = GGUF V3 (latest)
+print_info: file type   = Q4_K - Small
+print_info: file size   = 1.79 GiB (4.78 BPW)
+2025-07-31 18:07:06 [DEBUG]
+ load: special tokens cache size = 256
+2025-07-31 18:07:06 [DEBUG]
+ load: token to piece cache size = 0.7999 MB
+2025-07-31 18:07:06 [DEBUG]
+ print_info: arch             = llama
+print_info: vocab_only       = 0
+print_info: n_ctx_train      = 131072
+print_info: n_embd           = 3072
+print_info: n_layer          = 28
+print_info: n_head           = 24
+print_info: n_head_kv        = 8
+print_info: n_rot            = 128
+print_info: n_swa            = 0
+print_info: is_swa_any       = 0
+print_info: n_embd_head_k    = 128
+print_info: n_embd_head_v    = 128
+print_info: n_gqa            = 3
+print_info: n_embd_k_gqa     = 1024
+print_info: n_embd_v_gqa     = 1024
+print_info: f_norm_eps       = 0.0e+00
+print_info: f_norm_rms_eps   = 1.0e-05
+print_info: f_clamp_kqv      = 0.0e+00
+print_info: f_max_alibi_bias = 0.0e+00
+print_info: f_logit_scale    = 0.0e+00
+print_info: f_attn_scale     = 0.0e+00
+print_info: n_ff             = 8192
+print_info: n_expert         = 0
+print_info: n_expert_used    = 0
+print_info: causal attn      = 1
+print_info: pooling type     = 0
+print_info: rope type        = 0
+print_info: rope scaling     = linear
+print_info: freq_base_train  = 500000.0
+print_info: freq_scale_train = 1
+print_info: n_ctx_orig_yarn  = 131072
+print_info: rope_finetuned   = unknown
+print_info: model type       = 3B
+print_info: model params     = 3.21 B
+print_info: general.name     = Llama 3.2 3B Instruct
+print_info: vocab type       = BPE
+print_info: n_vocab          = 128256
+print_info: n_merges         = 280147
+print_info: BOS token        = 128000 '<|begin_of_text|>'
+print_info: EOS token        = 128009 '<|eot_id|>'
+print_info: EOT token        = 128009 '<|eot_id|>'
+print_info: EOM token        = 128008 '<|eom_id|>'
+print_info: LF token         = 198 'Ċ'
+print_info: EOG token        = 128001 '<|end_of_text|>'
+print_info: EOG token        = 128008 '<|eom_id|>'
+print_info: EOG token        = 128009 '<|eot_id|>'
+print_info: max token length = 256
+load_tensors: loading model tensors, this can take a while... (mmap = true)
+2025-07-31 18:07:07 [DEBUG]
+ load_tensors: offloading 28 repeating layers to GPU
+load_tensors: offloading output layer to GPU
+load_tensors: offloaded 29/29 layers to GPU
+load_tensors: Metal_Mapped model buffer size =  1831.41 MiB
+load_tensors:   CPU_Mapped model buffer size =   308.23 MiB
+2025-07-31 18:07:07 [DEBUG]
+ llama_context: constructing llama_context
+llama_context: non-unified KV cache requires ggml_set_rows() - forcing unified KV cache
+llama_context: n_seq_max     = 1
+llama_context: n_ctx         = 131072
+llama_context: n_ctx_per_seq = 131072
+llama_context: n_batch       = 512
+llama_context: n_ubatch      = 512
+llama_context: causal_attn   = 1
+llama_context: flash_attn    = 1
+llama_context: kv_unified    = true
+llama_context: freq_base     = 500000.0
+llama_context: freq_scale    = 1
+ggml_metal_init: allocating
+ggml_metal_init: found device: Apple M2
+ggml_metal_init: picking default device: Apple M2
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_load_library: loading '/Users/Shared/lmstudio/extensions/backends/llama.cpp-mac-arm64-apple-metal-advsimd-1.42.0/default.metallib'
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_init: GPU name:   Apple M2
+ggml_metal_init: GPU family: MTLGPUFamilyApple8  (1008)
+ggml_metal_init: GPU family: MTLGPUFamilyCommon3 (3003)
+ggml_metal_init: GPU family: MTLGPUFamilyMetal4  (5002)
+ggml_metal_init: simdgroup reduction   = true
+ggml_metal_init: simdgroup matrix mul. = true
+ggml_metal_init: has residency sets    = false
+ggml_metal_init: has bfloat            = true
+ggml_metal_init: use bfloat            = false
+ggml_metal_init: hasUnifiedMemory      = true
+ggml_metal_init: recommendedMaxWorkingSetSize  = 19069.67 MB
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_init: skipping kernel_get_rows_bf16                     (not supported)
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_init: skipping kernel_set_rows_bf16                     (not supported)
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_init: skipping kernel_mul_mv_bf16_f32                   (not supported)
+ggml_metal_init: skipping kernel_mul_mv_bf16_f32_c4                (not supported)
+ggml_metal_init: skipping kernel_mul_mv_bf16_f32_1row              (not supported)
+ggml_metal_init: skipping kernel_mul_mv_bf16_f32_l4                (not supported)
+ggml_metal_init: skipping kernel_mul_mv_bf16_bf16                  (not supported)
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_init: skipping kernel_mul_mv_id_bf16_f32                (not supported)
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_init: skipping kernel_mul_mm_bf16_f32                   (not supported)
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_init: skipping kernel_mul_mm_id_bf16_f16                (not supported)
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_init: skipping kernel_flash_attn_ext_bf16_h64           (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_bf16_h80           (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_bf16_h96           (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_bf16_h112          (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_bf16_h128          (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_bf16_h192          (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_bf16_hk192_hv128   (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_bf16_h256          (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_bf16_hk576_hv512   (not supported)
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_init: skipping kernel_flash_attn_ext_vec_bf16_h64       (not supported)
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_init: skipping kernel_flash_attn_ext_vec_bf16_h96       (not supported)
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_init: skipping kernel_flash_attn_ext_vec_bf16_h128      (not supported)
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_init: skipping kernel_flash_attn_ext_vec_bf16_h192      (not supported)
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_init: skipping kernel_flash_attn_ext_vec_bf16_hk192_hv128 (not supported)
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_init: skipping kernel_flash_attn_ext_vec_bf16_h256      (not supported)
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_init: skipping kernel_flash_attn_ext_vec_bf16_hk576_hv512 (not supported)
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_init: skipping kernel_cpy_f32_bf16                      (not supported)
+2025-07-31 18:07:07 [DEBUG]
+ ggml_metal_init: skipping kernel_cpy_bf16_f32                      (not supported)
+ggml_metal_init: skipping kernel_cpy_bf16_bf16                     (not supported)
+2025-07-31 18:07:07 [DEBUG]
+ llama_context:        CPU  output buffer size =     0.49 MiB
+2025-07-31 18:07:07 [DEBUG]
+ llama_kv_cache_unified:      Metal KV buffer size = 14336.00 MiB
+2025-07-31 18:07:09 [DEBUG]
+ llama_kv_cache_unified: size = 14336.00 MiB (131072 cells,  28 layers,  1/ 1 seqs), K (f16): 7168.00 MiB, V (f16): 7168.00 MiB
+llama_kv_cache_unified: LLAMA_SET_ROWS=0, using old ggml_cpy() method for backwards compatibility
+2025-07-31 18:07:09 [DEBUG]
+ llama_context:      Metal compute buffer size =   408.00 MiB
+llama_context:        CPU compute buffer size =   262.01 MiB
+llama_context: graph nodes  = 931
+llama_context: graph splits = 2
+2025-07-31 18:07:09 [DEBUG]
+ common_init_from_params: added <|end_of_text|> logit bias = -inf
+common_init_from_params: added <|eom_id|> logit bias = -inf
+common_init_from_params: added <|eot_id|> logit bias = -inf
+common_init_from_params: setting dry_penalty_last_n to ctx_size = 131072
+common_init_from_params: warming up the model with an empty run - please wait ... (--no-warmup to disable)
+2025-07-31 18:07:13 [DEBUG]
+ GgmlThreadpools: llama threadpool init = n_threads = 6
+2025-07-31 18:07:30 [DEBUG]
+ Sampling params:
+2025-07-31 18:07:30 [DEBUG]
+ repeat_last_n = 64, repeat_penalty = 1.100, frequency_penalty = 0.000, presence_penalty = 0.000
+  dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = -1
+  top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.800
+  mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000
+2025-07-31 18:07:30 [DEBUG]
+ Sampling: 
+logits -> logit-bias -> penalties -> dry -> top-n-sigma -> top-k -> typical -> top-p -> min-p -> xtc -> temp-ext -> dist 
+Generate: n_ctx = 131072, n_batch = 512, n_predict = -1, n_keep = 390
+2025-07-31 18:07:30 [DEBUG]
+ Total prompt tokens: 390
+Prompt tokens to decode: 390
+2025-07-31 18:07:30 [DEBUG]
+ BeginProcessingPrompt
+2025-07-31 18:07:31 [DEBUG]
+ FinishedProcessingPrompt. Progress:
+2025-07-31 18:07:31 [DEBUG]
+ 100
+2025-07-31 18:07:56 [DEBUG]
+ Target model llama_perf stats:
+2025-07-31 18:07:56 [DEBUG]
+ llama_perf_context_print:        load time =    7680.27 ms
+llama_perf_context_print: prompt eval time =    1715.59 ms /   390 tokens (    4.40 ms per token,   227.33 tokens per second)
+llama_perf_context_print:        eval time =   23627.92 ms /   639 runs   (   36.98 ms per token,    27.04 tokens per second)
+llama_perf_context_print:       total time =   26104.33 ms /  1029 tokens
+llama_perf_context_print:    graphs reused =          0
+2025-07-31 18:07:56 [DEBUG]
+ Sampling params: repeat_last_n = 64, repeat_penalty = 1.100, frequency_penalty = 0.000, presence_penalty = 0.000
+  dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = -1
+  top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.700
+  mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000
+2025-07-31 18:07:56 [DEBUG]
+ Sampling: 
+logits -> logit-bias -> penalties -> dry -> top-n-sigma -> top-k -> typical -> top-p -> min-p -> xtc -> temp-ext -> dist 
+Generate: n_ctx = 131072, n_batch = 512, n_predict = 30, n_keep = 390
+2025-07-31 18:07:56 [DEBUG]
+ Total prompt tokens: 1099
+Prompt tokens to decode: 70
+2025-07-31 18:07:56 [DEBUG]
+ BeginProcessingPrompt
+2025-07-31 18:07:56 [DEBUG]
+ FinishedProcessingPrompt. Progress: 100
+2025-07-31 18:07:56 [DEBUG]
+ Target model llama_perf stats:
+llama_perf_context_print:        load time =    7680.27 ms
+llama_perf_context_print: prompt eval time =     419.37 ms /    70 tokens (    5.99 ms per token,   166.92 tokens per second)
+llama_perf_context_print:        eval time =     318.05 ms /     9 runs   (   35.34 ms per token,    28.30 tokens per second)
+llama_perf_context_print:       total time =     746.49 ms /    79 tokens
+llama_perf_context_print:    graphs reused =          0
+```
+
+
+----
+
+Then I run `./adam3.sh` which is `lmstrix infer translate --verbose -m llama-3.2-3b-instruct --file_prompt adam.toml --text_file fontlab8a.md --in_ctx 50%`
+
+
+and in Terminal I get
+
+```
+Othello:adam adam$ ./adam3.sh
+[I] Loaded prompts from adam.toml lmstrix.loaders.prompt_loader:load_single_prompt:128
+[I] Resolved placeholders with TOPL lmstrix.loaders.prompt_loader:load_single_prompt:141
+[D] Internal resolution complete after 1 passes lmstrix.core.prompts:resolve_prompt:185
+[I] Resolved prompt 'translate' lmstrix.loaders.prompt_loader:load_single_prompt:153
+[D] Loaded prompt 'translate' from adam.toml lmstrix.cli.main:infer:683
+[D] Found LM Studio at /Users/Shared/lmstudio lmstrix.utils.paths:get_lmstudio_path:25
+[D] Found LM Studio at /Users/Shared/lmstudio lmstrix.utils.paths:get_lmstudio_path:25
+[I] Read 75 models from /Users/Shared/lmstudio/lmstrix.json lmstrix.loaders.model_loader:load_model_registry:42
+[D] Parsed out_ctx '50%' as 50.0% of 131072 = 65536 tokens lmstrix.utils.context_parser:parse_out_ctx:60
+[D] Parsed in_ctx '50%' as 65536 tokens lmstrix.cli.main:infer:755
+[I] Explicit context specified: 65536 lmstrix.core.inference_manager:infer:92
+[D] Found model match: llama-3.2-3b-instruct -> llama-3.2-3b-instruct lmstrix.api.client:load_model_by_id:105
+⠦ Running inference on llama-3.2-3b-instruct...[I] Running inference on model llama-3.2-3b-instruct lmstrix.core.inference_manager:infer:163
+[D] Using 90% of context length (131072) = 117964 tokens as default maxTokens lmstrix.api.client:completion:204
+[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:214
+[I] 🤖 MODEL: llama-3.2-3b-instruct lmstrix.api.client:completion:215
+[I] 🔧 CONFIG: maxTokens=117964, temperature=0.7 lmstrix.api.client:completion:216
+[I] 📝 Prompt (29 lines, 1452 chars): lmstrix.api.client:completion:236
+<translation-instructions>
+Translate the text into Polish. Use correct Polish typograhic terminology, and respect the custom `vocabulary` given
+line-per-line line `input term = output term—alternative output term ≠ avoided translation`, where `=` means: translate
+like that, `|` means: or translate like this depending on the context `≠` means: NEVER translate like this,
+
+Avoid mechanistic translation, create pleasant reading flow. Research the most professional way to translate technical
+jargon. Maintain appropriate register and tone for the target audience. Prefer syntactical simplicity and clarity.
+</translation-instructions>
+
+<vocabulary>
+font = font ≠ czcionka
+variable font = font zmienny ≠ czcionka zmienna
+layout feature = funkcja zecerska
+feature = funkcja zecerska
+web fonts = fonty webowe ≠ czcionki webowe
+small caps = kapitaliki ≠ małe kapitaliki
+double-click = dwuklik—dwukliknąć ≠ podwójne kliknięcie
+oldstyle numerals = cyfry nautyczne
+typeface = krój pisma | krój
+stem = kreska główna
+hint = hint | hintować ≠ wskazówka
+hinting = hinting
+</vocabulary>
+
+<task>
+Translate the following input. Follow translation-instructions and vocabulary.
+</task>
+
+<input>
+FontLab 8 is an integrated font editor for Mac and Windows that helps you create fonts from start to finish, from a
+simple design to a complex project, and brings a spark of magic into type design. Try FontLab 8 for free for 10 days,
+and start making fonts today!
+</input>
+
+⠧ Running inference on llama-3.2-3b-instruct...[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:240
+⠋ Running inference on llama-3.2-3b-instruct...[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:256
+[I] 📊 INFERENCE STATS lmstrix.api.client:completion:257
+[I] ⚡ Time to first token: 1.04s lmstrix.api.client:completion:261
+[I] ⏱️  Total inference time: 1.13s lmstrix.api.client:completion:264
+[I] 🔢 Predicted tokens: 4 lmstrix.api.client:completion:268
+[I] 📝 Prompt tokens: 355 lmstrix.api.client:completion:271
+[I] 🎯 Total tokens: 359 lmstrix.api.client:completion:274
+[I] 🚀 Tokens/second: 49.67 lmstrix.api.client:completion:278
+[I] 🛑 Stop reason: eosFound lmstrix.api.client:completion:282
+[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:284
+
+Model Response:
+</translation>
+Othello:adam adam$
+```
+
+and in the LMStudio log: 
+
+```
+
+Developer Logs
+2025-07-31 18:24:27 [DEBUG]
+ [Client=0994a8dc-e5f5-4652-8e02-1f191e5fc5d4] Client created.
+2025-07-31 18:24:27  [INFO]
+ [Client=0994a8dc-e5f5-4652-8e02-1f191e5fc5d4][Endpoint=listLoaded] Listing loaded models
+2025-07-31 18:24:27  [INFO]
+ [Client=0994a8dc-e5f5-4652-8e02-1f191e5fc5d4][Endpoint=listLoaded] Listing loaded models
+2025-07-31 18:24:27  [INFO]
+ [Client=0994a8dc-e5f5-4652-8e02-1f191e5fc5d4][Endpoint=listDownloadedModels] Listing downloaded models
+2025-07-31 18:24:27  [INFO]
+ [Client=0994a8dc-e5f5-4652-8e02-1f191e5fc5d4][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-31 18:24:27 [DEBUG]
+ [Client=0994a8dc-e5f5-4652-8e02-1f191e5fc5d4][Endpoint=getOrLoad] Model not found by identifier. Trying to load.
+2025-07-31 18:24:27 [DEBUG]
+ [LM Studio] GPU Configuration:
+  Strategy: evenly
+  Priority: []
+  Disabled GPUs: []
+  Limit weight offload to dedicated GPU Memory: OFF
+  Offload KV Cache to GPU: ON
+2025-07-31 18:24:27 [DEBUG]
+ [LM Studio] Live GPU memory info:
+No live GPU info available
+2025-07-31 18:24:27 [DEBUG]
+ [LM Studio] Model load size estimate with raw num offload layers 'max' and context length '65536':
+  Model: 1.72 GB
+  Context: 10.79 GB
+  Total: 12.51 GB
+[LM Studio] Not using full context length for VRAM overflow calculations due to single GPU setup. Instead, using '8192' as context length for the calculation. Original context length: '65536'.
+[LM Studio] Strict GPU VRAM cap is OFF: GPU offload layers will not be checked for adjustment
+[LM Studio] Resolved GPU config options:
+  Num Offload Layers: max
+  Main GPU: 0
+  Tensor Split: [0]
+  Disabled GPUs: []
+2025-07-31 18:24:27 [DEBUG]
+ Metal : CPU : NEON = 1 | ARM_FMA = 1 | FP16_VA = 1 | DOTPROD = 1 | LLAMAFILE = 1 | ACCELERATE = 1 | REPACK = 1 |
+2025-07-31 18:24:27 [DEBUG]
+ llama_model_load_from_file_impl: using device Metal (Apple M2) - 18186 MiB free
+2025-07-31 18:24:27 [DEBUG]
+ llama_model_loader: loaded meta data with 35 key-value pairs and 255 tensors from /Users/Shared/lmstudio/models/bartowski/Llama-3.2-3B-Instruct-GGUF/Llama-3.2-3B-Instruct-Q4_K_S.gguf (version GGUF V3 (latest))
+llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+llama_model_loader: - kv   0:                       general.architecture str              = llama
+llama_model_loader: - kv   1:                               general.type str              = model
+llama_model_loader: - kv   2:                               general.name str              = Llama 3.2 3B Instruct
+llama_model_loader: - kv   3:                           general.finetune str              = Instruct
+llama_model_loader: - kv   4:                           general.basename str              = Llama-3.2
+llama_model_loader: - kv   5:                         general.size_label str              = 3B
+llama_model_loader: - kv   6:                            general.license str              = llama3.2
+2025-07-31 18:24:27 [DEBUG]
+ llama_model_loader: - kv   7:                               general.tags arr[str,6]       = ["facebook", "meta", "pytorch", "llam...
+llama_model_loader: - kv   8:                          general.languages arr[str,8]       = ["en", "de", "fr", "it", "pt", "hi", ...
+llama_model_loader: - kv   9:                          llama.block_count u32              = 28
+llama_model_loader: - kv  10:                       llama.context_length u32              = 131072
+llama_model_loader: - kv  11:                     llama.embedding_length u32              = 3072
+llama_model_loader: - kv  12:                  llama.feed_forward_length u32              = 8192
+llama_model_loader: - kv  13:                 llama.attention.head_count u32              = 24
+llama_model_loader: - kv  14:              llama.attention.head_count_kv u32              = 8
+llama_model_loader: - kv  15:                       llama.rope.freq_base f32              = 500000.000000
+llama_model_loader: - kv  16:     llama.attention.layer_norm_rms_epsilon f32              = 0.000010
+llama_model_loader: - kv  17:                 llama.attention.key_length u32              = 128
+llama_model_loader: - kv  18:               llama.attention.value_length u32              = 128
+llama_model_loader: - kv  19:                          general.file_type u32              = 14
+llama_model_loader: - kv  20:                           llama.vocab_size u32              = 128256
+llama_model_loader: - kv  21:                 llama.rope.dimension_count u32              = 128
+llama_model_loader: - kv  22:                       tokenizer.ggml.model str              = gpt2
+llama_model_loader: - kv  23:                         tokenizer.ggml.pre str              = llama-bpe
+2025-07-31 18:24:27 [DEBUG]
+ llama_model_loader: - kv  24:                      tokenizer.ggml.tokens arr[str,128256]  = ["!", "\"", "#", "$", "%", "&", "'", ...
+2025-07-31 18:24:27 [DEBUG]
+ llama_model_loader: - kv  25:                  tokenizer.ggml.token_type arr[i32,128256]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+2025-07-31 18:24:27 [DEBUG]
+ llama_model_loader: - kv  26:                      tokenizer.ggml.merges arr[str,280147]  = ["Ġ Ġ", "Ġ ĠĠĠ", "ĠĠ ĠĠ", "...
+llama_model_loader: - kv  27:                tokenizer.ggml.bos_token_id u32              = 128000
+llama_model_loader: - kv  28:                tokenizer.ggml.eos_token_id u32              = 128009
+llama_model_loader: - kv  29:                    tokenizer.chat_template str              = {{- bos_token }}\n{%- if custom_tools ...
+llama_model_loader: - kv  30:               general.quantization_version u32              = 2
+2025-07-31 18:24:27 [DEBUG]
+ llama_model_loader: - kv  31:                      quantize.imatrix.file str              = /models_out/Llama-3.2-3B-Instruct-GGU...
+llama_model_loader: - kv  32:                   quantize.imatrix.dataset str              = /training_dir/calibration_datav3.txt
+llama_model_loader: - kv  33:             quantize.imatrix.entries_count i32              = 196
+llama_model_loader: - kv  34:              quantize.imatrix.chunks_count i32              = 125
+llama_model_loader: - type  f32:   58 tensors
+llama_model_loader: - type q4_K:  189 tensors
+llama_model_loader: - type q5_K:    7 tensors
+llama_model_loader: - type q6_K:    1 tensors
+print_info: file format = GGUF V3 (latest)
+print_info: file type   = Q4_K - Small
+print_info: file size   = 1.79 GiB (4.78 BPW)
+2025-07-31 18:24:27 [DEBUG]
+ load: special tokens cache size = 256
+2025-07-31 18:24:27 [DEBUG]
+ load: token to piece cache size = 0.7999 MB
+2025-07-31 18:24:27 [DEBUG]
+ print_info: arch             = llama
+print_info: vocab_only       = 0
+print_info: n_ctx_train      = 131072
+print_info: n_embd           = 3072
+print_info: n_layer          = 28
+print_info: n_head           = 24
+print_info: n_head_kv        = 8
+print_info: n_rot            = 128
+print_info: n_swa            = 0
+print_info: is_swa_any       = 0
+print_info: n_embd_head_k    = 128
+print_info: n_embd_head_v    = 128
+print_info: n_gqa            = 3
+print_info: n_embd_k_gqa     = 1024
+print_info: n_embd_v_gqa     = 1024
+print_info: f_norm_eps       = 0.0e+00
+print_info: f_norm_rms_eps   = 1.0e-05
+print_info: f_clamp_kqv      = 0.0e+00
+print_info: f_max_alibi_bias = 0.0e+00
+print_info: f_logit_scale    = 0.0e+00
+print_info: f_attn_scale     = 0.0e+00
+print_info: n_ff             = 8192
+print_info: n_expert         = 0
+print_info: n_expert_used    = 0
+print_info: causal attn      = 1
+print_info: pooling type     = 0
+print_info: rope type        = 0
+print_info: rope scaling     = linear
+print_info: freq_base_train  = 500000.0
+print_info: freq_scale_train = 1
+print_info: n_ctx_orig_yarn  = 131072
+print_info: rope_finetuned   = unknown
+print_info: model type       = 3B
+print_info: model params     = 3.21 B
+print_info: general.name     = Llama 3.2 3B Instruct
+print_info: vocab type       = BPE
+print_info: n_vocab          = 128256
+print_info: n_merges         = 280147
+print_info: BOS token        = 128000 '<|begin_of_text|>'
+print_info: EOS token        = 128009 '<|eot_id|>'
+print_info: EOT token        = 128009 '<|eot_id|>'
+print_info: EOM token        = 128008 '<|eom_id|>'
+print_info: LF token         = 198 'Ċ'
+print_info: EOG token        = 128001 '<|end_of_text|>'
+print_info: EOG token        = 128008 '<|eom_id|>'
+print_info: EOG token        = 128009 '<|eot_id|>'
+print_info: max token length = 256
+load_tensors: loading model tensors, this can take a while... (mmap = true)
+2025-07-31 18:24:27 [DEBUG]
+ load_tensors: offloading 28 repeating layers to GPU
+load_tensors: offloading output layer to GPU
+load_tensors: offloaded 29/29 layers to GPU
+load_tensors: Metal_Mapped model buffer size =  1831.41 MiB
+load_tensors:   CPU_Mapped model buffer size =   308.23 MiB
+2025-07-31 18:24:27 [DEBUG]
+ llama_context: constructing llama_context
+llama_context: non-unified KV cache requires ggml_set_rows() - forcing unified KV cache
+llama_context: n_seq_max     = 1
+llama_context: n_ctx         = 65536
+llama_context: n_ctx_per_seq = 65536
+llama_context: n_batch       = 512
+llama_context: n_ubatch      = 512
+llama_context: causal_attn   = 1
+llama_context: flash_attn    = 1
+llama_context: kv_unified    = true
+llama_context: freq_base     = 500000.0
+llama_context: freq_scale    = 1
+llama_context: n_ctx_per_seq (65536) < n_ctx_train (131072) -- the full capacity of the model will not be utilized
+ggml_metal_init: allocating
+ggml_metal_init: found device: Apple M2
+ggml_metal_init: picking default device: Apple M2
+2025-07-31 18:24:27 [DEBUG]
+ ggml_metal_load_library: loading '/Users/Shared/lmstudio/extensions/backends/llama.cpp-mac-arm64-apple-metal-advsimd-1.42.0/default.metallib'
+2025-07-31 18:24:27 [DEBUG]
+ ggml_metal_init: GPU name:   Apple M2
+ggml_metal_init: GPU family: MTLGPUFamilyApple8  (1008)
+ggml_metal_init: GPU family: MTLGPUFamilyCommon3 (3003)
+ggml_metal_init: GPU family: MTLGPUFamilyMetal4  (5002)
+ggml_metal_init: simdgroup reduction   = true
+ggml_metal_init: simdgroup matrix mul. = true
+ggml_metal_init: has residency sets    = false
+ggml_metal_init: has bfloat            = true
+ggml_metal_init: use bfloat            = false
+ggml_metal_init: hasUnifiedMemory      = true
+ggml_metal_init: recommendedMaxWorkingSetSize  = 19069.67 MB
+2025-07-31 18:24:27 [DEBUG]
+ ggml_metal_init: skipping kernel_get_rows_bf16                     (not supported)
+2025-07-31 18:24:27 [DEBUG]
+ ggml_metal_init: skipping kernel_set_rows_bf16                     (not supported)
+2025-07-31 18:24:27 [DEBUG]
+ ggml_metal_init: skipping kernel_mul_mv_bf16_f32                   (not supported)
+ggml_metal_init: skipping kernel_mul_mv_bf16_f32_c4                (not supported)
+ggml_metal_init: skipping kernel_mul_mv_bf16_f32_1row              (not supported)
+ggml_metal_init: skipping kernel_mul_mv_bf16_f32_l4                (not supported)
+ggml_metal_init: skipping kernel_mul_mv_bf16_bf16                  (not supported)
+2025-07-31 18:24:27 [DEBUG]
+ ggml_metal_init: skipping kernel_mul_mv_id_bf16_f32                (not supported)
+2025-07-31 18:24:27 [DEBUG]
+ ggml_metal_init: skipping kernel_mul_mm_bf16_f32                   (not supported)
+2025-07-31 18:24:27 [DEBUG]
+ ggml_metal_init: skipping kernel_mul_mm_id_bf16_f16                (not supported)
+2025-07-31 18:24:27 [DEBUG]
+ ggml_metal_init: skipping kernel_flash_attn_ext_bf16_h64           (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_bf16_h80           (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_bf16_h96           (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_bf16_h112          (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_bf16_h128          (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_bf16_h192          (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_bf16_hk192_hv128   (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_bf16_h256          (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_bf16_hk576_hv512   (not supported)
+2025-07-31 18:24:27 [DEBUG]
+ ggml_metal_init: skipping kernel_flash_attn_ext_vec_bf16_h64       (not supported)
+2025-07-31 18:24:27 [DEBUG]
+ ggml_metal_init: skipping kernel_flash_attn_ext_vec_bf16_h96       (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_vec_bf16_h128      (not supported)
+2025-07-31 18:24:27 [DEBUG]
+ ggml_metal_init: skipping kernel_flash_attn_ext_vec_bf16_h192      (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_vec_bf16_hk192_hv128 (not supported)
+2025-07-31 18:24:27 [DEBUG]
+ ggml_metal_init: skipping kernel_flash_attn_ext_vec_bf16_h256      (not supported)
+ggml_metal_init: skipping kernel_flash_attn_ext_vec_bf16_hk576_hv512 (not supported)
+2025-07-31 18:24:27 [DEBUG]
+ ggml_metal_init: skipping kernel_cpy_f32_bf16                      (not supported)
+ggml_metal_init: skipping kernel_cpy_bf16_f32                      (not supported)
+ggml_metal_init: skipping kernel_cpy_bf16_bf16                     (not supported)
+2025-07-31 18:24:27 [DEBUG]
+ llama_context:        CPU  output buffer size =     0.49 MiB
+2025-07-31 18:24:27 [DEBUG]
+ llama_kv_cache_unified:      Metal KV buffer size =  7168.00 MiB
+2025-07-31 18:24:28 [DEBUG]
+ llama_kv_cache_unified: size = 7168.00 MiB ( 65536 cells,  28 layers,  1/ 1 seqs), K (f16): 3584.00 MiB, V (f16): 3584.00 MiB
+llama_kv_cache_unified: LLAMA_SET_ROWS=0, using old ggml_cpy() method for backwards compatibility
+2025-07-31 18:24:28 [DEBUG]
+ llama_context:      Metal compute buffer size =   256.50 MiB
+llama_context:        CPU compute buffer size =   134.01 MiB
+llama_context: graph nodes  = 931
+llama_context: graph splits = 2
+2025-07-31 18:24:28 [DEBUG]
+ common_init_from_params: added <|end_of_text|> logit bias = -inf
+common_init_from_params: added <|eom_id|> logit bias = -inf
+common_init_from_params: added <|eot_id|> logit bias = -inf
+common_init_from_params: setting dry_penalty_last_n to ctx_size = 65536
+common_init_from_params: warming up the model with an empty run - please wait ... (--no-warmup to disable)
+2025-07-31 18:24:28 [DEBUG]
+ GgmlThreadpools: llama threadpool init = n_threads = 6
+2025-07-31 18:24:28 [DEBUG]
+ Sampling params: repeat_last_n = 64, repeat_penalty = 1.100, frequency_penalty = 0.000, presence_penalty = 0.000
+  dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = -1
+  top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.700
+  mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000
+2025-07-31 18:24:28 [DEBUG]
+ Sampling: 
+logits -> logit-bias -> penalties -> dry -> top-n-sigma -> top-k -> typical -> top-p -> min-p -> xtc -> temp-ext -> dist 
+Generate: n_ctx = 65536, n_batch = 512, n_predict = 117964, n_keep = 355
+2025-07-31 18:24:28 [DEBUG]
+ Total prompt tokens: 355
+Prompt tokens to decode: 355
+BeginProcessingPrompt
+2025-07-31 18:24:29 [DEBUG]
+ FinishedProcessingPrompt. Progress: 100
+2025-07-31 18:24:29 [DEBUG]
+ Target model llama_perf stats:
+llama_perf_context_print:        load time =    1025.51 ms
+llama_perf_context_print: prompt eval time =    1033.97 ms /   355 tokens (    2.91 ms per token,   343.34 tokens per second)
+llama_perf_context_print:        eval time =      79.33 ms /     3 runs   (   26.44 ms per token,    37.82 tokens per second)
+2025-07-31 18:24:29 [DEBUG]
+ llama_perf_context_print:       total time =    1116.33 ms /   358 tokens
+llama_perf_context_print:    graphs reused =          0
+2025-07-31 18:24:29  [INFO]
+ Client disconnected: Error: read ECONNRESET
+2025-07-31 18:24:29 [DEBUG]
+ [Client=0994a8dc-e5f5-4652-8e02-1f191e5fc5d4] Client disconnected.
+```
+
+</document_content>
+</document>
+
+<document index="39">
 <source>pyproject.toml</source>
 <document_content>
 [build-system]
@@ -4052,7 +5931,7 @@ Issues = "https://github.com/twardoch/lmstrix/issues"
 Changelog = "https://github.com/twardoch/lmstrix/blob/main/CHANGELOG.md"
 
 [project.scripts]
-lmstrix = "lmstrix.cli.main:main"
+lmstrix = "lmstrix.__main__:main"
 
 [project.optional-dependencies]
 dev = [
@@ -4311,16 +6190,10 @@ directory = "htmlcov"
 
 from importlib.metadata import PackageNotFoundError, version
 from lmstrix.api.exceptions import ModelNotFoundError
-from lmstrix.utils.logging import logger
 from lmstrix.core.context_tester import ContextTester
-from lmstrix.utils.logging import logger
 from lmstrix.core.inference_manager import InferenceManager
-from lmstrix.utils.logging import logger
 from lmstrix.core.models import Model
-from lmstrix.utils.logging import logger
 from lmstrix.loaders.model_loader import (
-from lmstrix.utils.logging import logger
-
     load_model_registry,
     save_model_registry,
     scan_and_update_registry,
@@ -4328,7 +6201,6 @@ from lmstrix.utils.logging import logger
 from lmstrix.utils.context_parser import get_model_max_context, parse_out_ctx
 from lmstrix.utils.logging import logger
 from lmstrix._version import __version__
-from lmstrix.utils.logging import logger
 
 class LMStrix:
     """High-level interface to LMStrix's core features."""
@@ -4374,17 +6246,111 @@ def infer((
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/__main__.py
 # Language: python
 
-from lmstrix.cli.main import main
+import sys
+import fire
+from lmstrix.api.main import LMStrixService
+
+class LMStrixCLI:
+    """A thin CLI wrapper for LMStrix commands."""
+    def __init__((self)) -> None:
+        """Initialize the CLI with the service layer."""
+    def scan((self, failed: bool = False, reset: bool = False, verbose: bool = False)) -> None:
+        """Scan for LM Studio models and update the local registry."""
+    def list((self, sort: str = "id", show: str | None = None, verbose: bool = False)) -> None:
+        """List all models from the registry with their test status."""
+    def test((
+        self,
+        model_id: str | None = None,
+        all: bool = False,
+        reset: bool = False,
+        threshold: int = 31744,
+        ctx: int | None = None,
+        sort: str = "id",
+        fast: bool = False,
+        verbose: bool = False,
+    )) -> None:
+        """Test the context limits for models."""
+    def infer((
+        self,
+        prompt: str,
+        model_id: str | None = None,
+        out_ctx: int | str = -1,
+        in_ctx: int | str | None = None,
+        reload: bool = False,
+        file_prompt: str | None = None,
+        dict: str | None = None,
+        text: str | None = None,
+        text_file: str | None = None,
+        param_temp: float = 0.8,
+        param_top_k: int = 40,
+        param_top_p: float = 0.95,
+        param_repeat: float = 1.1,
+        param_min_p: float = 0.05,
+        verbose: bool = False,
+    )) -> None:
+        """Run inference on a specified model."""
+    def health((self, verbose: bool = False)) -> None:
+        """Check database health and backup status."""
+    def save((self, flash: bool = False, verbose: bool = False)) -> None:
+        """Save tested context limits to LM Studio concrete config files."""
+
+def __init__((self)) -> None:
+    """Initialize the CLI with the service layer."""
+
+def scan((self, failed: bool = False, reset: bool = False, verbose: bool = False)) -> None:
+    """Scan for LM Studio models and update the local registry."""
+
+def list((self, sort: str = "id", show: str | None = None, verbose: bool = False)) -> None:
+    """List all models from the registry with their test status."""
+
+def test((
+        self,
+        model_id: str | None = None,
+        all: bool = False,
+        reset: bool = False,
+        threshold: int = 31744,
+        ctx: int | None = None,
+        sort: str = "id",
+        fast: bool = False,
+        verbose: bool = False,
+    )) -> None:
+    """Test the context limits for models."""
+
+def infer((
+        self,
+        prompt: str,
+        model_id: str | None = None,
+        out_ctx: int | str = -1,
+        in_ctx: int | str | None = None,
+        reload: bool = False,
+        file_prompt: str | None = None,
+        dict: str | None = None,
+        text: str | None = None,
+        text_file: str | None = None,
+        param_temp: float = 0.8,
+        param_top_k: int = 40,
+        param_top_p: float = 0.95,
+        param_repeat: float = 1.1,
+        param_min_p: float = 0.05,
+        verbose: bool = False,
+    )) -> None:
+    """Run inference on a specified model."""
+
+def health((self, verbose: bool = False)) -> None:
+    """Check database health and backup status."""
+
+def save((self, flash: bool = False, verbose: bool = False)) -> None:
+    """Save tested context limits to LM Studio concrete config files."""
+
+def main(()) -> None:
+    """Main entry point for the CLI."""
 
 
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/api/__init__.py
 # Language: python
 
 from lmstrix.api.client import CompletionResponse, LMStudioClient
-from lmstrix.utils.logging import logger
 from lmstrix.api.exceptions import (
-from lmstrix.utils.logging import logger
-
     APIConnectionError,
     ConfigurationError,
     ContextLimitExceededError,
@@ -4393,11 +6359,13 @@ from lmstrix.utils.logging import logger
     ModelLoadError,
     ModelNotFoundError,
 )
+from lmstrix.utils.logging import logger
 
 
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py
 # Language: python
 
+import sys
 from typing import Any
 import lmstudio
 from lmstudio import LMStudioServerError
@@ -4430,10 +6398,15 @@ class LMStudioClient:
         llm: Any,  # The loaded model object from lmstudio.llm
         prompt: str,
         out_ctx: int = -1,  # -1 for unlimited
-        temperature: float = 0.7,  # Temperature for generation
+        temperature: float = 0.8,  # Temperature for generation (LM Studio default)
         model_id: str | None = None,  # Pass model_id separately
-        model_context_length: int
-        | None = None,  # Model's total context length for percentage calculation
+        model_context_length: (
+            int | None
+        ) = None,  # Model's total context length for percentage calculation
+        top_k: int = 40,  # topKSampling - controls token sampling diversity
+        top_p: float = 0.95,  # topPSampling - nucleus sampling
+        repeat_penalty: float = 1.1,  # repeatPenalty - penalty for repeated tokens
+        min_p: float = 0.05,  # minPSampling - minimum token probability threshold
         **kwargs: Any,  # Accept additional parameters
     )) -> CompletionResponse:
         """Make a completion request to a loaded LM Studio model."""
@@ -4464,10 +6437,15 @@ def completion((
         llm: Any,  # The loaded model object from lmstudio.llm
         prompt: str,
         out_ctx: int = -1,  # -1 for unlimited
-        temperature: float = 0.7,  # Temperature for generation
+        temperature: float = 0.8,  # Temperature for generation (LM Studio default)
         model_id: str | None = None,  # Pass model_id separately
-        model_context_length: int
-        | None = None,  # Model's total context length for percentage calculation
+        model_context_length: (
+            int | None
+        ) = None,  # Model's total context length for percentage calculation
+        top_k: int = 40,  # topKSampling - controls token sampling diversity
+        top_p: float = 0.95,  # topPSampling - nucleus sampling
+        repeat_penalty: float = 1.1,  # repeatPenalty - penalty for repeated tokens
+        min_p: float = 0.05,  # minPSampling - minimum token probability threshold
         **kwargs: Any,  # Accept additional parameters
     )) -> CompletionResponse:
     """Make a completion request to a loaded LM Studio model."""
@@ -4604,60 +6582,42 @@ def __init__((self, count: int)) -> None:
     """Initialize the exception."""
 
 
-# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/__init__.py
-# Language: python
-
-
-
-# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/cli/main.py
+# File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py
 # Language: python
 
 import json
+import sys
 import time
 from datetime import datetime
-import fire
+from pathlib import Path
 from rich.console import Console
 from rich.table import Table
 from lmstrix.api.exceptions import APIConnectionError, ModelRegistryError
-from lmstrix.utils.logging import logger
 from lmstrix.core.concrete_config import ConcreteConfigManager
-from lmstrix.utils.logging import logger
 from lmstrix.core.context_tester import ContextTester
-from lmstrix.utils.logging import logger
 from lmstrix.core.inference_manager import InferenceManager
-from lmstrix.utils.logging import logger
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
-from lmstrix.utils.logging import logger
 from lmstrix.loaders.model_loader import (
-from lmstrix.utils.logging import logger
-
     load_model_registry,
     scan_and_update_registry,
 )
+from lmstrix.loaders.prompt_loader import load_single_prompt
 from lmstrix.utils import get_context_test_log_path, setup_logging
-from lmstrix.utils.logging import logger
 from lmstrix.utils.context_parser import get_model_max_context, parse_out_ctx
 from lmstrix.utils.logging import logger
 from lmstrix.utils.paths import get_default_models_file, get_lmstudio_path
-from lmstrix.utils.logging import logger
 from lmstrix.utils.state import StateManager
-from lmstrix.utils.logging import logger
-from pathlib import Path
-from pathlib import Path
-from lmstrix.loaders.prompt_loader import load_single_prompt
-from lmstrix.utils.logging import logger
-import sys
 
-class LMStrixCLI:
-    """A CLI for testing and managing LM Studio models."""
-    def scan((self, failed: bool = False, reset: bool = False, verbose: bool = False)) -> None:
+class LMStrixService:
+    """Service layer for LMStrix operations."""
+    def scan_models((self, failed: bool = False, reset: bool = False, verbose: bool = False)) -> None:
         """Scan for LM Studio models and update the local registry."""
-    def list((self, sort: str = "id", show: str | None = None, verbose: bool = False)) -> None:
+    def list_models((self, sort: str = "id", show: str | None = None, verbose: bool = False)) -> None:
         """List all models from the registry with their test status."""
-    def test((
+    def test_models((
         self,
         model_id: str | None = None,
-        all: bool = False,
+        test_all: bool = False,
         reset: bool = False,
         threshold: int = 31744,
         ctx: int | None = None,
@@ -4666,7 +6626,7 @@ class LMStrixCLI:
         verbose: bool = False,
     )) -> None:
         """Test the context limits for models."""
-    def infer((
+    def run_inference((
         self,
         prompt: str,
         model_id: str | None = None,
@@ -4674,13 +6634,23 @@ class LMStrixCLI:
         in_ctx: int | str | None = None,
         reload: bool = False,
         file_prompt: str | None = None,
-        dict: str | None = None,
+        dict_params: str | None = None,
         text: str | None = None,
         text_file: str | None = None,
-        temperature: float = 0.7,
+        param_temp: float = 0.8,
+        param_top_k: int = 40,
+        param_top_p: float = 0.95,
+        param_repeat: float = 1.1,
+        param_min_p: float = 0.05,
         verbose: bool = False,
     )) -> None:
         """Run inference on a specified model."""
+    def check_health((self, verbose: bool = False)) -> None:
+        """Check database health and backup status."""
+    def save_configs((self, flash: bool = False, verbose: bool = False)) -> None:
+        """Save tested context limits to LM Studio concrete config files."""
+    def show_help((self)) -> None:
+        """Show comprehensive help text."""
 
 def _get_models_to_test((
     registry: ModelRegistry,
@@ -4722,16 +6692,16 @@ def _test_all_models_optimized((
 def _print_final_results((updated_models: list[Model])) -> None:
     """Print the final results table."""
 
-def scan((self, failed: bool = False, reset: bool = False, verbose: bool = False)) -> None:
+def scan_models((self, failed: bool = False, reset: bool = False, verbose: bool = False)) -> None:
     """Scan for LM Studio models and update the local registry."""
 
-def list((self, sort: str = "id", show: str | None = None, verbose: bool = False)) -> None:
+def list_models((self, sort: str = "id", show: str | None = None, verbose: bool = False)) -> None:
     """List all models from the registry with their test status."""
 
-def test((
+def test_models((
         self,
         model_id: str | None = None,
-        all: bool = False,
+        test_all: bool = False,
         reset: bool = False,
         threshold: int = 31744,
         ctx: int | None = None,
@@ -4741,7 +6711,7 @@ def test((
     )) -> None:
     """Test the context limits for models."""
 
-def infer((
+def run_inference((
         self,
         prompt: str,
         model_id: str | None = None,
@@ -4749,25 +6719,26 @@ def infer((
         in_ctx: int | str | None = None,
         reload: bool = False,
         file_prompt: str | None = None,
-        dict: str | None = None,
+        dict_params: str | None = None,
         text: str | None = None,
         text_file: str | None = None,
-        temperature: float = 0.7,
+        param_temp: float = 0.8,
+        param_top_k: int = 40,
+        param_top_p: float = 0.95,
+        param_repeat: float = 1.1,
+        param_min_p: float = 0.05,
         verbose: bool = False,
     )) -> None:
     """Run inference on a specified model."""
 
-def health((self, verbose: bool = False)) -> None:
+def check_health((self, verbose: bool = False)) -> None:
     """Check database health and backup status."""
 
-def save((self, flash: bool = False, verbose: bool = False)) -> None:
+def save_configs((self, flash: bool = False, verbose: bool = False)) -> None:
     """Save tested context limits to LM Studio concrete config files."""
 
-def show_help(()) -> None:
+def show_help((self)) -> None:
     """Show comprehensive help text."""
-
-def main(()) -> None:
-    """Main entry point for the CLI."""
 
 
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/core/__init__.py
@@ -4940,6 +6911,19 @@ class ContextTester:
         fast_mode: bool = False,
     )) -> None:
         """Initialize context tester."""
+    def _test_at_context((
+        self,
+        model_id: str,
+        context_size: int,
+    )) -> ContextTestResult:
+        """Test a model at a specific context size."""
+    def test_model((
+        self,
+        model_id: str,
+        min_context: int = 512,
+        max_context: int = 131072,
+    )) -> dict:
+        """Test a model to find its maximum working context."""
 
 def __init__((
         self,
@@ -4965,6 +6949,21 @@ def __init__((
         fast_mode: bool = False,
     )) -> None:
     """Initialize context tester."""
+
+def _test_at_context((
+        self,
+        model_id: str,
+        context_size: int,
+    )) -> ContextTestResult:
+    """Test a model at a specific context size."""
+
+def test_model((
+        self,
+        model_id: str,
+        min_context: int = 512,
+        max_context: int = 131072,
+    )) -> dict:
+    """Test a model to find its maximum working context."""
 
 
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py
@@ -5065,7 +7064,11 @@ class InferenceManager:
         prompt: str,
         in_ctx: int | None = None,
         out_ctx: int = -1,
-        temperature: float = 0.7,
+        temperature: float = 0.8,
+        top_k: int = 40,
+        top_p: float = 0.95,
+        repeat_penalty: float = 1.1,
+        min_p: float = 0.05,
         **kwargs: Any,
     )) -> dict[str, Any]:
         """Run inference on a model."""
@@ -5086,7 +7089,11 @@ def infer((
         prompt: str,
         in_ctx: int | None = None,
         out_ctx: int = -1,
-        temperature: float = 0.7,
+        temperature: float = 0.8,
+        top_k: int = 40,
+        top_p: float = 0.95,
+        repeat_penalty: float = 1.1,
+        min_p: float = 0.05,
         **kwargs: Any,
     )) -> dict[str, Any]:
     """Run inference on a model."""
@@ -5133,6 +7140,8 @@ class Model:
         """Alias for to_dict() for backward compatibility."""
     def reset_test_data((self)) -> None:
         """Reset all context testing data."""
+    def validate_integrity((self)) -> bool:
+        """Validate the model's integrity."""
     def sanitized_id((self)) -> str:
         """Return a sanitized version of the model ID for filenames."""
 
@@ -5194,6 +7203,9 @@ def to_registry_dict((self)) -> dict[str, Any]:
 
 def reset_test_data((self)) -> None:
     """Reset all context testing data."""
+
+def validate_integrity((self)) -> bool:
+    """Validate the model's integrity."""
 
 def sanitized_id((self)) -> str:
     """Return a sanitized version of the model ID for filenames."""
@@ -5296,6 +7308,22 @@ class PromptResolver:
         out_ctx: int | None = None,
     )) -> str:
         """Inject context into a prompt, with optional truncation."""
+    def _resolve_phase((
+        self,
+        template: str,
+        context: dict[str, Any],
+    )) -> tuple[str, list[str], list[str], list[str]]:
+        """Resolve placeholders in a single phase."""
+    def resolve_template((
+        self,
+        name: str,
+        template: str,
+        prompt_context: dict[str, Any],
+        runtime_context: dict[str, Any],
+    )) -> ResolvedPrompt:
+        """Resolve a template with both prompt and runtime contexts."""
+    def _count_tokens((self, text: str)) -> int:
+        """Count tokens in text."""
 
 class _SafeDict(d, i, c, t):
     """Dict that leaves unknown placeholders unchanged."""
@@ -5354,6 +7382,25 @@ def inject_context((
     )) -> str:
     """Inject context into a prompt, with optional truncation."""
 
+def _resolve_phase((
+        self,
+        template: str,
+        context: dict[str, Any],
+    )) -> tuple[str, list[str], list[str], list[str]]:
+    """Resolve placeholders in a single phase."""
+
+def resolve_template((
+        self,
+        name: str,
+        template: str,
+        prompt_context: dict[str, Any],
+        runtime_context: dict[str, Any],
+    )) -> ResolvedPrompt:
+    """Resolve a template with both prompt and runtime contexts."""
+
+def _count_tokens((self, text: str)) -> int:
+    """Count tokens in text."""
+
 
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/core/scanner.py
 # Language: python
@@ -5375,6 +7422,8 @@ class ModelScanner:
         """Scan for all models in LM Studio."""
     def update_registry((self, registry: ModelRegistry | None = None)) -> ModelRegistry:
         """Update model registry with scanned models."""
+    def sync_with_registry((self, registry: ModelRegistry)) -> tuple[list[str], list[str]]:
+        """Sync scanned models with registry."""
 
 def __init__((self)) -> None:
     """Initialize scanner."""
@@ -5390,6 +7439,9 @@ def scan_models((self)) -> dict[str, dict]:
 
 def update_registry((self, registry: ModelRegistry | None = None)) -> ModelRegistry:
     """Update model registry with scanned models."""
+
+def sync_with_registry((self, registry: ModelRegistry)) -> tuple[list[str], list[str]]:
+    """Sync scanned models with registry."""
 
 
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/__init__.py
@@ -5550,7 +7602,7 @@ def save_prompts((
     """Save prompts to a TOML file."""
 
 
-<document index="38">
+<document index="40">
 <source>src/lmstrix/py.typed</source>
 <document_content>
 # This file indicates that the package supports type hints
@@ -5728,6 +7780,7 @@ def mock_context_data(()) -> dict[str, str]:
 
 import subprocess
 import sys
+from lmstrix.utils.logging import logger
 
 def run_tests(()) -> int:
     """Run the test suite."""
@@ -5966,7 +8019,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 import pytest
-from pydantic import ValidationError
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 
 class TestContextTestStatus:
@@ -6270,7 +8322,7 @@ import json
 from pathlib import Path
 from unittest.mock import Mock, patch
 import pytest
-from lmstrix.cli.main import LMStrixCLI
+from lmstrix.__main__ import LMStrixCLI
 
 class TestCLIIntegration:
     """Test CLI integration - basic functionality only."""

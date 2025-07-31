@@ -331,7 +331,10 @@ class InferenceEngine:
                 )
 
                 # Find working context length
-                working_context = self._find_working_context(model.id, initial_context)
+                working_context = self._find_working_context(
+                    model.id,
+                    context_to_use or model.context_limit,
+                )
 
                 if working_context > 0:
                     # Update the model's tested context in the registry

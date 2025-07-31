@@ -65,7 +65,7 @@ Issues = "https://github.com/twardoch/lmstrix/issues"
 Changelog = "https://github.com/twardoch/lmstrix/blob/main/CHANGELOG.md"
 
 [project.scripts]
-lmstrix = "lmstrix.cli.main:main"
+lmstrix = "lmstrix.__main__:main"
 
 [project.optional-dependencies]
 dev = [

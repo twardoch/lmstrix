@@ -1,6 +1,67 @@
 # LMStrix TODO List
 
-## Immediate Priorities
+## CRITICAL: Issue #302 - Fix Inference Output Mismatch (Priority 0)
+
+### Diagnostic Investigation
+- [ ] Add detailed logging of exact prompt being sent to model
+- [ ] Log all inference parameters before sending request
+- [ ] Log stop tokens configuration
+- [ ] Add comparison mode to show differences from LM Studio defaults
+- [ ] Check if chat template is being applied incorrectly
+
+### Parameter Alignment  
+- [ ] Change default temperature from 0.7 to 0.8
+- [ ] Add CLI flags for all inference parameters (--top_k, --top_p, --min_p)
+- [ ] Add --repeat_penalty and --repeat_last_n flags
+- [ ] Add --stop_tokens flag to override defaults
+- [ ] Remove or make optional the maxTokens calculation (90% of context)
+
+### Context Length Fix
+- [ ] Fix context reduction from 131072 to 65536 issue
+- [ ] Use full model context unless explicitly limited by user
+- [ ] Add warning message when context is reduced
+- [ ] Ensure --in_ctx parameter works correctly
+
+### Stop Token Investigation
+- [ ] Investigate why model stops at `</translate>` 
+- [ ] Test with stop tokens disabled
+- [ ] Compare stop token handling with LM Studio
+- [ ] Add --no-stop-tokens flag for testing
+
+### Testing and Validation
+- [ ] Compare output with LM Studio for identical prompts
+- [ ] Ensure token counts match between lmstrix and LM Studio
+- [ ] Verify translation quality matches expected output
+- [ ] Create regression test for this issue
+
+## HIGH PRIORITY: Fix Test Suite Failures (After Issue #302)
+
+### Missing Methods - CRITICAL (COMPLETED)
+- [x] Add Model.validate_integrity() method to src/lmstrix/core/models.py
+- [x] Implement PromptResolver._resolve_phase() in src/lmstrix/core/prompts.py
+- [x] Implement PromptResolver.resolve_template() in src/lmstrix/core/prompts.py
+- [x] Implement PromptResolver._count_tokens() in src/lmstrix/core/prompts.py
+- [x] Add ContextTester._test_at_context() to src/lmstrix/core/context_tester.py
+- [x] Add ContextTester.test_model() to src/lmstrix/core/context_tester.py
+- [x] Implement ModelScanner.sync_with_registry() in src/lmstrix/core/scanner.py
+
+### Type/Format Errors - HIGH (COMPLETED)
+- [x] Fix Mock format string error in src/lmstrix/api/client.py:221
+- [x] Fix invalid format specifier in src/lmstrix/core/prompts.py:133
+- [x] Handle None/Mock values in logging format strings
+
+### Test Fixes - MEDIUM
+- [ ] Update Model initialization tests to provide required arguments
+- [ ] Fix path handling in ModelScanner for paths outside models directory
+- [ ] Fix JSON output in CLI list command
+- [ ] Update test expectations to match current implementation
+
+### Infrastructure - LOW
+- [ ] Fix loguru I/O closed file errors in tests
+- [ ] Address pkg_resources deprecation warnings
+- [ ] Configure pytest-golden in pytest.ini
+
+## Immediate Priorities (AFTER Issue #302 and test fixes)
 
 ### Issue #105 - Adam.toml Simplification (High Priority)
 - [ ] Simplify adam.toml structure to use flat format instead of nested groups

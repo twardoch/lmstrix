@@ -1,4 +1,5 @@
 """Concrete config manager for LM Studio model configurations."""
+
 # this_file: src/lmstrix/core/concrete_config.py
 
 import json

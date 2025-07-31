@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from lmstrix.cli.main import LMStrixCLI
+from lmstrix.__main__ import LMStrixCLI
 
 
 class TestCLIIntegration:
@@ -43,7 +43,7 @@ class TestCLIIntegration:
         assert hasattr(cli, "test")
         assert hasattr(cli, "infer")
 
-    @patch("lmstrix.cli.main.get_default_models_file")
+    @patch("lmstrix.api.main.get_default_models_file")
     def test_list_command(self, mock_get_file: Mock, mock_registry: Path, capsys) -> None:
         """Test list command shows models."""
         mock_get_file.return_value = mock_registry
@@ -55,7 +55,7 @@ class TestCLIIntegration:
         assert "test-model" in captured.out
         assert "3500" in captured.out  # tested context
 
-    @patch("lmstrix.cli.main.get_default_models_file")
+    @patch("lmstrix.api.main.get_default_models_file")
     def test_list_json_format(self, mock_get_file: Mock, mock_registry: Path, capsys) -> None:
         """Test list command with JSON output."""
         mock_get_file.return_value = mock_registry

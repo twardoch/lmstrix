@@ -4,6 +4,8 @@
 import subprocess
 import sys
 
+from lmstrix.utils.logging import logger
+
 
 def run_tests() -> int:
     """Run the test suite."""
