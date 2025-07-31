@@ -3,18 +3,32 @@
 from importlib.metadata import PackageNotFoundError, version
 
 from lmstrix.api.exceptions import ModelNotFoundError
+from lmstrix.utils.logging import logger
+
 from lmstrix.core.context_tester import ContextTester
+from lmstrix.utils.logging import logger
+
 from lmstrix.core.inference_manager import InferenceManager
+from lmstrix.utils.logging import logger
+
 from lmstrix.core.models import Model
+from lmstrix.utils.logging import logger
+
 from lmstrix.loaders.model_loader import (
+from lmstrix.utils.logging import logger
+
     load_model_registry,
     save_model_registry,
     scan_and_update_registry,
 )
 from lmstrix.utils.context_parser import get_model_max_context, parse_out_ctx
+from lmstrix.utils.logging import logger
+
 
 try:
     from lmstrix._version import __version__
+from lmstrix.utils.logging import logger
+
 except ImportError:
     try:
         __version__ = version("lmstrix")
@@ -57,7 +71,7 @@ class LMStrix:
         Example:
             >>> lms = LMStrix()
             >>> models = lms.scan()
-            >>> print(f"Found {len(models)} models")
+            >>> logger.info(f"Found {len(models)} models")
         """
         registry = scan_and_update_registry(verbose=self.verbose)
         return registry.list_models()
@@ -75,7 +89,7 @@ class LMStrix:
             >>> lms = LMStrix()
             >>> models = lms.list_models()
             >>> for model in models:
-            ...     print(f"{model.id}: {model.context_test_status}")
+            ...     logger.info(f"{model.id}: {model.context_test_status}")
         """
         registry = load_model_registry(verbose=self.verbose)
         return registry.list_models()
@@ -100,7 +114,7 @@ class LMStrix:
         Example:
             >>> lms = LMStrix()
             >>> model = lms.test_model("llama-model-id")
-            >>> print(f"Max context: {model.tested_max_context} tokens")
+            >>> logger.info(f"Max context: {model.tested_max_context} tokens")
         """
         registry = load_model_registry(verbose=self.verbose)
         model = registry.get_model(model_id)

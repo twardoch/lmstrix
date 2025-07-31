@@ -4,8 +4,7 @@
 import json
 from pathlib import Path
 
-from loguru import logger
-
+from lmstrix.utils.logging import logger
 from lmstrix.utils.paths import get_lmstudio_path
 
 

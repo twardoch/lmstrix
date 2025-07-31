@@ -3,12 +3,12 @@
 import json
 from pathlib import Path
 
-from loguru import logger
 from pydantic import BaseModel, Field
 
 from lmstrix.api.client import LMStudioClient
 from lmstrix.api.exceptions import InferenceError, ModelLoadError
 from lmstrix.core.models import Model
+from lmstrix.utils.logging import logger
 
 
 class OptimizationResult(BaseModel):

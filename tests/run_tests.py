@@ -7,8 +7,8 @@ import sys
 
 def run_tests() -> int:
     """Run the test suite."""
-    print("Running LMStrix test suite...")
-    print("-" * 50)
+    logger.info("Running LMStrix test suite...")
+    logger.info("-" * 50)
 
     # Run pytest with coverage
     cmd = [
@@ -23,9 +23,9 @@ def run_tests() -> int:
     result = subprocess.run(cmd, check=True)  # noqa: S603
 
     if result.returncode == 0:
-        print("\n✅ All tests passed!")
+        logger.info("\n✅ All tests passed!")
     else:
-        print("\n❌ Some tests failed.")
+        logger.info("\n❌ Some tests failed.")
 
     return result.returncode
 

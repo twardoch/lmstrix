@@ -2,9 +2,8 @@
 
 from pathlib import Path
 
-from loguru import logger
-
 from lmstrix.api.exceptions import LMStudioInstallationNotFoundError
+from lmstrix.utils.logging import logger
 
 
 def get_lmstudio_path() -> Path:

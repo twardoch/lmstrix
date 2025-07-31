@@ -2,10 +2,9 @@
 
 from pathlib import Path
 
-from loguru import logger
-
 from lmstrix.core.models import Model, ModelRegistry
 from lmstrix.utils import get_lmstudio_path
+from lmstrix.utils.logging import logger
 
 
 class ModelScanner:

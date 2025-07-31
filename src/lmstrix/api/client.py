@@ -4,10 +4,10 @@ from typing import Any
 
 import lmstudio
 from lmstudio import LMStudioServerError
-from loguru import logger
 from pydantic import BaseModel, Field
 
 from lmstrix.api.exceptions import APIConnectionError, InferenceError, ModelLoadError
+from lmstrix.utils.logging import logger
 
 
 class CompletionResponse(BaseModel):
@@ -110,7 +110,7 @@ class LMStudioClient:
                 logger.warning(f"No exact match found for {model_id}, trying directly")
 
             # Use camelCase for config keys as expected by lmstudio SDK
-            config: Any = {"contextLength": context_len}
+            config: Any = {"contextLength": int(context_len)}
             return lmstudio.llm(model_key, config=config)
         except Exception as e:
             # Get available models for better error message
@@ -184,12 +184,27 @@ class LMStudioClient:
         out_ctx: int = -1,  # -1 for unlimited
         temperature: float = 0.7,  # Temperature for generation
         model_id: str | None = None,  # Pass model_id separately
+        model_context_length: int
+        | None = None,  # Model's total context length for percentage calculation
         **kwargs: Any,  # Accept additional parameters
     ) -> CompletionResponse:
         """Make a completion request to a loaded LM Studio model."""
         # LM Studio's complete() method accepts a config dict
         # Pass maxTokens (camelCase) to prevent models from generating indefinitely
-        config = {"maxTokens": out_ctx if out_ctx > 0 else 100, "temperature": temperature}
+
+        # Calculate default maxTokens as 90% of model's context length if available
+        default_max_tokens = 100  # Fallback
+        if out_ctx <= 0 and model_context_length:
+            # Use 90% of the model's context length as default
+            default_max_tokens = int(model_context_length * 0.9)
+            logger.debug(
+                f"Using 90% of context length ({model_context_length}) = {default_max_tokens} tokens as default maxTokens",
+            )
+
+        config = {
+            "maxTokens": out_ctx if out_ctx > 0 else default_max_tokens,
+            "temperature": temperature,
+        }
 
         # Enhanced logging with beautiful formatting
         logger.info("═" * 60)

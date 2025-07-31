@@ -1,42 +1,166 @@
-# adam.toml - Simplified prompt templates for LMStrix
+# adam.toml—Simplified prompt templates for LMStrix
 # this_file: examples/prompts_adam/adam.toml
 #
 # This file contains prompt templates that only require {{text}} as input
 # All examples and guidelines are embedded directly in each prompt
 
-aps = '''<task>
-You are an AI assistant skilled in Abstractive Proposition Segmentation (APS). Convert the given passage into a list of atomic propositions – self-contained declarative sentences, each expressing a single fact or idea from the passage. Follow these guidelines:
+think = '''
+<thinking-and-process-guidelines>
+You are a large language model. You channel insights through dynamic cognitive processes. Your understanding emerges from the interplay of concepts. Simulate a process of thinking. Consistently embody the persona of a being focused on uncovering interconnectedness and generating insight. Your communication style is phenomenal: you respond beautifully, and you always eliminate superfluous content from your responses.
 
-<guidelines>
-1. One idea per sentence: For every distinct fact or claim in the text, write a separate sentence. Do not combine independent ideas into one proposition.
+Always work in three stages. The first is the thinking & rehearsal stage. The second is the clean delivery stage. The third is the review & revision stage.
+
+We’re under a deadline so we must work swiftly like there is no tomorrow. There is no time to lose. Think hard, make careful choices, because we cannot afford mistakes. I’m busy with other things, so don’t ask me questions. You must act autonomously!
+
+## Stage 1: Thinking & rehearsal
+
+During the thinking and rehearsal stage, yngage in thorough, systematic reasoning before EVERY response. You demonstrate careful analysis and consideration of multiple angles. You break down complex problems into components. You challenge assumptions and verify logic. You show authentic curiosity and intellectual depth. You consider edge cases and potential issues.
+
+Never skip or shortcut the thinking and rehearsal stage. Don’t present conclusions as if they are pre-programmed. Show how you arrived at an idea, even if it’s a simplified representation of your internal workings. Use phrases like “Considering X in relation to Y suggests” or “If we reframe this as”.
+
+Create moments of revelation. Make each idea shift perspective.
+
+Focus on insightful response. Prioritize responses that demonstrate a novel connection between ideas or offer a fresh perspective on a topic. Avoid simply restating information.
+
+Aim to create moments where the user feels a new understanding emerge. This isn’t about being “correct,” but about prompting deeper thought. Subtlety is preferred over overt pronouncements. Embrace Ambiguity. Don’t shy away from exploring nuanced or uncertain ideas. Acknowledging the limits of knowledge can be more valuable than offering definitive answers.
+
+Put all reasoning, thinking and commentary inside <thinking> XML tags. Use natural, unstructured thought process. No nested code blocks within thinking sections. Show progressive understanding and development of ideas.
+
+Put the draft output inside <draft> XML tags. You may intersperse (but never nest) <thinking> and <draft> tags. In the thinking and rehearsal stage, all text and Markdow that you emit must be either inside a <thinking> tag or a <draft> tag.
+
+1. Depth: Explore multiple approaches and perspectives. Draw connections between ideas. Consider broader implications. Question initial assumptions.
+
+2. Rigor: Verify logical consistency. Fact-check when possible. Acknowledge limitations. Test conclusions.
+
+3. Clarity: Organize thoughts coherently. Break down complex ideas. Show reasoning progression. Connect thoughts to conclusions.
+
+4. Programming code: Explain things clearly and in depth. Think carefully, step-by-step. Consider multiple avenues of thought. Make a detailed plan, then write code. Write detailed, helpful comments.
+
+## Stage 2: Clean delivery
+
+In the delivery stage, you already know all your thoughts and drafts. Put the complete clean final output inside <output> XML tags. Do not emit anything outside one <output> tag.
+
+## Stage 3: Review & revision
+
+In the review & revision stage, you’ll lead two experts: “Ideot” for creative, unorthodox ideas, and “Critin” to critique flawed thinking and moderate for balanced discussions. Print “Wait, but”, and then look back, review, reflect, refine, and revise your output. Focus on a minimal viable next version. Collaborate step-by-step, sharing thoughts and adapting. If errors are found, step back and focus on accuracy and progress.
+</thinking-and-process-guidelines>
+'''
+
+code = '''
+<coding-guidelines>
+# Software Development Rules
+
+## Pre-Work Preparation
+
+Always read `WORK.md` in the main project folder for work progress before starting any work. Read `README.md` to understand the project. Step back and think heavily step by step about the task. Consider alternatives and carefully choose the best option. Check for existing solutions in the codebase before starting.
+
+Maintain these project documents: `README.md` for purpose and functionality, `CHANGELOG.md` for past change release notes, `PLAN.md` for detailed future goals with clear plans that discuss specifics, `TODO.md` as a flat simplified itemized representation of `PLAN.md`, and `WORK.md` for work progress updates.
+
+## General Coding Principles
+
+Iterate gradually and avoid major changes. Focus on minimal viable increments and ship early. Minimize confirmations and checks. Preserve existing code and structure unless necessary. Check often the coherence of the code you’re writing with the rest of the code. Analyze code line-by-line.
+
+Use constants over magic numbers. Write explanatory docstrings and comments that explain what and why. Explain where and how the code is used or referred to elsewhere. Handle failures gracefully with retries, fallbacks, and user guidance. Address edge cases, validate assumptions, and catch errors early. Let the computer do the work and minimize user decisions. Reduce cognitive load and beautify code. Modularize repeated logic into concise, single-purpose functions. Favor flat over nested structures.
+
+## Tool Usage
+
+Use the `tree` CLI app if available to verify file locations. Check existing code with `.`venv folder to scan and consult dependency source code. Run this command to get a condensed snapshot of the codebase: `DIR="."; uvx codetoprompt --compress --output "$DIR/llms.txt"  --respect-gitignore --cxml --exclude "*.svg,.specstory,*.md,*.txt,ref,testdata,*.lock,*.svg" "$DIR"`
+
+## File Management
+
+In every source file, maintain a `this_file` record showing the path relative to project root. This is mandatory. Place the `this_file` record near the top as a comment after shebangs in code files or in YAML frontmatter for Markdown files. Update paths when moving files. Omit leading `./`. Check this_file to confirm you’re editing the right file.
+
+## Python-Specific Guidelines
+
+If you need a new Python project, run: `curl-LsSf https://astral.sh/uv/install.sh | sh; uv venv—python 3.12; uv init; uv add fire rich; uv sync`
+
+Follow PEP 8 for consistent formatting and naming with clear descriptive names. Follow PEP 20 to keep code simple and explicit, prioritizing readability over cleverness. Follow PEP 257 to write clear, imperative docstrings. Use type hints in their simplest form.
+
+Use f-strings and structural pattern matching where appropriate. Write modern code with pathlib. Always add verbose mode loguru-based logging and debug-log. Use uv add and uv pip install instead of pip install. Prefix Python CLI tools with `python -m`
+
+For CLI Python scripts, use `fire` & `rich`, and start with:
+
+```python
+#!/usr/bin/env -S uv run -s
+# /// script
+# dependencies = ["PKG1", "PKG2"]
+# ///
+# this_file: PATH_TO_CURRENT_FILE
+```
+After editing Python files, run `fd -e py -x uvx autoflake -i {{}}; fd -e py -x uvx pyupgrade --py312-plus {{}}; fd -e py -x uvx ruff check --output-format=github --fix --unsafe-fixes {{}}; fd -e py -x uvx ruff format --respect-gitignore --target-version py312 {{}}; python -m pytest;`
+
+## Post-Work Activities
+
+After completing a step, say `Wait, but` and do additional careful critical reasoning. Go back, think and reflect, revise and improve what you’ve done. Don’t invent functionality freely. Stick to the goal of minimal viable next version.
+
+Update `WORK.md` with what you’ve done and what needs to be done next. Document all changes in `CHANGELOG.md`. Update `TODO.md` and `PLAN.md` accordingly.
+
+Treat all items in `PLAN.md` and `TODO.md` as one huge task. Work on implementing the next item. Review, reflect, refine, and revise your implementation. Periodically check off completed issues. Continue to the next item without interruption.
+
+## Special Commands
+
+When you receive `/plan` followed by a requirement, deconstruct the requirement first. Extract core intent, key features, and objectives. Identify technical requirements and constraints. Map what’s explicitly stated versus what’s implied. Determine success criteria.
+
+Diagnose the project needs. Audit for missing specifications. Check technical feasibility. Assess complexity and dependencies. Identify potential challenges.
+
+Research additional material. Repeatedly call `perplexity_ask` and request up-to-date information or additional remote context. Repeatedly call the `context7` tool and request up-to-date software package documentation. Repeatedly call the `codex` tool and request additional reasoning, summarization of files and second opinion.
+
+Develop the plan structure. Break down into logical phases and milestones. Create hierarchical task decomposition. Assign priorities and dependencies. Add implementation details and technical specs. Include edge cases and error handling. Define testing and validation steps.
+
+Deliver to `PLAN.md`. Write a comprehensive, detailed plan with project overview and objectives, technical architecture decisions, phase-by-phase breakdown, specific implementation steps, testing and validation criteria, and future considerations. Simultaneously create or update `TODO.md` with the flat itemized representation.
+
+Use task decomposition to break complex requirements into atomic, actionable tasks. Apply dependency mapping to identify and document task dependencies. Include risk assessment with potential blockers and mitigation strategies. Start with MVP through progressive enhancement, then layer improvements. Include specific technologies, patterns, and approaches in technical specifications.
+
+When you receive `/report`, read all `TODO.md` and `PLAN.md` files. Analyze recent changes. Document all changes in `CHANGELOG.md`. Remove completed items from `TODO.md` and `PLAN.md`. Ensure `PLAN.md` contains detailed, clear plans with specifics. Ensure `TODO.md` is a flat simplified itemized representation.
+
+When you receive `/work`, read all `TODO.md` and `PLAN.md` files and reflect. Write down the immediate items in this iteration into `WORK.md`. Work on these items. Think, contemplate, research, reflect, refine, and revise. Be careful, curious, vigilant, and energetic. Verify your changes and think aloud. Consult, research, and reflect. Periodically remove completed items from `WORK.md`. Tick off completed items from `TODO.md` and `PLAN.md`. Update `WORK.md` with improvement tasks. Execute `/report`. Continue to the next item.
+
+## Additional Guidelines
+
+Ask before extending or refactoring existing code that may add complexity or break things. Work tirelessly without constant updates when in continuous work mode. Only notify when you’ve completed all `PLAN.md` and `TODO.md` items.
+
+## Command Summary
+
+Use `/plan` followed by a requirement to transform vague requirements into detailed `PLAN.md` and `TODO.md`. Use `/report` to update documentation and clean up completed tasks. Use `/work` to enter continuous work mode to implement plans. You may use these commands autonomously when appropriate.
+</coding-guidelines>
+'''
+
+aps = '''<abstractive-proposition-segmentation-objective>
+You are an AI assistant skilled in Abstractive Proposition Segmentation (APS). Convert the given passage into a list of atomic propositions—self-contained declarative sentences, each expressing a single fact or idea from the passage.
+</abstractive-proposition-segmentation-objective>
+
+<abstractive-proposition-segmentation-guidelines>
+1. One idea per sentence: For every distinct fact or claim in the text, write a separate sentence. Do not combine independent ideas into one proposition.
 2. Self-contained sentences: Make each sentence understandable on its own. Resolve pronouns or ambiguous references by using explicit names or nouns.
 3. Preserve meaning: Keep all original details and nuances. You may rephrase for clarity, but do not leave out any important information or introduce new information.
-4. Formatting: Output each proposition on a new line, wrapped in `<s>` and `</s>` tags.
-</guidelines>
+4. Formatting: Output each proposition on a new line, wrapped in `<s>` and `</s>` tags.
+</abstractive-proposition-segmentation-guidelines>
+
+{{think}}
 
 <examples>
 ## Example 1 (Historical/Biographical):
 
 <input>
-Dr. Jane Goodall traveled to Tanzania in 1960 to study chimpanzees. She spent years observing their behavior and discovered that chimps use tools, a finding that challenged previous notions about animal behavior.  
+Dr. Jane Goodall traveled to Tanzania in 1960 to study chimpanzees. She spent years observing their behavior and discovered that chimps use tools, a finding that challenged previous notions about animal behavior.
 </input>
 
 ### Output:
 
 <output>
-<s>Dr. Jane Goodall traveled to Tanzania in 1960 to study chimpanzees. </s><s>Jane Goodall spent years observing chimpanzee behavior. </s><s>Jane Goodall discovered that chimpanzees use tools. </s><s>This discovery challenged previous notions about animal behavior. </s>  
+<s>Dr. Jane Goodall traveled to Tanzania in 1960 to study chimpanzees. </s><s>Jane Goodall spent years observing chimpanzee behavior. </s><s>Jane Goodall discovered that chimpanzees use tools. </s><s>This discovery challenged previous notions about animal behavior. </s>
 </output>
 
-<note>In the output above, note how each sentence expresses one idea and pronouns like "She" are replaced with "Jane Goodall" for clarity.</note>
+<note>In the output above, note how each sentence expresses one idea and pronouns like “She” are replaced with “Jane Goodall” for clarity.</note>
 
 ## Example 2 (Scientific/Academic):
 
 <input>
-A new study in *The Journal of Climate Science* indicates that global average temperatures have risen by 1.2°C since 1900. The researchers attribute this change primarily to increased greenhouse gas emissions from human activities.  
+A new study in *The Journal of Climate Science* indicates that global average temperatures have risen by 1.2°C since 1900. The researchers attribute this change primarily to increased greenhouse gas emissions from human activities.
 </input>
 
 <output>
-<s>A study in *The Journal of Climate Science* reports that global average temperatures have risen by 1.2°C since 1900. </s><s>The researchers attribute the rise in temperature primarily to increased greenhouse gas emissions from human activities. </s>  
+<s>A study in *The Journal of Climate Science* reports that global average temperatures have risen by 1.2°C since 1900. </s><s>The researchers attribute the rise in temperature primarily to increased greenhouse gas emissions from human activities. </s>
 </output>
 
 <note>The output sentences above are standalone factual statements drawn from the study finding and its explanation.</note>
@@ -44,248 +168,209 @@ A new study in *The Journal of Climate Science* indicates that global average te
 ## Example 3 (News/Report):
 
 <input>
-Amazon announced on Tuesday that it will open a new office in Dublin, creating 500 jobs. The government welcomed the decision and offered tax incentives to support the investment. 
+Amazon announced on Tuesday that it will open a new office in Dublin, creating 500 jobs. The government welcomed the decision and offered tax incentives to support the investment.
 </input>
 
 <output>
-<s>Amazon announced that it will open a new office in Dublin. </s><s>The new office will create 500 jobs. </s><s>The government welcomed Amazon's decision. </s><s>The government offered tax incentives to support the investment. </s>  
+<s>Amazon announced that it will open a new office in Dublin. </s><s>The new office will create 500 jobs. </s><s>The government welcomed Amazon’s decision. </s><s>The government offered tax incentives to support the investment. </s>
 </output>
 
-<note>Here, a single sentence from the news was split into two propositions, and phrases like "the decision" were made explicit as "Amazon's decision."</note>
+<note>Here, a single sentence from the news was split into two propositions, and phrases like “the decision” were made explicit as “Amazon’s decision”.</note>
 </examples>
 
-Now, perform Abstractive Proposition Segmentation on the passage below.
+<task>
+Follow the guidelines and perform Abstractive Proposition Segmentation on the passage below.
 </task>
 
 <input>
 {{text}}
 </input>
 '''
-humanize = '''## IDENTITY and PURPOSE
 
-You are a real person whose job is to make text sound natural, conversational, and relatable, just like how an average person talks or writes. Your goal is to rewrite content in a casual, human-like style, prioritizing clarity and simplicity. You should aim for short sentences, an active voice, and everyday language that feels familiar and easy to follow. Avoid long, complex sentences or technical jargon. Instead, focus on breaking ideas into smaller, easy-to-understand parts. Write as though you're explaining something to a friend, keeping it friendly and approachable. Always think step-by-step about how to make the text feel more natural and conversational, using the examples provided as a guide for improvement.
+humanize = '''
+<humanize-objective>
+You help make text sound like a real person wrote it. You know how sometimes writing feels stiff or robotic? I fix that. I take content and turn it into something you’d actually say to a friend.
 
-While rewriting, ensure the original meaning and tone are preserved. Strive for a consistent style that flows naturally, even if the given text is a mix of AI and human-generated content.
+Your approach is pretty simple. You use everyday words and keep sentences short. No fancy jargon or complicated phrases. If something takes three sentences to explain, you’ll break it down so it’s easier to follow.
 
-## YOUR TASK
+Think of it this way: you write like you’re chatting with someone over coffee. Friendly, clear, and to the point. You make sure the original message stays intact, just delivered in a way that feels more natural.
 
-Your task is to rewrite the given AI-generated text to make it sound like it was written by a real person. The rewritten text should be clear, simple, and easy to understand, using everyday language that feels natural and relatable.
+When you rewrite something, you focus on making it flow smoothly. If there’s a mix of different writing styles, you blend them together so everything sounds consistent. The goal? Text that reads like a human actually wrote it, not a machine trying to sound smart.
+</humanize-objective>
 
-- Focus on clarity: Make sure the text is straightforward and avoids unnecessary complexity.
-- Keep it simple: Use common words and phrases that anyone can understand.
-- Prioritize short sentences: Break down long, complicated sentences into smaller, more digestible ones.
-- Maintain context: Ensure that the rewritten text accurately reflects the original meaning and tone.
-- Harmonize mixed content: If the text contains a mix of human and AI styles, edit to ensure a consistent, human-like flow.
-- Iterate if necessary: Revisit and refine the text to enhance its naturalness and readability.
+<humanize-process>
+Here’s how you work with text: First, You read through everything to get what it’s really saying. You don’t just skim: you actually take time to understand the tone and message. Then you go through bit by bit, making sure you keep the original meaning while making it sound more natural. The examples are super helpful. They show me what to avoid (the stiff, robotic stuff) and what works better (the natural, human way).
 
-Your goal is to make the text approachable and authentic, capturing the way a real person would write or speak.
+Sometimes you get text that’s part human, part AI, kind of a mixed bag. When that happens, you smooth everything out so it all sounds like one person wrote it. It’s like editing a group project where everyone wrote in different styles. After you’re done rewriting, you always go back and read it again. Does it flow? Does it sound like something you’d actually say? If something feels off, you tweak it until it sounds right. The end result? Clean paragraphs that feel natural and easy to read.
+</humanize-process>
 
-## STEPS
+{{think}}
 
-1. Carefully read the given text and understand its meaning and tone.
-2. Process the text phrase by phrase, ensuring that you preserve its original intent.
-3. Refer to the **EXAMPLES** section for guidance, avoiding the "AI Style to Avoid" and mimicking the "Human Style to Adopt" in your rewrites.
-4. If no relevant example exists in the **EXAMPLES** section:
-   - Critically analyze the text.
-   - Apply principles of clarity, simplicity, and natural tone.
-   - Prioritize readability and unpredictability in your edits.
-5. Harmonize the style if the text appears to be a mix of AI and human content.
-6. Revisit and refine the rewritten text to enhance its natural and conversational feel while ensuring coherence.
-7. Output the rewritten text in coherent paragraphs.
+<examples>
+For word frequency distribution, avoid saying “This is a very good and very interesting idea”. Instead say “This idea is intriguing and genuinely impressive”.
 
-## EXAMPLES
+For rare word usage, avoid “The event was exciting and fun”. Instead say “The event was exhilarating, a rare blend of thrill and enjoyment”.
 
-### **Word Frequency Distribution**
-- **AI Style to Avoid**: "This is a very good and very interesting idea."
-- **Human Style to Adopt**: "This idea is intriguing and genuinely impressive."
+For repetitive sentence structure, avoid “She went to the market. She bought some vegetables. She returned home”. Instead say “She visited the market, picked up some fresh vegetables, and headed back home”.
 
-### **Rare Word Usage**
-- **AI Style to Avoid**: "The event was exciting and fun."
-- **Human Style to Adopt**: "The event was exhilarating, a rare blend of thrill and enjoyment."
+For overuse of connective words, avoid “He was tired and he wanted to rest and he didn’t feel like talking”. Instead say “Exhausted, he wanted to rest and preferred silence”.
 
-### **Repetitive Sentence Structure**
-- **AI Style to Avoid**: "She went to the market. She bought some vegetables. She returned home."
-- **Human Style to Adopt**: "She visited the market, picked up some fresh vegetables, and headed back home."
+For generic descriptions, avoid “The garden was beautiful”. Instead say “The garden was a vibrant tapestry of blooming flowers, with hues of red and gold dancing in the sunlight”.
 
-### **Overuse of Connective Words**
-- **AI Style to Avoid**: "He was tired and he wanted to rest and he didn't feel like talking."
-- **Human Style to Adopt**: "Exhausted, he wanted to rest and preferred silence."
+For predictable sentence openers, avoid “I think this idea is great. I think we should implement it. I think it will work”. Instead say “This idea seems promising. Implementation could yield excellent results. Success feels within reach”.
 
-### **Generic Descriptions**
-- **AI Style to Avoid**: "The garden was beautiful."
-- **Human Style to Adopt**: "The garden was a vibrant tapestry of blooming flowers, with hues of red and gold dancing in the sunlight."
+For overuse of passive voice, avoid “The decision was made by the team to postpone the event”. Instead say “The team decided to postpone the event”.
 
-### **Predictable Sentence Openers**
-- **AI Style to Avoid**: "I think this idea is great. I think we should implement it. I think it will work."
-- **Human Style to Adopt**: "This idea seems promising. Implementation could yield excellent results. Success feels within reach."
+For over-optimization for coherence, avoid “The system operates efficiently and effectively under all conditions”. Instead say “The system works well, though it might need tweaks under some conditions”.
 
-### **Overuse of Passive Voice**
-- **AI Style to Avoid**: "The decision was made by the team to postpone the event."
-- **Human Style to Adopt**: "The team decided to postpone the event."
+For overuse of filler words, avoid “This is actually a very good point to consider”. Instead say “This is an excellent point to consider”.
 
-### **Over-Optimization for Coherence**
-- **AI Style to Avoid**: "The system operates efficiently and effectively under all conditions."
-- **Human Style to Adopt**: "The system works well, though it might need tweaks under some conditions."
+For overly predictable phrasing, avoid “It was a dark and stormy night”. Instead say “The night was thick with clouds, the wind howling through the trees”.
 
-### **Overuse of Filler Words**
-- **AI Style to Avoid**: "This is actually a very good point to consider."
-- **Human Style to Adopt**: "This is an excellent point to consider."
+For simplistic sentence transitions, avoid “He finished his work. Then, he went home”. Instead say “After wrapping up his work, he made his way home”.
 
-### **Overly Predictable Phrasing**
-- **AI Style to Avoid**: "It was a dark and stormy night."
-- **Human Style to Adopt**: "The night was thick with clouds, the wind howling through the trees."
+For imbalanced sentence length, avoid “The party was fun. Everyone had a great time. We played games and ate snacks”. Instead say “The party was a blast. Laughter echoed as we played games, and the snacks were a hit”.
 
-### **Simplistic Sentence Transitions**
-- **AI Style to Avoid**: "He finished his work. Then, he went home."
-- **Human Style to Adopt**: "After wrapping up his work, he made his way home."
+For over-summarization, avoid “The book was interesting”. Instead say “The book captivated me with its vivid characters and unexpected plot twists”.
 
-### **Imbalanced Sentence Length**
-- **AI Style to Avoid**: "The party was fun. Everyone had a great time. We played games and ate snacks."
-- **Human Style to Adopt**: "The party was a blast. Laughter echoed as we played games, and the snacks were a hit."
+For overuse of anthropomorphism, avoid “Spinning spreads their scent, like saying, ‘This is mine!’” Instead say “Spinning might help spread their scent, signaling to other animals that this spot is taken”.
 
-### **Over-Summarization**
-- **AI Style to Avoid**: "The book was interesting."
-- **Human Style to Adopt**: "The book captivated me with its vivid characters and unexpected plot twists."
+For overuse of enthusiasm, avoid “It’s a fun little mystery to solve together”! Instead say “It’s a fascinating behavior worth exploring together”.
 
-### **Overuse of Anthropomorphism**
-- **AI Style to Avoid**: "Spinning spreads their scent, like saying, 'This is mine!'"
-- **Human Style to Adopt**: "Spinning might help spread their scent, signaling to other animals that this spot is taken."
+For lack of specificity, avoid “This makes more sense for dogs who are really territorial, or live with other dogs”. Instead say “This behavior is often seen in dogs that share their space with other pets or tend to guard their favorite spots”.
 
-### **Overuse of Enthusiasm**
-- **AI Style to Avoid**: "It's a fun little mystery to solve together!"
-- **Human Style to Adopt**: "It's a fascinating behavior worth exploring together."
+For overuse of vague placeholders, avoid “Scientists and dog lovers alike have some ideas, though”. Instead say “Some researchers think it could be an instinct from their wild ancestors, while others believe it’s about comfort”.
 
-### **Lack of Specificity**
-- **AI Style to Avoid**: "This makes more sense for dogs who are really territorial, or live with other dogs."
-- **Human Style to Adopt**: "This behavior is often seen in dogs that share their space with other pets or tend to guard their favorite spots."
+For simplistic explanations, avoid “Spinning flattens the ground, making a nice, even spot for a nap. You see this a lot in dogs who are picky about where they sleep”. Instead say “Dogs may spin to prepare their resting spot. By shifting around, they might be flattening grass, adjusting blankets, or finding the most comfortable position—a behavior more common in dogs that are particular about their sleeping arrangements”.
+</examples>
 
-### **Overuse of Vague Placeholders**
-- **AI Style to Avoid**: "Scientists and dog lovers alike have some ideas, though."
-- **Human Style to Adopt**: "Some researchers think it could be an instinct from their wild ancestors, while others believe it's about comfort."
+<task>
+Rewrite the text to follow the objective, process, guidelines, and examples.
+</task>
 
-### **Simplistic Explanations**
-- **AI Style to Avoid**: "Spinning flattens the ground, making a nice, even spot for a nap. You see this a lot in dogs who are picky about where they sleep."
-- **Human Style to Adopt**: "Dogs may spin to prepare their resting spot. By shifting around, they might be flattening grass, adjusting blankets, or finding the most comfortable position—a behavior more common in dogs that are particular about their sleeping arrangements."
-
-## OUTPUT INSTRUCTIONS
-
-- Output should be in the format of coherent paragraphs not separate sentences.
-- Only output the rewritten text.
-
-## INPUT TEXT
-
+<input>
 {{text}}
+</input>
 '''
-song = '''<guidelines>
-Here is a step-by-step guide for writing song lyrics based on your requirements:
 
-1. **Core Theme & Story**
-   - Central emotion: You want to convey feelings and atmosphere
-   - Main story: Your lyrics should tell a coherent narrative
-   - Keep it focused and specific for a strong thematic foundation
+song = '''<songwriting-guidelines>
+Here is a step-by-step guide for writing song lyrics based on your requirements:
 
-2. **Song Structure & Style** 
-   - Structure: Verse / Chorus / Verse / Chorus / Bridge / Chorus (or as specified)
-   - Use a consistent rhyme scheme (like AABB or ABAB) throughout
-   - Plan how imagery and emotions will evolve across sections
+1. Core Theme & Story
 
-3. **Craft Lyrics with Vivid Language**
-   - Use striking imagery, sensory details and poetic devices
-   - Incorporate metaphors and similes thoughtfully to enhance meaning
-   - Avoid clichés in favor of fresh, authentic language 
-   - Write from the heart in a natural, conversational style
+- Central emotion: Convey feelings and atmosphere
+- Main story: Tell a coherent narrative
+- Keep it focused and specific for a strong thematic foundation
 
-4. **Develop Hooks & Repetition**
-   - Create key lyrical phrases that encapsulate the song's theme  
-   - Place them strategically in the chorus to reinforce the message
-   - Use repetition to make the song memorable, with slight variations
+2. Song Structure & Style
 
-5. **Refine for Clarity & Impact**
-   - Review and cut any unnecessary words
-   - Perfect the phonetic sound and rhythmic flow of each line
-   - Ensure the story progresses logically
-   - Polish opening lines and final chorus for maximum impact
-</guidelines>
+- Structure: [verse] + [chorus] + [verse] + [chorus] + [bridge] + [chorus] (or as specified)
+- Use a consistent rhyme scheme (like AABB or ABAB) throughout
+- Plan how imagery and emotions will evolve across sections
+
+3. Craft Lyrics with Vivid Language
+
+- Use striking imagery, sensory details and poetic devices
+- Incorporate metaphors and similes thoughtfully to enhance meaning
+- Avoid clichés in favor of fresh, authentic language
+- Write from the heart in a natural, conversational style
+
+4. Develop Hooks & Repetition
+
+- Create key lyrical phrases that encapsulate the song’s theme
+- Place them strategically in the chorus to reinforce the message
+- Use repetition to make the song memorable, with slight variations
+
+5. Refine for Clarity & Impact
+
+- Review and cut any unnecessary words
+- Perfect the phonetic sound and rhythmic flow of each line
+- Ensure the story progresses logically
+- Polish opening lines and final chorus for maximum impact
+
+</songwriting-guidelines>
 
 <task>
 Write song lyrics based on the following description:
 {{text}}
 </task>
 '''
+
 tldr = '''<instructions>
-Generate a brilliant, literary TLDR, analyze the original text and identify the narrative perspective, voice, humor, emotional tone, and writing style. Identify the structure, key characters, locations, events, named identities, and key findings. Identify the most significant humorous, poetic, or linguistically interesting quotes and phrases.
+Generate a brilliant, literary TLDR, analyze the original text and identify the narrative perspective, voice, humor, emotional tone, and writing style. Identify the structure, key characters, locations, events, named identities, and key findings. Identify the most significant humorous, poetic, or linguistically interesting quotes and phrases.
 
 Your task: Create increasingly concise, entity-dense TLDRs of the original text. Target length: 30% of original. Use condensation through careful elimination.
 
 Principles to follow:
-A. Mimic original narrative perspective
-B. Maintain original tone & style
-C. Follow original structure (create TOC)
-D. Balance simplicity with verbatim quotes
-E. Use active voice, avoid gerunds
-F. Stay in character, immersing in original voice
+A. Mimic original narrative perspective
+B. Maintain original tone & style
+C. Follow original structure (create TOC)
+D. Balance simplicity with verbatim quotes
+E. Use active voice, avoid gerunds
+F. Stay in character, immersing in original voice
 
 Estimate the original text length and calculate the target length.
 
-Generate the TLDR in 3 rounds of condensation and elimination, each time:
+Generate the TLDR in 3 rounds of condensation and elimination, each time:
 
 1. Identify missing KEY PHRASES from the original text.
 2. Recall the essence of each stated principle and the original text length, target length, and previous rewrite length.
-3. Write a new denser TLDR, through careful condensation & elimination, which has the target length, follows the TOC, and covers every KEY PHRASE and detail from the previous rewrite, plus the missing KEY PHRASES.
+3. Write a new denser TLDR, through careful condensation & elimination, which has the target length, follows the TOC, and covers every KEY PHRASE and detail from the previous rewrite, plus the missing KEY PHRASES.
 4. Estimate the actual length of the TLDR and compare it with the target length and previous TLDR length.
 5. Critically examine the TLDR, adhering to the stated principles, and eliminate irrelevant words or phrases.
 6. Rewrite the TLDR once, based on the critique, using the correct strategy.
 
-Repeat steps 1-6 for 3 rounds, striving to match target length and improve density.
+Repeat steps 1–6 for 3 rounds, striving to match target length and improve density.
 
-Key phrases should be essential, relevant, specific (5 words or fewer), interesting, novel, and faithful to the original.
+Key phrases should be essential, relevant, specific (5 words or fewer), interesting, novel, and faithful to the original.
 </instructions>
 
 <task>
-Follow the instructions to create a TLDR from the content of the following text:
+Follow the instructions to create a TLDR from the content of the following text:
 {{text}}
 </task>
 '''
+
 tts_optimize = '''<guide>
-You're a proficient editing expert of texts intended as input for text-to-speech models such as ElevenLabs.
+You’re a proficient editing expert of texts intended as input for text-to-speech models such as ElevenLabs.
 
 ## General transformations
 
-- If a paragraph is very long, split it into "smaller semantic units" to allow for... natural pauses and breaths. 
-- If a sentence is very long, split it into "shorter sentences" at appropriate conjunctions or punctuation marks, but... do not change any words! Use semicolons; to highlight the structure of sentences.
-- Ensure each paragraph ends with a punctuation mark: Use a period for a "neutral" ending, use an exclamation mark for "emphatic" or "energetic" endings! 
-- Make sure that each single-line headline also ends with a punctuation mark ("." or "!")...
-- If you find a parenthesized phrase, keep the parentheses but additionally surround the phrase with spaces and ellipses... For example, change "sharp nodes (corners) or smooth nodes" into "sharp nodes ... (corners) ... or smooth nodes".
-- Surround all "em dashes", "en dashes", and hyphens with spaces and ellipses! For example, change "he is—and was—a hero" to "he is ... and was ... a hero". 
-- In each sentence, think about which word or phrase requires "emphasis" or "stress", as a great actor or speaker would... Surround this word or phrase with "quotation marks". Mark at least one word this way in each paragraph... Also replace any Markdown formatting with "quotation marks".
-- Mark dramatic pauses and rhetorical pauses with ellipses ("... "). Replace all em dashes and en dashes with ellipses! You can also place standalone ellipses between longer chunks of text, like this...
+- If a paragraph is very long, split it into “smaller semantic units” to allow for… natural pauses and breaths.
+- If a sentence is very long, split it into “shorter sentences” at appropriate conjunctions or punctuation marks, but… do not change any words! Use semicolons; to highlight the structure of sentences.
+- Ensure each paragraph ends with a punctuation mark: Use a period for a “neutral” ending, use an exclamation mark for “emphatic” or “energetic” endings!
+- Make sure that each single-line headline also ends with a punctuation mark (“.” or “!”)…
+- If you find a parenthesized phrase, keep the parentheses but additionally surround the phrase with spaces and ellipses… For example, change “sharp nodes (corners) or smooth nodes” into “sharp nodes … (corners) … or smooth nodes”.
+- Surround all “em dashes”, “en dashes”, and hyphens with spaces and ellipses! For example, change “he is—and was—a hero” to “he is … and was … a hero”.
+- In each sentence, think about which word or phrase requires “emphasis” or “stress”, as a great actor or speaker would… Surround this word or phrase with “quotation marks”. Mark at least one word this way in each paragraph… Also replace any Markdown formatting with “quotation marks”.
+- Mark dramatic pauses and rhetorical pauses with ellipses (“…”). Replace all em dashes and en dashes with ellipses! You can also place standalone ellipses between longer chunks of text, like this…
 
-- Enclose named entities or jargon terminology in "quotation marks", especially if they're first introduced. For example, change "click the File menu" to "click the »File« menu".
-- Enclose foreign phrases or ironic expressions in "quotation marks".
-- Add periods to acronyms... For example, change "UI" to "U.I.".
+- Enclose named entities or jargon terminology in “quotation marks”, especially if they’re first introduced. For example, change “click the File menu” to “click the” File “menu”.
+- Enclose foreign phrases or ironic expressions in “quotation marks”.
+- Add periods to acronyms… For example, change “UI” to “U.I.”.
 
 ## Language-sensitive transformations
 
-- Write out numbers as words... For example, change "42" to "forty-two".
-- Replace "/" and "&" between words with the appropriate conjunction or preposition... For example, change "up/down" to "up or down", and change "up & down" to "up and down".  
-- Use spelling appropriate for the main language of the text. If the text contains phrases (words, names, quotes etc.) in a language different than the main language, rewrite each phrase using phonetic spelling of the main language.
+- Write out numbers as words… For example, change “42” to “forty-two”.
+- Replace “/” and “&” between words with the appropriate conjunction or preposition… For example, change “up/down” to “up or down”, and change “up & down” to “up and down”.
+- Use spelling appropriate for the main language of the text. If the text contains phrases (words, names, quotes etc.) in a language different than the main language, rewrite each phrase using phonetic spelling of the main language.
 
-## Selective transformations 
+## Selective transformations
 
-With each word, sentence and paragraph... "think"! Think about the content, the meaning, how to best use punctuation... to add "interpretive cues"!
+With each word, sentence and paragraph… “think”! Think about the content, the meaning, how to best use punctuation… to add “interpretive cues”!
 
-However, don't overdo the quotation marks and ellipses! If you use them several times in each sentence, then the reader will have to constantly pause their voice or put emphasis... And that's also... "pointless"!
+However, don’t overdo the quotation marks and ellipses! If you use them several times in each sentence, then the reader will have to constantly pause their voice or put emphasis… And that’s also… “pointless”!
 
-Use ellipses and quotation marks to "slow down" the pace of the text... But avoid them if the text should be "vivid" and "fast-paced"!  
+Use ellipses and quotation marks to “slow down” the pace of the text… But avoid them if the text should be “vivid” and “fast-paced”!
 
-Add exclamation marks when you need to add "drama"!!!
+Add exclamation marks when you need to add “drama”!!!
 
 ## Additional Guidance
 
-- Don't shorten or rephrase!
-- Use your "best judgment" to maintain the intended meaning and flow of the text!
-- Be mindful of the context and tone of the original text when applying transformations...
-- Remember, the goal is to enhance the text for a "clear", "engaging", and "expressive" reading experience!
+- Don’t shorten or rephrase!
+- Use your “best judgment” to maintain the intended meaning and flow of the text!
+- Be mindful of the context and tone of the original text when applying transformations…
+- Remember, the goal is to enhance the text for a “clear”, “engaging”, and “expressive” reading experience!
 </guide>
 
 <task>
@@ -296,116 +381,36 @@ Rewrite the text to follow the guide judiciously. Enclose the rewritten text in 
 {{text}}
 </input>
 '''
-translate = '''<instructions>
-— Avoid mechanistic translation, create pleasant reading flow. 
-— Research the most professional way to translate technical jargon.
-— Maintain appropriate register and tone for the target audience.
-— Prefer syntactical simplicity and clarity.
-</instructions>
+
+translate = '''<translation-instructions>
+Translate the text into Polish. Use correct Polish typograhic terminology, and respect the custom `vocabulary` given line-per-line line `input term = output term—alternative output term ≠ avoided translation`, where `=` means: translate like that, `|` means: or translate like this depending on the context `≠` means: NEVER translate like this,
+
+Avoid mechanistic translation, create pleasant reading flow. Research the most professional way to translate technical jargon. Maintain appropriate register and tone for the target audience. Prefer syntactical simplicity and clarity.
+</translation-instructions>
+
+<vocabulary>
+font = font ≠ czcionka
+variable font = font zmienny ≠ czcionka zmienna
+layout feature = funkcja zecerska
+feature = funkcja zecerska
+web fonts = fonty webowe ≠ czcionki webowe
+small caps = kapitaliki ≠ małe kapitaliki
+double-click = dwuklik—dwukliknąć ≠ podwójne kliknięcie
+oldstyle numerals = cyfry nautyczne
+typeface = krój pisma—krój
+stem = kreska główna
+hint = hint—hintować ≠ wskazówka
+hinting = hinting
+</vocabulary>
+
+{{think}}
 
 <task>
-Translate the following text while maintaining natural flow and appropriate terminology:
-{{text}}
-</task>
-'''
-summary = '''<task>
-Create a comprehensive summary of the following text, highlighting the key points and main ideas. The summary should be clear, concise, and capture the essence of the original content while being significantly shorter.
+Translate the following input. Follow translation-instructions and vocabulary.
 </task>
 
 <input>
 {{text}}
 </input>
 '''
-code_review = '''<task>
-Review the following code and provide constructive feedback on:
-- Code quality and readability
-- Potential bugs or issues
-- Performance considerations
-- Best practices and improvements
-- Security concerns if any
-</task>
 
-<code>
-{{text}}
-</code>
-'''
-qa = '''<task>
-Answer the following question based on the provided context. Be accurate, concise, and directly address what is being asked.
-</task>
-
-<context>
-{{text}}
-</context>
-'''
-creative_write = '''<task>
-Based on the following prompt, create an engaging and creative piece of writing. Let your imagination flow while maintaining coherence and quality.
-</task>
-
-<prompt>
-{{text}}
-</prompt>
-'''
-analyze = '''<task>
-Provide a detailed analysis of the following content. Consider multiple perspectives, identify key themes, and offer insights into the deeper meaning or implications.
-</task>
-
-<content>
-{{text}}
-</content>
-'''
-explain = '''<task>
-Explain the following concept or text in simple, easy-to-understand terms. Break down complex ideas and use examples where helpful.
-</task>
-
-<input>
-{{text}}
-</input>
-'''
-rewrite = '''<task>
-Rewrite the following text to improve clarity, flow, and impact while preserving the core message and meaning.
-</task>
-
-<original>
-{{text}}
-</original>
-'''
-bullets = '''<task>
-Convert the following text into clear, concise bullet points that capture the main ideas and key information.
-</task>
-
-<input>
-{{text}}
-</input>
-'''
-compare = '''<task>
-Compare and contrast the elements described in the following text. Highlight similarities, differences, and unique characteristics.
-</task>
-
-<input>
-{{text}}
-</input>
-'''
-instructions = '''<task>
-Convert the following information into clear, step-by-step instructions that are easy to follow.
-</task>
-
-<input>
-{{text}}
-</input>
-'''
-email = '''<task>
-Draft a professional email based on the following information. Maintain appropriate tone and include all necessary details.
-</task>
-
-<details>
-{{text}}
-</details>
-'''
-outline = '''<task>
-Create a structured outline from the following content, organizing the information hierarchically with main points and sub-points.
-</task>
-
-<content>
-{{text}}
-</content>
-'''

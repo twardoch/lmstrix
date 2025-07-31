@@ -11,7 +11,7 @@ cd "$(dirname "$0")" || exit
 
 echo "### LMStrix CLI Demo - Simplified adam.toml ###"
 
-MODEL_ID="llama-3.2-3b-instruct" # <--- CHANGE THIS to match your model
+MODEL_ID="$1" # <--- CHANGE THIS to match your model
 PROMPT_FILE="adam.toml"
 
 if [ ! -f "$PROMPT_FILE" ]; then

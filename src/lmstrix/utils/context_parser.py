@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from loguru import logger
+from lmstrix.utils.logging import logger
 
 
 def parse_out_ctx(

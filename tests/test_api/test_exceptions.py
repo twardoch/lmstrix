@@ -45,7 +45,8 @@ class TestAPIExceptions:
         assert reason in str(error)
 
     def test_exception_inheritance(self) -> None:
-        """Test that all exceptions inherit from LMStrixError."""
+        """Test that all exceptions inherit from lmstrixError."""
+
         exceptions = [
             APIConnectionError("host", "reason"),
             ModelLoadError("model", "reason"),

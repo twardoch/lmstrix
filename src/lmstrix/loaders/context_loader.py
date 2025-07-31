@@ -3,9 +3,9 @@
 from pathlib import Path
 
 import tiktoken
-from loguru import logger
 
 from lmstrix.api.exceptions import ConfigurationError
+from lmstrix.utils.logging import logger
 
 
 def load_context(

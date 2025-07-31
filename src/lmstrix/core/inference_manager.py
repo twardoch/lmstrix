@@ -10,11 +10,10 @@ import contextlib
 import time
 from typing import Any
 
-from loguru import logger
-
 from lmstrix.api.client import LMStudioClient
 from lmstrix.api.exceptions import ModelNotFoundError
 from lmstrix.core.models import Model, ModelRegistry
+from lmstrix.utils.logging import logger
 
 
 class InferenceManager:
@@ -167,6 +166,7 @@ class InferenceManager:
                 out_ctx=out_ctx,
                 temperature=temperature,
                 model_id=model_id,
+                model_context_length=model.tested_max_context or model.context_limit,
                 **kwargs,
             )
 

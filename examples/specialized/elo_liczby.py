@@ -37,7 +37,11 @@ from rich.console import Console
 from slugify import slugify
 
 from lmstrix.core.inference_manager import InferenceManager
+from lmstrix.utils.logging import logger
+
 from lmstrix.loaders.model_loader import load_model_registry
+from lmstrix.utils.logging import logger
+
 
 console = Console()
 
@@ -61,15 +65,15 @@ def process_text_with_model(
     input_path = Path(input_file)
 
     if not input_path.exists():
-        console.print(f"[red]Error: Input file '{input_file}' not found.[/red]")
+        logger.error(f"Input file '{input_file}' not found.")
         return ""
 
     # Load model registry
-    console.print("Loading model registry...")
+    logger.debug("Loading model registry...")
     registry = load_model_registry(verbose=verbose)
 
     if not registry._models:
-        console.print("[red]Error: No models found in registry. Run 'lmstrix scan' first.[/red]")
+        logger.error(f"No models found in registry. Run 'lmstrix scan' first.")
         return ""
 
     # Select model
@@ -86,18 +90,18 @@ def process_text_with_model(
 
             if len(matching_models) == 1:
                 model = matching_models[0]
-                console.print(f"[green]Found matching model: {model.id}[/green]")
+                logger.success(f"Found matching model: {model.id}")
             elif len(matching_models) > 1:
-                console.print(f"[yellow]Multiple models found matching '{model_id}':[/yellow]")
+                logger.debug(f"[yellow]Multiple models found matching '{model_id}':[/yellow]")
                 for m in matching_models[:5]:  # Show first 5 matches
-                    console.print(f"  - {m.id}")
+                    logger.debug(f"  - {m.id}")
                 if len(matching_models) > 5:
-                    console.print(f"  ... and {len(matching_models) - 5} more")
+                    logger.debug(f"  ... and {len(matching_models) - 5} more")
                 return ""
             else:
-                console.print(f"[red]Error: No model found matching '{model_id}'.[/red]")
+                logger.error(f"No model found matching '{model_id}'.")
                 available_models = [m.id for m in registry.list_models()]
-                console.print(f"[yellow]Available models: {len(available_models)} total[/yellow]")
+                logger.debug(f"[yellow]Available models: {len(available_models)} total[/yellow]")
                 return ""
     else:
         # Use first available model with tested context
@@ -108,32 +112,32 @@ def process_text_with_model(
             # Fallback to any available model
             all_models = registry.list_models()
             if not all_models:
-                console.print("[red]Error: No models available.[/red]")
+                logger.error(f"No models available.")
                 return ""
             model = all_models[0]
         else:
             model = models_with_context[0]
 
-        console.print(f"[green]Using model: {model.id}[/green]")
+        logger.success(f"Using model: {model.id}")
 
     # Read input file
-    console.print(f"Reading input file: {input_path}")
+    logger.debug(f"Reading input file: {input_path}")
     try:
         text_content = input_path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
-        console.print("[red]Error: Could not read file as UTF-8. Please check file encoding.[/red]")
+        logger.error(f"Could not read file as UTF-8. Please check file encoding.")
         return ""
 
     # Split into paragraphs (separated by two empty lines)
     paragraphs = [p.strip() for p in text_content.split("\n\n") if p.strip()]
-    console.print(f"Found {len(paragraphs)} paragraphs to process")
+    logger.debug(f"Found {len(paragraphs)} paragraphs to process")
 
     if not paragraphs:
-        console.print("[yellow]Warning: No paragraphs found in input file.[/yellow]")
+        logger.debug("[yellow]Warning: No paragraphs found in input file.[/yellow]")
         return ""
 
     # Initialize inference manager
-    console.print("Initializing inference manager...")
+    logger.debug("Initializing inference manager...")
     manager = InferenceManager(verbose=verbose)
 
     # Process each paragraph
@@ -141,10 +145,10 @@ def process_text_with_model(
     prompt_template = "Convert numbers to words in the following text: <text>{text}</text>"
 
     for i, paragraph in enumerate(paragraphs, 1):
-        console.print(f"Processing paragraph {i}/{len(paragraphs)}...")
+        logger.debug(f"Processing paragraph {i}/{len(paragraphs)}...")
 
         if verbose:
-            console.print(
+            logger.debug(
                 f"[dim]Input: {paragraph[:100]}{'...' if len(paragraph) > 100 else ''}[/dim]",
             )
 
@@ -161,13 +165,13 @@ def process_text_with_model(
             if result["succeeded"]:
                 results.append(result["response"].strip())
                 if verbose:
-                    console.print("[green]✓ Success[/green]")
+                    logger.success(f"✓ Succes")
             else:
-                console.print(f"[red]✗ Failed: {result['error']}[/red]")
+                logger.debug(f"[red]✗ Failed: {result['error']}[/red]")
                 results.append(f"[ERROR: {result['error'] or 'Unknown error'}]")
 
         except Exception as e:
-            console.print(f"[red]✗ Exception: {e}[/red]")
+            logger.debug(f"[red]✗ Exception: {e}[/red]")
             results.append(f"[ERROR: {e}]")
 
     # Generate output filename
@@ -177,16 +181,16 @@ def process_text_with_model(
     output_path = input_path.parent / output_filename
 
     # Write results
-    console.print(f"Writing results to: {output_path}")
+    logger.debug(f"Writing results to: {output_path}")
     output_content = "\n\n".join(results)
 
     try:
         output_path.write_text(output_content, encoding="utf-8")
-        console.print(f"[green]✓ Successfully processed {len(paragraphs)} paragraphs[/green]")
-        console.print(f"[green]✓ Output saved to: {output_path}[/green]")
+        logger.success(f"✓ Successfully processed {len(paragraphs)} paragraph")
+        logger.success(f"✓ Output saved to: {output_path")
         return str(output_path)
     except Exception as e:
-        console.print(f"[red]Error writing output file: {e}[/red]")
+        logger.debug(f"[red]Error writing output file: {e}[/red]")
         return ""
 
 

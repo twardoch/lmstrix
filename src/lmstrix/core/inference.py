@@ -4,12 +4,12 @@ import time
 from typing import Any
 
 import lmstudio
-from loguru import logger
 from pydantic import BaseModel, Field
 
 from lmstrix.api.client import LMStudioClient
 from lmstrix.api.exceptions import ModelNotFoundError
 from lmstrix.core.models import ModelRegistry
+from lmstrix.utils.logging import logger
 
 
 class InferenceResult(BaseModel):

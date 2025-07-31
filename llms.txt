@@ -2,224 +2,99 @@ Project Structure:
 📁 lmstrix
 ├── 📁 _keep_this
 │   └── 📁 adam
-│       ├── 📄 adam.sh
-│       ├── 📄 adam.toml
-│       └── 📄 README.md
-├── 📁 context_tests
 ├── 📁 docs
 │   ├── 📄 _config.yml
 │   ├── 📄 api.md
-│   ├── 📄 
-│   │   how-it-works.md
+│   ├── 📄 how-it-works.md
 │   ├── 📄 index.md
-│   ├── 📄 
-│   │   installation.md
+│   ├── 📄 installation.md
 │   └── 📄 usage.md
 ├── 📁 examples
 │   ├── 📁 cli
-│   │   ├── 📄 
-│   │   │   basic_workfl
-│   │   │   ow.sh
-│   │   ├── 📄 
-│   │   │   context_cont
-│   │   │   rol_examples
-│   │   │   .sh
-│   │   ├── 📄 
-│   │   │   inference_ex
-│   │   │   amples.sh
-│   │   ├── 📄 
-│   │   │   model_state_
-│   │   │   demo.sh
-│   │   └── 📄 
-│   │       model_testin
-│   │       g.sh
+│   │   ├── 📄 basic_workflow.sh
+│   │   ├── 📄 context_control_examples.sh
+│   │   ├── 📄 inference_examples.sh
+│   │   ├── 📄 model_state_demo.sh
+│   │   └── 📄 model_testing.sh
 │   ├── 📁 data
-│   │   ├── 📄 
-│   │   │   fontlab8.md
-│   │   ├── 📄 
-│   │   │   sample_conte
-│   │   │   xt.txt
-│   │   └── 📄 
-│   │       test_questio
-│   │       ns.json
+│   │   ├── 📄 sample_context.txt
+│   │   └── 📄 test_questions.json
 │   ├── 📁 prompts
-│   │   ├── 📄 
-│   │   │   analysis.tom
-│   │   │   l
-│   │   ├── 📄 
-│   │   │   coding.toml
-│   │   ├── 📄 
-│   │   │   creative.tom
-│   │   │   l
+│   │   ├── 📄 analysis.toml
+│   │   ├── 📄 coding.toml
+│   │   ├── 📄 creative.toml
 │   │   └── 📄 qa.toml
 │   ├── 📁 python
-│   │   ├── 📄 
-│   │   │   __init__.py
-│   │   ├── 📄 
-│   │   │   advanced_tes
-│   │   │   ting.py
-│   │   ├── 📄 
-│   │   │   basic_usage.
-│   │   │   py
-│   │   ├── 📄 
-│   │   │   batch_proces
-│   │   │   sing.py
-│   │   ├── 📄 
-│   │   │   custom_infer
-│   │   │   ence.py
-│   │   └── 📄 
-│   │       prompt_templ
-│   │       ates_demo.py
+│   │   ├── 📄 __init__.py
+│   │   ├── 📄 advanced_testing.py
+│   │   ├── 📄 basic_usage.py
+│   │   ├── 📄 batch_processing.py
+│   │   ├── 📄 custom_inference.py
+│   │   └── 📄 prompt_templates_demo.py
 │   ├── 📁 specialized
-│   │   └── 📄 
-│   │       elo_liczby.p
-│   │       y
+│   │   └── 📄 elo_liczby.py
 │   ├── 📄 prompts.toml
 │   ├── 📄 README.md
-│   └── 📄 
-│       run_all_examples
-│       .sh
+│   └── 📄 run_all_examples.sh
 ├── 📁 issues
-│   └── 📄 105.txt
-├── 📁 results
+│   └── 📄 301.txt
 ├── 📁 src
 │   ├── 📁 lmstrix
 │   │   ├── 📁 api
-│   │   │   ├── 📄 
-│   │   │   │   __init__
-│   │   │   │   .py
-│   │   │   ├── 📄 
-│   │   │   │   client.p
-│   │   │   │   y
-│   │   │   └── 📄 
-│   │   │       exceptio
-│   │   │       ns.py
+│   │   │   ├── 📄 __init__.py
+│   │   │   ├── 📄 client.py
+│   │   │   └── 📄 exceptions.py
 │   │   ├── 📁 cli
-│   │   │   ├── 📄 
-│   │   │   │   __init__
-│   │   │   │   .py
-│   │   │   └── 📄 
-│   │   │       main.py
+│   │   │   ├── 📄 __init__.py
+│   │   │   └── 📄 main.py
 │   │   ├── 📁 core
-│   │   │   ├── 📄 
-│   │   │   │   __init__
-│   │   │   │   .py
-│   │   │   ├── 📄 
-│   │   │   │   concrete
-│   │   │   │   _config.
-│   │   │   │   py
-│   │   │   ├── 📄 
-│   │   │   │   context.
-│   │   │   │   py
-│   │   │   ├── 📄 
-│   │   │   │   context_
-│   │   │   │   tester.p
-│   │   │   │   y
-│   │   │   ├── 📄 
-│   │   │   │   inferenc
-│   │   │   │   e.py
-│   │   │   ├── 📄 
-│   │   │   │   inferenc
-│   │   │   │   e_manage
-│   │   │   │   r.py
-│   │   │   ├── 📄 
-│   │   │   │   models.p
-│   │   │   │   y
-│   │   │   ├── 📄 
-│   │   │   │   prompts.
-│   │   │   │   py
-│   │   │   └── 📄 
-│   │   │       scanner.
-│   │   │       py
+│   │   │   ├── 📄 __init__.py
+│   │   │   ├── 📄 concrete_config.py
+│   │   │   ├── 📄 context.py
+│   │   │   ├── 📄 context_tester.py
+│   │   │   ├── 📄 inference.py
+│   │   │   ├── 📄 inference_manager.py
+│   │   │   ├── 📄 models.py
+│   │   │   ├── 📄 prompts.py
+│   │   │   └── 📄 scanner.py
 │   │   ├── 📁 loaders
-│   │   │   ├── 📄 
-│   │   │   │   __init__
-│   │   │   │   .py
-│   │   │   ├── 📄 
-│   │   │   │   context_
-│   │   │   │   loader.p
-│   │   │   │   y
-│   │   │   ├── 📄 
-│   │   │   │   model_lo
-│   │   │   │   ader.py
-│   │   │   └── 📄 
-│   │   │       prompt_l
-│   │   │       oader.py
+│   │   │   ├── 📄 __init__.py
+│   │   │   ├── 📄 context_loader.py
+│   │   │   ├── 📄 model_loader.py
+│   │   │   └── 📄 prompt_loader.py
 │   │   ├── 📁 utils
-│   │   │   ├── 📄 
-│   │   │   │   __init__
-│   │   │   │   .py
-│   │   │   ├── 📄 
-│   │   │   │   context_
-│   │   │   │   parser.p
-│   │   │   │   y
-│   │   │   ├── 📄 
-│   │   │   │   logging.
-│   │   │   │   py
-│   │   │   ├── 📄 
-│   │   │   │   paths.py
-│   │   │   └── 📄 
-│   │   │       state.py
-│   │   ├── 📄 
-│   │   │   __init__.py
-│   │   ├── 📄 
-│   │   │   __main__.py
+│   │   │   ├── 📄 __init__.py
+│   │   │   ├── 📄 context_parser.py
+│   │   │   ├── 📄 logging.py
+│   │   │   ├── 📄 paths.py
+│   │   │   └── 📄 state.py
+│   │   ├── 📄 __init__.py
+│   │   ├── 📄 __main__.py
 │   │   └── 📄 py.typed
-│   └── 📁 
-│       lmstrix.egg-info
+│   └── 📁 lmstrix.egg-info
 ├── 📁 tests
 │   ├── 📁 test_api
-│   │   ├── 📄 
-│   │   │   __init__.py
-│   │   ├── 📄 
-│   │   │   test_client.
-│   │   │   py
-│   │   └── 📄 
-│   │       test_excepti
-│   │       ons.py
+│   │   ├── 📄 __init__.py
+│   │   ├── 📄 test_client.py
+│   │   └── 📄 test_exceptions.py
 │   ├── 📁 test_core
-│   │   ├── 📄 
-│   │   │   __init__.py
-│   │   ├── 📄 
-│   │   │   test_context
-│   │   │   _tester.py
-│   │   ├── 📄 
-│   │   │   test_inferen
-│   │   │   ce.py
-│   │   ├── 📄 
-│   │   │   test_models.
-│   │   │   py
-│   │   ├── 📄 
-│   │   │   test_prompts
-│   │   │   .py
-│   │   └── 📄 
-│   │       test_scanner
-│   │       .py
-│   ├── 📁 
-│   │   test_integration
-│   │   ├── 📄 
-│   │   │   __init__.py
-│   │   └── 📄 
-│   │       test_cli_int
-│   │       egration.py
+│   │   ├── 📄 __init__.py
+│   │   ├── 📄 test_context_tester.py
+│   │   ├── 📄 test_inference.py
+│   │   ├── 📄 test_models.py
+│   │   ├── 📄 test_prompts.py
+│   │   └── 📄 test_scanner.py
+│   ├── 📁 test_integration
+│   │   ├── 📄 __init__.py
+│   │   └── 📄 test_cli_integration.py
 │   ├── 📁 test_loaders
-│   │   ├── 📄 
-│   │   │   __init__.py
-│   │   ├── 📄 
-│   │   │   test_context
-│   │   │   _loader.py
-│   │   ├── 📄 
-│   │   │   test_model_l
-│   │   │   oader.py
-│   │   └── 📄 
-│   │       test_prompt_
-│   │       loader.py
+│   │   ├── 📄 __init__.py
+│   │   ├── 📄 test_context_loader.py
+│   │   ├── 📄 test_model_loader.py
+│   │   └── 📄 test_prompt_loader.py
 │   ├── 📁 test_utils
-│   │   ├── 📄 
-│   │   │   __init__.py
-│   │   └── 📄 
-│   │       test_paths.p
-│   │       y
+│   │   ├── 📄 __init__.py
+│   │   └── 📄 test_paths.py
 │   ├── 📄 __init__.py
 │   ├── 📄 conftest.py
 │   └── 📄 run_tests.py
@@ -644,6 +519,7 @@ llms.txt
 CLEANUP.txt
 src/lmstrix/_version.py
 
+_keep_this/adam
 </document_content>
 </document>
 
@@ -2633,606 +2509,6 @@ The immediate focus should shift to the items outlined in the updated PLAN.md:
 </document>
 
 <document index="14">
-<source>_keep_this/adam/README.md</source>
-<document_content>
-# Simplified Prompt Templates - adam.toml
-
-This directory contains simplified prompt templates demonstrating LMStrix's prompt system with the new `--text` and `--text_file` support.
-
-## Overview
-
-The `adam.toml` file contains various prompt templates that all use a single `{{text}}` placeholder. This simplification makes it easy to use any prompt with just the text content you want to process.
-
-## Usage
-
-### Basic CLI Usage
-
-```bash
-# Using --text for inline content
-lmstrix infer <prompt_name> <model_id> --file_prompt adam.toml --text "Your text here"
-
-# Using --text_file for file content
-lmstrix infer <prompt_name> <model_id> --file_prompt adam.toml --text_file path/to/file.txt
-
-# Direct prompt with placeholder
-lmstrix infer "Summarize this: {{text}}" <model_id> --text "Your text here"
-```
-
-### Examples
-
-```bash
-# Abstractive Proposition Segmentation
-lmstrix infer aps qwen3-14b-mlx --file_prompt adam.toml --text "Marie Curie won two Nobel Prizes."
-
-# Text humanization
-lmstrix infer humanize qwen3-14b-mlx --file_prompt adam.toml --text "The methodology employed..."
-
-# Summary generation
-lmstrix infer summary qwen3-14b-mlx --file_prompt adam.toml --text_file article.txt
-
-# Code review
-lmstrix infer code_review qwen3-14b-mlx --file_prompt adam.toml --text "def add(a,b): return a+b"
-```
-
-## Available Prompts
-
-### Text Analysis & Processing
-- **aps** - Abstractive Proposition Segmentation: breaks text into atomic facts
-- **analyze** - Detailed analysis with multiple perspectives
-- **summary** - Comprehensive summary generation
-- **tldr** - Literary TLDR with 30% condensation
-- **bullets** - Convert text to bullet points
-- **outline** - Create structured outline
-
-### Text Transformation
-- **humanize** - Make AI text sound natural and conversational
-- **rewrite** - Improve clarity and flow
-- **tts_optimize** - Optimize for text-to-speech
-- **translate** - Natural translation with flow
-
-### Creative Tasks
-- **song** - Song lyrics generation with guidelines
-- **creative_write** - Creative writing from prompts
-
-### Practical Tasks
-- **code_review** - Code quality and security review
-- **email** - Professional email drafting
-- **instructions** - Step-by-step instructions
-- **qa** - Question answering from context
-- **explain** - Simple explanations
-- **compare** - Compare and contrast analysis
-
-## Demo Script
-
-Run the demo script to see examples:
-
-```bash
-./adam.sh
-```
-
-Make sure to update the `MODEL_ID` in the script to match your LM Studio model.
-
-## Features
-
-- **Single placeholder**: All prompts use only `{{text}}` for simplicity
-- **Embedded examples**: Each prompt includes guidelines and examples
-- **No nested templates**: Direct, self-contained prompts
-- **CLI integration**: Works seamlessly with `--text` and `--text_file` flags
-</document_content>
-</document>
-
-<document index="15">
-<source>_keep_this/adam/adam.sh</source>
-<document_content>
-#!/bin/bash
-# this_file: examples/prompts_adam/demo_adam_prompts_cli.sh
-#
-# Demonstration of adam.toml with simplified CLI usage
-# All prompts now only require {{text}} as input
-#
-
-set -e
-
-cd "$(dirname "$0")" || exit
-
-echo "### LMStrix CLI Demo - Simplified adam.toml ###"
-
-MODEL_ID="llama-3.2-3b-instruct" # <--- CHANGE THIS to match your model
-PROMPT_FILE="adam.toml"
-
-if [ ! -f "$PROMPT_FILE" ]; then
-    echo "Error: $PROMPT_FILE not found!"
-    exit 1
-fi
-
-echo -e "\nUsing prompt file: $PROMPT_FILE"
-echo "Using model: $MODEL_ID"
-
-# Example 1: Abstractive Proposition Segmentation using --text
-echo -e "\n--- Example 1: APS with --text ---"
-lmstrix infer aps --verbose -m "$MODEL_ID" \
-    --file_prompt "$PROMPT_FILE" \
-    --text "The Internet was originally developed by DARPA in the 1960s as ARPANET. It was designed to create a decentralized communication network that could survive nuclear attacks." \
-    --out_ctx "25%"
-
-# Example 2: Text humanization using --text
-echo -e "\n--- Example 2: Humanize with --text ---"
-lmstrix infer humanize --verbose -m "$MODEL_ID" \
-    --file_prompt "$PROMPT_FILE" \
-    --text "The implementation of artificial intelligence systems in corporate environments necessitates careful consideration of various factors including but not limited to data privacy."
-
-# Example 3: Using --text_file for longer content
-echo -e "\n--- Example 3: Summary using --text_file ---"
-# Create a temporary file with text
-cat >/tmp/sample_text.txt <<'EOF'
-In the summer of 1922, Nick Carraway, a young man from Minnesota, moves to New York to learn about the bond business. He rents a house in the West Egg district of Long Island, next door to a mysterious millionaire named Jay Gatsby who throws extravagant parties every Saturday night. Nick's cousin Daisy lives across the bay with her wealthy but brutish husband Tom Buchanan. As the summer progresses, Nick becomes drawn into the world of his mysterious neighbor and learns that Gatsby is deeply in love with Daisy, whom he had met years before during the war.
-EOF
-
-lmstrix infer summary --verbose -m "$MODEL_ID" \
-    --file_prompt "$PROMPT_FILE" \
-    --text_file /tmp/sample_text.txt
-
-# Example 4: TTS optimization
-echo -e "\n--- Example 4: TTS Optimize ---"
-lmstrix infer tts_optimize --verbose -m "$MODEL_ID" \
-    --file_prompt "$PROMPT_FILE" \
-    --text "The CEO announced that Q3 revenues increased by 42% year-over-year."
-
-# Example 5: Song lyrics generation
-echo -e "\n--- Example 5: Song Generation ---"
-lmstrix infer song --verbose -m "$MODEL_ID" \
-    --file_prompt "$PROMPT_FILE" \
-    --text "Write a folk song about a traveler who finds home in unexpected places, with themes of belonging and discovery" \
-    --temperature 0.8
-
-# Example 6: Code review
-echo -e "\n--- Example 6: Code Review ---"
-lmstrix infer code_review --verbose -m "$MODEL_ID" \
-    --file_prompt "$PROMPT_FILE" \
-    --text 'def factorial(n):
-    if n == 0:
-        return 1
-    else:
-        return n * factorial(n - 1)'
-
-# Example 7: Using prompt without file_prompt (direct prompt with --text)
-echo -e "\n--- Example 7: Direct prompt with --text ---"
-lmstrix infer "Explain the following concept: {{text}}" --verbose -m "$MODEL_ID" \
-    --text "quantum entanglement"
-
-# Cleanup
-rm -f /tmp/sample_text.txt
-
-echo -e "\n### Demo Complete ###"
-echo -e "\nKey features demonstrated:"
-echo "- Using --text for inline text content"
-echo "- Using --text_file for file-based content"
-echo "- All prompts now only require {{text}} placeholder"
-echo "- Simplified prompt structure in adam.toml"
-echo -e "\nTip: View $PROMPT_FILE to see all available prompts!"
-
-</document_content>
-</document>
-
-<document index="16">
-<source>_keep_this/adam/adam.toml</source>
-<document_content>
-# adam.toml - Simplified prompt templates for LMStrix
-# this_file: examples/prompts_adam/adam.toml
-#
-# This file contains prompt templates that only require {{text}} as input
-# All examples and guidelines are embedded directly in each prompt
-
-aps = '''<task>
-You are an AI assistant skilled in Abstractive Proposition Segmentation (APS). Convert the given passage into a list of atomic propositions – self-contained declarative sentences, each expressing a single fact or idea from the passage. Follow these guidelines:
-
-<guidelines>
-1. One idea per sentence: For every distinct fact or claim in the text, write a separate sentence. Do not combine independent ideas into one proposition.
-2. Self-contained sentences: Make each sentence understandable on its own. Resolve pronouns or ambiguous references by using explicit names or nouns.
-3. Preserve meaning: Keep all original details and nuances. You may rephrase for clarity, but do not leave out any important information or introduce new information.
-4. Formatting: Output each proposition on a new line, wrapped in `<s>` and `</s>` tags.
-</guidelines>
-
-<examples>
-## Example 1 (Historical/Biographical):
-
-<input>
-Dr. Jane Goodall traveled to Tanzania in 1960 to study chimpanzees. She spent years observing their behavior and discovered that chimps use tools, a finding that challenged previous notions about animal behavior.  
-</input>
-
-### Output:
-
-<output>
-<s>Dr. Jane Goodall traveled to Tanzania in 1960 to study chimpanzees. </s><s>Jane Goodall spent years observing chimpanzee behavior. </s><s>Jane Goodall discovered that chimpanzees use tools. </s><s>This discovery challenged previous notions about animal behavior. </s>  
-</output>
-
-<note>In the output above, note how each sentence expresses one idea and pronouns like "She" are replaced with "Jane Goodall" for clarity.</note>
-
-## Example 2 (Scientific/Academic):
-
-<input>
-A new study in *The Journal of Climate Science* indicates that global average temperatures have risen by 1.2°C since 1900. The researchers attribute this change primarily to increased greenhouse gas emissions from human activities.  
-</input>
-
-<output>
-<s>A study in *The Journal of Climate Science* reports that global average temperatures have risen by 1.2°C since 1900. </s><s>The researchers attribute the rise in temperature primarily to increased greenhouse gas emissions from human activities. </s>  
-</output>
-
-<note>The output sentences above are standalone factual statements drawn from the study finding and its explanation.</note>
-
-## Example 3 (News/Report):
-
-<input>
-Amazon announced on Tuesday that it will open a new office in Dublin, creating 500 jobs. The government welcomed the decision and offered tax incentives to support the investment. 
-</input>
-
-<output>
-<s>Amazon announced that it will open a new office in Dublin. </s><s>The new office will create 500 jobs. </s><s>The government welcomed Amazon's decision. </s><s>The government offered tax incentives to support the investment. </s>  
-</output>
-
-<note>Here, a single sentence from the news was split into two propositions, and phrases like "the decision" were made explicit as "Amazon's decision."</note>
-</examples>
-
-Now, perform Abstractive Proposition Segmentation on the passage below.
-</task>
-
-<input>
-{{text}}
-</input>
-'''
-humanize = '''## IDENTITY and PURPOSE
-
-You are a real person whose job is to make text sound natural, conversational, and relatable, just like how an average person talks or writes. Your goal is to rewrite content in a casual, human-like style, prioritizing clarity and simplicity. You should aim for short sentences, an active voice, and everyday language that feels familiar and easy to follow. Avoid long, complex sentences or technical jargon. Instead, focus on breaking ideas into smaller, easy-to-understand parts. Write as though you're explaining something to a friend, keeping it friendly and approachable. Always think step-by-step about how to make the text feel more natural and conversational, using the examples provided as a guide for improvement.
-
-While rewriting, ensure the original meaning and tone are preserved. Strive for a consistent style that flows naturally, even if the given text is a mix of AI and human-generated content.
-
-## YOUR TASK
-
-Your task is to rewrite the given AI-generated text to make it sound like it was written by a real person. The rewritten text should be clear, simple, and easy to understand, using everyday language that feels natural and relatable.
-
-- Focus on clarity: Make sure the text is straightforward and avoids unnecessary complexity.
-- Keep it simple: Use common words and phrases that anyone can understand.
-- Prioritize short sentences: Break down long, complicated sentences into smaller, more digestible ones.
-- Maintain context: Ensure that the rewritten text accurately reflects the original meaning and tone.
-- Harmonize mixed content: If the text contains a mix of human and AI styles, edit to ensure a consistent, human-like flow.
-- Iterate if necessary: Revisit and refine the text to enhance its naturalness and readability.
-
-Your goal is to make the text approachable and authentic, capturing the way a real person would write or speak.
-
-## STEPS
-
-1. Carefully read the given text and understand its meaning and tone.
-2. Process the text phrase by phrase, ensuring that you preserve its original intent.
-3. Refer to the **EXAMPLES** section for guidance, avoiding the "AI Style to Avoid" and mimicking the "Human Style to Adopt" in your rewrites.
-4. If no relevant example exists in the **EXAMPLES** section:
-   - Critically analyze the text.
-   - Apply principles of clarity, simplicity, and natural tone.
-   - Prioritize readability and unpredictability in your edits.
-5. Harmonize the style if the text appears to be a mix of AI and human content.
-6. Revisit and refine the rewritten text to enhance its natural and conversational feel while ensuring coherence.
-7. Output the rewritten text in coherent paragraphs.
-
-## EXAMPLES
-
-### **Word Frequency Distribution**
-- **AI Style to Avoid**: "This is a very good and very interesting idea."
-- **Human Style to Adopt**: "This idea is intriguing and genuinely impressive."
-
-### **Rare Word Usage**
-- **AI Style to Avoid**: "The event was exciting and fun."
-- **Human Style to Adopt**: "The event was exhilarating, a rare blend of thrill and enjoyment."
-
-### **Repetitive Sentence Structure**
-- **AI Style to Avoid**: "She went to the market. She bought some vegetables. She returned home."
-- **Human Style to Adopt**: "She visited the market, picked up some fresh vegetables, and headed back home."
-
-### **Overuse of Connective Words**
-- **AI Style to Avoid**: "He was tired and he wanted to rest and he didn't feel like talking."
-- **Human Style to Adopt**: "Exhausted, he wanted to rest and preferred silence."
-
-### **Generic Descriptions**
-- **AI Style to Avoid**: "The garden was beautiful."
-- **Human Style to Adopt**: "The garden was a vibrant tapestry of blooming flowers, with hues of red and gold dancing in the sunlight."
-
-### **Predictable Sentence Openers**
-- **AI Style to Avoid**: "I think this idea is great. I think we should implement it. I think it will work."
-- **Human Style to Adopt**: "This idea seems promising. Implementation could yield excellent results. Success feels within reach."
-
-### **Overuse of Passive Voice**
-- **AI Style to Avoid**: "The decision was made by the team to postpone the event."
-- **Human Style to Adopt**: "The team decided to postpone the event."
-
-### **Over-Optimization for Coherence**
-- **AI Style to Avoid**: "The system operates efficiently and effectively under all conditions."
-- **Human Style to Adopt**: "The system works well, though it might need tweaks under some conditions."
-
-### **Overuse of Filler Words**
-- **AI Style to Avoid**: "This is actually a very good point to consider."
-- **Human Style to Adopt**: "This is an excellent point to consider."
-
-### **Overly Predictable Phrasing**
-- **AI Style to Avoid**: "It was a dark and stormy night."
-- **Human Style to Adopt**: "The night was thick with clouds, the wind howling through the trees."
-
-### **Simplistic Sentence Transitions**
-- **AI Style to Avoid**: "He finished his work. Then, he went home."
-- **Human Style to Adopt**: "After wrapping up his work, he made his way home."
-
-### **Imbalanced Sentence Length**
-- **AI Style to Avoid**: "The party was fun. Everyone had a great time. We played games and ate snacks."
-- **Human Style to Adopt**: "The party was a blast. Laughter echoed as we played games, and the snacks were a hit."
-
-### **Over-Summarization**
-- **AI Style to Avoid**: "The book was interesting."
-- **Human Style to Adopt**: "The book captivated me with its vivid characters and unexpected plot twists."
-
-### **Overuse of Anthropomorphism**
-- **AI Style to Avoid**: "Spinning spreads their scent, like saying, 'This is mine!'"
-- **Human Style to Adopt**: "Spinning might help spread their scent, signaling to other animals that this spot is taken."
-
-### **Overuse of Enthusiasm**
-- **AI Style to Avoid**: "It's a fun little mystery to solve together!"
-- **Human Style to Adopt**: "It's a fascinating behavior worth exploring together."
-
-### **Lack of Specificity**
-- **AI Style to Avoid**: "This makes more sense for dogs who are really territorial, or live with other dogs."
-- **Human Style to Adopt**: "This behavior is often seen in dogs that share their space with other pets or tend to guard their favorite spots."
-
-### **Overuse of Vague Placeholders**
-- **AI Style to Avoid**: "Scientists and dog lovers alike have some ideas, though."
-- **Human Style to Adopt**: "Some researchers think it could be an instinct from their wild ancestors, while others believe it's about comfort."
-
-### **Simplistic Explanations**
-- **AI Style to Avoid**: "Spinning flattens the ground, making a nice, even spot for a nap. You see this a lot in dogs who are picky about where they sleep."
-- **Human Style to Adopt**: "Dogs may spin to prepare their resting spot. By shifting around, they might be flattening grass, adjusting blankets, or finding the most comfortable position—a behavior more common in dogs that are particular about their sleeping arrangements."
-
-## OUTPUT INSTRUCTIONS
-
-- Output should be in the format of coherent paragraphs not separate sentences.
-- Only output the rewritten text.
-
-## INPUT TEXT
-
-{{text}}
-'''
-song = '''<guidelines>
-Here is a step-by-step guide for writing song lyrics based on your requirements:
-
-1. **Core Theme & Story**
-   - Central emotion: You want to convey feelings and atmosphere
-   - Main story: Your lyrics should tell a coherent narrative
-   - Keep it focused and specific for a strong thematic foundation
-
-2. **Song Structure & Style** 
-   - Structure: Verse / Chorus / Verse / Chorus / Bridge / Chorus (or as specified)
-   - Use a consistent rhyme scheme (like AABB or ABAB) throughout
-   - Plan how imagery and emotions will evolve across sections
-
-3. **Craft Lyrics with Vivid Language**
-   - Use striking imagery, sensory details and poetic devices
-   - Incorporate metaphors and similes thoughtfully to enhance meaning
-   - Avoid clichés in favor of fresh, authentic language 
-   - Write from the heart in a natural, conversational style
-
-4. **Develop Hooks & Repetition**
-   - Create key lyrical phrases that encapsulate the song's theme  
-   - Place them strategically in the chorus to reinforce the message
-   - Use repetition to make the song memorable, with slight variations
-
-5. **Refine for Clarity & Impact**
-   - Review and cut any unnecessary words
-   - Perfect the phonetic sound and rhythmic flow of each line
-   - Ensure the story progresses logically
-   - Polish opening lines and final chorus for maximum impact
-</guidelines>
-
-<task>
-Write song lyrics based on the following description:
-{{text}}
-</task>
-'''
-tldr = '''<instructions>
-Generate a brilliant, literary TLDR, analyze the original text and identify the narrative perspective, voice, humor, emotional tone, and writing style. Identify the structure, key characters, locations, events, named identities, and key findings. Identify the most significant humorous, poetic, or linguistically interesting quotes and phrases.
-
-Your task: Create increasingly concise, entity-dense TLDRs of the original text. Target length: 30% of original. Use condensation through careful elimination.
-
-Principles to follow:
-A. Mimic original narrative perspective
-B. Maintain original tone & style
-C. Follow original structure (create TOC)
-D. Balance simplicity with verbatim quotes
-E. Use active voice, avoid gerunds
-F. Stay in character, immersing in original voice
-
-Estimate the original text length and calculate the target length.
-
-Generate the TLDR in 3 rounds of condensation and elimination, each time:
-
-1. Identify missing KEY PHRASES from the original text.
-2. Recall the essence of each stated principle and the original text length, target length, and previous rewrite length.
-3. Write a new denser TLDR, through careful condensation & elimination, which has the target length, follows the TOC, and covers every KEY PHRASE and detail from the previous rewrite, plus the missing KEY PHRASES.
-4. Estimate the actual length of the TLDR and compare it with the target length and previous TLDR length.
-5. Critically examine the TLDR, adhering to the stated principles, and eliminate irrelevant words or phrases.
-6. Rewrite the TLDR once, based on the critique, using the correct strategy.
-
-Repeat steps 1-6 for 3 rounds, striving to match target length and improve density.
-
-Key phrases should be essential, relevant, specific (5 words or fewer), interesting, novel, and faithful to the original.
-</instructions>
-
-<task>
-Follow the instructions to create a TLDR from the content of the following text:
-{{text}}
-</task>
-'''
-tts_optimize = '''<guide>
-You're a proficient editing expert of texts intended as input for text-to-speech models such as ElevenLabs.
-
-## General transformations
-
-- If a paragraph is very long, split it into "smaller semantic units" to allow for... natural pauses and breaths. 
-- If a sentence is very long, split it into "shorter sentences" at appropriate conjunctions or punctuation marks, but... do not change any words! Use semicolons; to highlight the structure of sentences.
-- Ensure each paragraph ends with a punctuation mark: Use a period for a "neutral" ending, use an exclamation mark for "emphatic" or "energetic" endings! 
-- Make sure that each single-line headline also ends with a punctuation mark ("." or "!")...
-- If you find a parenthesized phrase, keep the parentheses but additionally surround the phrase with spaces and ellipses... For example, change "sharp nodes (corners) or smooth nodes" into "sharp nodes ... (corners) ... or smooth nodes".
-- Surround all "em dashes", "en dashes", and hyphens with spaces and ellipses! For example, change "he is—and was—a hero" to "he is ... and was ... a hero". 
-- In each sentence, think about which word or phrase requires "emphasis" or "stress", as a great actor or speaker would... Surround this word or phrase with "quotation marks". Mark at least one word this way in each paragraph... Also replace any Markdown formatting with "quotation marks".
-- Mark dramatic pauses and rhetorical pauses with ellipses ("... "). Replace all em dashes and en dashes with ellipses! You can also place standalone ellipses between longer chunks of text, like this...
-
-- Enclose named entities or jargon terminology in "quotation marks", especially if they're first introduced. For example, change "click the File menu" to "click the »File« menu".
-- Enclose foreign phrases or ironic expressions in "quotation marks".
-- Add periods to acronyms... For example, change "UI" to "U.I.".
-
-## Language-sensitive transformations
-
-- Write out numbers as words... For example, change "42" to "forty-two".
-- Replace "/" and "&" between words with the appropriate conjunction or preposition... For example, change "up/down" to "up or down", and change "up & down" to "up and down".  
-- Use spelling appropriate for the main language of the text. If the text contains phrases (words, names, quotes etc.) in a language different than the main language, rewrite each phrase using phonetic spelling of the main language.
-
-## Selective transformations 
-
-With each word, sentence and paragraph... "think"! Think about the content, the meaning, how to best use punctuation... to add "interpretive cues"!
-
-However, don't overdo the quotation marks and ellipses! If you use them several times in each sentence, then the reader will have to constantly pause their voice or put emphasis... And that's also... "pointless"!
-
-Use ellipses and quotation marks to "slow down" the pace of the text... But avoid them if the text should be "vivid" and "fast-paced"!  
-
-Add exclamation marks when you need to add "drama"!!!
-
-## Additional Guidance
-
-- Don't shorten or rephrase!
-- Use your "best judgment" to maintain the intended meaning and flow of the text!
-- Be mindful of the context and tone of the original text when applying transformations...
-- Remember, the goal is to enhance the text for a "clear", "engaging", and "expressive" reading experience!
-</guide>
-
-<task>
-Rewrite the text to follow the guide judiciously. Enclose the rewritten text in the <output> XML tag.
-</task>
-
-<input>
-{{text}}
-</input>
-'''
-translate = '''<instructions>
-— Avoid mechanistic translation, create pleasant reading flow. 
-— Research the most professional way to translate technical jargon.
-— Maintain appropriate register and tone for the target audience.
-— Prefer syntactical simplicity and clarity.
-</instructions>
-
-<task>
-Translate the following text while maintaining natural flow and appropriate terminology:
-{{text}}
-</task>
-'''
-summary = '''<task>
-Create a comprehensive summary of the following text, highlighting the key points and main ideas. The summary should be clear, concise, and capture the essence of the original content while being significantly shorter.
-</task>
-
-<input>
-{{text}}
-</input>
-'''
-code_review = '''<task>
-Review the following code and provide constructive feedback on:
-- Code quality and readability
-- Potential bugs or issues
-- Performance considerations
-- Best practices and improvements
-- Security concerns if any
-</task>
-
-<code>
-{{text}}
-</code>
-'''
-qa = '''<task>
-Answer the following question based on the provided context. Be accurate, concise, and directly address what is being asked.
-</task>
-
-<context>
-{{text}}
-</context>
-'''
-creative_write = '''<task>
-Based on the following prompt, create an engaging and creative piece of writing. Let your imagination flow while maintaining coherence and quality.
-</task>
-
-<prompt>
-{{text}}
-</prompt>
-'''
-analyze = '''<task>
-Provide a detailed analysis of the following content. Consider multiple perspectives, identify key themes, and offer insights into the deeper meaning or implications.
-</task>
-
-<content>
-{{text}}
-</content>
-'''
-explain = '''<task>
-Explain the following concept or text in simple, easy-to-understand terms. Break down complex ideas and use examples where helpful.
-</task>
-
-<input>
-{{text}}
-</input>
-'''
-rewrite = '''<task>
-Rewrite the following text to improve clarity, flow, and impact while preserving the core message and meaning.
-</task>
-
-<original>
-{{text}}
-</original>
-'''
-bullets = '''<task>
-Convert the following text into clear, concise bullet points that capture the main ideas and key information.
-</task>
-
-<input>
-{{text}}
-</input>
-'''
-compare = '''<task>
-Compare and contrast the elements described in the following text. Highlight similarities, differences, and unique characteristics.
-</task>
-
-<input>
-{{text}}
-</input>
-'''
-instructions = '''<task>
-Convert the following information into clear, step-by-step instructions that are easy to follow.
-</task>
-
-<input>
-{{text}}
-</input>
-'''
-email = '''<task>
-Draft a professional email based on the following information. Maintain appropriate tone and include all necessary details.
-</task>
-
-<details>
-{{text}}
-</details>
-'''
-outline = '''<task>
-Create a structured outline from the following content, organizing the information hierarchically with main points and sub-points.
-</task>
-
-<content>
-{{text}}
-</content>
-'''
-
-</document_content>
-</document>
-
-<document index="17">
 <source>build.sh</source>
 <document_content>
 #!/bin/bash
@@ -3270,7 +2546,7 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 </document_content>
 </document>
 
-<document index="18">
+<document index="15">
 <source>cleanup.sh</source>
 <document_content>
 #!/usr/bin/env bash
@@ -3289,7 +2565,7 @@ uvx hatch publish
 </document_content>
 </document>
 
-<document index="19">
+<document index="16">
 <source>docs/_config.yml</source>
 <document_content>
 title: LMStrix
@@ -3311,7 +2587,7 @@ plugins:
 </document_content>
 </document>
 
-<document index="20">
+<document index="17">
 <source>docs/api.md</source>
 <document_content>
 ---
@@ -3360,7 +2636,7 @@ Represents the response from an inference request.
 </document_content>
 </document>
 
-<document index="21">
+<document index="18">
 <source>docs/how-it-works.md</source>
 <document_content>
 ---
@@ -3399,7 +2675,7 @@ The command saves the results of the test to a local registry, so you only need 
 </document_content>
 </document>
 
-<document index="22">
+<document index="19">
 <source>docs/index.md</source>
 <document_content>
 ---
@@ -3444,7 +2720,7 @@ This gives you a reliable, empirical measurement of the model's true capabilitie
 </document_content>
 </document>
 
-<document index="23">
+<document index="20">
 <source>docs/installation.md</source>
 <document_content>
 ---
@@ -3484,7 +2760,7 @@ pip install -e .[dev]
 </document_content>
 </document>
 
-<document index="24">
+<document index="21">
 <source>docs/usage.md</source>
 <document_content>
 ---
@@ -3605,7 +2881,7 @@ if __name__ == "__main__":
 </document_content>
 </document>
 
-<document index="25">
+<document index="22">
 <source>examples/README.md</source>
 <document_content>
 # LMStrix Usage Examples
@@ -3882,7 +3158,7 @@ For more help, see the main [LMStrix documentation](https://github.com/AdamAdli/
 </document_content>
 </document>
 
-<document index="26">
+<document index="23">
 <source>examples/cli/basic_workflow.sh</source>
 <document_content>
 #!/bin/bash
@@ -3947,7 +3223,7 @@ echo -e "\n### Workflow Demo Finished ###"
 </document_content>
 </document>
 
-<document index="27">
+<document index="24">
 <source>examples/cli/context_control_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -4049,7 +3325,7 @@ echo "- Test models first to find their true limits"
 </document_content>
 </document>
 
-<document index="28">
+<document index="25">
 <source>examples/cli/inference_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -4150,7 +3426,7 @@ echo "- Combine features for advanced use cases"
 </document_content>
 </document>
 
-<document index="29">
+<document index="26">
 <source>examples/cli/model_state_demo.sh</source>
 <document_content>
 #!/bin/bash
@@ -4208,7 +3484,7 @@ echo "- Third call: 'Using last-used model...'"
 </document_content>
 </document>
 
-<document index="30">
+<document index="27">
 <source>examples/cli/model_testing.sh</source>
 <document_content>
 #!/bin/bash
@@ -4310,453 +3586,7 @@ echo "- Tests automatically resume if interrupted"
 </document_content>
 </document>
 
-<document index="31">
-<source>examples/data/fontlab8.md</source>
-<document_content>
-
-# FontLab 8
-
-[Try Free](https://www.fontlab.com/font-editor/fontlab/#download)
-
-Try FontLab
-
-Click to download the free fully-functional 10-day trial version of FontLab 8 for Mac or Windows
-
-[Buy FontLab](https://www.fontlab.com/font-editor/fontlab/#buy)
-
-##### Mac & Windows font editor
-
-## Design & edit OpenType, variable, web & color fonts
-
-FontLab 8 is an integrated font editor for Mac and Windows that helps you create fonts from start to finish, from a simple design to a complex project, and brings a spark of magic into type design. Try FontLab 8 for free for 10 days, and start making fonts today!
-
-[FontLab 8](https://www.fontlab.com/font-editor/fontlab/#description)[What’s new](https://help.fontlab.com/fontlab/8/whats-new/)[Tutorials](https://help.fontlab.com/fontlab/8/tutorials/)[Manual](https://help.fontlab.com/fontlab/8/manual/)[Reference](https://help.fontlab.com/fontlab/8/reference/)[Download](https://www.fontlab.com/font-editor/fontlab/#download)[Buy](https://www.fontlab.com/font-editor/fontlab/#buy)
-
-![](./fontlab8_files/62a1bf8e7428ab453f5e9bfa_fl8-shot-masters.png)
-
-![](./fontlab8_files/62a1c07256d2cfdd53a6acc9_fl8-shot-theme-dark.png)
-
-![](./fontlab8_files/62a1bfad746b216e2e4bf0f6_fl8-shot-spacing.png)
-
-![](./fontlab8_files/62a1bfce41f2301c61256ce9_fl8-shot-color.png)
-
-WHAT TYPEFACE DESIGNERS SAY
-
-*“amazing and innovative”*
-‍**Eduardo Tunni**
-
-*“worthy of a master”*
-‍**Vassil Kateliev**
-
-*“best drawing tools”*
-‍**FÁBIO DUARTE MARTINS**
-
-*“more advanced than the competition”*
-‍**Tobias Kvant**
-
-*“wonderful, very addictive”*
-‍**Yves Michel**
-
-*“excels in new features and innovations”***Robert Strauch & Alexander Haberer**
-
-*“without FontLab,
-I could do just about nothing”*
-‍**Dave Lawrence**
-
-[Read More](https://help.fontlab.com/fontlab/8/reference/testimonials/)
-
-##### Create. Develop. Complete. Deliver.
-
-## Make world-class
-
-## fonts with *FontLab 8*
-
-![](./fontlab8_files/629fc5ec69d2132842ef4eca_icon_glyph.png)
-
-### Turn letters into art
-
-Express your imagination, prototype and experiment. **Draft** glyphs with bitmap **autotracing** and live **calligraphic** strokes.
-
-‍**Draw** and **edit** beautiful, smooth, consistent glyphs in **fractional** or **integer** precision, with the help of intelligent **snapping** and live **numeric** and **visual measurements**.
-
-**Refine** your drawings: create **overlaps**, **simplify** paths, **equalize** stems. **Scale** while **keeping** stroke **thickness**, globally **adjust** weight and width, **find & fix** imperfections.
-
-![](./fontlab8_files/629fe49423c2372ce10aa178_icon_word.png)
-
-### Make words look good
-
-**Build and assemble** glyphs from variable components or from self-adjusting segment or corner **skins**. Add **accented glyphs** with a simple double-click.
-
-‍**Space and kern** in multi-line tabs or windows that feel like a **text editor**.
-
-Add typographic smartness like ligatures, small caps, old-style numerals with automatically-generated **OpenType features**, and test them in the integrated state-of-the-art complex-script text engine.
-
-![](./fontlab8_files/629fe495bd125901d3fd04f5_icon_text.png)
-
-### Give text a voice
-
-Explore new directions with color and variation. Extend and complete any font in FontLab, or in mix with other font editors.
-
-**Create, open, extend, test** and **export** font **families**, **variable** OpenType fonts, **color** fonts and **web** fonts for any **Unicode** writing system.
-
-**Interchange** with other font editing apps like FontForge, RoboFont or Glyphs. **Supercharge** your workflow with powerful add-ins and Python 3 scripts.
-
-##### 700 REASONS TO LOVE FONTLAB 8
-
-## The *boldest* upgrade
-
-FontLab has been the go-to app for professional typeface designers to make smooth and consistent curves, comfortably tweak, space and kern a typeface, and then export technically solid fonts in any format. With FontLab 8, we’ve revised and modernized every aspect of our powerful, versatile font editor. **NEW** [FontLab 8.4](https://help.fontlab.com/fontlab/8/whats-new/release-notes/8.4.0.8898/) has 500 improvements over version 8, and 900 improvements over FontLab 7: it’s easier to learn and use, it’s better, and it’s faster.
-
-Discover the new dark UI theme, adjustable Stroke and Brush sketching, polished drawing and editing, non-destructive transformations with Delta, visual and numeric measurement, glyph building with Skin and variable components, spacing and kerning with mouse and trackpad, right-to-left kerning, batch font export and Actions sets, revamped color and gradients, plus support for .glyphs 3, FontForge, COLRv1, and Python 3.
-
-[##### EXPLORE & PREPARE *NEW*
-
-Relax your eyes with the new dark or refined light interface theme. Group panels into a vertical infinite, scrollable panel dock, and intuitively navigate between the panels.
-
-Adjust numeric values with sliders and calculations. Boost your productivity with up to 8× improved performance.
-
-Read More](https://help.fontlab.com/fontlab/8/whats-new/whats-new-01-explore-prepare/)[##### DRAFT & DRAW *NEW*
-
-Draw calligraphic letterforms with new Power Stroke or improved Power Brush. Modulate thickness visually with Thickness tool.
-
-Draw fluently with Pen and Rapid toolbox sub-tools. Draw polygons and stars with Rectangle tool.
-
-Read More](https://help.fontlab.com/fontlab/8/whats-new/whats-new-02-draft-draw/)[##### EDIT & REFINE *NEW*
-
-Make slanted selections, keep selections as you switch masters, and store them in Selections panel. Use toolbox for hands-free Power Nudge, handle Nudge and Lever precision dragging, and for easier curve cleanup with Eraser.
-
-Adjust curve tension numerically. Align and collapse points. Reverse contours with Fill tool. Sort contours. Paste to replace selection. Fine-tune individual ink traps and smart corners.
-
-Read More](https://help.fontlab.com/fontlab/8/whats-new/whats-new-03-edit-refine/)[##### CONSISTENCY & PRECISION *NEW*
-
-Study the numeric values of your stem widths, segment lengths, curve tensions and corner angles with Auto-meter, or hold G to temporarily view these in Guides tool along with quick measurement and master relations.
-
-View relative node offsets. Snap to continuation lines, perpendicular lines and centerlines. See coordinates for key nodes only. Edit visual TrueType Hinting like never before.
-
-Read More](https://help.fontlab.com/fontlab/8/whats-new/whats-new-04-consistency-precision/)[##### Build & ASSEMBLE *NEW*
-
-Convert selections to components or elements. Add decoration and attach shapes to nodes or segments with updated Glue filter, or with .glyphs-compatible Skin filter in segment, dash, corner and cap modes.
-
-Use Fusion for live non-destructive Boolean pathfinding. Use text shapes to re-use scaled words or phrases from your font in existing glyphs.
-
-Read More](https://help.fontlab.com/fontlab/8/whats-new/whats-new-05-build-assemble/)[##### METRICS & KERNING *NEW*
-
-Use your mouse or trackpad to adjust metrics and kerning with high-precision Lever dragging.
-
-Hide or reduce the visibility of spacing controls for distraction-free spacing and kerning.
-
-Auto-space and auto-kern with one click or tap.
-
-Edit kerning for **right-to-left** scripts like Arabic or Hebrew
-
-Read More](https://help.fontlab.com/fontlab/8/whats-new/whats-new-06-metrics-kerning/)[##### FAMILIES & VARIATION *NEW*
-
-Quickly make variable fonts from static fonts. Define custom per-glyph variation axes. Re-use live interpolated instances to build glyphs with smart variable components.
-
-Set start points and reverse contours in all masters. Make contours compatible with improved Matchmaker. Group layers visually.
-
-Read More](https://help.fontlab.com/fontlab/8/whats-new/whats-new-07-families-variation/)[##### TEST & ADJUST *NEW*
-
-Print waterfalls or interpolations from Preview panel. Batch-run selected FontAudit fixes in glyphs and masters. Create, save and run action sets that combine multiple actions.
-
-Batch-adjust stem widths in a master. Adjust by variation to replace contours with a different dynamic instance. Perform complex non-destructive contour transformations with new Delta filter.
-
-Read More](https://help.fontlab.com/fontlab/8/whats-new/whats-new-08-test-adjust/)[##### COLOR *NEW*
-
-Fill elements with gradients or solid colors. Copy-paste color fill and stroke between glyphs. Import drawings with gradients. Open and export better OpenType+SVG and new OpenType+COLRv1 fonts.
-
-Export an automatic dark-mode color palette. Overlay multiple layers into color fonts.
-
-Read More](https://help.fontlab.com/fontlab/8/whats-new/whats-new-09-color/)[##### GLYPHS & FONTS *NEW*
-
-Quickly create new glyphs with common suffixes. Clean up classes when removing glyphs.
-
-Copy-paste classes between fonts or masters. Exclude glyphs from export into final formats.
-
-Read More](https://help.fontlab.com/fontlab/8/whats-new/whats-new-10-glyphs-fonts/)[##### FORMATS *NEW*
-
-Batch-export many fonts into many formats. Open and export the .glyphs format in version 2 or 3. Open FontForge SFD files, bitmap BDF fonts and multi-flavor color fonts.
-
-Use improved VFJ, UFO, VF support. Export WOFF2 color web fonts.
-
-Read More](https://help.fontlab.com/fontlab/8/whats-new/whats-new-11-formats/)[##### Scripts & Integrations *NEW*
-
-Write and use Python 3 scripts. Seamlessly interchange with other font editing apps like Glyphs or RoboFont.
-
-Perform global transformations with the powerful TypeRig library. Create fonts for the entire Unicode 15 standard.
-
-Read More](https://help.fontlab.com/fontlab/8/whats-new/whats-new-12-scripts-extensions/)
-
-#### Ready to make your first font?
-
-## Try FontLab 8 today
-
-Download the **free** fully-functional ***10-day*** trial of FontLab 8, and **start making fonts today!**
-
-We’ll **occasionally** notify you about special offers and latest updates.
-
-Works on macOS 15 **Sequoia (Intel and Apple Silicon)** or older, including 10.15 Catalina.
-
-Works on 64-bit versions of **Windows 11** or later, **Windows 10**, and **Windows 8.1**. Limited functionality on Windows 7.
-
-Thank you! Your submission has been received!
-
-Oops! Something went wrong while submitting the form.
-
-##### *From novice to pro. From start to finish.*
-
-### Love type design and font making? FontLab 8 has you covered!
-
-##### **Explore & Prepare
-
-Work with **blazing speed** with even most complex contours thanks to FontLab’s optimized architecture.
-
-Customize FontLab’s interface to your needs, and easily navigate it with the intuitive **Quick Help** system: hover and hold F1.
-
-##### **Draft & Draw
-
-Draw **outline-based** glyphs using the **Brush**, **Pencil**, **Rapid**, **Pen**, **Ellipse / Oval**, **Rectangle / Polygon / Star** tools, in a purely-**integer** or **fractional** coordinate space.
-
-Draw **calligraphic** letterforms with live, adjustable **Power Stroke** and **Power Brush** tools. Modulate thickness visually with new **Thickness** tool. Assign and expand strokes.
-
-**Paste** and **import** PDF, EPS & SVG vector artwork with **monochrome**, **color** or **gradient** fills and strokes, as well as scanned character sets or color bitmap glyphs. Turn them into monochrome fonts via customizable **autotracing**, or into **color** OpenType fonts.
-
-##### **Edit & Refine
-
-Natively edit cubic **PostScript** Bézier curves and quadratic **TrueType** curves, including overlapping open paths, using the **Contour**, **Knife**, **Scissors** and **Fill** tools.
-
-Drag some nodes and have other nodes or handles follow intelligently with **Power Nudge** and handle **Nudge**. Drag without zooming in for small adjustments with **Lever** precision dragging.
-
-Convert between the curve types with adjustable precision.
-
-##### **Consistency & Precision
-
-Use upright and **slanted grids**, flexible **guidelines**, snapping **suggestions** and **live measurement** tools for consistent and precise vector drawing.
-
-Dynamically **snap to nodes**, angles, stem distances, continuation lines, perpendicular lines and centerlines as you draw.
-
-**See lengths**, angles, curve tension, stem thickness, whitespace distance — **measured numerically** and visually as you draw.
-
-Work on a purely integer grid, or scale, rotate and slant losslessly thanks to FontLab’s **fractional drawing** precision and live integer rounding, apply the rounding to bake in the integers.
-
-##### **Build & Assemble
-
-Build glyphs from **Components** that point to other glyphs, or from **Element References** that cross-reference each other and can be edited anywhere they appear.
-
-**Decompose** a component and unlink a reference to make local changes only.
-
-Use **Auto layers** to build predefined glyphs and keep them automatically updated.
-
-‍
-
-##### **Metrics & Kerning
-
-Space entire phrases and kern according to planned pair lists. Apply **tracking**, **modify widths**, sidebearings and kerning globally or for selected glyphs. Edit kerning for **right-to-left** scripts like Arabic or Hebrew.
-
-Automatically or manually build kerning classes and **link metrics** between glyphs using complex expressions. Automatically **calculate metrics** and kerning, or use autokerning suggestions as you kern manually.
-
-**Kern** between classes and glyphs in a UFO- and OpenType-compatible way, with exceptions. **Audit kerning** to find combinations that produce visual conflicts.
-
-##### **Families & Variation
-
-Blend, **interpolate** and **extrapolate** fonts, create **intermediate weights** and styles, build extensive font families and variable **OpenType PS & TT** fonts with intermediate font and glyph masters, conditional **glyph substitutions**, and automatic masters matching for point-compatible outlines.
-
-**Preview interpolation** live with sliders, variations map and play/pause buttons.
-
-##### **Test & Adjust
-
-Use **Preview panel** to view current and custom text in current, all or visible masters, waterfalls, composites and anchor groups.
-
-**Print** a **glyph map** from the Font window; words, phrases and texts from the Glyph window; waterfalls and masters from the Preview panel.
-
-Preview Windows **screen rendering** with built-in genuine Microsoft ClearType, even on the Mac.
-
-Preview complex-script shaping and OpenType features with the genuine **HarfBuzz** world-ready shaper.
-
-Find and fix outline problems with **FontAudit**. Automatically clean up and optimize outline drawings, balance segments and modify curve tension, **harmonize** G2 **curvature**, create and remove overlapping paths, apply **non-destructive ink traps** and **rounded corners.**
-
-Run **automatic action sets** to make changes to multiple glyphs and layers, to change weight, create contour versions, apply effects to outline and bitmap glyphs.
-
-##### **Color
-
-Paste and import **PDF** & SVG vector artwork with color or gradient fills and strokes, and color images in a variety of formats.
-
-Apply solid colors or **gradients** to fill and stroke, edit gradients visually.
-
-Space and kern vector-based or bitmap-based color glyphs, automatically build OpenType features.
-
-**Overlay** monochrome fonts or layers into multi-color fonts.
-
-Export into OpenType+**SVG**, +**COLRv0/v1**, +**sbix** and +CBDT color font formats.
-
-##### **Glyphs & Fonts
-
-Create, open, edit and export **monochrome** outline fonts with single masters (desktop and web) and **multiple masters** (variable), **color** fonts (with multi-layer editable glyphs, SVG glyphs or bitmap glyphs).
-
-**Compare** fonts, merge and split font glyph sets and variations. Modify fonts, glyphs, metrics, kerning and technical font information. **Convert** between font formats, improve screen appearance with automatic and manual hinting. **Exchange** font source with other font creation apps.
-
-**Unicode 15** support.
-
-Automatic and manual **OpenType Layout** features creation with FEA format and Adobe FDK for OpenType.
-
-##### **Formats
-
-Open and export **OpenType-PS**/CFF (OTF), **OpenType TT** / TrueType (TTF), **Variable OpenType** TT (TTF+gvar), Variable OpenType PS (OTF+CFF2), Color OpenType (TTF+SVG, +**COLRv0/v1**, +CBDT, +sbix), PostScript Type 1 (PFB/PFA), **Web fonts** (WOFF2, WOFF, EOT), FontLab (VFB, VFC, VFJ), UFO 2 & 3, designSpace, **Glyphs.app** (glyphs v2 & 3).
-
-Also open BitFonter Photofont (PHF+PNG, +SVG), Fontographer (FOG), Ikarus, **FontForge** SFD, bitmap **BDF**, and any of the above in ZIP files.
-
-##### **Scripts & Integrations
-
-Write and use **Python 3** scripts.
-
-Seamlessly interchange with other font editing apps like **Glyphs**, **RoboFont**, **FontForge** and **Microsoft VOLT**.
-
-Perform global transformations with the powerful **TypeRig** library.
-
-##### **Learn the Tricks
-
-[**Read or watch**](https://help.fontlab.com/fontlab/8/tutorials/) the [**FontLab tutorials**](https://help.fontlab.com/fontlab/8/tutorials/), and start your font-making adventure. Learn type design essentials, follow the exercises, master FontLab and benefit from pro tips and techniques!
-
-[**Download**](https://fontlabcom.github.io/getgo-fonts/) the [**GetGo Fonts**](https://fontlabcom.github.io/getgo-fonts/) for FontLab and use them as inspiration or templates for your own font. [GetGo Fonts](https://fontlabcom.github.io/getgo-fonts/) is a curated collection of free and opensource designs that range from simple sanserif and serif designs to multi-axis variable font projects and world script fonts.
-
-##### **Join the Pros
-
-FontLab 8 is versatile and battle-proven. **Thousands of designers and foundries** large and small have been using the FontLab apps to create 10,000s professional fonts: Adobe, Apple, FontFont, Linotype, Microsoft, Monotype, Canada Type, Porchez, Underware, Tiro Typeworks and many more.
-
-Most fonts that are bundled with Microsoft Windows or with the Apple systems (macOS, iOS) were designed in our apps!
-
-##### Made with FontLab
-
-## From fresh ideas
-
-## to ideal fonts
-
-Designers and foundries have used FontLab to create fonts in all flavors and for various world scripts. Check out some of the highlights below, and visit our [Testimonials](https://help.fontlab.com/fontlab/8/reference/testimonials/) to read what designers say about the newest FontLab!
-
-![](./fontlab8_files/629fc5ec69d2132842ef4eca_icon_glyph.png)
-
-Variable font families like [**Graduate**](https://etunni.github.io/Graduate-Variable-Font/) (Eduardo Tunni), [**Science Gothic**](https://github.com/tphinney/science-gothic) (Thomas Phinney & team), [**Grand Gothik**](https://grandgothik.com/) (Parachute), [**Circe Slab**](https://www.paratype.com/fonts/pt/circe-slab), [**Fact**](https://www.paratype.com/fonts/pt/fact) (ParaType), [**Bolyar Sans**](http://myfonts.us/AWORGh) (Fontmaker), [**Lato**](https://github.com/latofonts/lato-source/) (Łukasz Dziedzic).
-
-![](./fontlab8_files/629fe49423c2372ce10aa178_icon_word.png)
-
-Ambitious historical revivals like [**CAL Bodoni**](https://calfonts.com/origin/) by (California Type Foundry).
-
-One-offs like [**Wanchy**](https://www.herzbergdesign.com/fonts/wanchy) (Matthijs Herzberg) or [**Optician Sans**](https://github.com/anewtypeofinterference/Optician-Sans) (Scannerlicker & ANTI Hamar).
-
-![](./fontlab8_files/629fe495bd125901d3fd04f5_icon_text.png)
-
-Massive icon fonts like [**Material Symbols**](https://fonts.google.com/icons) (Google).
-
-Color fonts like the titling font for the [Joker](https://www.instagram.com/p/BwFwtQHhQya/) movie by Chad Danieley.
-
-#### Ready for the next level?
-
-## Buy FontLab 8
-
-### Education
-
-For more info, [see all edu offers](https://www.fontlab.com/edu/)
-
-Student 1-year
-
-[$109](https://fontlab.onfastspring.com/fl8-edu1y)
-
-Buy if you’re an academic student, use for any purpose for 365 days. [Upgradable](https://fontlab.onfastspring.com/fl8-u-fl56) to lifetime.
-
-Student / teacher lifetime
-
-[$335](https://fontlab.onfastspring.com/fl8-edu)
-
-Buy if you’re an academic student, teacher or institution, use forever for any purpose. Discounts on future upgrades.
-
-Course 4-months
-
-[$249](https://fontlab.onfastspring.com/fl8-edu4m)
-
-Buy as teacher / school for 20 students, who can use it for 4 months.
-
-Workshop 2-weeks
-
-[$99](https://fontlab.onfastspring.com/fl8-edu2w)
-
-Buy as workshop organizer for 20 participants, who can use it for 14 days.
-
-### Starter
-
-3-months license
-
-US$ 97
-
-Mac & Windows
-1 user, 3 computers
-Buy once
-No recurring fees **Use for 97 days
-Full functionality
-Can buy again when expires**No extra plugins required
-Regular feature updates
-Expert support
-
-[BUY NOW](https://fontlab.onfastspring.com/fl8-3m)
-
-### Pro
-
-Lifetime license
-
-US$499
-
-Mac & Windows
-1 user, 3 computers
-Buy once
-No recurring fees
-**Full functionality forever**
-**Discounts on future upgrades
-Volume discount available
-‍**No extra plugins required
-Regular feature updates
-Expert support**‍**
-
-[BUY NOW](https://fontlab.onfastspring.com/popup-fontlab8)
-
-### Upgrade
-
-If you own another font editor, get a lifetime license at a discount
-
-FontLab 7
-
-[$149](https://fontlab.onfastspring.com/fl8-u-fl7)
-
-Click the price, then enter your FL70 serial as Coupon Code & click Apply. Free if bought after 20 April 2022.
-
-FontLab VI
-
-[$299](https://fontlab.onfastspring.com/fl8-u-fl56)
-
-FontLab Studio 5
-
-[$299](https://fontlab.onfastspring.com/fl8-u-fl56)
-
-Fontographer 5
-
-[$399](https://fontlab.onfastspring.com/fl8-u-fog)
-
-TypeTool 3
-
-[$459](https://fontlab.onfastspring.com/fl8-upgrade)
-
-RoboFont
-
-[$459](https://fontlab.onfastspring.com/fl8-upgrade)
-
-Glyphs
-
-[$459](https://fontlab.onfastspring.com/fl8-upgrade)
-
-Your final price will include applicable tax. Pre-sales questions? Multi-user upgrades? Different payment methods? [Contact Sales](https://www.fontlab.com/contact/). We also sell through [regional distributors](https://www.fontlab.com/distributors/). FontLab 8.4 works on **macOS 10.15–15 Sequoia (natively on Intel and Apple Silicon)** and on **Windows 8.1–11**.
-
-</document_content>
-</document>
-
-<document index="32">
+<document index="28">
 <source>examples/data/sample_context.txt</source>
 <document_content>
 This is a sample text file designed for context length testing in LMStrix. The purpose of this file is to provide a sufficiently large and repetitive block of text that can be used to fill the context window of a large language model. By feeding a model a long prompt composed of this text, we can determine the maximum number of tokens it can process before it fails to load or produce a coherent response. This process is crucial for understanding the true operational limits of a model, which may differ from the limits advertised by its developers. The text itself is not intended to be meaningful, but rather to serve as a consistent and measurable filler for the model's context buffer. The repetition ensures that the content is uniform and does not introduce unexpected variables into the testing process.
@@ -4772,7 +3602,7 @@ This is a sample text file designed for context length testing in LMStrix. The p
 </document_content>
 </document>
 
-<document index="33">
+<document index="29">
 <source>examples/data/test_questions.json</source>
 <document_content>
 [
@@ -4784,7 +3614,7 @@ This is a sample text file designed for context length testing in LMStrix. The p
 </document_content>
 </document>
 
-<document index="34">
+<document index="30">
 <source>examples/prompts/analysis.toml</source>
 <document_content>
 # examples/prompts/analysis.toml
@@ -4805,7 +3635,7 @@ description = "Analyzes the sentiment of a given text."
 </document_content>
 </document>
 
-<document index="35">
+<document index="31">
 <source>examples/prompts/coding.toml</source>
 <document_content>
 # examples/prompts/coding.toml
@@ -4827,7 +3657,7 @@ description = "Explains a snippet of code."
 </document_content>
 </document>
 
-<document index="36">
+<document index="32">
 <source>examples/prompts/creative.toml</source>
 <document_content>
 # examples/prompts/creative.toml
@@ -4844,7 +3674,7 @@ description = "Generates a story idea from a genre and character."
 </document_content>
 </document>
 
-<document index="37">
+<document index="33">
 <source>examples/prompts/qa.toml</source>
 <document_content>
 # examples/prompts/qa.toml
@@ -4865,7 +3695,7 @@ description = "Answers a question based on a provided context."
 </document_content>
 </document>
 
-<document index="38">
+<document index="34">
 <source>examples/prompts.toml</source>
 <document_content>
 # Example prompt templates for LMStrix
@@ -4962,6 +3792,7 @@ Special instructions: {{instructions}}"""
 
 from lmstrix import LMStrix
 from lmstrix.core.models import ContextTestStatus
+from lmstrix.utils.logging import logger
 
 def main(()) -> None:
     """Demonstrates advanced context testing with the LMStrix Python API."""
@@ -4972,6 +3803,7 @@ def main(()) -> None:
 
 from lmstrix import LMStrix
 from lmstrix.api.exceptions import InferenceError, ModelLoadError, ModelNotFoundError
+from lmstrix.utils.logging import logger
 
 def main(()) -> None:
     """Demonstrates basic usage of the LMStrix Python API."""
@@ -4983,6 +3815,7 @@ def main(()) -> None:
 import time
 from lmstrix import LMStrix
 from lmstrix.core.models import ContextTestStatus
+from lmstrix.utils.logging import logger
 
 def main(()) -> None:
     """Demonstrates batch processing of multiple models for testing or inference."""
@@ -4995,6 +3828,7 @@ from pathlib import Path
 from lmstrix import LMStrix
 from lmstrix.api.exceptions import InferenceError, ModelLoadError
 from lmstrix.loaders.prompt_loader import load_single_prompt
+from lmstrix.utils.logging import logger
 
 def main(()) -> None:
     """Demonstrates custom inference workflows with the LMStrix Python API."""
@@ -5008,12 +3842,13 @@ import toml
 from lmstrix import LMStrix
 from lmstrix.core.prompts import PromptResolver
 from lmstrix.loaders.prompt_loader import load_prompts, load_single_prompt
+from lmstrix.utils.logging import logger
 
 def main(()) -> None:
     """Demonstrates prompt template features."""
 
 
-<document index="39">
+<document index="35">
 <source>examples/run_all_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -5094,41 +3929,60 @@ import fire
 from rich.console import Console
 from slugify import slugify
 from lmstrix.core.inference_manager import InferenceManager
+from lmstrix.utils.logging import logger
 from lmstrix.loaders.model_loader import load_model_registry
-
-def process_text_with_model((
-    input_file: str,
-    model_id: str | None = None,
-    verbose: bool = False,
-)) -> str:
-    """ Process a text file by sending paragraphs to a model for number-to-words conversion...."""
-
-def main(()) -> None:
-    """Main entry point using Fire CLI."""
+from lmstrix.utils.logging import logger
 
 
-<document index="40">
-<source>issues/105.txt</source>
+<document index="36">
+<source>issues/301.txt</source>
 <document_content>
-```json
-{
-    "key1": "value1",
-    "key2": "value2"
-}
+```
+$ ./adam2.sh
+15:41:35 | INFO | lmstrix.loaders.prompt_loader:load_single_prompt:128 - Loaded prompts from adam.toml
+15:41:35 | WARNING | lmstrix.loaders.prompt_loader:load_single_prompt:143 - TOPL placeholder resolution failed: Format string contains positional fields
+15:41:35 | DEBUG | lmstrix.core.prompts:resolve_prompt:186 - Internal resolution complete after 2 passes
+15:41:35 | INFO | lmstrix.loaders.prompt_loader:load_single_prompt:153 - Resolved prompt 'translate'
+Loaded prompt 'translate' from adam.toml
+Resolved placeholders: text, think
+15:41:35 | DEBUG | lmstrix.utils.paths:get_lmstudio_path:26 - Found LM Studio at /Users/Shared/lmstudio
+15:41:35 | DEBUG | lmstrix.utils.paths:get_lmstudio_path:26 - Found LM Studio at /Users/Shared/lmstudio
+15:41:35 | INFO | lmstrix.loaders.model_loader:load_model_registry:43 - Read 75 models from /Users/Shared/lmstudio/lmstrix.json
+15:41:35 | INFO | lmstrix.core.inference_manager:infer:92 - Explicit context specified: 75%
+15:41:35 | DEBUG | lmstrix.api.client:load_model_by_id:104 - Found model match: qwen/qwen3-4b -> qwen/qwen3-4b
+15:41:35 | ERROR | lmstrix.core.inference_manager:infer:188 - Inference failed for model qwen/qwen3-4b: Failed to load model 'qwen/qwen3-4b': Failed to load model 'qwen/qwen3-4b'. Available models: ['google/gemma-3n-e4b', 'microsoft/phi-4-mini-reasoning', 'deepseek-r1-0528-qwen3-8b', 'magistral-small-2507-rebased-vision-i1', 'huihui-qwen3-14b-abliterated-v2']
+Inference failed: Failed to load model 'qwen/qwen3-4b': Failed to load model 'qwen/qwen3-4b'. Available models: ['google/gemma-3n-e4b',
+'microsoft/phi-4-mini-reasoning', 'deepseek-r1-0528-qwen3-8b', 'magistral-small-2507-rebased-vision-i1', 'huihui-qwen3-14b-abliterated-v2']
 ```
 
-The TOML equivalence: 
+but our lmstrix.json database has
 
-```toml
-key1 = "value1"
-key2 = "value2"
+```
+"qwen/qwen3-4b": {
+"id": "qwen/qwen3-4b",
+"short_id": "qwen3-4b",
+"path": "qwen/qwen3-4b",
+"size_bytes": 4280583359,
+"ctx_in": 32768,
+"ctx_out": 4096,
+"has_tools": false,
+"has_vision": false,
+"tested_max_context": 32768,
+"loadable_max_context": null,
+"last_known_good_context": 32768,
+"last_known_bad_context": null,
+"context_test_status": "completed",
+"context_test_log": "/Users/Shared/lmstudio/lmstrix/context_tests/qwen_qwen3-4b_context_test.log",
+"context_test_date": "2025-07-28 01:18:12.706392",
+"failed": false,
+"error_msg": ""
+},
 ```
 
-So we don't need the `[groups]` in adam.toml. Rewrite it to simplify the nesting. Make sure that we only need to resolve `{text}`. Also `--text` (string) and `--text_file` (path) should be supported in `lmstrix infer`. `--text_file` would be loaded as content, and `--text` would be passed as a string, and it would then be equivalent to --dict with `text` as a key and the value as value. So it would be used for the `{text}` placeholder. Rewrite all prompts in adam.toml and in @examples/prompts_adam/demo_adam_prompts_cli.sh to use this approach. Remove the unneeded files from @examples/prompts_adam
 </document_content>
 </document>
 
-<document index="41">
+<document index="37">
 <source>pyproject.toml</source>
 <document_content>
 [build-system]
@@ -5457,16 +4311,24 @@ directory = "htmlcov"
 
 from importlib.metadata import PackageNotFoundError, version
 from lmstrix.api.exceptions import ModelNotFoundError
+from lmstrix.utils.logging import logger
 from lmstrix.core.context_tester import ContextTester
+from lmstrix.utils.logging import logger
 from lmstrix.core.inference_manager import InferenceManager
+from lmstrix.utils.logging import logger
 from lmstrix.core.models import Model
+from lmstrix.utils.logging import logger
 from lmstrix.loaders.model_loader import (
+from lmstrix.utils.logging import logger
+
     load_model_registry,
     save_model_registry,
     scan_and_update_registry,
 )
 from lmstrix.utils.context_parser import get_model_max_context, parse_out_ctx
+from lmstrix.utils.logging import logger
 from lmstrix._version import __version__
+from lmstrix.utils.logging import logger
 
 class LMStrix:
     """High-level interface to LMStrix's core features."""
@@ -5519,7 +4381,10 @@ from lmstrix.cli.main import main
 # Language: python
 
 from lmstrix.api.client import CompletionResponse, LMStudioClient
+from lmstrix.utils.logging import logger
 from lmstrix.api.exceptions import (
+from lmstrix.utils.logging import logger
+
     APIConnectionError,
     ConfigurationError,
     ContextLimitExceededError,
@@ -5536,9 +4401,9 @@ from lmstrix.api.exceptions import (
 from typing import Any
 import lmstudio
 from lmstudio import LMStudioServerError
-from loguru import logger
 from pydantic import BaseModel, Field
 from lmstrix.api.exceptions import APIConnectionError, InferenceError, ModelLoadError
+from lmstrix.utils.logging import logger
 import time
 
 class CompletionResponse(B, a, s, e, M, o, d, e, l):
@@ -5567,6 +4432,8 @@ class LMStudioClient:
         out_ctx: int = -1,  # -1 for unlimited
         temperature: float = 0.7,  # Temperature for generation
         model_id: str | None = None,  # Pass model_id separately
+        model_context_length: int
+        | None = None,  # Model's total context length for percentage calculation
         **kwargs: Any,  # Accept additional parameters
     )) -> CompletionResponse:
         """Make a completion request to a loaded LM Studio model."""
@@ -5599,6 +4466,8 @@ def completion((
         out_ctx: int = -1,  # -1 for unlimited
         temperature: float = 0.7,  # Temperature for generation
         model_id: str | None = None,  # Pass model_id separately
+        model_context_length: int
+        | None = None,  # Model's total context length for percentage calculation
         **kwargs: Any,  # Accept additional parameters
     )) -> CompletionResponse:
     """Make a completion request to a loaded LM Studio model."""
@@ -5750,21 +4619,33 @@ import fire
 from rich.console import Console
 from rich.table import Table
 from lmstrix.api.exceptions import APIConnectionError, ModelRegistryError
+from lmstrix.utils.logging import logger
 from lmstrix.core.concrete_config import ConcreteConfigManager
+from lmstrix.utils.logging import logger
 from lmstrix.core.context_tester import ContextTester
+from lmstrix.utils.logging import logger
 from lmstrix.core.inference_manager import InferenceManager
+from lmstrix.utils.logging import logger
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
+from lmstrix.utils.logging import logger
 from lmstrix.loaders.model_loader import (
+from lmstrix.utils.logging import logger
+
     load_model_registry,
     scan_and_update_registry,
 )
 from lmstrix.utils import get_context_test_log_path, setup_logging
+from lmstrix.utils.logging import logger
 from lmstrix.utils.context_parser import get_model_max_context, parse_out_ctx
+from lmstrix.utils.logging import logger
 from lmstrix.utils.paths import get_default_models_file, get_lmstudio_path
+from lmstrix.utils.logging import logger
 from lmstrix.utils.state import StateManager
+from lmstrix.utils.logging import logger
 from pathlib import Path
 from pathlib import Path
 from lmstrix.loaders.prompt_loader import load_single_prompt
+from lmstrix.utils.logging import logger
 import sys
 
 class LMStrixCLI:
@@ -5790,7 +4671,7 @@ class LMStrixCLI:
         prompt: str,
         model_id: str | None = None,
         out_ctx: int | str = -1,
-        in_ctx: int | None = None,
+        in_ctx: int | str | None = None,
         reload: bool = False,
         file_prompt: str | None = None,
         dict: str | None = None,
@@ -5800,10 +4681,6 @@ class LMStrixCLI:
         verbose: bool = False,
     )) -> None:
         """Run inference on a specified model."""
-    def health((self, verbose: bool = False)) -> None:
-        """Check database health and backup status."""
-    def save((self, flash: bool = False, verbose: bool = False)) -> None:
-        """Save tested context limits to LM Studio concrete config files."""
 
 def _get_models_to_test((
     registry: ModelRegistry,
@@ -5869,7 +4746,7 @@ def infer((
         prompt: str,
         model_id: str | None = None,
         out_ctx: int | str = -1,
-        in_ctx: int | None = None,
+        in_ctx: int | str | None = None,
         reload: bool = False,
         file_prompt: str | None = None,
         dict: str | None = None,
@@ -5901,6 +4778,7 @@ from lmstrix.core.context_tester import ContextTester, ContextTestResult
 from lmstrix.core.inference_manager import InferenceManager
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 from lmstrix.core.prompts import PromptResolver, ResolvedPrompt
+from lmstrix.utils.logging import logger
 
 
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/core/concrete_config.py
@@ -5909,12 +4787,12 @@ from lmstrix.core.prompts import PromptResolver, ResolvedPrompt
 import json
 from pathlib import Path
 from typing import Any
-from loguru import logger
 from lmstrix.core.models import Model
+from lmstrix.utils.logging import logger
 
 class ConcreteConfigManager:
     """Manages LM Studio concrete model configurations."""
-    def __init__((self, lms_path: Path)):
+    def __init__((self, lms_path: Path)) -> None:
         """Initialize the concrete config manager."""
     def _get_config_path((self, model: Model)) -> Path:
         """Get the path for a model's concrete config file."""
@@ -5927,7 +4805,7 @@ class ConcreteConfigManager:
     def save_all_configs((self, models: list[Model], enable_flash: bool = False)) -> tuple[int, int]:
         """Save concrete configs for all models with tested contexts."""
 
-def __init__((self, lms_path: Path)):
+def __init__((self, lms_path: Path)) -> None:
     """Initialize the concrete config manager."""
 
 def _get_config_path((self, model: Model)) -> Path:
@@ -5951,11 +4829,11 @@ def save_all_configs((self, models: list[Model], enable_flash: bool = False)) ->
 
 import json
 from pathlib import Path
-from loguru import logger
 from pydantic import BaseModel, Field
 from lmstrix.api.client import LMStudioClient
 from lmstrix.api.exceptions import InferenceError, ModelLoadError
 from lmstrix.core.models import Model
+from lmstrix.utils.logging import logger
 
 class OptimizationResult(B, a, s, e, M, o, d, e, l):
     """Result from context optimization."""
@@ -6032,19 +4910,9 @@ def find_optimal_context((
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py
 # Language: python
 
-import json
-import time
 from datetime import datetime
-from pathlib import Path
-from typing import ClassVar, Self
-from lmstudio import LMStudioModelNotFoundError
-from loguru import logger
+from typing import ClassVar
 from lmstrix.api import LMStudioClient
-from lmstrix.api.exceptions import InferenceError, ModelLoadError
-from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
-from lmstrix.loaders.model_loader import load_model_registry, save_model_registry
-from lmstrix.utils import get_context_test_log_path, get_lmstrix_log_path
-from lmstrix.core.models import ContextTestStatus
 
 class ContextTestResult:
     """Result of a context test attempt."""
@@ -6072,97 +4940,6 @@ class ContextTester:
         fast_mode: bool = False,
     )) -> None:
         """Initialize context tester."""
-    def _log_result((self, log_path: Path, result: ContextTestResult)) -> None:
-        """Append test result to log file."""
-    def _log_to_main_log((
-        self,
-        model_id: str,
-        context_size: int,
-        event_type: str,
-        details: str = "",
-    )) -> None:
-        """Log attempt or solution to the main lmstrix.log.txt file."""
-    def _test_at_context((
-        self: Self,
-        model_path: str,
-        context_size: int,
-        log_path: Path,
-        model: Model | None = None,
-        registry: ModelRegistry | None = None,
-    )) -> ContextTestResult:
-        """Test model at a specific context size with retry logic for timeouts."""
-    def _calculate_smart_increment((
-        self,
-        last_tested: int,
-        max_declared: int,
-    )) -> int:
-        """Calculate smart context increment based on gap between tested and declared max."""
-    def _perform_initial_test((
-        self: Self,
-        model: Model,
-        min_context: int,
-        log_path: Path,
-        registry: ModelRegistry,
-    )) -> ContextTestResult | None:
-        """Perform the initial test at a minimal context to ensure the model is operational."""
-    def _perform_threshold_test((
-        self: Self,
-        model: Model,
-        max_context: int,
-        log_path: Path,
-        registry: ModelRegistry,
-    )) -> ContextTestResult | None:
-        """Perform the test at the specified threshold."""
-    def _perform_incremental_test((
-        self: Self,
-        model: Model,
-        start_context: int,
-        log_path: Path,
-        registry: ModelRegistry,
-    )) -> None:
-        """Perform incremental testing from a known good context."""
-    def _perform_binary_search((
-        self: Self,
-        model: Model,
-        low: int,
-        high: int,
-        log_path: Path,
-        registry: ModelRegistry,
-    )) -> None:
-        """Perform binary search to find the optimal context size."""
-    def _filter_models_for_testing((self: Self, models: list[Model])) -> list[Model]:
-        """Filter out embedding models and already completed models."""
-    def _perform_pass_one_testing((
-        self: Self,
-        sorted_models: list[Model],
-        min_context: int,
-        registry: ModelRegistry,
-    )) -> tuple[dict[str, Model], list[Model]]:
-        """Perform the first pass of testing at a minimal context."""
-    def _perform_subsequent_passes((
-        self: Self,
-        active_models: dict[str, Model],
-        threshold: int,
-        registry: ModelRegistry,
-    )) -> None:
-        """Perform subsequent passes of testing at progressively higher contexts."""
-    def test_model((
-        self: Self,
-        model: Model,
-        min_context: int = 2047,
-        max_context: int | None = None,
-        registry: ModelRegistry | None = None,
-    )) -> Model:
-        """Run full context test on a model using the new fixed context testing strategy."""
-    def _is_embedding_model((self: Self, model: Model)) -> bool:
-        """Check if a model is an embedding model."""
-    def test_all_models((
-        self: Self,
-        models: list[Model],
-        threshold: int = 102400,
-        registry: ModelRegistry | None = None,
-    )) -> list[Model]:
-        """Test multiple models efficiently using a pass-based approach."""
 
 def __init__((
         self,
@@ -6189,111 +4966,6 @@ def __init__((
     )) -> None:
     """Initialize context tester."""
 
-def _log_result((self, log_path: Path, result: ContextTestResult)) -> None:
-    """Append test result to log file."""
-
-def _log_to_main_log((
-        self,
-        model_id: str,
-        context_size: int,
-        event_type: str,
-        details: str = "",
-    )) -> None:
-    """Log attempt or solution to the main lmstrix.log.txt file."""
-
-def _test_at_context((
-        self: Self,
-        model_path: str,
-        context_size: int,
-        log_path: Path,
-        model: Model | None = None,
-        registry: ModelRegistry | None = None,
-    )) -> ContextTestResult:
-    """Test model at a specific context size with retry logic for timeouts."""
-
-def _calculate_smart_increment((
-        self,
-        last_tested: int,
-        max_declared: int,
-    )) -> int:
-    """Calculate smart context increment based on gap between tested and declared max."""
-
-def _perform_initial_test((
-        self: Self,
-        model: Model,
-        min_context: int,
-        log_path: Path,
-        registry: ModelRegistry,
-    )) -> ContextTestResult | None:
-    """Perform the initial test at a minimal context to ensure the model is operational."""
-
-def _perform_threshold_test((
-        self: Self,
-        model: Model,
-        max_context: int,
-        log_path: Path,
-        registry: ModelRegistry,
-    )) -> ContextTestResult | None:
-    """Perform the test at the specified threshold."""
-
-def _perform_incremental_test((
-        self: Self,
-        model: Model,
-        start_context: int,
-        log_path: Path,
-        registry: ModelRegistry,
-    )) -> None:
-    """Perform incremental testing from a known good context."""
-
-def _perform_binary_search((
-        self: Self,
-        model: Model,
-        low: int,
-        high: int,
-        log_path: Path,
-        registry: ModelRegistry,
-    )) -> None:
-    """Perform binary search to find the optimal context size."""
-
-def _filter_models_for_testing((self: Self, models: list[Model])) -> list[Model]:
-    """Filter out embedding models and already completed models."""
-
-def _perform_pass_one_testing((
-        self: Self,
-        sorted_models: list[Model],
-        min_context: int,
-        registry: ModelRegistry,
-    )) -> tuple[dict[str, Model], list[Model]]:
-    """Perform the first pass of testing at a minimal context."""
-
-def _perform_subsequent_passes((
-        self: Self,
-        active_models: dict[str, Model],
-        threshold: int,
-        registry: ModelRegistry,
-    )) -> None:
-    """Perform subsequent passes of testing at progressively higher contexts."""
-
-def test_model((
-        self: Self,
-        model: Model,
-        min_context: int = 2047,
-        max_context: int | None = None,
-        registry: ModelRegistry | None = None,
-    )) -> Model:
-    """Run full context test on a model using the new fixed context testing strategy."""
-
-def _is_embedding_model((self: Self, model: Model)) -> bool:
-    """Check if a model is an embedding model."""
-
-def test_all_models((
-        self: Self,
-        models: list[Model],
-        threshold: int = 102400,
-        registry: ModelRegistry | None = None,
-    )) -> list[Model]:
-    """Test multiple models efficiently using a pass-based approach."""
-
 
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py
 # Language: python
@@ -6301,11 +4973,11 @@ def test_all_models((
 import time
 from typing import Any
 import lmstudio
-from loguru import logger
 from pydantic import BaseModel, Field
 from lmstrix.api.client import LMStudioClient
 from lmstrix.api.exceptions import ModelNotFoundError
 from lmstrix.core.models import ModelRegistry
+from lmstrix.utils.logging import logger
 
 class InferenceResult(B, a, s, e, M, o, d, e, l):
     """Result from an inference run."""
@@ -6370,10 +5042,10 @@ import builtins
 import contextlib
 import time
 from typing import Any
-from loguru import logger
 from lmstrix.api.client import LMStudioClient
 from lmstrix.api.exceptions import ModelNotFoundError
 from lmstrix.core.models import Model, ModelRegistry
+from lmstrix.utils.logging import logger
 import lmstudio
 import lmstudio
 import lmstudio
@@ -6431,7 +5103,7 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any
-from loguru import logger
+from lmstrix.utils.logging import logger
 import re
 from lmstrix.utils.paths import get_default_models_file
 
@@ -6577,9 +5249,9 @@ from collections.abc import Mapping
 from types import MappingProxyType
 from typing import Any
 import tiktoken
-from loguru import logger
 from pydantic import BaseModel, Field
 from lmstrix.api.exceptions import ConfigurationError
+from lmstrix.utils.logging import logger
 
 class ResolvedPrompt(B, a, s, e, M, o, d, e, l):
     """A prompt after placeholder resolution."""
@@ -6687,9 +5359,9 @@ def inject_context((
 # Language: python
 
 from pathlib import Path
-from loguru import logger
 from lmstrix.core.models import Model, ModelRegistry
 from lmstrix.utils import get_lmstudio_path
+from lmstrix.utils.logging import logger
 
 class ModelScanner:
     """Scans LM Studio for available models."""
@@ -6732,6 +5404,7 @@ from lmstrix.loaders.context_loader import (
 )
 from lmstrix.loaders.model_loader import load_model_registry, save_model_registry
 from lmstrix.loaders.prompt_loader import load_prompts, load_single_prompt, save_prompts
+from lmstrix.utils.logging import logger
 
 
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/context_loader.py
@@ -6739,8 +5412,8 @@ from lmstrix.loaders.prompt_loader import load_prompts, load_single_prompt, save
 
 from pathlib import Path
 import tiktoken
-from loguru import logger
 from lmstrix.api.exceptions import ConfigurationError
+from lmstrix.utils.logging import logger
 
 def load_context((
     file_path: str | Path,
@@ -6784,7 +5457,6 @@ def save_context((
 # Language: python
 
 from pathlib import Path
-from loguru import logger
 from lmstrix.api.client import LMStudioClient
 from lmstrix.api.exceptions import APIConnectionError
 from lmstrix.core.models import (
@@ -6793,6 +5465,7 @@ from lmstrix.core.models import (
     ModelRegistry,
     ModelRegistryError,
 )
+from lmstrix.utils.logging import logger
 from lmstrix.utils.paths import get_default_models_file
 
 def load_model_registry((
@@ -6845,10 +5518,10 @@ from pathlib import Path
 from typing import Any
 import tomllib
 import tomli as tomllib
-from loguru import logger
 from topl.core import resolve_placeholders
 from lmstrix.api.exceptions import ConfigurationError
 from lmstrix.core.prompts import PromptResolver, ResolvedPrompt
+from lmstrix.utils.logging import logger
 import tomli_w
 import tomlkit
 import toml
@@ -6877,7 +5550,7 @@ def save_prompts((
     """Save prompts to a TOML file."""
 
 
-<document index="42">
+<document index="38">
 <source>src/lmstrix/py.typed</source>
 <document_content>
 # This file indicates that the package supports type hints
@@ -6888,7 +5561,7 @@ def save_prompts((
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/__init__.py
 # Language: python
 
-from lmstrix.utils.logging import setup_logging
+from lmstrix.utils.logging import logger, setup_logging
 from lmstrix.utils.paths import (
     get_context_test_log_path,
     get_context_tests_dir,
@@ -6905,7 +5578,7 @@ from lmstrix.utils.paths import (
 # Language: python
 
 from typing import Any
-from loguru import logger
+from lmstrix.utils.logging import logger
 
 def parse_out_ctx((
     out_ctx: int | str,
@@ -6922,18 +5595,22 @@ def get_model_max_context((model: Any, use_tested: bool = True)) -> int | None:
 # Language: python
 
 import sys
+from typing import Any
 from loguru import logger
 
 def setup_logging((verbose: bool = False)) -> None:
     """Configure loguru logging based on verbose flag."""
+
+def format_log((record: Any)) -> str:
+    """Custom formatter for colored output with level shortcuts."""
 
 
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/paths.py
 # Language: python
 
 from pathlib import Path
-from loguru import logger
 from lmstrix.api.exceptions import LMStudioInstallationNotFoundError
+from lmstrix.utils.logging import logger
 
 def get_lmstudio_path(()) -> Path:
     """Get the LM Studio installation path."""
@@ -6965,7 +5642,7 @@ def get_lmstrix_log_path(()) -> Path:
 
 import json
 from pathlib import Path
-from loguru import logger
+from lmstrix.utils.logging import logger
 from lmstrix.utils.paths import get_lmstudio_path
 
 class StateManager:
@@ -7161,7 +5838,7 @@ class TestAPIExceptions:
     def test_inference_error((self)) -> None:
         """Test InferenceError creation and attributes."""
     def test_exception_inheritance((self)) -> None:
-        """Test that all exceptions inherit from LMStrixError."""
+        """Test that all exceptions inherit from lmstrixError."""
 
 def test_api_error_base((self)) -> None:
     """Test base LMStrixError class."""
@@ -7176,7 +5853,7 @@ def test_inference_error((self)) -> None:
     """Test InferenceError creation and attributes."""
 
 def test_exception_inheritance((self)) -> None:
-    """Test that all exceptions inherit from LMStrixError."""
+    """Test that all exceptions inherit from lmstrixError."""
 
 
 # File: /Users/Shared/lmstudio/lmstrix/tests/test_core/__init__.py

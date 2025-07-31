@@ -10,11 +10,11 @@ except ImportError:
     # Fall back to tomli for older Python versions
     import tomli as tomllib
 
-from loguru import logger
 from topl.core import resolve_placeholders
 
 from lmstrix.api.exceptions import ConfigurationError
 from lmstrix.core.prompts import PromptResolver, ResolvedPrompt
+from lmstrix.utils.logging import logger
 
 
 def load_prompts(
@@ -62,16 +62,15 @@ def load_prompts(
             {"path": str(toml_path), "error": str(e)},
         ) from e
 
-    # Resolve placeholders with TOPL if parameters provided
-    if params:
-        try:
-            resolved_data = resolve_placeholders(data, **params)
-            # Convert back to dict
-            data = dict(resolved_data)
-            logger.info("Resolved placeholders with TOPL")
-        except Exception as e:
-            logger.warning(f"TOPL placeholder resolution failed: {e}")
-            # Continue with unresolved data
+    # Always resolve placeholders with TOPL (internal first, then external)
+    try:
+        resolved_data = resolve_placeholders(data, **params)
+        # Convert back to dict
+        data = dict(resolved_data)
+        logger.info("Resolved placeholders with TOPL")
+    except Exception as e:
+        logger.warning(f"TOPL placeholder resolution failed: {e}")
+        # Continue with unresolved data
 
     # Create resolver if not provided
     if resolver is None:
@@ -134,16 +133,15 @@ def load_single_prompt(
             {"path": str(toml_path), "error": str(e)},
         ) from e
 
-    # Resolve placeholders with TOPL if parameters provided
-    if params:
-        try:
-            resolved_data = resolve_placeholders(data, **params)
-            # Convert back to dict
-            data = dict(resolved_data)
-            logger.info("Resolved placeholders with TOPL")
-        except Exception as e:
-            logger.warning(f"TOPL placeholder resolution failed: {e}")
-            # Continue with unresolved data
+    # Always resolve placeholders with TOPL (internal first, then external)
+    try:
+        resolved_data = resolve_placeholders(data, **params)
+        # Convert back to dict
+        data = dict(resolved_data)
+        logger.info("Resolved placeholders with TOPL")
+    except Exception as e:
+        logger.warning(f"TOPL placeholder resolution failed: {e}")
+        # Continue with unresolved data
 
     # Create resolver if not provided
     if resolver is None:

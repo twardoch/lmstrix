@@ -7,7 +7,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from loguru import logger
+from lmstrix.utils.logging import logger
 
 
 class ContextTestStatus(str, Enum):

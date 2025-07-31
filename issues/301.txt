@@ -1,0 +1,41 @@
+```
+$ ./adam2.sh
+15:41:35 | INFO | lmstrix.loaders.prompt_loader:load_single_prompt:128 - Loaded prompts from adam.toml
+15:41:35 | WARNING | lmstrix.loaders.prompt_loader:load_single_prompt:143 - TOPL placeholder resolution failed: Format string contains positional fields
+15:41:35 | DEBUG | lmstrix.core.prompts:resolve_prompt:186 - Internal resolution complete after 2 passes
+15:41:35 | INFO | lmstrix.loaders.prompt_loader:load_single_prompt:153 - Resolved prompt 'translate'
+Loaded prompt 'translate' from adam.toml
+Resolved placeholders: text, think
+15:41:35 | DEBUG | lmstrix.utils.paths:get_lmstudio_path:26 - Found LM Studio at /Users/Shared/lmstudio
+15:41:35 | DEBUG | lmstrix.utils.paths:get_lmstudio_path:26 - Found LM Studio at /Users/Shared/lmstudio
+15:41:35 | INFO | lmstrix.loaders.model_loader:load_model_registry:43 - Read 75 models from /Users/Shared/lmstudio/lmstrix.json
+15:41:35 | INFO | lmstrix.core.inference_manager:infer:92 - Explicit context specified: 75%
+15:41:35 | DEBUG | lmstrix.api.client:load_model_by_id:104 - Found model match: qwen/qwen3-4b -> qwen/qwen3-4b
+15:41:35 | ERROR | lmstrix.core.inference_manager:infer:188 - Inference failed for model qwen/qwen3-4b: Failed to load model 'qwen/qwen3-4b': Failed to load model 'qwen/qwen3-4b'. Available models: ['google/gemma-3n-e4b', 'microsoft/phi-4-mini-reasoning', 'deepseek-r1-0528-qwen3-8b', 'magistral-small-2507-rebased-vision-i1', 'huihui-qwen3-14b-abliterated-v2']
+Inference failed: Failed to load model 'qwen/qwen3-4b': Failed to load model 'qwen/qwen3-4b'. Available models: ['google/gemma-3n-e4b',
+'microsoft/phi-4-mini-reasoning', 'deepseek-r1-0528-qwen3-8b', 'magistral-small-2507-rebased-vision-i1', 'huihui-qwen3-14b-abliterated-v2']
+```
+
+but our lmstrix.json database has
+
+```
+"qwen/qwen3-4b": {
+"id": "qwen/qwen3-4b",
+"short_id": "qwen3-4b",
+"path": "qwen/qwen3-4b",
+"size_bytes": 4280583359,
+"ctx_in": 32768,
+"ctx_out": 4096,
+"has_tools": false,
+"has_vision": false,
+"tested_max_context": 32768,
+"loadable_max_context": null,
+"last_known_good_context": 32768,
+"last_known_bad_context": null,
+"context_test_status": "completed",
+"context_test_log": "/Users/Shared/lmstudio/lmstrix/context_tests/qwen_qwen3-4b_context_test.log",
+"context_test_date": "2025-07-28 01:18:12.706392",
+"failed": false,
+"error_msg": ""
+},
+```

@@ -2,8 +2,6 @@
 
 from pathlib import Path
 
-from loguru import logger
-
 from lmstrix.api.client import LMStudioClient
 from lmstrix.api.exceptions import APIConnectionError
 from lmstrix.core.models import (
@@ -12,6 +10,7 @@ from lmstrix.core.models import (
     ModelRegistry,
     ModelRegistryError,
 )
+from lmstrix.utils.logging import logger
 from lmstrix.utils.paths import get_default_models_file
 
 

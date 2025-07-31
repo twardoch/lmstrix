@@ -9,6 +9,7 @@ from lmstrix.loaders.context_loader import (
 )
 from lmstrix.loaders.model_loader import load_model_registry, save_model_registry
 from lmstrix.loaders.prompt_loader import load_prompts, load_single_prompt, save_prompts
+from lmstrix.utils.logging import logger
 
 __all__ = [
     "estimate_tokens",

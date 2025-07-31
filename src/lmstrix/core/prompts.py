@@ -6,10 +6,10 @@ from types import MappingProxyType
 from typing import Any
 
 import tiktoken
-from loguru import logger
 from pydantic import BaseModel, Field
 
 from lmstrix.api.exceptions import ConfigurationError
+from lmstrix.utils.logging import logger
 
 
 class ResolvedPrompt(BaseModel):
