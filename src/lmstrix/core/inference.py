@@ -1,6 +1,7 @@
 """Inference engine for running models."""
 
 import time
+from collections.abc import Callable, Iterator
 from typing import Any
 
 import lmstudio
@@ -392,6 +393,170 @@ class InferenceEngine:
                 inference_time=time.time() - start_time,
                 error=error_str,
             )
+
+        finally:
+            # Only unload if we explicitly loaded with in_ctx
+            if llm and should_unload_after:
+                try:
+                    logger.info(f"Unloading model {model_id} (was loaded with explicit context)...")
+                    llm.unload()
+                except (TypeError, AttributeError) as e:
+                    logger.warning(f"Failed to unload model: {e}")
+
+    def stream_infer(
+        self,
+        model_id: str,
+        prompt: str,
+        in_ctx: int | None = None,
+        out_ctx: int = -1,  # Use -1 for unlimited as per new client
+        temperature: float = 0.7,
+        on_token: Callable[[str], None] | None = None,  # Callback for each token
+        stream_timeout: int = 120,  # Timeout in seconds
+        **kwargs: Any,
+    ) -> Iterator[str]:
+        """Stream inference on a model with automatic context optimization.
+
+        Args:
+            model_id: Model identifier
+            prompt: Text prompt for the model
+            in_ctx: Context size at which to load the model.
+                   If 0, load without specified context.
+                   If None, reuse existing loaded model if available.
+            out_ctx: Maximum tokens to generate (-1 for unlimited)
+            temperature: Sampling temperature
+            on_token: Optional callback for each token
+            stream_timeout: Timeout in seconds for no progress
+            **kwargs: Additional arguments passed to stream completion
+
+        Yields:
+            String tokens as they are generated
+        """
+        model = self.registry.find_model(model_id)
+        if not model:
+            available = [m.id for m in self.registry.list_models()]
+            raise ModelNotFoundError(model_id, available)
+
+        time.time()
+        llm = None
+        should_unload_after = False
+        model_was_reused = False
+
+        # Check if model is already loaded
+        is_loaded, loaded_context = self.client.is_model_loaded(model_id)
+
+        # Determine context size based on in_ctx parameter
+        if in_ctx is not None:
+            # Explicit context specified - always unload existing and reload
+            logger.info(f"Explicit context specified: {in_ctx}")
+            if is_loaded:
+                logger.info(
+                    f"Model currently loaded with context {loaded_context:,}, will reload with new context",
+                )
+
+            try:
+                # Unload all models first when explicit context is specified
+                logger.info("Unloading all models before loading with specific context...")
+                lmstudio.unload()
+                time.sleep(0.5)  # Brief pause after unload
+            except Exception as e:
+                logger.warning(f"Failed to unload existing models: {e}")
+
+            if in_ctx == 0:
+                # Load without specified context (use model's default)
+                logger.info(
+                    f"Loading model {model_id} without specified context (using default)...",
+                )
+                context_to_use = None
+            else:
+                # Validate context size
+                if in_ctx > model.context_limit:
+                    logger.warning(
+                        f"Requested context {in_ctx:,} exceeds model's declared limit {model.context_limit:,}",
+                    )
+                    logger.warning("This may cause loading to fail or performance issues")
+
+                if model.tested_max_context and in_ctx > model.tested_max_context:
+                    logger.warning(
+                        f"Requested context {in_ctx:,} exceeds tested maximum {model.tested_max_context:,}",
+                    )
+                    logger.info("Consider using the tested maximum for best results")
+
+                # Load with specific context
+                logger.info(f"Loading model {model_id} with context length {in_ctx:,}...")
+                context_to_use = in_ctx
+            should_unload_after = True  # Always unload after when explicit context specified
+        else:
+            # No explicit context - try to reuse existing or load with optimal context
+            logger.info("No explicit context specified, checking if model already loaded...")
+
+            if is_loaded:
+                # Model already loaded - reuse it
+                logger.info(
+                    f"Model {model_id} already loaded with context {loaded_context:,}, reusing...",
+                )
+                model_was_reused = True
+                # We'll skip loading and use the existing model
+                context_to_use = None  # Signal to skip loading
+            else:
+                # Model not loaded - load with optimal context
+                context_to_use = model.tested_max_context or model.context_limit
+                logger.info(f"Model not loaded, loading with optimal context {context_to_use:,}...")
+
+        try:
+            if model_was_reused:
+                # Model already loaded, get a reference to it
+                loaded_models = lmstudio.list_loaded_models()
+                logger.debug(f"Found {len(loaded_models)} loaded models, searching for {model.id}")
+
+                for loaded_llm in loaded_models:
+                    # Try multiple matching strategies for better model identification
+                    llm_id = getattr(loaded_llm, "id", "")
+                    llm_model_key = getattr(loaded_llm, "model_key", "")
+
+                    logger.debug(
+                        f"Checking loaded model: id='{llm_id}', model_key='{llm_model_key}'",
+                    )
+
+                    # Match by exact ID or model_key, or if model.id appears in either
+                    if (
+                        model.id in (llm_id, llm_model_key)
+                        or model.id in llm_id
+                        or model.id in llm_model_key
+                    ):
+                        llm = loaded_llm
+                        logger.info(f"✓ Found matching loaded model: {llm_id or llm_model_key}")
+                        break
+
+                if llm is None:
+                    # Fallback: couldn't find the loaded model, load it anyway
+                    logger.warning("Could not find reference to loaded model, loading anyway...")
+                    context_to_use = model.tested_max_context or model.context_limit
+                    llm = self.client.load_model_by_id(model.id, context_len=context_to_use)
+                    model_was_reused = False  # Mark as not reused since we had to load it
+            elif context_to_use is None and in_ctx == 0:
+                # Load without context specification (for in_ctx=0 case)
+                llm = lmstudio.llm(model.id)
+            else:
+                # Normal loading with context
+                llm = self.client.load_model_by_id(model.id, context_len=context_to_use)
+
+            logger.info(f"Running streaming inference on model {model_id}")
+
+            # Stream tokens using the client's stream_completion method
+            yield from self.client.stream_completion(
+                llm=llm,
+                prompt=prompt,
+                out_ctx=out_ctx,
+                temperature=temperature,
+                model_id=model_id,
+                on_token=on_token,
+                stream_timeout=stream_timeout,
+                **kwargs,
+            )
+
+        except Exception as e:
+            logger.error(f"Streaming inference failed for model {model_id}: {e}")
+            raise
 
         finally:
             # Only unload if we explicitly loaded with in_ctx

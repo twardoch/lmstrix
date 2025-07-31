@@ -8,10 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Issue #307**: Streaming Inference Support
+  - Added `stream_completion()` method to LMStudioClient using lmstudio SDK's `complete_stream()`
+  - Implemented token-by-token streaming with callbacks and progress monitoring
+  - Added `stream_infer()` methods to InferenceEngine and InferenceManager
+  - Added CLI `--stream` flag for real-time token display during inference
+  - Added `--stream-timeout` parameter (default 120s) for hang detection
+  - Streaming statistics: tokens/second, time to first token
+- **Issue #306**: Batch Processing Tool (`_keep_this/adam/adamall.py`)
+  - Processes multiple prompts across all models automatically
+  - Smart model management - reuses loaded models when possible
+  - Skips existing outputs for resumable batch processing
+  - Safe filename generation using pathvalidate
+  - Error capture to output files on failure
+  - Progress tracking with percentage completion
+  - Processes prompts: `think,aps`, `think,humanize`, `think,tldr`, `think,tts_optimize`, `translate`, `tldr`
 - Created `src/lmstrix/api/main.py` with `LMStrixService` class containing all business logic
 - Implemented separation of concerns with thin CLI wrapper in `__main__.py`
 
 ### Changed
+- Default temperature changed from 0.7 to 0.8 to match LM Studio GUI defaults
 - Default `out_ctx` now falls back to the model's `ctx_out − 1` when callers leave it as `-1`. This avoids LM Studio SDK hangs triggered by unlimited generations.
 - Refactored CLI architecture - moved all business logic from `__main__.py` to `api/main.py`
 - Updated `__main__.py` to be a thin wrapper that delegates to `LMStrixService`

@@ -512,6 +512,8 @@ class LMStrixService:
         param_top_p: float = 0.95,
         param_repeat: float = 1.1,
         param_min_p: float = 0.05,
+        stream: bool = False,
+        stream_timeout: int = 120,
         verbose: bool = False,
     ) -> None:
         """Run inference on a specified model."""
@@ -716,9 +718,57 @@ class LMStrixService:
 
         manager = InferenceManager(registry=registry, verbose=verbose)
 
-        # Show status only in verbose mode
-        if verbose:
-            with console.status(f"Running inference on {model.id}..."):
+        # Handle streaming vs regular inference
+        if stream:
+            try:
+                # Show status only in verbose mode
+                if verbose:
+                    print(f"\nStreaming inference on {model.id}...", file=sys.stderr)
+
+                # Callback to print tokens to stdout as they arrive
+                def print_token(token: str) -> None:
+                    print(token, end="", flush=True, file=sys.stdout)
+
+                # Stream the response
+                for _token in manager.stream_infer(
+                    model_id=model.id,  # Use the full ID for inference
+                    prompt=actual_prompt,  # Use the resolved prompt
+                    in_ctx=in_ctx,
+                    out_ctx=out_ctx,
+                    temperature=param_temp,
+                    top_k=param_top_k,
+                    top_p=param_top_p,
+                    repeat_penalty=param_repeat,
+                    min_p=param_min_p,
+                    on_token=print_token,
+                    stream_timeout=stream_timeout,
+                ):
+                    # Tokens are already printed by callback, just iterate
+                    pass
+
+                # Add newline after streaming completes
+                print("", file=sys.stdout)
+
+            except Exception as e:
+                # Use stderr for error messages
+                print(f"\nStreaming inference failed: {e}", file=sys.stderr)
+        else:
+            # Regular non-streaming inference
+            # Show status only in verbose mode
+            if verbose:
+                with console.status(f"Running inference on {model.id}..."):
+                    result = manager.infer(
+                        model_id=model.id,  # Use the full ID for inference
+                        prompt=actual_prompt,  # Use the resolved prompt
+                        in_ctx=in_ctx,
+                        out_ctx=out_ctx,
+                        temperature=param_temp,
+                        top_k=param_top_k,
+                        top_p=param_top_p,
+                        repeat_penalty=param_repeat,
+                        min_p=param_min_p,
+                    )
+            else:
                 result = manager.infer(
                     model_id=model.id,  # Use the full ID for inference
                     prompt=actual_prompt,  # Use the resolved prompt
@@ -730,28 +780,16 @@ class LMStrixService:
                     repeat_penalty=param_repeat,
                     min_p=param_min_p,
                 )
-        else:
-            result = manager.infer(
-                model_id=model.id,  # Use the full ID for inference
-                prompt=actual_prompt,  # Use the resolved prompt
-                in_ctx=in_ctx,
-                out_ctx=out_ctx,
-                temperature=param_temp,
-                top_k=param_top_k,
-                top_p=param_top_p,
-                repeat_penalty=param_repeat,
-                min_p=param_min_p,
-            )
 
-        if result["succeeded"]:
-            if verbose:
-                # Use stderr for debug info to avoid parsing issues
-                print("\nModel Response:", file=sys.stderr)
-            # Always output the actual response to stdout
-            print(result["response"], file=sys.stdout)
-        else:
-            # Use stderr for error messages
-            print(f"Inference failed: {result['error']}", file=sys.stderr)
+            if result["succeeded"]:
+                if verbose:
+                    # Use stderr for debug info to avoid parsing issues
+                    print("\nModel Response:", file=sys.stderr)
+                # Always output the actual response to stdout
+                print(result["response"], file=sys.stdout)
+            else:
+                # Use stderr for error messages
+                print(f"Inference failed: {result['error']}", file=sys.stderr)
 
     def check_health(self, verbose: bool = False) -> None:
         """Check database health and backup status."""

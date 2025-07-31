@@ -85,6 +85,8 @@ class LMStrixCLI:
         param_top_p: float = 0.95,
         param_repeat: float = 1.1,
         param_min_p: float = 0.05,
+        stream: bool = False,
+        stream_timeout: int = 120,
         verbose: bool = False,
     ) -> None:
         """Run inference on a specified model.
@@ -106,6 +108,8 @@ class LMStrixCLI:
             param_top_p: Top-p sampling parameter.
             param_repeat: Repeat penalty parameter.
             param_min_p: Min-p sampling parameter.
+            stream: Enable streaming output (tokens displayed as generated).
+            stream_timeout: Timeout in seconds for streaming (default: 120).
             verbose: Enable verbose output.
         """
         self.service.run_inference(
@@ -123,6 +127,8 @@ class LMStrixCLI:
             param_top_p=param_top_p,
             param_repeat=param_repeat,
             param_min_p=param_min_p,
+            stream=stream,
+            stream_timeout=stream_timeout,
             verbose=verbose,
         )
 

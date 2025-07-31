@@ -1,0 +1,1 @@
+Analyze how we can utilize inference streaming out of the `lmstudio` python module in our `lmstrix`. Research, then /plan into @PLAN.md and @TODO.md how to do it. Think about the plan, reflect, revise, refine the plan. 

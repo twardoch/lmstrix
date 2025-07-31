@@ -54,6 +54,7 @@ dependencies = [
   "tomli>=2.0.1; python_version < '3.11'",
   "hydra-core",
   "omegaconf",
+  "pathvalidate",
 ]
 dynamic = ["version"]
 
