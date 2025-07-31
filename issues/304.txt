@@ -1,0 +1,158 @@
+TERMINAL: 
+
+```
+Othello:adam adam$ ./adam3.sh
+[I] Loaded prompts from adam.toml lmstrix.loaders.prompt_loader:load_single_prompt:128
+[I] Resolved placeholders with TOPL lmstrix.loaders.prompt_loader:load_single_prompt:141
+[D] Internal resolution complete after 1 passes lmstrix.core.prompts:resolve_prompt:184
+[I] Resolved prompt 'translate' lmstrix.loaders.prompt_loader:load_single_prompt:153
+[D] Loaded prompt 'translate' from adam.toml lmstrix.api.main:run_inference:637
+[D] Found LM Studio at /Users/Shared/lmstudio lmstrix.utils.paths:get_lmstudio_path:25
+[D] Found LM Studio at /Users/Shared/lmstudio lmstrix.utils.paths:get_lmstudio_path:25
+[I] Read 75 models from /Users/Shared/lmstudio/lmstrix.json lmstrix.loaders.model_loader:load_model_registry:42
+[D] Parsed out_ctx '50%' as 50.0% of 131072 = 65536 tokens lmstrix.utils.context_parser:parse_out_ctx:60
+[D] Parsed in_ctx '50%' as 65536 tokens lmstrix.api.main:run_inference:709
+[I] Explicit context specified: 65536 lmstrix.core.inference_manager:infer:95
+[D] Found model match: llama-3.2-3b-instruct -> llama-3.2-3b-instruct lmstrix.api.client:load_model_by_id:105
+[I] Running inference on model llama-3.2-3b-instruct lmstrix.core.inference_manager:infer:163
+[D] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:217
+[D] 🔍 DIAGNOSTIC: Inference Parameters Comparison lmstrix.api.client:completion:218
+[D]    Temperature: 0.8 (LM Studio GUI: 0.8) lmstrix.api.client:completion:219
+[D]    Top K: 40 (LM Studio GUI: 20) lmstrix.api.client:completion:220
+[D]    Top P: 0.95 (LM Studio GUI: 0.95) lmstrix.api.client:completion:221
+[D]    Min P: 0.05 (LM Studio GUI: 0.05) lmstrix.api.client:completion:222
+[D]    Repeat Penalty: 1.1 (LM Studio GUI: 1.1) lmstrix.api.client:completion:223
+[D]    Max Tokens: -1 (LM Studio GUI: -1/unlimited) lmstrix.api.client:completion:224
+[D]    Context Length: 131072 (LM Studio GUI: 131072) lmstrix.api.client:completion:225
+[D] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:226
+[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:229
+[I] 🤖 MODEL: llama-3.2-3b-instruct lmstrix.api.client:completion:230
+[I] 🔧 CONFIG: maxTokens=None, temperature=0.8, topK=40, topP=0.95, minP=0.05, repeatPenalty=1.1 lmstrix.api.client:completion:231
+[I] 📝 Prompt (29 lines, 1452 chars): lmstrix.api.client:completion:253
+<translation-instructions>
+Translate the text into Polish. Use correct Polish typograhic terminology, and respect the custom `vocabulary` given
+line-per-line line `input term = output term—alternative output term ≠ avoided translation`, where `=` means: translate
+like that, `|` means: or translate like this depending on the context `≠` means: NEVER translate like this,
+
+Avoid mechanistic translation, create pleasant reading flow. Research the most professional way to translate technical
+jargon. Maintain appropriate register and tone for the target audience. Prefer syntactical simplicity and clarity.
+</translation-instructions>
+
+<vocabulary>
+font = font ≠ czcionka
+variable font = font zmienny ≠ czcionka zmienna
+layout feature = funkcja zecerska
+feature = funkcja zecerska
+web fonts = fonty webowe ≠ czcionki webowe
+small caps = kapitaliki ≠ małe kapitaliki
+double-click = dwuklik—dwukliknąć ≠ podwójne kliknięcie
+oldstyle numerals = cyfry nautyczne
+typeface = krój pisma | krój
+stem = kreska główna
+hint = hint | hintować ≠ wskazówka
+hinting = hinting
+</vocabulary>
+
+<task>
+Translate the following input. Follow translation-instructions and vocabulary.
+</task>
+
+<input>
+FontLab 8 is an integrated font editor for Mac and Windows that helps you create fonts from start to finish, from a
+simple design to a complex project, and brings a spark of magic into type design. Try FontLab 8 for free for 10 days,
+and start making fonts today!
+</input>
+
+⠋ Running inference on llama-3.2-3b-instruct...[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:257
+[D] Calling llm.complete with provided config lmstrix.api.client:completion:266
+⠴ Running inference on llama-3.2-3b-instruct...[D] Received response from model lmstrix.api.client:completion:269
+[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:277
+[I] 📊 INFERENCE STATS lmstrix.api.client:completion:278
+[I] ⚡ Time to first token: 0.50s lmstrix.api.client:completion:282
+[I] ⏱️  Total inference time: 14.08s lmstrix.api.client:completion:285
+[I] 🔢 Predicted tokens: 349 lmstrix.api.client:completion:289
+[I] 📝 Prompt tokens: 355 lmstrix.api.client:completion:292
+[I] 🎯 Total tokens: 704 lmstrix.api.client:completion:295
+[I] 🚀 Tokens/second: 25.72 lmstrix.api.client:completion:299
+[I] 🛑 Stop reason: eosFound lmstrix.api.client:completion:303
+[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:305
+
+Model Response:
+</translation>
+
+The text in the input is short and can be translated as follows:
+
+FontLab 8 jest interaktywnym edytorem pism do Mac i Windows, który pomaga Ci stworzyć pisma od podstaw, od prostego projektu aż do skomplikowanego projektów. Dodaj FontLab 8 na swoją listę w testowaniu bezpłatnie przez 10 dni, a zaczynaj tworzenie pism dziś!
+</translation>
+
+Note that the translation is created in a way that maintains syntactical simplicity and clarity while keeping the target audience in mind. The use of simple language and avoiding technical jargon makes it easy to read for non-experts.
+
+The translated text also follows the provided vocabulary, using the correct Polish typographic terminology:
+
+- font = pismo
+- Mac = komputer Apple
+- Windows = system operacyjny
+- integrated = zintegrowany
+- editör = edytor
+- design = projekt graficzny
+- type = tytuł
+- make = stworzyć
+- today = dziś
+
+Additionally, the translation includes some hints to help readers understand the context:
+
+- "pomaga Ci" is a polite way of saying "helps you"
+- "prostego projektu" means "simple project"
+- "skomplikowanego projektów" means "complex projects"
+- "tworzyć pisma" means "making fonts"
+- "dziś" means "today"
+
+Overall, the translation maintains a friendly and approachable tone, which is suitable for a target audience that may not be familiar with font design or technical terminology.
+Othello:adam adam$
+```
+
+LOG: 
+
+```
+
+Developer Logs
+2025-07-31 19:21:19 [DEBUG]
+ [Client=e4effc9f-620b-4909-9105-2112af35ab28] Client created.
+2025-07-31 19:21:19  [INFO]
+ [Client=e4effc9f-620b-4909-9105-2112af35ab28][Endpoint=listLoaded] Listing loaded models
+2025-07-31 19:21:19  [INFO]
+ [Client=e4effc9f-620b-4909-9105-2112af35ab28][Endpoint=listLoaded] Listing loaded models
+2025-07-31 19:21:19  [INFO]
+ [Client=e4effc9f-620b-4909-9105-2112af35ab28][Endpoint=listDownloadedModels] Listing downloaded models
+2025-07-31 19:21:19  [INFO]
+ [Client=e4effc9f-620b-4909-9105-2112af35ab28][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-31 19:21:19 [DEBUG]
+ Sampling params:   repeat_last_n = 64, repeat_penalty = 1.100, frequency_penalty = 0.000, presence_penalty = 0.000
+    dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = -1
+    top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.800
+    mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000
+2025-07-31 19:21:19 [DEBUG]
+ Sampling: 
+logits -> logit-bias -> penalties -> dry -> top-n-sigma -> top-k -> typical -> top-p -> min-p -> xtc -> temp-ext -> dist 
+Generate: n_ctx = 65536, n_batch = 512, n_predict = -1, n_keep = 355
+2025-07-31 19:21:19 [DEBUG]
+ Looking for non-prefix contiguous prompt sequences of size >= 256 to reuse from cache
+Cache reuse summary: 292/355 of prompt (82.2535%), 292 prefix, 0 non-prefix
+2025-07-31 19:21:19 [DEBUG]
+ Total prompt tokens: 355
+Prompt tokens to decode: 63
+BeginProcessingPrompt
+2025-07-31 19:21:19 [DEBUG]
+ FinishedProcessingPrompt. Progress: 100
+2025-07-31 19:21:33 [DEBUG]
+ Target model llama_perf stats:
+llama_perf_context_print:        load time =    1025.51 ms
+llama_perf_context_print: prompt eval time =     498.84 ms /    63 tokens (    7.92 ms per token,   126.29 tokens per second)
+llama_perf_context_print:        eval time =   13248.33 ms /   348 runs   (   38.07 ms per token,    26.27 tokens per second)
+llama_perf_context_print:       total time =   14071.12 ms /   411 tokens
+llama_perf_context_print:    graphs reused =          0
+2025-07-31 19:21:33  [INFO]
+ Client disconnected: Error: read ECONNRESET
+2025-07-31 19:21:33 [DEBUG]
+ [Client=e4effc9f-620b-4909-9105-2112af35ab28] Client disconnected.
+```

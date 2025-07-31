@@ -1,5 +1,24 @@
 # LMStrix TODO List
 
+## CRITICAL: Issue #303 - Fix Loguru Output Interference (Priority 0) ✅ COMPLETED
+
+### Remove Loguru from Prompt/Response Logging
+- [x] Remove all `logger.debug()` calls that output prompts or model responses in api/client.py
+- [x] Remove the "Raw response object" logging that causes ValueError
+- [x] Remove prompt logging that passes through loguru formatting
+
+### Implement Proper Output Separation
+- [x] Use `print(prompt, file=sys.stderr)` for verbose prompt display
+- [x] Use `print(response, file=sys.stdout)` for model output only
+- [x] Keep loguru only for status messages like "Running inference...", "Time to first token", etc.
+- [x] Ensure clean separation between diagnostic info and actual output
+
+### Test the Fix
+- [x] Run the translation example from issue #303
+- [x] Verify no loguru errors appear
+- [x] Confirm model output goes only to stdout
+- [x] Confirm diagnostic info goes only to stderr
+
 ## CRITICAL: Issue #302 - Fix Inference Output Mismatch (Priority 0)
 
 ### Diagnostic Investigation
@@ -34,34 +53,7 @@
 - [ ] Verify translation quality matches expected output
 - [ ] Create regression test for this issue
 
-## HIGH PRIORITY: Fix Test Suite Failures (After Issue #302)
-
-### Missing Methods - CRITICAL (COMPLETED)
-- [x] Add Model.validate_integrity() method to src/lmstrix/core/models.py
-- [x] Implement PromptResolver._resolve_phase() in src/lmstrix/core/prompts.py
-- [x] Implement PromptResolver.resolve_template() in src/lmstrix/core/prompts.py
-- [x] Implement PromptResolver._count_tokens() in src/lmstrix/core/prompts.py
-- [x] Add ContextTester._test_at_context() to src/lmstrix/core/context_tester.py
-- [x] Add ContextTester.test_model() to src/lmstrix/core/context_tester.py
-- [x] Implement ModelScanner.sync_with_registry() in src/lmstrix/core/scanner.py
-
-### Type/Format Errors - HIGH (COMPLETED)
-- [x] Fix Mock format string error in src/lmstrix/api/client.py:221
-- [x] Fix invalid format specifier in src/lmstrix/core/prompts.py:133
-- [x] Handle None/Mock values in logging format strings
-
-### Test Fixes - MEDIUM
-- [ ] Update Model initialization tests to provide required arguments
-- [ ] Fix path handling in ModelScanner for paths outside models directory
-- [ ] Fix JSON output in CLI list command
-- [ ] Update test expectations to match current implementation
-
-### Infrastructure - LOW
-- [ ] Fix loguru I/O closed file errors in tests
-- [ ] Address pkg_resources deprecation warnings
-- [ ] Configure pytest-golden in pytest.ini
-
-## Immediate Priorities (AFTER Issue #302 and test fixes)
+## Immediate Priorities (AFTER Issue #303 and #302)
 
 ### Issue #105 - Adam.toml Simplification (High Priority)
 - [ ] Simplify adam.toml structure to use flat format instead of nested groups

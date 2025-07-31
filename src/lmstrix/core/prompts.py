@@ -240,7 +240,9 @@ class PromptResolver:
                     if "template" in value and isinstance(value["template"], str):
                         try:
                             results[full_key] = self.resolve_prompt(
-                                f"{full_key}.template", prompts_data, **params
+                                f"{full_key}.template",
+                                prompts_data,
+                                **params,
                             )
                         except ConfigurationError as e:
                             logger.error(f"Failed to resolve prompt '{full_key}': {e}")

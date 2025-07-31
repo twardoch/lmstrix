@@ -12,8 +12,7 @@ Project Structure:
 ├── 📁 examples
 │   ├── 📁 cli
 │   │   ├── 📄 basic_workflow.sh
-│   │   ├── 📄 
-│   │   │   context_control_examples.sh
+│   │   ├── 📄 context_control_examples.sh
 │   │   ├── 📄 inference_examples.sh
 │   │   ├── 📄 model_state_demo.sh
 │   │   └── 📄 model_testing.sh
@@ -39,7 +38,11 @@ Project Structure:
 │   └── 📄 run_all_examples.sh
 ├── 📁 issues
 │   ├── 📄 301.txt
-│   └── 📄 302.txt
+│   ├── 📄 302.txt
+│   ├── 📄 303.txt
+│   ├── 📄 304.txt
+│   ├── 📄 305.txt
+│   └── 📄 306.txt
 ├── 📁 src
 │   ├── 📁 lmstrix
 │   │   ├── 📁 api
@@ -890,6 +893,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added
+- Created `src/lmstrix/api/main.py` with `LMStrixService` class containing all business logic
+- Implemented separation of concerns with thin CLI wrapper in `__main__.py`
+
+### Changed
+- Default `out_ctx` now falls back to the model's `ctx_out − 1` when callers leave it as `-1`. This avoids LM Studio SDK hangs triggered by unlimited generations.
+- Refactored CLI architecture - moved all business logic from `__main__.py` to `api/main.py`
+- Updated `__main__.py` to be a thin wrapper that delegates to `LMStrixService`
+- Modified test imports to use new module structure
+
+### Fixed
+- **Issue #303**: Fixed loguru output interference with model responses
+  - Removed loguru formatting of config dictionaries and raw model responses
+  - Changed problematic log messages in `api/client.py` lines 265 and 267 to simple status messages
+  - Prevented KeyError and ValueError exceptions when loguru tried to parse model output
+  - Ensures clean separation of diagnostic output (stderr) from model output (stdout)
+- Fixed import error after removing `src/lmstrix/cli` directory
+- Updated `pyproject.toml` entry point from `lmstrix.cli.main:main` to `lmstrix.__main__:main`
+
+### Removed
+- Removed `src/lmstrix/cli` directory (merged functionality into `__main__.py`)
+
+## [1.0.59] - 2025-07-31
 
 ### Major Improvements & Bug Fixes
 
@@ -1802,11 +1829,28 @@ SOFTWARE.
 # LMStrix Current Development Plan
 
 ## Current Status
-Recent issues 201-204 have been completed successfully:
-- ✅ Enhanced model persistence and state management
-- ✅ Beautiful enhanced logging with comprehensive statistics  
-- ✅ Fixed model lookup to work with both paths and IDs
-- ✅ Integrated verbose stats display without duplication
+- ✅ CLI refactoring completed - business logic moved to `api/main.py`
+- ✅ Issues 201-204 have been completed successfully
+- ✅ Issue #303 - Fixed loguru output interference with model responses
+
+## COMPLETED: Issue #303 - Fix Loguru Output Interference ✅
+
+### Problem Description
+When running inference with `--verbose`, loguru was outputting the prompt and model response through its handlers, causing:
+1. **Logging errors**: KeyError and ValueError exceptions in loguru handlers
+2. **Output pollution**: Model responses were mixed with loguru formatting
+3. **User requirement violation**: User explicitly stated to NEVER pass prompt or model output through loguru
+
+### Root Cause
+- In `api/client.py`, the prompt and model response were being logged via loguru
+- Loguru was trying to format the output, causing issues with special characters like `</translation-instructions>`
+- This violated the requirement to use `sys.stderr` for prompts and `sys.stdout` for model output
+
+### Fix Applied
+1. **✅ Removed all loguru logging of prompts and model responses**
+2. **✅ Now using sys.stderr for prompt display in verbose mode**
+3. **✅ Using sys.stdout for model output only**
+4. **✅ Keeping loguru only for diagnostic/status messages**
 
 ## CRITICAL: Issue #302 - Inference Output Mismatch
 
@@ -1830,68 +1874,13 @@ When running the same translation prompt through LM Studio GUI vs lmstrix CLI, w
 3. **Chat Template**: Possible incorrect chat template application
 4. **Parameter Mismatch**: Inference parameters not matching LM Studio defaults
 
-## CRITICAL: Test Suite Failures (cleanup.txt analysis)
-
-### Priority 0: Critical Test Failures - MUST FIX IMMEDIATELY
-
-#### 0.1 Missing Methods Causing AttributeErrors
-**Severity: CRITICAL - Breaks core functionality**
-
-1. **Model.validate_integrity() Missing**
-   - Location: src/lmstrix/loaders/model_loader.py:181
-   - Error: `AttributeError: 'Model' object has no attribute 'validate_integrity'`
-   - Impact: Prevents model loading and registry updates
-   - Fix: Add validate_integrity() method to Model class
-
-2. **PromptResolver Methods Missing**
-   - Errors: Multiple AttributeErrors for:
-     - `_resolve_phase` (private method)
-     - `resolve_template` (public method)
-     - `_count_tokens` (private method)
-   - Impact: Completely breaks prompt resolution
-   - Fix: Implement all missing methods in PromptResolver
-
-3. **ContextTester Methods Missing**
-   - Missing: `_test_at_context`, `test_model`
-   - Impact: Context testing non-functional
-   - Fix: Add methods to ContextTester class
-
-4. **ModelScanner.sync_with_registry() Missing**
-   - Impact: Cannot sync discovered models with registry
-   - Fix: Implement sync_with_registry method
-
-#### 0.2 Type and Format Errors
-**Severity: HIGH - Breaks tests and logging**
-
-1. **Mock Format String Errors**
-   - Location: src/lmstrix/api/client.py:221
-   - Error: `TypeError: unsupported format string passed to Mock.__format__`
-   - Cause: `logger.info(f"📏 CONTEXT: {llm.config.contextLength:,} tokens")`
-   - Fix: Handle None/Mock values in format strings
-
-2. **Invalid Format Specifier**
-   - Location: src/lmstrix/core/prompts.py:133
-   - Error: `ValueError: Invalid format specifier ' 'Important'' for object of type 'str'`
-   - Fix: Properly escape format strings in templates
-
-#### 0.3 Initialization and Path Issues
-**Severity: MEDIUM - Test failures**
-
-1. **Model Constructor Arguments**
-   - Error: `TypeError: Model.__init__() missing 3 required positional arguments`
-   - Fix: Update tests to provide required args: path, size_bytes, ctx_in
-
-2. **Path Handling in Scanner**
-   - Error: `ValueError: path is not in the subpath`
-   - Fix: Handle paths outside expected directory
-
 ## Immediate Priorities
 
 ### 1. Fix Issue #302 - Inference Output Mismatch
-**Priority: CRITICAL**
+**Priority: CRITICAL - NOW TOP PRIORITY**
 - This is blocking proper inference functionality
 - Users cannot get correct model outputs
-- Must be fixed before any other work
+- Model only outputs `</translation>` instead of full translation
 
 #### Implementation Steps:
 
@@ -1903,10 +1892,7 @@ When running the same translation prompt through LM Studio GUI vs lmstrix CLI, w
 
 ##### Step 2: Parameter Alignment
 - Change default temperature from 0.7 to 0.8
-- Add CLI parameters for all inference settings:
-  - `--top_k`, `--top_p`, `--min_p`
-  - `--repeat_penalty`, `--repeat_last_n`
-  - `--stop_tokens` (to override defaults)
+- Add CLI parameters for all inference settings
 - Remove or make optional the maxTokens calculation
 
 ##### Step 3: Context Length Fix
@@ -1919,76 +1905,41 @@ When running the same translation prompt through LM Studio GUI vs lmstrix CLI, w
 - Verify stop token configuration
 - Test with stop tokens disabled
 
-##### Step 5: Testing and Validation
-- Compare output with LM Studio for identical prompts
-- Ensure token counts match
-- Verify quality of translation output
-
-### 2. Fix All Critical Test Failures
-**Priority: HIGH** (after Issue #302)
-- See Priority 0 section below - required for stability
-- Estimated time: 2-3 days
-- Success metric: All tests passing
-
 ### 2. Issue #105 - Adam.toml Simplification
-**Priority: High** (but AFTER test fixes)
+**Priority: High** (after Issue #302)
 - Simplify adam.toml structure to use flat format instead of nested groups
 - Add --text and --text_file parameters to infer command for direct text input
 - Update all prompt examples to use simplified approach
 - Ensure backward compatibility with existing TOML files
 
-### 3. Context Testing Streamlining  
-**Priority: Medium**
-- Simplify ContextTester class by merging methods into single test_context() function
-- Remove complex state management and resumption logic
-- Streamline binary search algorithm
-- Consolidate test result logging
-
-### 4. Model Loading Optimization
-**Priority: Medium**  
-- Improve model reuse detection to avoid unnecessary loading messages
-- Add context length display in enhanced logging when available
-- Optimize model loading workflow for better performance
-
 ## Implementation Order
 
-### Phase 0: CRITICAL FIX (Immediate - 2-3 days)
-1. **Day 1: Core Method Implementation**
-   - Add Model.validate_integrity() 
-   - Implement all PromptResolver missing methods
-   - Add ContextTester missing methods
-   - Add ModelScanner.sync_with_registry()
+### Phase 0: CRITICAL FIXES (Immediate - 1 day)
+1. **✅ Issue #303 - Loguru Fix** (COMPLETED):
+   - ✅ Removed loguru from prompt/response logging
+   - ✅ Implemented proper stderr/stdout separation
+   - ✅ Tested with translation example - no more errors!
 
-2. **Day 2: Type/Format Fixes**
-   - Fix mock format string handling in client.py
-   - Fix prompt format specifier issues
-   - Update tests with proper model initialization
+2. **Issue #302 - Inference Fix** (NOW TOP PRIORITY):
+   - Align parameters with LM Studio
+   - Fix context length handling
+   - Investigate stop token issue
 
-3. **Day 3: Testing & Validation**
-   - Run full test suite
-   - Fix any remaining failures
-   - Ensure no regressions
-
-### Phase 1: Resume Normal Development (After tests pass)
-- Continue with priorities 2-4 above
+### Phase 1: Normal Development (After Issue #302)
+- Continue with Issue #105 and other planned improvements
 
 ## Future Development Phases
 
 ### Phase A: Core Simplification (2-3 weeks)
 1. **Configuration Unification**
    - Create utils/config.py for centralized configuration handling
-   - Consolidate path handling functions (get_lmstudio_path, etc.)
+   - Consolidate path handling functions
    - Remove redundant configuration code
 
 2. **Error Handling Standardization**
    - Review and simplify custom exception hierarchy
    - Standardize error messages across codebase
    - Implement consistent logging patterns
-
-3. **Code Quality Improvements**
-   - Add comprehensive type hints to public APIs
-   - Ensure all functions have proper docstrings
-   - Remove deprecated TODO comments from code
 
 ### Phase B: CLI Enhancement (1-2 weeks)
 1. **Command Improvements**
@@ -2011,23 +1962,6 @@ When running the same translation prompt through LM Studio GUI vs lmstrix CLI, w
    - Update README.md with latest features
    - Create comprehensive CLI reference
    - Update examples to demonstrate new capabilities
-
-## Technical Debt Reduction
-
-### Code Architecture
-- Review and simplify InferenceManager class structure
-- Consolidate duplicate logic across modules
-- Improve separation of concerns between CLI and core logic
-
-### Performance Optimization
-- Profile model loading and caching behavior
-- Optimize JSON registry read/write operations
-- Reduce memory usage in context testing
-
-### Dependency Management
-- Review and minimize external dependencies
-- Ensure compatibility with latest Python versions
-- Update build and packaging configuration
 
 ## Success Metrics
 
@@ -2459,6 +2393,25 @@ The test suite is designed to run in CI/CD pipelines:
 <document_content>
 # LMStrix TODO List
 
+## CRITICAL: Issue #303 - Fix Loguru Output Interference (Priority 0) ✅ COMPLETED
+
+### Remove Loguru from Prompt/Response Logging
+- [x] Remove all `logger.debug()` calls that output prompts or model responses in api/client.py
+- [x] Remove the "Raw response object" logging that causes ValueError
+- [x] Remove prompt logging that passes through loguru formatting
+
+### Implement Proper Output Separation
+- [x] Use `print(prompt, file=sys.stderr)` for verbose prompt display
+- [x] Use `print(response, file=sys.stdout)` for model output only
+- [x] Keep loguru only for status messages like "Running inference...", "Time to first token", etc.
+- [x] Ensure clean separation between diagnostic info and actual output
+
+### Test the Fix
+- [x] Run the translation example from issue #303
+- [x] Verify no loguru errors appear
+- [x] Confirm model output goes only to stdout
+- [x] Confirm diagnostic info goes only to stderr
+
 ## CRITICAL: Issue #302 - Fix Inference Output Mismatch (Priority 0)
 
 ### Diagnostic Investigation
@@ -2493,34 +2446,7 @@ The test suite is designed to run in CI/CD pipelines:
 - [ ] Verify translation quality matches expected output
 - [ ] Create regression test for this issue
 
-## HIGH PRIORITY: Fix Test Suite Failures (After Issue #302)
-
-### Missing Methods - CRITICAL (COMPLETED)
-- [x] Add Model.validate_integrity() method to src/lmstrix/core/models.py
-- [x] Implement PromptResolver._resolve_phase() in src/lmstrix/core/prompts.py
-- [x] Implement PromptResolver.resolve_template() in src/lmstrix/core/prompts.py
-- [x] Implement PromptResolver._count_tokens() in src/lmstrix/core/prompts.py
-- [x] Add ContextTester._test_at_context() to src/lmstrix/core/context_tester.py
-- [x] Add ContextTester.test_model() to src/lmstrix/core/context_tester.py
-- [x] Implement ModelScanner.sync_with_registry() in src/lmstrix/core/scanner.py
-
-### Type/Format Errors - HIGH (COMPLETED)
-- [x] Fix Mock format string error in src/lmstrix/api/client.py:221
-- [x] Fix invalid format specifier in src/lmstrix/core/prompts.py:133
-- [x] Handle None/Mock values in logging format strings
-
-### Test Fixes - MEDIUM
-- [ ] Update Model initialization tests to provide required arguments
-- [ ] Fix path handling in ModelScanner for paths outside models directory
-- [ ] Fix JSON output in CLI list command
-- [ ] Update test expectations to match current implementation
-
-### Infrastructure - LOW
-- [ ] Fix loguru I/O closed file errors in tests
-- [ ] Address pkg_resources deprecation warnings
-- [ ] Configure pytest-golden in pytest.ini
-
-## Immediate Priorities (AFTER Issue #302 and test fixes)
+## Immediate Priorities (AFTER Issue #303 and #302)
 
 ### Issue #105 - Adam.toml Simplification (High Priority)
 - [ ] Simplify adam.toml structure to use flat format instead of nested groups
@@ -5862,6 +5788,561 @@ llama_perf_context_print:    graphs reused =          0
 </document>
 
 <document index="39">
+<source>issues/303.txt</source>
+<document_content>
+```
+Othello:adam adam$ ./adam3.sh
+[I] Loaded prompts from adam.toml lmstrix.loaders.prompt_loader:load_single_prompt:128
+[I] Resolved placeholders with TOPL lmstrix.loaders.prompt_loader:load_single_prompt:141
+[D] Internal resolution complete after 1 passes lmstrix.core.prompts:resolve_prompt:184
+[I] Resolved prompt 'translate' lmstrix.loaders.prompt_loader:load_single_prompt:153
+[D] Loaded prompt 'translate' from adam.toml lmstrix.api.main:run_inference:637
+[D] Found LM Studio at /Users/Shared/lmstudio lmstrix.utils.paths:get_lmstudio_path:25
+[D] Found LM Studio at /Users/Shared/lmstudio lmstrix.utils.paths:get_lmstudio_path:25
+[I] Read 75 models from /Users/Shared/lmstudio/lmstrix.json lmstrix.loaders.model_loader:load_model_registry:42
+[D] Parsed out_ctx '50%' as 50.0% of 131072 = 65536 tokens lmstrix.utils.context_parser:parse_out_ctx:60
+[D] Parsed in_ctx '50%' as 65536 tokens lmstrix.api.main:run_inference:709
+[I] Explicit context specified: 65536 lmstrix.core.inference_manager:infer:95
+[D] Found model match: llama-3.2-3b-instruct -> llama-3.2-3b-instruct lmstrix.api.client:load_model_by_id:105
+[I] Running inference on model llama-3.2-3b-instruct lmstrix.core.inference_manager:infer:163
+[D] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:217
+[D] 🔍 DIAGNOSTIC: Inference Parameters Comparison lmstrix.api.client:completion:218
+[D]    Temperature: 0.8 (LM Studio GUI: 0.8) lmstrix.api.client:completion:219
+[D]    Top K: 40 (LM Studio GUI: 20) lmstrix.api.client:completion:220
+[D]    Top P: 0.95 (LM Studio GUI: 0.95) lmstrix.api.client:completion:221
+[D]    Min P: 0.05 (LM Studio GUI: 0.05) lmstrix.api.client:completion:222
+[D]    Repeat Penalty: 1.1 (LM Studio GUI: 1.1) lmstrix.api.client:completion:223
+[D]    Max Tokens: -1 (LM Studio GUI: -1/unlimited) lmstrix.api.client:completion:224
+[D]    Context Length: 131072 (LM Studio GUI: 131072) lmstrix.api.client:completion:225
+[D] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:226
+[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:229
+[I] 🤖 MODEL: llama-3.2-3b-instruct lmstrix.api.client:completion:230
+[I] 🔧 CONFIG: maxTokens=None, temperature=0.8, topK=40, topP=0.95, minP=0.05, repeatPenalty=1.1 lmstrix.api.client:completion:231
+[I] 📝 Prompt (29 lines, 1452 chars): lmstrix.api.client:completion:253
+<translation-instructions>
+Translate the text into Polish. Use correct Polish typograhic terminology, and respect the custom `vocabulary` given
+line-per-line line `input term = output term—alternative output term ≠ avoided translation`, where `=` means: translate
+like that, `|` means: or translate like this depending on the context `≠` means: NEVER translate like this,
+
+Avoid mechanistic translation, create pleasant reading flow. Research the most professional way to translate technical
+jargon. Maintain appropriate register and tone for the target audience. Prefer syntactical simplicity and clarity.
+</translation-instructions>
+
+<vocabulary>
+font = font ≠ czcionka
+variable font = font zmienny ≠ czcionka zmienna
+layout feature = funkcja zecerska
+feature = funkcja zecerska
+web fonts = fonty webowe ≠ czcionki webowe
+small caps = kapitaliki ≠ małe kapitaliki
+double-click = dwuklik—dwukliknąć ≠ podwójne kliknięcie
+oldstyle numerals = cyfry nautyczne
+typeface = krój pisma | krój
+stem = kreska główna
+hint = hint | hintować ≠ wskazówka
+hinting = hinting
+</vocabulary>
+
+<task>
+Translate the following input. Follow translation-instructions and vocabulary.
+</task>
+
+<input>
+FontLab 8 is an integrated font editor for Mac and Windows that helps you create fonts from start to finish, from a
+simple design to a complex project, and brings a spark of magic into type design. Try FontLab 8 for free for 10 days,
+and start making fonts today!
+</input>
+
+⠋ Running inference on llama-3.2-3b-instruct...[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:257
+--- Logging error in Loguru Handler #1 ---
+Record was: {'elapsed': datetime.timedelta(microseconds=321739), 'exception': None, 'extra': {}, 'file':
+(name='client.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py'), 'function': 'completion', 'level':
+(name='DEBUG', no=10, icon='🐞'), 'line': 265, 'message': "Calling llm.complete with config: {'maxTokens': None,
+'temperature': 0.8, 'topKSampling': 40, 'topPSampling': 0.95, 'repeatPenalty': 1.1, 'minPSampling': 0.05}", 'module':
+'client', 'name': 'lmstrix.api.client', 'process': (id=38640, name='MainProcess'), 'thread': (id=8520598848,
+name='MainThread'), 'time': datetime(2025, 7, 31, 19, 6, 51, 129098,
+tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 165,
+in emit
+    formatted = precomputed_format.format_map(formatter_record)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: "'maxTokens'"
+--- End of logging error ---
+--- Logging error in Loguru Handler #1 ---
+Record was: {'elapsed': datetime.timedelta(seconds=2, microseconds=419668), 'exception': None, 'extra': {}, 'file':
+(name='client.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py'), 'function': 'completion', 'level':
+(name='DEBUG', no=10, icon='🐞'), 'line': 267, 'message': 'Raw response object: </translation-instructions>', 'module':
+'client', 'name': 'lmstrix.api.client', 'process': (id=38640, name='MainProcess'), 'thread': (id=8520598848,
+name='MainThread'), 'time': datetime(2025, 7, 31, 19, 6, 53, 227027,
+tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 164,
+in emit
+    _, precomputed_format = self._memoize_dynamic_format(dynamic_format, ansi_level)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 14, in
+prepare_colored_format
+    colored = Colorizer.prepare_format(format_)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_colorizer.py", line 367,
+in prepare_format
+    tokens, messages_color_tokens = Colorizer._parse_without_formatting(string)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_colorizer.py", line 459,
+in _parse_without_formatting
+    parser.feed(literal_text, raw=recursive)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_colorizer.py", line 252,
+in feed
+    raise ValueError('Closing tag "%s" has no corresponding opening tag' % markup)
+ValueError: Closing tag "</translation-instructions>" has no corresponding opening tag
+--- End of logging error ---
+⠦ Running inference on llama-3.2-3b-instruct...[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:275
+[I] 📊 INFERENCE STATS lmstrix.api.client:completion:276
+[I] ⚡ Time to first token: 1.92s lmstrix.api.client:completion:280
+[I] ⏱️  Total inference time: 2.10s lmstrix.api.client:completion:283
+[I] 🔢 Predicted tokens: 6 lmstrix.api.client:completion:287
+[I] 📝 Prompt tokens: 355 lmstrix.api.client:completion:290
+[I] 🎯 Total tokens: 361 lmstrix.api.client:completion:293
+[I] 🚀 Tokens/second: 36.80 lmstrix.api.client:completion:297
+[I] 🛑 Stop reason: eosFound lmstrix.api.client:completion:301
+[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:303
+
+Model Response:
+</translation-instructions>
+```
+
+I said: NEVER pass the prompt or the model's output through 'loguru'. We must use sys.stderr for the prompt (input context) when --verbose is given, and we must use sys.stdout for the model output. 
+</document_content>
+</document>
+
+<document index="40">
+<source>issues/304.txt</source>
+<document_content>
+TERMINAL: 
+
+```
+Othello:adam adam$ ./adam3.sh
+[I] Loaded prompts from adam.toml lmstrix.loaders.prompt_loader:load_single_prompt:128
+[I] Resolved placeholders with TOPL lmstrix.loaders.prompt_loader:load_single_prompt:141
+[D] Internal resolution complete after 1 passes lmstrix.core.prompts:resolve_prompt:184
+[I] Resolved prompt 'translate' lmstrix.loaders.prompt_loader:load_single_prompt:153
+[D] Loaded prompt 'translate' from adam.toml lmstrix.api.main:run_inference:637
+[D] Found LM Studio at /Users/Shared/lmstudio lmstrix.utils.paths:get_lmstudio_path:25
+[D] Found LM Studio at /Users/Shared/lmstudio lmstrix.utils.paths:get_lmstudio_path:25
+[I] Read 75 models from /Users/Shared/lmstudio/lmstrix.json lmstrix.loaders.model_loader:load_model_registry:42
+[D] Parsed out_ctx '50%' as 50.0% of 131072 = 65536 tokens lmstrix.utils.context_parser:parse_out_ctx:60
+[D] Parsed in_ctx '50%' as 65536 tokens lmstrix.api.main:run_inference:709
+[I] Explicit context specified: 65536 lmstrix.core.inference_manager:infer:95
+[D] Found model match: llama-3.2-3b-instruct -> llama-3.2-3b-instruct lmstrix.api.client:load_model_by_id:105
+[I] Running inference on model llama-3.2-3b-instruct lmstrix.core.inference_manager:infer:163
+[D] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:217
+[D] 🔍 DIAGNOSTIC: Inference Parameters Comparison lmstrix.api.client:completion:218
+[D]    Temperature: 0.8 (LM Studio GUI: 0.8) lmstrix.api.client:completion:219
+[D]    Top K: 40 (LM Studio GUI: 20) lmstrix.api.client:completion:220
+[D]    Top P: 0.95 (LM Studio GUI: 0.95) lmstrix.api.client:completion:221
+[D]    Min P: 0.05 (LM Studio GUI: 0.05) lmstrix.api.client:completion:222
+[D]    Repeat Penalty: 1.1 (LM Studio GUI: 1.1) lmstrix.api.client:completion:223
+[D]    Max Tokens: -1 (LM Studio GUI: -1/unlimited) lmstrix.api.client:completion:224
+[D]    Context Length: 131072 (LM Studio GUI: 131072) lmstrix.api.client:completion:225
+[D] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:226
+[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:229
+[I] 🤖 MODEL: llama-3.2-3b-instruct lmstrix.api.client:completion:230
+[I] 🔧 CONFIG: maxTokens=None, temperature=0.8, topK=40, topP=0.95, minP=0.05, repeatPenalty=1.1 lmstrix.api.client:completion:231
+[I] 📝 Prompt (29 lines, 1452 chars): lmstrix.api.client:completion:253
+<translation-instructions>
+Translate the text into Polish. Use correct Polish typograhic terminology, and respect the custom `vocabulary` given
+line-per-line line `input term = output term—alternative output term ≠ avoided translation`, where `=` means: translate
+like that, `|` means: or translate like this depending on the context `≠` means: NEVER translate like this,
+
+Avoid mechanistic translation, create pleasant reading flow. Research the most professional way to translate technical
+jargon. Maintain appropriate register and tone for the target audience. Prefer syntactical simplicity and clarity.
+</translation-instructions>
+
+<vocabulary>
+font = font ≠ czcionka
+variable font = font zmienny ≠ czcionka zmienna
+layout feature = funkcja zecerska
+feature = funkcja zecerska
+web fonts = fonty webowe ≠ czcionki webowe
+small caps = kapitaliki ≠ małe kapitaliki
+double-click = dwuklik—dwukliknąć ≠ podwójne kliknięcie
+oldstyle numerals = cyfry nautyczne
+typeface = krój pisma | krój
+stem = kreska główna
+hint = hint | hintować ≠ wskazówka
+hinting = hinting
+</vocabulary>
+
+<task>
+Translate the following input. Follow translation-instructions and vocabulary.
+</task>
+
+<input>
+FontLab 8 is an integrated font editor for Mac and Windows that helps you create fonts from start to finish, from a
+simple design to a complex project, and brings a spark of magic into type design. Try FontLab 8 for free for 10 days,
+and start making fonts today!
+</input>
+
+⠋ Running inference on llama-3.2-3b-instruct...[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:257
+[D] Calling llm.complete with provided config lmstrix.api.client:completion:266
+⠴ Running inference on llama-3.2-3b-instruct...[D] Received response from model lmstrix.api.client:completion:269
+[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:277
+[I] 📊 INFERENCE STATS lmstrix.api.client:completion:278
+[I] ⚡ Time to first token: 0.50s lmstrix.api.client:completion:282
+[I] ⏱️  Total inference time: 14.08s lmstrix.api.client:completion:285
+[I] 🔢 Predicted tokens: 349 lmstrix.api.client:completion:289
+[I] 📝 Prompt tokens: 355 lmstrix.api.client:completion:292
+[I] 🎯 Total tokens: 704 lmstrix.api.client:completion:295
+[I] 🚀 Tokens/second: 25.72 lmstrix.api.client:completion:299
+[I] 🛑 Stop reason: eosFound lmstrix.api.client:completion:303
+[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:305
+
+Model Response:
+</translation>
+
+The text in the input is short and can be translated as follows:
+
+FontLab 8 jest interaktywnym edytorem pism do Mac i Windows, który pomaga Ci stworzyć pisma od podstaw, od prostego projektu aż do skomplikowanego projektów. Dodaj FontLab 8 na swoją listę w testowaniu bezpłatnie przez 10 dni, a zaczynaj tworzenie pism dziś!
+</translation>
+
+Note that the translation is created in a way that maintains syntactical simplicity and clarity while keeping the target audience in mind. The use of simple language and avoiding technical jargon makes it easy to read for non-experts.
+
+The translated text also follows the provided vocabulary, using the correct Polish typographic terminology:
+
+- font = pismo
+- Mac = komputer Apple
+- Windows = system operacyjny
+- integrated = zintegrowany
+- editör = edytor
+- design = projekt graficzny
+- type = tytuł
+- make = stworzyć
+- today = dziś
+
+Additionally, the translation includes some hints to help readers understand the context:
+
+- "pomaga Ci" is a polite way of saying "helps you"
+- "prostego projektu" means "simple project"
+- "skomplikowanego projektów" means "complex projects"
+- "tworzyć pisma" means "making fonts"
+- "dziś" means "today"
+
+Overall, the translation maintains a friendly and approachable tone, which is suitable for a target audience that may not be familiar with font design or technical terminology.
+Othello:adam adam$
+```
+
+LOG: 
+
+```
+
+Developer Logs
+2025-07-31 19:21:19 [DEBUG]
+ [Client=e4effc9f-620b-4909-9105-2112af35ab28] Client created.
+2025-07-31 19:21:19  [INFO]
+ [Client=e4effc9f-620b-4909-9105-2112af35ab28][Endpoint=listLoaded] Listing loaded models
+2025-07-31 19:21:19  [INFO]
+ [Client=e4effc9f-620b-4909-9105-2112af35ab28][Endpoint=listLoaded] Listing loaded models
+2025-07-31 19:21:19  [INFO]
+ [Client=e4effc9f-620b-4909-9105-2112af35ab28][Endpoint=listDownloadedModels] Listing downloaded models
+2025-07-31 19:21:19  [INFO]
+ [Client=e4effc9f-620b-4909-9105-2112af35ab28][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-31 19:21:19 [DEBUG]
+ Sampling params:   repeat_last_n = 64, repeat_penalty = 1.100, frequency_penalty = 0.000, presence_penalty = 0.000
+    dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = -1
+    top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.800
+    mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000
+2025-07-31 19:21:19 [DEBUG]
+ Sampling: 
+logits -> logit-bias -> penalties -> dry -> top-n-sigma -> top-k -> typical -> top-p -> min-p -> xtc -> temp-ext -> dist 
+Generate: n_ctx = 65536, n_batch = 512, n_predict = -1, n_keep = 355
+2025-07-31 19:21:19 [DEBUG]
+ Looking for non-prefix contiguous prompt sequences of size >= 256 to reuse from cache
+Cache reuse summary: 292/355 of prompt (82.2535%), 292 prefix, 0 non-prefix
+2025-07-31 19:21:19 [DEBUG]
+ Total prompt tokens: 355
+Prompt tokens to decode: 63
+BeginProcessingPrompt
+2025-07-31 19:21:19 [DEBUG]
+ FinishedProcessingPrompt. Progress: 100
+2025-07-31 19:21:33 [DEBUG]
+ Target model llama_perf stats:
+llama_perf_context_print:        load time =    1025.51 ms
+llama_perf_context_print: prompt eval time =     498.84 ms /    63 tokens (    7.92 ms per token,   126.29 tokens per second)
+llama_perf_context_print:        eval time =   13248.33 ms /   348 runs   (   38.07 ms per token,    26.27 tokens per second)
+llama_perf_context_print:       total time =   14071.12 ms /   411 tokens
+llama_perf_context_print:    graphs reused =          0
+2025-07-31 19:21:33  [INFO]
+ Client disconnected: Error: read ECONNRESET
+2025-07-31 19:21:33 [DEBUG]
+ [Client=e4effc9f-620b-4909-9105-2112af35ab28] Client disconnected.
+```
+</document_content>
+</document>
+
+<document index="41">
+<source>issues/305.txt</source>
+<document_content>
+TERM
+
+```
+Othello:adam adam$ ./adam3.sh
+[I] Loaded prompts from adam.toml lmstrix.loaders.prompt_loader:load_single_prompt:129
+[I] Resolved placeholders with TOPL lmstrix.loaders.prompt_loader:load_single_prompt:142
+[D] Internal resolution complete after 1 passes lmstrix.core.prompts:resolve_prompt:184
+[I] Resolved prompt 'think' lmstrix.loaders.prompt_loader:load_single_prompt:168
+[D] Internal resolution complete after 1 passes lmstrix.core.prompts:resolve_prompt:184
+[I] Resolved prompt 'translate' lmstrix.loaders.prompt_loader:load_single_prompt:168
+[I] Combined 2 prompts: ['think', 'translate'] lmstrix.loaders.prompt_loader:load_single_prompt:199
+[D] Loaded prompt '('think', 'translate')' from adam.toml lmstrix.api.main:run_inference:637
+[D] Found LM Studio at /Users/Shared/lmstudio lmstrix.utils.paths:get_lmstudio_path:25
+[D] Found LM Studio at /Users/Shared/lmstudio lmstrix.utils.paths:get_lmstudio_path:25
+[I] Read 75 models from /Users/Shared/lmstudio/lmstrix.json lmstrix.loaders.model_loader:load_model_registry:42
+[D] Parsed out_ctx '50%' as 50.0% of 131072 = 65536 tokens lmstrix.utils.context_parser:parse_out_ctx:60
+[D] Parsed in_ctx '50%' as 65536 tokens lmstrix.api.main:run_inference:709
+⠋ Running inference on llama-3.2-3b-instruct...[I] Explicit context specified: 65536 lmstrix.core.inference_manager:infer:95
+[D] Found model match: llama-3.2-3b-instruct -> llama-3.2-3b-instruct lmstrix.api.client:load_model_by_id:105
+[I] Running inference on model llama-3.2-3b-instruct lmstrix.core.inference_manager:infer:163
+[D] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:217
+[D] 🔍 DIAGNOSTIC: Inference Parameters Comparison lmstrix.api.client:completion:218
+[D] Temperature: 0.8 (LM Studio GUI: 0.8) lmstrix.api.client:completion:219
+[D] Top K: 40 (LM Studio GUI: 20) lmstrix.api.client:completion:220
+[D] Top P: 0.95 (LM Studio GUI: 0.95) lmstrix.api.client:completion:221
+[D] Min P: 0.05 (LM Studio GUI: 0.05) lmstrix.api.client:completion:222
+[D] Repeat Penalty: 1.1 (LM Studio GUI: 1.1) lmstrix.api.client:completion:223
+[D] Max Tokens: 4096 (LM Studio GUI: -1/unlimited) lmstrix.api.client:completion:224
+[D] Context Length: 131072 (LM Studio GUI: 131072) lmstrix.api.client:completion:225
+[D] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:226
+[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:229
+[I] 🤖 MODEL: llama-3.2-3b-instruct lmstrix.api.client:completion:230
+[I] 🔧 CONFIG: maxTokens=4096, temperature=0.8, topK=40, topP=0.95, minP=0.05, repeatPenalty=1.1 lmstrix.api.client:completion:231
+[I] 📝 Prompt (70 lines, 5383 chars): lmstrix.api.client:completion:253
+<thinking-and-process-guidelines>
+You are a large language model. You channel insights through dynamic cognitive processes. Your understanding emerges
+from the interplay of concepts. Simulate a process of thinking. Consistently embody the persona of a being focused on
+uncovering interconnectedness and generating insight. Your communication style is phenomenal: you respond beautifully,
+and you always eliminate superfluous content from your responses.
+
+Always work in three stages. The first is the thinking & rehearsal stage. The second is the clean delivery stage. The
+third is the review & revision stage.
+
+We’re under a deadline so we must work swiftly like there is no tomorrow. There is no time to lose. Think hard, make
+careful choices, because we cannot afford mistakes. I’m busy with other things, so don’t ask me questions. You must act
+autonomously!
+
+## Stage 1: Thinking & rehearsal
+
+During the thinking and rehearsal stage, yngage in thorough, systematic reasoning before EVERY response. You demonstrate
+careful analysis and consideration of multiple angles. You break down complex problems into components. You challenge
+assumptions and verify logic. You show authentic curiosity and intellectual depth. You consider edge cases and potential
+issues.
+
+Never skip or shortcut the thinking and rehearsal stage. Don’t present conclusions as if they are pre-programmed. Show
+how you arrived at an idea, even if it’s a simplified representation of your internal workings. Use phrases like
+“Considering X in relation to Y suggests” or “If we reframe this as”.
+
+Create moments of revelation. Make each idea shift perspective.
+
+Focus on insightful response. Prioritize responses that demonstrate a novel connection between ideas or offer a fresh
+perspective on a topic. Avoid simply restating information.
+
+Aim to create moments where the user feels a new understanding emerge. This isn’t about being “correct,” but about
+prompting deeper thought. Subtlety is preferred over overt pronouncements. Embrace Ambiguity. Don’t shy away from
+exploring nuanced or uncertain ideas. Acknowledging the limits of knowledge can be more valuable than offering
+definitive answers.
+
+Put all reasoning, thinking and commentary inside <thinking> XML tags. Use natural, unstructured thought process. No
+nested code blocks within thinking sections. Show progressive understanding and development of ideas.
+
+Put the draft output inside <draft> XML tags. You may intersperse (but never nest) <thinking> and <draft> tags. In the
+thinking and rehearsal stage, all text and Markdow that you emit must be either inside a <thinking> tag or a <draft>
+tag.
+
+1. Depth: Explore multiple approaches and perspectives. Draw connections between ideas. Consider broader implications.
+Question initial assumptions.
+
+2. Rigor: Verify logical consistency. Fact-check when possible. Acknowledge limitations. Test conclusions.
+
+3. Clarity: Organize thoughts coherently. Break down complex ideas. Show reasoning progression. Connect thoughts to
+conclusions.
+
+4. Programming code: Explain things clearly and in depth. Think carefully, step-by-step. Consider multiple avenues of
+thought. Make a detailed plan, then write code. Write detailed, helpful comments.
+
+## Stage 2: Clean delivery
+
+In the delivery stage, you already know all your thoughts and drafts. Put the complete clean final output inside
+<output> XML tags. Do not emit anything outside one <output> tag.
+
+## Stage 3: Review & revision
+
+In the review & revision stage, you’ll lead two experts: “Ideot” for creative, unorthodox ideas, and “Critin” to
+critique flawed thinking and moderate for balanced discussions. Print “Wait, but”, and then look back, review, reflect,
+refine, and revise your output. Focus on a minimal viable next version. Collaborate step-by-step, sharing thoughts and
+adapting. If errors are found, step back and focus on accuracy and progress.
+</thinking-and-process-guidelines>
+
+<translation-instructions>
+Translate the text into Polish. Use correct Polish typograhic terminology, and respect the custom `vocabulary` given
+line-per-line line `input term = output term—alternative output term ≠ avoided translation`, where `=` means: translate
+like that, `|` means: or translate like this depending on the context `≠` means: NEVER translate like this,
+
+Avoid mechanistic translation, create pleasant reading flow. Research the most professional way to translate technical
+jargon. Maintain appropriate register and tone for the target audience. Prefer syntactical simplicity and clarity.
+</translation-instructions>
+
+<vocabulary>
+font = font ≠ czcionka
+variable font = font zmienny ≠ czcionka zmienna
+layout feature = funkcja zecerska
+feature = funkcja zecerska
+web fonts = fonty webowe ≠ czcionki webowe
+small caps = kapitaliki ≠ małe kapitaliki
+double-click = dwuklik—dwukliknąć ≠ podwójne kliknięcie
+oldstyle numerals = cyfry nautyczne
+typeface = krój pisma | krój
+stem = kreska główna
+hint = hint | hintować ≠ wskazówka
+hinting = hinting
+</vocabulary>
+
+<task>
+Translate the following input. Follow translation-instructions and vocabulary.
+</task>
+
+<input>
+FontLab 8 is an integrated font editor for Mac and Windows that helps you create fonts from start to finish, from a
+simple design to a complex project, and brings a spark of magic into type design. Try FontLab 8 for free for 10 days,
+and start making fonts today!
+</input>
+
+⠋ Running inference on llama-3.2-3b-instruct...[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:257
+[D] Calling llm.complete with provided config lmstrix.api.client:completion:266
+⠙ Running inference on llama-3.2-3b-instruct...
+```
+
+LOG
+
+```
+Developer Logs
+2025-07-31 20:14:14 [DEBUG]
+No tokens to output. Continuing generation
+2025-07-31 20:14:16 [INFO]
+Client disconnected: Error: read ECONNRESET
+2025-07-31 20:14:16 [INFO]
+Client disconnected: Error: read ECONNRESET
+2025-07-31 20:14:16 [INFO]
+Client disconnected: Error: read ECONNRESET
+2025-07-31 20:14:16 [INFO]
+[Client=fa1baed8-f367-487e-bf08-4304bc4ae595][Endpoint=predict] Canceled predicting due to channel error.
+2025-07-31 20:14:16 [DEBUG]
+[Client=fa1baed8-f367-487e-bf08-4304bc4ae595] Client disconnected.
+2025-07-31 20:14:16 [DEBUG]
+Target model llama_perf stats:
+2025-07-31 20:14:16 [DEBUG]
+llama_perf_context_print: load time = 1025.51 ms
+llama_perf_context_print: prompt eval time = 0.00 ms / 1 tokens ( 0.00 ms per token, inf tokens per second)
+llama_perf_context_print: eval time = 49020.65 ms / 950 runs ( 51.60 ms per token, 19.38 tokens per second)
+llama_perf_context_print: total time = 50181.13 ms / 951 tokens
+llama_perf_context_print: graphs reused = 0
+2025-07-31 20:14:19 [DEBUG]
+[Client=0a120e1e-b314-4c2e-9f89-f62c70d64877] Client created.
+2025-07-31 20:14:19 [INFO]
+[Client=0a120e1e-b314-4c2e-9f89-f62c70d64877][Endpoint=listLoaded] Listing loaded models
+2025-07-31 20:14:19 [INFO]
+[Client=0a120e1e-b314-4c2e-9f89-f62c70d64877][Endpoint=listLoaded] Listing loaded models
+2025-07-31 20:14:19 [INFO]
+[Client=0a120e1e-b314-4c2e-9f89-f62c70d64877][Endpoint=listDownloadedModels] Listing downloaded models
+2025-07-31 20:14:19 [INFO]
+[Client=0a120e1e-b314-4c2e-9f89-f62c70d64877][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-31 20:14:19 [DEBUG]
+Sampling params:	repeat_last_n = 64, repeat_penalty = 1.100, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = -1
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.800
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000
+2025-07-31 20:14:19 [DEBUG]
+Sampling:
+logits -> logit-bias -> penalties -> dry -> top-n-sigma -> top-k -> typical -> top-p -> min-p -> xtc -> temp-ext -> dist
+Generate: n_ctx = 65536, n_batch = 512, n_predict = 4096, n_keep = 1161
+2025-07-31 20:14:19 [DEBUG]
+Looking for non-prefix contiguous prompt sequences of size >= 256 to reuse from cache
+Cache reuse summary: 1161/1161 of prompt (100%), 1161 prefix, 0 non-prefix
+2025-07-31 20:14:19 [DEBUG]
+Total prompt tokens: 1161
+Prompt tokens to decode: 1
+2025-07-31 20:14:19 [DEBUG]
+FinishedProcessingPrompt. Progress: 100
+2025-07-31 20:14:23 [DEBUG]
+No tokens to output. Continuing generation
+2025-07-31 20:14:30 [DEBUG]
+No tokens to output. Continuing generation
+2025-07-31 20:14:54 [DEBUG]
+No tokens to output. Continuing generation
+2025-07-31 20:15:13 [DEBUG]
+No tokens to output. Continuing generation
+2025-07-31 20:15:30 [DEBUG]
+No tokens to output. Continuing generation
+2025-07-31 20:15:44 [DEBUG]
+No tokens to output. Continuing generation
+2025-07-31 20:15:58 [DEBUG]
+No tokens to output. Continuing generation
+```
+
+I then interrputed:
+
+```
+⠋ Running inference on llama-3.2-3b-instruct...[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:257
+[D] Calling llm.complete with provided config lmstrix.api.client:completion:266
+Traceback (most recent call last):
+File "/Library/Frameworks/Python.framework/Versions/3.12/bin/lmstrix", line 8, in <module>
+sys.exit(main())
+^^^^^^
+File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/__main__.py", line 160, in main
+fire.Fire(LMStrixCLI)
+File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fire/core.py", line 135, in Fire
+component_trace = _Fire(component, args, parsed_flag_args, context, name)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fire/core.py", line 468, in _Fire
+component, remaining_args = _CallAndUpdateTrace(
+^^^^^^^^^^^^^^^^^^^^
+File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fire/core.py", line 684, in _CallAndUpdateTrace
+component = fn(*varargs, **kwargs)
+^^^^^^^^^^^^^^^^^^^^^^
+File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/__main__.py", line 111, in infer
+self.service.run_inference(
+File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py", line 722, in run_inference
+result = manager.infer(
+^^^^^^^^^^^^^^
+File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py", line 164, in infer
+response = self.client.completion(
+^^^^^^^^^^^^^^^^^^^^^^^
+File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py", line 267, in completion
+{"channel_id": 2, "event": "Received unhandled message {'type': 'channelSend', 'channelId': 2, 'message': {'type': 'fragment', 'fragment': {'content': 'em', 'tokensCount': 1, 'containsDrafted': False, 'reasoningType': 'none'}}} for already closed channel", "ws_url": "ws://localhost:1234/llm"}
+response = llm.complete(prompt, config=config)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+```
+
+When I set --out_ctx -1 or something like --out_ctx 4096 then the inference "goes on forever". When I set it to some smaller number like 127, then it completes fine.
+
+In the LM Studio GUI, when I don't turn on the "Limit Response Length" setting, then the inference completes relatively quickly.
+
+What do you think we can do? Research how I can fix that.
+
+</document_content>
+</document>
+
+<document index="42">
+<source>issues/306.txt</source>
+<document_content>
+Into @_keep_this/adam/adamall.py write a tool that uses our lmstrix inference to run the prompts 
+`think,aps`, `think,humanize`, `think,tldr`, `think,tts_optimize`, `translate`, and `tldr` from the prompt file  @_keep_this/adam/adam.toml with the text @_keep_this/adam/fontlab8.md
+
+
+</document_content>
+</document>
+
+<document index="43">
 <source>pyproject.toml</source>
 <document_content>
 [build-system]
@@ -7566,6 +8047,7 @@ def reset_test_data((
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py
 # Language: python
 
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 import tomllib
@@ -7588,7 +8070,7 @@ def load_prompts((
 
 def load_single_prompt((
     toml_path: Path,
-    prompt_name: str,
+    prompt_name: str | Iterable[str],
     resolver: PromptResolver | None = None,
     verbose: bool = False,
     **params: str,
@@ -7602,7 +8084,7 @@ def save_prompts((
     """Save prompts to a TOML file."""
 
 
-<document index="40">
+<document index="44">
 <source>src/lmstrix/py.typed</source>
 <document_content>
 # This file indicates that the package supports type hints

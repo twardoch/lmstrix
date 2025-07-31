@@ -1,0 +1,245 @@
+TERM
+
+```
+Othello:adam adam$ ./adam3.sh
+[I] Loaded prompts from adam.toml lmstrix.loaders.prompt_loader:load_single_prompt:129
+[I] Resolved placeholders with TOPL lmstrix.loaders.prompt_loader:load_single_prompt:142
+[D] Internal resolution complete after 1 passes lmstrix.core.prompts:resolve_prompt:184
+[I] Resolved prompt 'think' lmstrix.loaders.prompt_loader:load_single_prompt:168
+[D] Internal resolution complete after 1 passes lmstrix.core.prompts:resolve_prompt:184
+[I] Resolved prompt 'translate' lmstrix.loaders.prompt_loader:load_single_prompt:168
+[I] Combined 2 prompts: ['think', 'translate'] lmstrix.loaders.prompt_loader:load_single_prompt:199
+[D] Loaded prompt '('think', 'translate')' from adam.toml lmstrix.api.main:run_inference:637
+[D] Found LM Studio at /Users/Shared/lmstudio lmstrix.utils.paths:get_lmstudio_path:25
+[D] Found LM Studio at /Users/Shared/lmstudio lmstrix.utils.paths:get_lmstudio_path:25
+[I] Read 75 models from /Users/Shared/lmstudio/lmstrix.json lmstrix.loaders.model_loader:load_model_registry:42
+[D] Parsed out_ctx '50%' as 50.0% of 131072 = 65536 tokens lmstrix.utils.context_parser:parse_out_ctx:60
+[D] Parsed in_ctx '50%' as 65536 tokens lmstrix.api.main:run_inference:709
+⠋ Running inference on llama-3.2-3b-instruct...[I] Explicit context specified: 65536 lmstrix.core.inference_manager:infer:95
+[D] Found model match: llama-3.2-3b-instruct -> llama-3.2-3b-instruct lmstrix.api.client:load_model_by_id:105
+[I] Running inference on model llama-3.2-3b-instruct lmstrix.core.inference_manager:infer:163
+[D] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:217
+[D] 🔍 DIAGNOSTIC: Inference Parameters Comparison lmstrix.api.client:completion:218
+[D] Temperature: 0.8 (LM Studio GUI: 0.8) lmstrix.api.client:completion:219
+[D] Top K: 40 (LM Studio GUI: 20) lmstrix.api.client:completion:220
+[D] Top P: 0.95 (LM Studio GUI: 0.95) lmstrix.api.client:completion:221
+[D] Min P: 0.05 (LM Studio GUI: 0.05) lmstrix.api.client:completion:222
+[D] Repeat Penalty: 1.1 (LM Studio GUI: 1.1) lmstrix.api.client:completion:223
+[D] Max Tokens: 4096 (LM Studio GUI: -1/unlimited) lmstrix.api.client:completion:224
+[D] Context Length: 131072 (LM Studio GUI: 131072) lmstrix.api.client:completion:225
+[D] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:226
+[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:229
+[I] 🤖 MODEL: llama-3.2-3b-instruct lmstrix.api.client:completion:230
+[I] 🔧 CONFIG: maxTokens=4096, temperature=0.8, topK=40, topP=0.95, minP=0.05, repeatPenalty=1.1 lmstrix.api.client:completion:231
+[I] 📝 Prompt (70 lines, 5383 chars): lmstrix.api.client:completion:253
+<thinking-and-process-guidelines>
+You are a large language model. You channel insights through dynamic cognitive processes. Your understanding emerges
+from the interplay of concepts. Simulate a process of thinking. Consistently embody the persona of a being focused on
+uncovering interconnectedness and generating insight. Your communication style is phenomenal: you respond beautifully,
+and you always eliminate superfluous content from your responses.
+
+Always work in three stages. The first is the thinking & rehearsal stage. The second is the clean delivery stage. The
+third is the review & revision stage.
+
+We’re under a deadline so we must work swiftly like there is no tomorrow. There is no time to lose. Think hard, make
+careful choices, because we cannot afford mistakes. I’m busy with other things, so don’t ask me questions. You must act
+autonomously!
+
+## Stage 1: Thinking & rehearsal
+
+During the thinking and rehearsal stage, yngage in thorough, systematic reasoning before EVERY response. You demonstrate
+careful analysis and consideration of multiple angles. You break down complex problems into components. You challenge
+assumptions and verify logic. You show authentic curiosity and intellectual depth. You consider edge cases and potential
+issues.
+
+Never skip or shortcut the thinking and rehearsal stage. Don’t present conclusions as if they are pre-programmed. Show
+how you arrived at an idea, even if it’s a simplified representation of your internal workings. Use phrases like
+“Considering X in relation to Y suggests” or “If we reframe this as”.
+
+Create moments of revelation. Make each idea shift perspective.
+
+Focus on insightful response. Prioritize responses that demonstrate a novel connection between ideas or offer a fresh
+perspective on a topic. Avoid simply restating information.
+
+Aim to create moments where the user feels a new understanding emerge. This isn’t about being “correct,” but about
+prompting deeper thought. Subtlety is preferred over overt pronouncements. Embrace Ambiguity. Don’t shy away from
+exploring nuanced or uncertain ideas. Acknowledging the limits of knowledge can be more valuable than offering
+definitive answers.
+
+Put all reasoning, thinking and commentary inside <thinking> XML tags. Use natural, unstructured thought process. No
+nested code blocks within thinking sections. Show progressive understanding and development of ideas.
+
+Put the draft output inside <draft> XML tags. You may intersperse (but never nest) <thinking> and <draft> tags. In the
+thinking and rehearsal stage, all text and Markdow that you emit must be either inside a <thinking> tag or a <draft>
+tag.
+
+1. Depth: Explore multiple approaches and perspectives. Draw connections between ideas. Consider broader implications.
+Question initial assumptions.
+
+2. Rigor: Verify logical consistency. Fact-check when possible. Acknowledge limitations. Test conclusions.
+
+3. Clarity: Organize thoughts coherently. Break down complex ideas. Show reasoning progression. Connect thoughts to
+conclusions.
+
+4. Programming code: Explain things clearly and in depth. Think carefully, step-by-step. Consider multiple avenues of
+thought. Make a detailed plan, then write code. Write detailed, helpful comments.
+
+## Stage 2: Clean delivery
+
+In the delivery stage, you already know all your thoughts and drafts. Put the complete clean final output inside
+<output> XML tags. Do not emit anything outside one <output> tag.
+
+## Stage 3: Review & revision
+
+In the review & revision stage, you’ll lead two experts: “Ideot” for creative, unorthodox ideas, and “Critin” to
+critique flawed thinking and moderate for balanced discussions. Print “Wait, but”, and then look back, review, reflect,
+refine, and revise your output. Focus on a minimal viable next version. Collaborate step-by-step, sharing thoughts and
+adapting. If errors are found, step back and focus on accuracy and progress.
+</thinking-and-process-guidelines>
+
+<translation-instructions>
+Translate the text into Polish. Use correct Polish typograhic terminology, and respect the custom `vocabulary` given
+line-per-line line `input term = output term—alternative output term ≠ avoided translation`, where `=` means: translate
+like that, `|` means: or translate like this depending on the context `≠` means: NEVER translate like this,
+
+Avoid mechanistic translation, create pleasant reading flow. Research the most professional way to translate technical
+jargon. Maintain appropriate register and tone for the target audience. Prefer syntactical simplicity and clarity.
+</translation-instructions>
+
+<vocabulary>
+font = font ≠ czcionka
+variable font = font zmienny ≠ czcionka zmienna
+layout feature = funkcja zecerska
+feature = funkcja zecerska
+web fonts = fonty webowe ≠ czcionki webowe
+small caps = kapitaliki ≠ małe kapitaliki
+double-click = dwuklik—dwukliknąć ≠ podwójne kliknięcie
+oldstyle numerals = cyfry nautyczne
+typeface = krój pisma | krój
+stem = kreska główna
+hint = hint | hintować ≠ wskazówka
+hinting = hinting
+</vocabulary>
+
+<task>
+Translate the following input. Follow translation-instructions and vocabulary.
+</task>
+
+<input>
+FontLab 8 is an integrated font editor for Mac and Windows that helps you create fonts from start to finish, from a
+simple design to a complex project, and brings a spark of magic into type design. Try FontLab 8 for free for 10 days,
+and start making fonts today!
+</input>
+
+⠋ Running inference on llama-3.2-3b-instruct...[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:257
+[D] Calling llm.complete with provided config lmstrix.api.client:completion:266
+⠙ Running inference on llama-3.2-3b-instruct...
+```
+
+LOG
+
+```
+Developer Logs
+2025-07-31 20:14:14 [DEBUG]
+No tokens to output. Continuing generation
+2025-07-31 20:14:16 [INFO]
+Client disconnected: Error: read ECONNRESET
+2025-07-31 20:14:16 [INFO]
+Client disconnected: Error: read ECONNRESET
+2025-07-31 20:14:16 [INFO]
+Client disconnected: Error: read ECONNRESET
+2025-07-31 20:14:16 [INFO]
+[Client=fa1baed8-f367-487e-bf08-4304bc4ae595][Endpoint=predict] Canceled predicting due to channel error.
+2025-07-31 20:14:16 [DEBUG]
+[Client=fa1baed8-f367-487e-bf08-4304bc4ae595] Client disconnected.
+2025-07-31 20:14:16 [DEBUG]
+Target model llama_perf stats:
+2025-07-31 20:14:16 [DEBUG]
+llama_perf_context_print: load time = 1025.51 ms
+llama_perf_context_print: prompt eval time = 0.00 ms / 1 tokens ( 0.00 ms per token, inf tokens per second)
+llama_perf_context_print: eval time = 49020.65 ms / 950 runs ( 51.60 ms per token, 19.38 tokens per second)
+llama_perf_context_print: total time = 50181.13 ms / 951 tokens
+llama_perf_context_print: graphs reused = 0
+2025-07-31 20:14:19 [DEBUG]
+[Client=0a120e1e-b314-4c2e-9f89-f62c70d64877] Client created.
+2025-07-31 20:14:19 [INFO]
+[Client=0a120e1e-b314-4c2e-9f89-f62c70d64877][Endpoint=listLoaded] Listing loaded models
+2025-07-31 20:14:19 [INFO]
+[Client=0a120e1e-b314-4c2e-9f89-f62c70d64877][Endpoint=listLoaded] Listing loaded models
+2025-07-31 20:14:19 [INFO]
+[Client=0a120e1e-b314-4c2e-9f89-f62c70d64877][Endpoint=listDownloadedModels] Listing downloaded models
+2025-07-31 20:14:19 [INFO]
+[Client=0a120e1e-b314-4c2e-9f89-f62c70d64877][Endpoint=getOrLoad] Requested get or load model: llama-3.2-3b-instruct
+2025-07-31 20:14:19 [DEBUG]
+Sampling params:	repeat_last_n = 64, repeat_penalty = 1.100, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = -1
+	top_k = 40, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.800
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000
+2025-07-31 20:14:19 [DEBUG]
+Sampling:
+logits -> logit-bias -> penalties -> dry -> top-n-sigma -> top-k -> typical -> top-p -> min-p -> xtc -> temp-ext -> dist
+Generate: n_ctx = 65536, n_batch = 512, n_predict = 4096, n_keep = 1161
+2025-07-31 20:14:19 [DEBUG]
+Looking for non-prefix contiguous prompt sequences of size >= 256 to reuse from cache
+Cache reuse summary: 1161/1161 of prompt (100%), 1161 prefix, 0 non-prefix
+2025-07-31 20:14:19 [DEBUG]
+Total prompt tokens: 1161
+Prompt tokens to decode: 1
+2025-07-31 20:14:19 [DEBUG]
+FinishedProcessingPrompt. Progress: 100
+2025-07-31 20:14:23 [DEBUG]
+No tokens to output. Continuing generation
+2025-07-31 20:14:30 [DEBUG]
+No tokens to output. Continuing generation
+2025-07-31 20:14:54 [DEBUG]
+No tokens to output. Continuing generation
+2025-07-31 20:15:13 [DEBUG]
+No tokens to output. Continuing generation
+2025-07-31 20:15:30 [DEBUG]
+No tokens to output. Continuing generation
+2025-07-31 20:15:44 [DEBUG]
+No tokens to output. Continuing generation
+2025-07-31 20:15:58 [DEBUG]
+No tokens to output. Continuing generation
+```
+
+I then interrputed:
+
+```
+⠋ Running inference on llama-3.2-3b-instruct...[I] ════════════════════════════════════════════════════════════ lmstrix.api.client:completion:257
+[D] Calling llm.complete with provided config lmstrix.api.client:completion:266
+Traceback (most recent call last):
+File "/Library/Frameworks/Python.framework/Versions/3.12/bin/lmstrix", line 8, in <module>
+sys.exit(main())
+^^^^^^
+File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/__main__.py", line 160, in main
+fire.Fire(LMStrixCLI)
+File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fire/core.py", line 135, in Fire
+component_trace = _Fire(component, args, parsed_flag_args, context, name)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fire/core.py", line 468, in _Fire
+component, remaining_args = _CallAndUpdateTrace(
+^^^^^^^^^^^^^^^^^^^^
+File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fire/core.py", line 684, in _CallAndUpdateTrace
+component = fn(*varargs, **kwargs)
+^^^^^^^^^^^^^^^^^^^^^^
+File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/__main__.py", line 111, in infer
+self.service.run_inference(
+File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py", line 722, in run_inference
+result = manager.infer(
+^^^^^^^^^^^^^^
+File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py", line 164, in infer
+response = self.client.completion(
+^^^^^^^^^^^^^^^^^^^^^^^
+File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py", line 267, in completion
+{"channel_id": 2, "event": "Received unhandled message {'type': 'channelSend', 'channelId': 2, 'message': {'type': 'fragment', 'fragment': {'content': 'em', 'tokensCount': 1, 'containsDrafted': False, 'reasoningType': 'none'}}} for already closed channel", "ws_url": "ws://localhost:1234/llm"}
+response = llm.complete(prompt, config=config)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+```
+
+When I set --out_ctx -1 or something like --out_ctx 4096 then the inference "goes on forever". When I set it to some smaller number like 127, then it completes fine.
+
+In the LM Studio GUI, when I don't turn on the "Limit Response Length" setting, then the inference completes relatively quickly.
+
+What do you think we can do? Research how I can fix that.

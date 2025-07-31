@@ -890,7 +890,7 @@ class LMStrixService:
         logger.debug("[bold cyan]LMStrix - LM Studio Model Testing Toolkit[/bold cyan]")
         logger.debug("\n[cyan]Available commands:[/cyan]")
         logger.debug(
-            "  [green]scan[/green]            Scan for LM Studio models and update registry"
+            "  [green]scan[/green]            Scan for LM Studio models and update registry",
         )
         logger.debug("    --failed          Re-scan only previously failed models")
         logger.debug("    --reset           Re-scan all models (clear test data)")

@@ -262,9 +262,11 @@ class LMStudioClient:
 
         try:
             # Direct synchronous call - no threading or async
-            logger.debug(f"Calling llm.complete with config: {config}")
+            # Don't log config dict to avoid format string errors
+            logger.debug("Calling llm.complete with provided config")
             response = llm.complete(prompt, config=config)
-            logger.debug(f"Raw response object: {response}")
+            # Don't log raw response to avoid tag parsing errors
+            logger.debug("Received response from model")
 
             # Calculate total inference time
             total_inference_time = time.time() - start_time

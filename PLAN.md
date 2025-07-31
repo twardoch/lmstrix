@@ -1,11 +1,28 @@
 # LMStrix Current Development Plan
 
 ## Current Status
-Recent issues 201-204 have been completed successfully:
-- ✅ Enhanced model persistence and state management
-- ✅ Beautiful enhanced logging with comprehensive statistics  
-- ✅ Fixed model lookup to work with both paths and IDs
-- ✅ Integrated verbose stats display without duplication
+- ✅ CLI refactoring completed - business logic moved to `api/main.py`
+- ✅ Issues 201-204 have been completed successfully
+- ✅ Issue #303 - Fixed loguru output interference with model responses
+
+## COMPLETED: Issue #303 - Fix Loguru Output Interference ✅
+
+### Problem Description
+When running inference with `--verbose`, loguru was outputting the prompt and model response through its handlers, causing:
+1. **Logging errors**: KeyError and ValueError exceptions in loguru handlers
+2. **Output pollution**: Model responses were mixed with loguru formatting
+3. **User requirement violation**: User explicitly stated to NEVER pass prompt or model output through loguru
+
+### Root Cause
+- In `api/client.py`, the prompt and model response were being logged via loguru
+- Loguru was trying to format the output, causing issues with special characters like `</translation-instructions>`
+- This violated the requirement to use `sys.stderr` for prompts and `sys.stdout` for model output
+
+### Fix Applied
+1. **✅ Removed all loguru logging of prompts and model responses**
+2. **✅ Now using sys.stderr for prompt display in verbose mode**
+3. **✅ Using sys.stdout for model output only**
+4. **✅ Keeping loguru only for diagnostic/status messages**
 
 ## CRITICAL: Issue #302 - Inference Output Mismatch
 
@@ -29,68 +46,13 @@ When running the same translation prompt through LM Studio GUI vs lmstrix CLI, w
 3. **Chat Template**: Possible incorrect chat template application
 4. **Parameter Mismatch**: Inference parameters not matching LM Studio defaults
 
-## CRITICAL: Test Suite Failures (cleanup.txt analysis)
-
-### Priority 0: Critical Test Failures - MUST FIX IMMEDIATELY
-
-#### 0.1 Missing Methods Causing AttributeErrors
-**Severity: CRITICAL - Breaks core functionality**
-
-1. **Model.validate_integrity() Missing**
-   - Location: src/lmstrix/loaders/model_loader.py:181
-   - Error: `AttributeError: 'Model' object has no attribute 'validate_integrity'`
-   - Impact: Prevents model loading and registry updates
-   - Fix: Add validate_integrity() method to Model class
-
-2. **PromptResolver Methods Missing**
-   - Errors: Multiple AttributeErrors for:
-     - `_resolve_phase` (private method)
-     - `resolve_template` (public method)
-     - `_count_tokens` (private method)
-   - Impact: Completely breaks prompt resolution
-   - Fix: Implement all missing methods in PromptResolver
-
-3. **ContextTester Methods Missing**
-   - Missing: `_test_at_context`, `test_model`
-   - Impact: Context testing non-functional
-   - Fix: Add methods to ContextTester class
-
-4. **ModelScanner.sync_with_registry() Missing**
-   - Impact: Cannot sync discovered models with registry
-   - Fix: Implement sync_with_registry method
-
-#### 0.2 Type and Format Errors
-**Severity: HIGH - Breaks tests and logging**
-
-1. **Mock Format String Errors**
-   - Location: src/lmstrix/api/client.py:221
-   - Error: `TypeError: unsupported format string passed to Mock.__format__`
-   - Cause: `logger.info(f"📏 CONTEXT: {llm.config.contextLength:,} tokens")`
-   - Fix: Handle None/Mock values in format strings
-
-2. **Invalid Format Specifier**
-   - Location: src/lmstrix/core/prompts.py:133
-   - Error: `ValueError: Invalid format specifier ' 'Important'' for object of type 'str'`
-   - Fix: Properly escape format strings in templates
-
-#### 0.3 Initialization and Path Issues
-**Severity: MEDIUM - Test failures**
-
-1. **Model Constructor Arguments**
-   - Error: `TypeError: Model.__init__() missing 3 required positional arguments`
-   - Fix: Update tests to provide required args: path, size_bytes, ctx_in
-
-2. **Path Handling in Scanner**
-   - Error: `ValueError: path is not in the subpath`
-   - Fix: Handle paths outside expected directory
-
 ## Immediate Priorities
 
 ### 1. Fix Issue #302 - Inference Output Mismatch
-**Priority: CRITICAL**
+**Priority: CRITICAL - NOW TOP PRIORITY**
 - This is blocking proper inference functionality
 - Users cannot get correct model outputs
-- Must be fixed before any other work
+- Model only outputs `</translation>` instead of full translation
 
 #### Implementation Steps:
 
@@ -102,10 +64,7 @@ When running the same translation prompt through LM Studio GUI vs lmstrix CLI, w
 
 ##### Step 2: Parameter Alignment
 - Change default temperature from 0.7 to 0.8
-- Add CLI parameters for all inference settings:
-  - `--top_k`, `--top_p`, `--min_p`
-  - `--repeat_penalty`, `--repeat_last_n`
-  - `--stop_tokens` (to override defaults)
+- Add CLI parameters for all inference settings
 - Remove or make optional the maxTokens calculation
 
 ##### Step 3: Context Length Fix
@@ -118,76 +77,41 @@ When running the same translation prompt through LM Studio GUI vs lmstrix CLI, w
 - Verify stop token configuration
 - Test with stop tokens disabled
 
-##### Step 5: Testing and Validation
-- Compare output with LM Studio for identical prompts
-- Ensure token counts match
-- Verify quality of translation output
-
-### 2. Fix All Critical Test Failures
-**Priority: HIGH** (after Issue #302)
-- See Priority 0 section below - required for stability
-- Estimated time: 2-3 days
-- Success metric: All tests passing
-
 ### 2. Issue #105 - Adam.toml Simplification
-**Priority: High** (but AFTER test fixes)
+**Priority: High** (after Issue #302)
 - Simplify adam.toml structure to use flat format instead of nested groups
 - Add --text and --text_file parameters to infer command for direct text input
 - Update all prompt examples to use simplified approach
 - Ensure backward compatibility with existing TOML files
 
-### 3. Context Testing Streamlining  
-**Priority: Medium**
-- Simplify ContextTester class by merging methods into single test_context() function
-- Remove complex state management and resumption logic
-- Streamline binary search algorithm
-- Consolidate test result logging
-
-### 4. Model Loading Optimization
-**Priority: Medium**  
-- Improve model reuse detection to avoid unnecessary loading messages
-- Add context length display in enhanced logging when available
-- Optimize model loading workflow for better performance
-
 ## Implementation Order
 
-### Phase 0: CRITICAL FIX (Immediate - 2-3 days)
-1. **Day 1: Core Method Implementation**
-   - Add Model.validate_integrity() 
-   - Implement all PromptResolver missing methods
-   - Add ContextTester missing methods
-   - Add ModelScanner.sync_with_registry()
+### Phase 0: CRITICAL FIXES (Immediate - 1 day)
+1. **✅ Issue #303 - Loguru Fix** (COMPLETED):
+   - ✅ Removed loguru from prompt/response logging
+   - ✅ Implemented proper stderr/stdout separation
+   - ✅ Tested with translation example - no more errors!
 
-2. **Day 2: Type/Format Fixes**
-   - Fix mock format string handling in client.py
-   - Fix prompt format specifier issues
-   - Update tests with proper model initialization
+2. **Issue #302 - Inference Fix** (NOW TOP PRIORITY):
+   - Align parameters with LM Studio
+   - Fix context length handling
+   - Investigate stop token issue
 
-3. **Day 3: Testing & Validation**
-   - Run full test suite
-   - Fix any remaining failures
-   - Ensure no regressions
-
-### Phase 1: Resume Normal Development (After tests pass)
-- Continue with priorities 2-4 above
+### Phase 1: Normal Development (After Issue #302)
+- Continue with Issue #105 and other planned improvements
 
 ## Future Development Phases
 
 ### Phase A: Core Simplification (2-3 weeks)
 1. **Configuration Unification**
    - Create utils/config.py for centralized configuration handling
-   - Consolidate path handling functions (get_lmstudio_path, etc.)
+   - Consolidate path handling functions
    - Remove redundant configuration code
 
 2. **Error Handling Standardization**
    - Review and simplify custom exception hierarchy
    - Standardize error messages across codebase
    - Implement consistent logging patterns
-
-3. **Code Quality Improvements**
-   - Add comprehensive type hints to public APIs
-   - Ensure all functions have proper docstrings
-   - Remove deprecated TODO comments from code
 
 ### Phase B: CLI Enhancement (1-2 weeks)
 1. **Command Improvements**
@@ -210,23 +134,6 @@ When running the same translation prompt through LM Studio GUI vs lmstrix CLI, w
    - Update README.md with latest features
    - Create comprehensive CLI reference
    - Update examples to demonstrate new capabilities
-
-## Technical Debt Reduction
-
-### Code Architecture
-- Review and simplify InferenceManager class structure
-- Consolidate duplicate logic across modules
-- Improve separation of concerns between CLI and core logic
-
-### Performance Optimization
-- Profile model loading and caching behavior
-- Optimize JSON registry read/write operations
-- Reduce memory usage in context testing
-
-### Dependency Management
-- Review and minimize external dependencies
-- Ensure compatibility with latest Python versions
-- Update build and packaging configuration
 
 ## Success Metrics
 

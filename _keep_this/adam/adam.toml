@@ -179,7 +179,7 @@ Amazon announced on Tuesday that it will open a new office in Dublin, creating 
 </examples>
 
 <task>
-Follow the guidelines and perform Abstractive Proposition Segmentation on the passage below.
+Follow the guidelines and perform Abstractive Proposition Segmentation on the passage below. Put the entire final clean output inside the XML tag <output>
 </task>
 
 <input>
@@ -245,7 +245,7 @@ For simplistic explanations, avoid “Spinning flattens the ground, making a ni
 </examples>
 
 <task>
-Rewrite the text to follow the objective, process, guidelines, and examples.
+Rewrite the text to follow the objective, process, guidelines, and examples. Put the entire final clean output inside the XML tag <output>
 </task>
 
 <input>
@@ -291,9 +291,12 @@ Here is a step-by-step guide for writing song lyrics based on your requirements
 </songwriting-guidelines>
 
 <task>
-Write song lyrics based on the following description:
-{{text}}
+Write song lyrics based on the following description, Put the entire final clean output inside the XML tag <output>
 </task>
+
+<input>
+{{text}}
+</input>
 '''
 
 tldr = '''<instructions>
@@ -326,9 +329,12 @@ Key phrases should be essential, relevant, specific (5 words or fewer), interes
 </instructions>
 
 <task>
-Follow the instructions to create a TLDR from the content of the following text:
-{{text}}
+Follow the instructions to create a TLDR from the content of the following text. Put the entire final clean output inside the XML tag <output>
 </task>
+
+<input>
+{{text}}
+</input>
 '''
 
 tts_optimize = '''<guide>
@@ -374,7 +380,7 @@ Add exclamation marks when you need to add “drama”!!!
 </guide>
 
 <task>
-Rewrite the text to follow the guide judiciously. Enclose the rewritten text in the <output> XML tag.
+Rewrite the text to follow the guide judiciously. Put the entire final clean output inside the XML tag <output>
 </task>
 
 <input>
@@ -385,7 +391,7 @@ Rewrite the text to follow the guide judiciously. Enclose the rewritten text in 
 translate = '''<translation-instructions>
 Translate the text into Polish. Use correct Polish typograhic terminology, and respect the custom `vocabulary` given line-per-line line `input term = output term—alternative output term ≠ avoided translation`, where `=` means: translate like that, `|` means: or translate like this depending on the context `≠` means: NEVER translate like this,
 
-Avoid mechanistic translation, create pleasant reading flow. Research the most professional way to translate technical jargon. Maintain appropriate register and tone for the target audience. Prefer syntactical simplicity and clarity.
+Avoid mechanistic translation. Create pleasant reading flow. Research the most professional way to translate technical jargon. Maintain appropriate register and tone for the target audience. Prefer syntactical simplicity and clarity.
 </translation-instructions>
 
 <vocabulary>
@@ -404,7 +410,7 @@ hinting = hinting
 </vocabulary>
 
 <task>
-Translate the following input. Follow translation-instructions and vocabulary.
+Translate the following input. Follow the above-described translation-instructions & vocabulary. Put the entire final clean output inside the XML tag <output>
 </task>
 
 <input>
@@ -412,3 +418,4 @@ Translate the following input. Follow translation-instructions and vocabulary.
 </input>
 '''
 
+CAPS = '''Important: PRINT EVERYTHING IN ALL CAPS!!!'''

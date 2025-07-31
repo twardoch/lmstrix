@@ -1,5 +1,6 @@
 """Prompt loading functionality."""
 
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
@@ -88,7 +89,7 @@ def load_prompts(
 
 def load_single_prompt(
     toml_path: Path,
-    prompt_name: str,
+    prompt_name: str | Iterable[str],
     resolver: PromptResolver | None = None,
     verbose: bool = False,
     **params: str,
@@ -147,16 +148,62 @@ def load_single_prompt(
     if resolver is None:
         resolver = PromptResolver(verbose=verbose)
 
-    # Resolve the specific prompt
-    resolved = resolver.resolve_prompt(prompt_name, data, **params)
+    # Handle prompt_name being either a string (comma-separated) or an iterable
+    if isinstance(prompt_name, str):
+        prompt_names = [name.strip() for name in prompt_name.split(",")]
+    else:
+        prompt_names = list(prompt_name)
 
-    logger.info(f"Resolved prompt '{prompt_name}'")
-    if resolved.placeholders_unresolved:
+    # Resolve each prompt individually
+    resolved_prompts = []
+    all_unresolved_placeholders = set()
+
+    for name in prompt_names:
+        resolved = resolver.resolve_prompt(name, data, **params)
+        resolved_prompts.append(resolved)
+        if resolved.placeholders_unresolved:
+            all_unresolved_placeholders.update(
+                resolved.placeholders_unresolved,
+            )
+        logger.info(f"Resolved prompt '{name}'")
+
+    # Concatenate all resolved prompts
+    if len(resolved_prompts) == 1:
+        final_resolved = resolved_prompts[0]
+    else:
+        # Combine resolved text from all prompts
+        combined_text = "\n\n".join(rp.resolved for rp in resolved_prompts)
+        combined_template = "\n\n".join(rp.template for rp in resolved_prompts)
+        combined_name = ",".join(prompt_names)
+
+        # Calculate total tokens
+        total_tokens = sum(rp.tokens for rp in resolved_prompts)
+
+        # Combine all found placeholders
+        all_found_placeholders = []
+        all_resolved_placeholders = []
+        for rp in resolved_prompts:
+            all_found_placeholders.extend(rp.placeholders_found)
+            all_resolved_placeholders.extend(rp.placeholders_resolved)
+
+        # Create a new ResolvedPrompt with combined content
+        final_resolved = ResolvedPrompt(
+            name=combined_name,
+            template=combined_template,
+            resolved=combined_text,
+            tokens=total_tokens,
+            placeholders_found=list(set(all_found_placeholders)),
+            placeholders_resolved=list(set(all_resolved_placeholders)),
+            placeholders_unresolved=list(all_unresolved_placeholders),
+        )
+        logger.info(f"Combined {len(prompt_names)} prompts: {prompt_names}")
+
+    if final_resolved.placeholders_unresolved:
         logger.warning(
-            f"Unresolved placeholders in '{prompt_name}': {resolved.placeholders_unresolved}",
+            f"Unresolved placeholders: {final_resolved.placeholders_unresolved}",
         )
 
-    return resolved
+    return final_resolved
 
 
 def save_prompts(

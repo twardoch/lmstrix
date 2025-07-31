@@ -1,0 +1,3 @@
+Into @_keep_this/adam/adamall.py write a tool that uses our lmstrix inference to run the prompts 
+`think,aps`, `think,humanize`, `think,tldr`, `think,tts_optimize`, `translate`, and `tldr` from the prompt file  @_keep_this/adam/adam.toml with the text @_keep_this/adam/fontlab8.md
+

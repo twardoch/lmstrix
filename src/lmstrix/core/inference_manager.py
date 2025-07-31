@@ -151,13 +151,27 @@ class InferenceManager:
                         logger.info(f"✓ Found matching loaded model: {llm_id or llm_model_key}")
                         break
 
-                if llm is None:
-                    # Fallback: load anyway
-                    logger.warning("Could not find reference to loaded model, loading anyway...")
-                    llm = self.client.load_model_by_id(
-                        model_id,
-                        model.tested_max_context or model.context_limit,
-                    )
+            if llm is None:
+                # Fallback: load anyway
+                logger.warning("Could not find reference to loaded model, loading anyway...")
+                llm = self.client.load_model_by_id(
+                    model_id,
+                    model.tested_max_context or model.context_limit,
+                )
+
+            # Decide effective out_ctx if the caller left it as -1 (unlimited)
+            if out_ctx == -1:
+                try:
+                    model_ctx_out = getattr(model, "context_out", None)
+                    if model_ctx_out and model_ctx_out > 0:
+                        # Use one token less than recorded limit to stay safely within bounds
+                        out_ctx = max(1, model_ctx_out - 1)
+                        logger.debug(
+                            f"No out_ctx specified; using model.context_out={model_ctx_out} "
+                            f"→ effective out_ctx={out_ctx}",
+                        )
+                except Exception as e:
+                    logger.debug(f"Could not derive context_out from model: {e}")
 
             # Run inference
             logger.info(f"Running inference on model {model_id}")

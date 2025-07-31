@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Created `src/lmstrix/api/main.py` with `LMStrixService` class containing all business logic
+- Implemented separation of concerns with thin CLI wrapper in `__main__.py`
+
+### Changed
+- Default `out_ctx` now falls back to the model's `ctx_out − 1` when callers leave it as `-1`. This avoids LM Studio SDK hangs triggered by unlimited generations.
+- Refactored CLI architecture - moved all business logic from `__main__.py` to `api/main.py`
+- Updated `__main__.py` to be a thin wrapper that delegates to `LMStrixService`
+- Modified test imports to use new module structure
+
+### Fixed
+- **Issue #303**: Fixed loguru output interference with model responses
+  - Removed loguru formatting of config dictionaries and raw model responses
+  - Changed problematic log messages in `api/client.py` lines 265 and 267 to simple status messages
+  - Prevented KeyError and ValueError exceptions when loguru tried to parse model output
+  - Ensures clean separation of diagnostic output (stderr) from model output (stdout)
+- Fixed import error after removing `src/lmstrix/cli` directory
+- Updated `pyproject.toml` entry point from `lmstrix.cli.main:main` to `lmstrix.__main__:main`
+
+### Removed
+- Removed `src/lmstrix/cli` directory (merged functionality into `__main__.py`)
+
+## [1.0.59] - 2025-07-31
+
 ### Major Improvements & Bug Fixes
 
 #### Issues 201-204 (Completed)
