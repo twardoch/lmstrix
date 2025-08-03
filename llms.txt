@@ -2,7 +2,12 @@ Project Structure:
 📁 lmstrix
 ├── 📁 _keep_this
 │   └── 📁 adam
+│       ├── 📁 analyse
+│       │   ├── 📁 input
+│       │   ├── 📁 output
+│       │   └── 📁 review
 │       └── 📁 out
+├── 📁 context_tests
 ├── 📁 docs
 │   ├── 📄 _config.yml
 │   ├── 📄 api.md
@@ -44,7 +49,8 @@ Project Structure:
 │   ├── 📄 304.txt
 │   ├── 📄 305.txt
 │   ├── 📄 306.txt
-│   └── 📄 307.txt
+│   ├── 📄 307.txt
+│   └── 📄 310.txt
 ├── 📁 src
 │   ├── 📁 lmstrix
 │   │   ├── 📁 api
@@ -6759,6 +6765,65 @@ Analyze how we can utilize inference streaming out of the `lmstudio` python modu
 </document>
 
 <document index="44">
+<source>issues/310.txt</source>
+<document_content>
+$ lmstrix test --all
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.12/bin/lmstrix", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/__main__.py", line 166, in main
+    fire.Fire(LMStrixCLI)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fire/core.py", line 135, in Fire
+    component_trace = _Fire(component, args, parsed_flag_args, context, name)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fire/core.py", line 468, in _Fire
+    component, remaining_args = _CallAndUpdateTrace(
+                                ^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fire/core.py", line 684, in _CallAndUpdateTrace
+    component = fn(*varargs, **kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/__main__.py", line 61, in test
+    self.service.test_models(
+  File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py", line 455, in test_models
+    models_to_test = _get_models_to_test(
+                     ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py", line 64, in _get_models_to_test
+    if tester._is_embedding_model(m):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ContextTester' object has no attribute '_is_embedding_model'
+Othello:adam adam$
+
+
+Othello:adam adam$ lmstrix test --all
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.12/bin/lmstrix", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/__main__.py", line 166, in main
+    fire.Fire(LMStrixCLI)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fire/core.py", line 135, in Fire
+    component_trace = _Fire(component, args, parsed_flag_args, context, name)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fire/core.py", line 468, in _Fire
+    component, remaining_args = _CallAndUpdateTrace(
+                                ^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fire/core.py", line 684, in _CallAndUpdateTrace
+    component = fn(*varargs, **kwargs)
+                ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/__main__.py", line 61, in test
+    self.service.test_models(
+  File "/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py", line 479, in test_models
+    models_to_test = tester._filter_models_for_testing(models_to_test)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'ContextTester' object has no attribute '_filter_models_for_testing'
+Othello:adam adam$
+
+
+</document_content>
+</document>
+
+<document index="45">
 <source>pyproject.toml</source>
 <document_content>
 [build-system]
@@ -7166,6 +7231,7 @@ class LMStrixCLI:
         sort: str = "id",
         fast: bool = False,
         verbose: bool = False,
+        force: bool = False,
     )) -> None:
         """Test the context limits for models."""
     def infer((
@@ -7213,6 +7279,7 @@ def test((
         sort: str = "id",
         fast: bool = False,
         verbose: bool = False,
+        force: bool = False,
     )) -> None:
     """Test the context limits for models."""
 
@@ -7267,7 +7334,6 @@ from lmstrix.utils.logging import logger
 # File: /Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py
 # Language: python
 
-import sys
 import time
 from collections.abc import Callable, Iterator
 from typing import Any
@@ -7558,9 +7624,19 @@ from lmstrix.utils.state import StateManager
 
 class LMStrixService:
     """Service layer for LMStrix operations."""
-    def scan_models((self, failed: bool = False, reset: bool = False, verbose: bool = False)) -> None:
+    def scan_models((
+        self,
+        failed: bool = False,
+        reset: bool = False,
+        verbose: bool = False,
+    )) -> None:
         """Scan for LM Studio models and update the local registry."""
-    def list_models((self, sort: str = "id", show: str | None = None, verbose: bool = False)) -> None:
+    def list_models((
+        self,
+        sort: str = "id",
+        show: str | None = None,
+        verbose: bool = False,
+    )) -> None:
         """List all models from the registry with their test status."""
     def test_models((
         self,
@@ -7572,6 +7648,7 @@ class LMStrixService:
         sort: str = "id",
         fast: bool = False,
         verbose: bool = False,
+        force: bool = False,
     )) -> None:
         """Test the context limits for models."""
     def run_inference((
@@ -7620,6 +7697,7 @@ def _test_single_model((
     model: Model,
     ctx: int,
     registry: ModelRegistry,
+    force: bool = False,
 )) -> None:
     """Test a single model at a specific context size."""
 
@@ -7642,10 +7720,20 @@ def _test_all_models_optimized((
 def _print_final_results((updated_models: list[Model])) -> None:
     """Print the final results table."""
 
-def scan_models((self, failed: bool = False, reset: bool = False, verbose: bool = False)) -> None:
+def scan_models((
+        self,
+        failed: bool = False,
+        reset: bool = False,
+        verbose: bool = False,
+    )) -> None:
     """Scan for LM Studio models and update the local registry."""
 
-def list_models((self, sort: str = "id", show: str | None = None, verbose: bool = False)) -> None:
+def list_models((
+        self,
+        sort: str = "id",
+        show: str | None = None,
+        verbose: bool = False,
+    )) -> None:
     """List all models from the registry with their test status."""
 
 def test_models((
@@ -7658,6 +7746,7 @@ def test_models((
         sort: str = "id",
         fast: bool = False,
         verbose: bool = False,
+        force: bool = False,
     )) -> None:
     """Test the context limits for models."""
 
@@ -7836,8 +7925,11 @@ def find_optimal_context((
 # Language: python
 
 from datetime import datetime
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 from lmstrix.api import LMStudioClient
+from lmstrix.core.inference import InferenceEngine
+from lmstrix.core.models import Model, ModelRegistry
+from lmstrix.core.models import ContextTestStatus
 
 class ContextTestResult:
     """Result of a context test attempt."""
@@ -7869,8 +7961,22 @@ class ContextTester:
         self,
         model_id: str,
         context_size: int,
+        log_path: str | None = None,
+        model: "Model" = None,
+        registry: "ModelRegistry" = None,
     )) -> ContextTestResult:
-        """Test a model at a specific context size."""
+        """Test a model at a specific context size using InferenceEngine."""
+    def _is_embedding_model((self, model)) -> bool:
+        """Check if a model is an embedding model."""
+    def _filter_models_for_testing((self, models: list)) -> list:
+        """Filter out embedding models from the list of models to test."""
+    def test_all_models((
+        self,
+        models_to_test: list["Model"],
+        threshold: int = 4096,
+        registry: "ModelRegistry" = None,
+    )) -> list["Model"]:
+        """Test all models to find their maximum working context."""
     def test_model((
         self,
         model_id: str,
@@ -7908,8 +8014,25 @@ def _test_at_context((
         self,
         model_id: str,
         context_size: int,
+        log_path: str | None = None,
+        model: "Model" = None,
+        registry: "ModelRegistry" = None,
     )) -> ContextTestResult:
-    """Test a model at a specific context size."""
+    """Test a model at a specific context size using InferenceEngine."""
+
+def _is_embedding_model((self, model)) -> bool:
+    """Check if a model is an embedding model."""
+
+def _filter_models_for_testing((self, models: list)) -> list:
+    """Filter out embedding models from the list of models to test."""
+
+def test_all_models((
+        self,
+        models_to_test: list["Model"],
+        threshold: int = 4096,
+        registry: "ModelRegistry" = None,
+    )) -> list["Model"]:
+    """Test all models to find their maximum working context."""
 
 def test_model((
         self,
@@ -8180,7 +8303,7 @@ class ModelRegistry:
     def update_model((self, model_id: str, model: Model)) -> None:
         """Update a model in the registry (adds if not exists for compatibility)."""
     def update_model_by_id((self, model: Model)) -> None:
-        """Update a model using its own ID."""
+        """Update a model using its own ID, finding existing entry by path or ID."""
     def get_model((self, model_id: str)) -> Model | None:
         """Get a model by ID."""
     def find_model((self, model_identifier: str)) -> Model | None:
@@ -8246,7 +8369,7 @@ def update_model((self, model_id: str, model: Model)) -> None:
     """Update a model in the registry (adds if not exists for compatibility)."""
 
 def update_model_by_id((self, model: Model)) -> None:
-    """Update a model using its own ID."""
+    """Update a model using its own ID, finding existing entry by path or ID."""
 
 def get_model((self, model_id: str)) -> Model | None:
     """Get a model by ID."""
@@ -8620,7 +8743,7 @@ def save_prompts((
     """Save prompts to a TOML file."""
 
 
-<document index="45">
+<document index="46">
 <source>src/lmstrix/py.typed</source>
 <document_content>
 # This file indicates that the package supports type hints

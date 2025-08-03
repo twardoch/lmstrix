@@ -91,7 +91,11 @@ class Model:
             "has_tools": self.has_tools,
             "has_vision": self.has_vision,
             "tested_max_context": self.tested_max_context,
-            "context_test_status": self.context_test_status.value,
+            "context_test_status": (
+                self.context_test_status.value
+                if hasattr(self.context_test_status, "value")
+                else self.context_test_status
+            ),
             "context_test_date": (
                 self.context_test_date.isoformat() if self.context_test_date else None
             ),
@@ -255,8 +259,26 @@ class ModelRegistry:
         self.save()  # Auto-save for compatibility
 
     def update_model_by_id(self, model: Model) -> None:
-        """Update a model using its own ID."""
-        self.update_model(model.id, model)
+        """Update a model using its own ID, finding existing entry by path or ID."""
+        # First, try to find the existing model by checking all keys
+        existing_key = None
+
+        # Check if there's an entry with the exact path
+        if model.path in self._models:
+            existing_key = model.path
+        # Otherwise, check if there's an entry with the model ID
+        elif model.id in self._models:
+            existing_key = model.id
+        else:
+            # Search through all models to find one with matching path or ID
+            for key, existing_model in self._models.items():
+                if existing_model.path == model.path or existing_model.id == model.id:
+                    existing_key = key
+                    break
+
+        # Update using the existing key if found, otherwise use model.id
+        key_to_use = existing_key if existing_key else model.id
+        self.update_model(key_to_use, model)
 
     def get_model(self, model_id: str) -> Model | None:
         """Get a model by ID."""

@@ -44,6 +44,7 @@ class LMStrixCLI:
         sort: str = "id",
         fast: bool = False,
         verbose: bool = False,
+        force: bool = False,
     ) -> None:
         """Test the context limits for models.
 
@@ -57,6 +58,7 @@ class LMStrixCLI:
             sort: Sort order (only used for single model tests). --all always sorts by size.
             fast: Skip semantic verification - only test if inference completes technically.
             verbose: Enable verbose output.
+            force: Override safety limits and test at contexts marked as bad.
         """
         self.service.test_models(
             model_id=model_id,
@@ -67,6 +69,7 @@ class LMStrixCLI:
             sort=sort,
             fast=fast,
             verbose=verbose,
+            force=force,
         )
 
     def infer(

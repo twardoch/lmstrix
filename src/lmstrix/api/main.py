@@ -37,7 +37,9 @@ def _get_models_to_test(
     fast_mode: bool = False,
 ) -> list[Model]:
     """Filter and return a list of models to be tested."""
-    tester = ContextTester(fast_mode=fast_mode)  # Create a temporary tester for _is_embedding_model
+    tester = ContextTester(
+        fast_mode=fast_mode,
+    )  # Create a temporary tester for _is_embedding_model
 
     if not test_all:
         if not model_id:
@@ -122,28 +124,36 @@ def _test_single_model(
     model: Model,
     ctx: int,
     registry: ModelRegistry,
+    force: bool = False,
 ) -> None:
     """Test a single model at a specific context size."""
     if ctx > model.context_limit:
-        logger.debug(
+        logger.warning(
             f"Warning: Specified context ({ctx:,}) exceeds model's declared limit ({model.context_limit:,}). Skipping test.",
         )
         return
 
-    if model.last_known_bad_context and ctx >= model.last_known_bad_context:
+    if model.last_known_bad_context and ctx >= model.last_known_bad_context and not force:
         max_safe_context = int(model.last_known_bad_context * 0.75)
-        logger.debug(
+        logger.error(
             f"Error: Specified context ({ctx:,}) is at or above the last known bad context ({model.last_known_bad_context:,}).",
         )
-        logger.debug(
+        logger.error(
             f"The maximum safe context to test is {max_safe_context:,} (75% of last bad).",
         )
+        logger.error(
+            "Use --force to override this safety limit.",
+        )
         return
+    if model.last_known_bad_context and ctx >= model.last_known_bad_context and force:
+        logger.warning(
+            f"FORCE MODE: Testing context ({ctx:,}) despite being at/above last known bad context ({model.last_known_bad_context:,}).",
+        )
 
-    logger.debug(
+    logger.info(
         f"\n[bold cyan]Testing model: {model.id} at specific context: {ctx:,}[/bold cyan]",
     )
-    logger.debug(f"Declared context limit: {model.context_limit:,} tokens")
+    logger.info(f"Declared context limit: {model.context_limit:,} tokens")
 
     log_path = get_context_test_log_path(model.id)
 
@@ -162,8 +172,8 @@ def _test_single_model(
         model.context_test_status = ContextTestStatus.COMPLETED
     else:
         error_type = "load" if not result.load_success else "inference"
-        logger.debug(f"✗ Test failed at context {ctx:,} ({error_type} failed)")
-        logger.debug(f"Error: {result.error}")
+        logger.error(f"✗ Test failed at context {ctx:,} ({error_type} failed)")
+        logger.error(f"Error: {result.error}")
         model.last_known_bad_context = ctx
         model.context_test_status = ContextTestStatus.FAILED
 
@@ -187,7 +197,9 @@ def _test_all_models_at_ctx(
         logger.info(f"[{i}/{len(models_to_test)}] Testing {model.id}...")
 
         if i > 1:
-            logger.info("\n\n  ⏳ Waiting 3 seconds before next model (resource cleanup)...")
+            logger.info(
+                "\n\n  ⏳ Waiting 3 seconds before next model (resource cleanup)...",
+            )
             time.sleep(3.0)
 
         log_path = get_context_test_log_path(model.id)
@@ -273,7 +285,12 @@ def _print_final_results(updated_models: list[Model]) -> None:
 class LMStrixService:
     """Service layer for LMStrix operations."""
 
-    def scan_models(self, failed: bool = False, reset: bool = False, verbose: bool = False) -> None:
+    def scan_models(
+        self,
+        failed: bool = False,
+        reset: bool = False,
+        verbose: bool = False,
+    ) -> None:
         """Scan for LM Studio models and update the local registry."""
         setup_logging(verbose=verbose)
 
@@ -310,7 +327,12 @@ class LMStrixService:
         # After scanning, list the models
         self.list_models(verbose=verbose)
 
-    def list_models(self, sort: str = "id", show: str | None = None, verbose: bool = False) -> None:
+    def list_models(
+        self,
+        sort: str = "id",
+        show: str | None = None,
+        verbose: bool = False,
+    ) -> None:
         """List all models from the registry with their test status."""
         setup_logging(verbose=verbose)
 
@@ -330,9 +352,17 @@ class LMStrixService:
         if sort_key in ("id", "idd"):
             sorted_models = sorted(models, key=lambda m: m.id, reverse=reverse)
         elif sort_key in ("ctx", "ctxd"):
-            sorted_models = sorted(models, key=lambda m: m.tested_max_context or 0, reverse=reverse)
+            sorted_models = sorted(
+                models,
+                key=lambda m: m.tested_max_context or 0,
+                reverse=reverse,
+            )
         elif sort_key in ("dtx", "dtxd"):
-            sorted_models = sorted(models, key=lambda m: m.context_limit, reverse=reverse)
+            sorted_models = sorted(
+                models,
+                key=lambda m: m.context_limit,
+                reverse=reverse,
+            )
         elif sort_key in ("size", "sized"):
             sorted_models = sorted(models, key=lambda m: m.size, reverse=reverse)
         elif sort_key in ("smart", "smartd"):
@@ -415,6 +445,7 @@ class LMStrixService:
         sort: str = "id",
         fast: bool = False,
         verbose: bool = False,
+        force: bool = False,
     ) -> None:
         """Test the context limits for models."""
         setup_logging(verbose=verbose)
@@ -424,7 +455,14 @@ class LMStrixService:
             logger.error("Cannot use --all and specify a model ID together.")
             return
 
-        models_to_test = _get_models_to_test(registry, test_all, ctx, model_id, reset, fast)
+        models_to_test = _get_models_to_test(
+            registry,
+            test_all,
+            ctx,
+            model_id,
+            reset,
+            fast,
+        )
         if not models_to_test:
             return
 
@@ -466,14 +504,24 @@ class LMStrixService:
 
         if ctx is not None:
             if test_all:
-                updated_models = _test_all_models_at_ctx(tester, models_to_test, ctx, registry)
+                updated_models = _test_all_models_at_ctx(
+                    tester,
+                    models_to_test,
+                    ctx,
+                    registry,
+                )
                 _print_final_results(updated_models)
             else:
-                _test_single_model(tester, models_to_test[0], ctx, registry)
+                _test_single_model(tester, models_to_test[0], ctx, registry, force)
             return
 
         if test_all:
-            updated_models = _test_all_models_optimized(tester, models_to_test, threshold, registry)
+            updated_models = _test_all_models_optimized(
+                tester,
+                models_to_test,
+                threshold,
+                registry,
+            )
             _print_final_results(updated_models)
         else:
             model = models_to_test[0]
@@ -593,7 +641,9 @@ class LMStrixService:
                     all_placeholders_unresolved = []
 
                     if verbose:
-                        logger.debug(f"Loading multiple prompts: {', '.join(prompt_names)}")
+                        logger.debug(
+                            f"Loading multiple prompts: {', '.join(prompt_names)}",
+                        )
 
                     for prompt_name in prompt_names:
                         resolved_prompt = load_single_prompt(
@@ -603,11 +653,17 @@ class LMStrixService:
                             **prompt_params,
                         )
                         concatenated_prompts.append(resolved_prompt.resolved)
-                        all_placeholders_resolved.extend(resolved_prompt.placeholders_resolved)
-                        all_placeholders_unresolved.extend(resolved_prompt.placeholders_unresolved)
+                        all_placeholders_resolved.extend(
+                            resolved_prompt.placeholders_resolved,
+                        )
+                        all_placeholders_unresolved.extend(
+                            resolved_prompt.placeholders_unresolved,
+                        )
 
                         if verbose:
-                            logger.debug(f"Loaded prompt '{prompt_name}' from {file_prompt}")
+                            logger.debug(
+                                f"Loaded prompt '{prompt_name}' from {file_prompt}",
+                            )
 
                     # Concatenate all prompts with double newline separator
                     actual_prompt = "\n\n".join(concatenated_prompts)
@@ -934,7 +990,9 @@ class LMStrixService:
         logger.debug("    --reset           Re-scan all models (clear test data)")
         logger.debug("    --verbose         Enable verbose output")
         logger.debug("")
-        logger.debug("  [green]list[/green]            List all models with their test status")
+        logger.debug(
+            "  [green]list[/green]            List all models with their test status",
+        )
         logger.debug(
             "    --sort id|ctx|dtx|size|smart  Sort by: id, tested context, declared context, size, smart",
         )
@@ -966,10 +1024,14 @@ class LMStrixService:
         logger.debug("    --reload          Force reload model")
         logger.debug("    --verbose         Enable verbose output")
         logger.debug("")
-        logger.debug("  [green]health[/green]          Check database health and backups")
+        logger.debug(
+            "  [green]health[/green]          Check database health and backups",
+        )
         logger.debug("    --verbose         Show detailed health information")
         logger.debug("")
-        logger.debug("  [green]save[/green]            Save tested contexts to LM Studio configs")
+        logger.debug(
+            "  [green]save[/green]            Save tested contexts to LM Studio configs",
+        )
         logger.debug("    --flash           Enable flash attention for GGUF models")
         logger.debug("    --verbose         Enable verbose output")
         logger.debug("")

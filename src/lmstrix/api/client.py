@@ -1,6 +1,5 @@
 """LM Studio API client for interacting with the local server."""
 
-import sys
 import time
 from collections.abc import Callable, Iterator
 from typing import Any
@@ -253,8 +252,9 @@ class LMStudioClient:
         prompt_lines = prompt.count("\n") + 1
         prompt_chars = len(prompt)
         logger.info(f"📝 Prompt ({prompt_lines} lines, {prompt_chars} chars):")
-        # Print prompt directly to stderr to avoid loguru tag parsing
-        print(prompt, file=sys.stderr)
+        # Only print prompt if logger is enabled for debug mode
+        if logger._core.handlers:
+            logger.debug(f"Prompt content: {prompt}")
 
         logger.info("═" * 60)
 
@@ -441,8 +441,9 @@ class LMStudioClient:
         prompt_lines = prompt.count("\n") + 1
         prompt_chars = len(prompt)
         logger.info(f"📝 Prompt ({prompt_lines} lines, {prompt_chars} chars):")
-        # Print prompt directly to stderr to avoid loguru tag parsing
-        print(prompt, file=sys.stderr)
+        # Only print prompt if logger is enabled for debug mode
+        if logger._core.handlers:
+            logger.debug(f"Prompt content: {prompt}")
 
         logger.info("═" * 60)
 

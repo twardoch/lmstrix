@@ -1,9 +1,15 @@
 """Context testing functionality for discovering true model limits."""
 
 from datetime import datetime
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
 from lmstrix.api import LMStudioClient
+from lmstrix.core.inference import InferenceEngine
+
+if TYPE_CHECKING:
+    from lmstrix.core.models import Model, ModelRegistry
+
+from lmstrix.core.models import ContextTestStatus
 
 
 class ContextTestResult:
@@ -80,6 +86,7 @@ class ContextTester:
             fast_mode: Skip semantic verification - only test if inference completes.
         """
         self.client = client or LMStudioClient()
+        self.inference_engine = InferenceEngine(client=self.client, verbose=verbose)
         # Enhanced dual testing prompts
         self.test_prompt_1 = "Write 'ninety-six' as a number using only digits"
         self.test_prompt_2 = "2+3="
@@ -94,51 +101,121 @@ class ContextTester:
         self,
         model_id: str,
         context_size: int,
+        log_path: str | None = None,
+        model: "Model" = None,
+        registry: "ModelRegistry" = None,
     ) -> ContextTestResult:
-        """Test a model at a specific context size.
+        """Test a model at a specific context size using InferenceEngine.
 
         Args:
             model_id: Model identifier.
             context_size: Context size to test.
+            log_path: Optional path for logging (unused).
+            model: Optional model object (unused).
+            registry: Optional registry (unused).
 
         Returns:
             ContextTestResult with test outcome.
         """
-        # Try to load the model
+        # Use the proven InferenceEngine test method
         try:
-            llm = self.client.load_model(model_id, context_size)
+            success, response = self.inference_engine._test_inference_capability(
+                model_id,
+                context_size,
+            )
+
+            return ContextTestResult(
+                context_size=context_size,
+                load_success=True,  # If we got here, model loaded
+                inference_success=success,
+                prompt="Dual inference test (96 digits + 2+3=5)",
+                response=response,
+                error=None if success else response,
+            )
         except Exception as e:
             return ContextTestResult(
                 context_size=context_size,
                 load_success=False,
                 inference_success=False,
+                prompt="Dual inference test (96 digits + 2+3=5)",
+                response="",
                 error=str(e),
             )
 
-        # Try inference
-        try:
-            response = self.client.completion(
-                llm,
-                self.test_prompt,
-                max_tokens=50,
-                timeout=self.inference_timeout,
+    def _is_embedding_model(self, model) -> bool:
+        """Check if a model is an embedding model.
+
+        Args:
+            model: Model object to check
+
+        Returns:
+            True if the model is an embedding model, False otherwise
+        """
+        # Check if model has the id attribute and contains embedding keywords
+        if hasattr(model, "id") and model.id:
+            model_id = model.id.lower()
+            return "embedding" in model_id or "embed" in model_id
+        return False
+
+    def _filter_models_for_testing(self, models: list) -> list:
+        """Filter out embedding models from the list of models to test.
+
+        Args:
+            models: List of models to filter
+
+        Returns:
+            List of models with embedding models removed
+        """
+        filtered_models = []
+        for model in models:
+            if not self._is_embedding_model(model):
+                filtered_models.append(model)
+        return filtered_models
+
+    def test_all_models(
+        self,
+        models_to_test: list["Model"],
+        threshold: int = 4096,
+        registry: "ModelRegistry" = None,
+    ) -> list["Model"]:
+        """Test all models to find their maximum working context.
+
+        Args:
+            models_to_test: List of models to test
+            threshold: Context size threshold to test
+            registry: Model registry for updating results
+
+        Returns:
+            List of updated models with test results
+        """
+        updated_models = []
+
+        for model in models_to_test:
+            # Test the model at the threshold context size
+            result = self._test_at_context(
+                model.id,
+                threshold,
+                log_path=None,
+                model=model,
+                registry=registry,
             )
 
-            return ContextTestResult(
-                context_size=context_size,
-                load_success=True,
-                inference_success=True,
-                prompt=self.test_prompt,
-                response=response,
-            )
-        except Exception as e:
-            return ContextTestResult(
-                context_size=context_size,
-                load_success=True,
-                inference_success=False,
-                prompt=self.test_prompt,
-                error=str(e),
-            )
+            # Update model with test results
+            if result.load_success and result.inference_success:
+                model.tested_max_context = threshold
+                model.context_test_status = ContextTestStatus.COMPLETED
+            else:
+                model.context_test_status = ContextTestStatus.FAILED
+
+            model.context_test_date = datetime.now()
+
+            # Update registry if provided
+            if registry:
+                registry.update_model_by_id(model)
+
+            updated_models.append(model)
+
+        return updated_models
 
     def test_model(
         self,
