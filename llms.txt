@@ -3,6 +3,7 @@ Project Structure:
 ├── 📁 _keep_this
 │   └── 📁 adam
 │       ├── 📁 analyse
+│       │   ├── 📁 0
 │       │   ├── 📁 input
 │       │   ├── 📁 output
 │       │   ├── 📁 output-all
@@ -10,7 +11,6 @@ Project Structure:
 │       │   ├── 📁 review-cla
 │       │   └── 📁 review-gemi
 │       └── 📁 out
-├── 📁 context_tests
 ├── 📁 docs
 │   ├── 📄 _config.yml
 │   ├── 📄 api.md
@@ -53,7 +53,8 @@ Project Structure:
 │   ├── 📄 305.txt
 │   ├── 📄 306.txt
 │   ├── 📄 307.txt
-│   └── 📄 310.txt
+│   ├── 📄 310.txt
+│   └── 📄 311.txt
 ├── 📁 src
 │   ├── 📁 lmstrix
 │   │   ├── 📁 api
@@ -3065,6 +3066,23 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 <document index="15">
 <source>cleanup.txt</source>
 <document_content>
+::error title=Ruff (A002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/__main__.py,line=40,col=9,endLine=40,endColumn=12::src/lmstrix/__main__.py:40:9: A002 Function argument `all` is shadowing a Python builtin
+::error title=Ruff (A002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/__main__.py,line=83,col=9,endLine=83,endColumn=13::src/lmstrix/__main__.py:83:9: A002 Function argument `dict` is shadowing a Python builtin
+::error title=Ruff (TRY301),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=47,col=21,endLine=47,endColumn=96::src/lmstrix/utils/context_parser.py:47:21: TRY301 Abstract `raise` to an inner function
+::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=47,col=27,endLine=47,endColumn=96::src/lmstrix/utils/context_parser.py:47:27: TRY003 Avoid specifying long messages outside the exception class
+::error title=Ruff (TRY301),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=53,col=21,endLine=55,endColumn=22::src/lmstrix/utils/context_parser.py:53:21: TRY301 Abstract `raise` to an inner function
+::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=53,col=27,endLine=55,endColumn=22::src/lmstrix/utils/context_parser.py:53:27: TRY003 Avoid specifying long messages outside the exception class
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=64,col=17,endLine=64,endColumn=35::src/lmstrix/utils/context_parser.py:64:17: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=67,col=23,endLine=67,endColumn=80::src/lmstrix/utils/context_parser.py:67:23: TRY003 Avoid specifying long messages outside the exception class
+::error title=Ruff (B904),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=73,col=13,endLine=75,endColumn=14::src/lmstrix/utils/context_parser.py:73:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=73,col=19,endLine=75,endColumn=14::src/lmstrix/utils/context_parser.py:73:19: TRY003 Avoid specifying long messages outside the exception class
+::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=77,col=11,endLine=77,endColumn=81::src/lmstrix/utils/context_parser.py:77:11: TRY003 Avoid specifying long messages outside the exception class
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=3,col=1,endLine=3,endColumn=40::src/lmstrix/utils/state.py:3:1: ERA001 Found commented-out code
+::error title=Ruff (PTH123),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=24,col=22,endLine=24,endColumn=26::src/lmstrix/utils/state.py:24:22: PTH123 `open()` should be replaced by `Path.open()`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=26,col=20,endLine=26,endColumn=29::src/lmstrix/utils/state.py:26:20: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PTH123),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=33,col=18,endLine=33,endColumn=22::src/lmstrix/utils/state.py:33:18: PTH123 `open()` should be replaced by `Path.open()`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=35,col=16,endLine=35,endColumn=25::src/lmstrix/utils/state.py:35:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_streaming.py,line=47,col=12,endLine=47,endColumn=21::test_streaming.py:47:12: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=63,col=9,endLine=63,endColumn=25::src/lmstrix/loaders/model_loader.py:63:9: TRY300 Consider moving this statement to an `else` block
 ::error title=Ruff (PLR0911),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=69,col=5,endLine=69,endColumn=31::src/lmstrix/loaders/model_loader.py:69:5: PLR0911 Too many return statements (8 > 6)
 ::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=105,col=9,endLine=105,endColumn=20::src/lmstrix/loaders/model_loader.py:105:9: TRY300 Consider moving this statement to an `else` block
@@ -3072,14 +3090,58 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 ::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=205,col=5,endLine=205,endColumn=29::src/lmstrix/loaders/model_loader.py:205:5: PLR0912 Too many branches (15 > 12)
 ::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=205,col=5,endLine=205,endColumn=29::src/lmstrix/loaders/model_loader.py:205:5: PLR0915 Too many statements (51 > 50)
 ::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=346,col=9,endLine=346,endColumn=20::src/lmstrix/loaders/model_loader.py:346:9: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (A002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/__main__.py,line=40,col=9,endLine=40,endColumn=12::src/lmstrix/__main__.py:40:9: A002 Function argument `all` is shadowing a Python builtin
-::error title=Ruff (A002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/__main__.py,line=83,col=9,endLine=83,endColumn=13::src/lmstrix/__main__.py:83:9: A002 Function argument `dict` is shadowing a Python builtin
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=72,col=12,endLine=72,endColumn=21::src/lmstrix/loaders/prompt_loader.py:72:12: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=90,col=5,endLine=90,endColumn=23::src/lmstrix/loaders/prompt_loader.py:90:5: PLR0912 Too many branches (14 > 12)
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=143,col=12,endLine=143,endColumn=21::src/lmstrix/loaders/prompt_loader.py:143:12: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=221,col=9,endLine=221,endColumn=23::src/lmstrix/loaders/prompt_loader.py:221:9: PLC0415 `import` should be at the top-level of a file
 ::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=226,col=13,endLine=226,endColumn=27::src/lmstrix/loaders/prompt_loader.py:226:13: PLC0415 `import` should be at the top-level of a file
 ::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=231,col=13,endLine=231,endColumn=24::src/lmstrix/loaders/prompt_loader.py:231:13: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=2,col=1,endLine=2,endColumn=49::examples/python/custom_inference.py:2:1: ERA001 Found commented-out code
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=13,col=5,endLine=13,endColumn=9::examples/python/custom_inference.py:13:5: PLR0915 Too many statements (89 > 50)
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=60,col=12,endLine=60,endColumn=21::examples/python/custom_inference.py:60:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=68,col=12,endLine=68,endColumn=21::examples/python/custom_inference.py:68:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=94,col=16,endLine=94,endColumn=25::examples/python/custom_inference.py:94:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=109,col=16,endLine=109,endColumn=25::examples/python/custom_inference.py:109:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=137,col=12,endLine=137,endColumn=21::examples/python/custom_inference.py:137:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=149,col=12,endLine=149,endColumn=21::examples/python/custom_inference.py:149:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=165,col=12,endLine=165,endColumn=21::examples/python/custom_inference.py:165:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=2,col=1,endLine=2,endColumn=49::examples/python/batch_processing.py:2:1: ERA001 Found commented-out code
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=12,col=5,endLine=12,endColumn=9::examples/python/batch_processing.py:12:5: PLR0912 Too many branches (16 > 12)
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=12,col=5,endLine=12,endColumn=9::examples/python/batch_processing.py:12:5: PLR0915 Too many statements (86 > 50)
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=65,col=20,endLine=65,endColumn=29::examples/python/batch_processing.py:65:20: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=108,col=16,endLine=108,endColumn=25::examples/python/batch_processing.py:108:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=2,col=1,endLine=2,endColumn=54::examples/python/prompt_templates_demo.py:2:1: ERA001 Found commented-out code
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=15,col=5,endLine=15,endColumn=9::examples/python/prompt_templates_demo.py:15:5: PLR0915 Too many statements (86 > 50)
+::error title=Ruff (PTH123),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=53,col=10,endLine=53,endColumn=14::examples/python/prompt_templates_demo.py:53:10: PTH123 `open()` should be replaced by `Path.open()`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=75,col=12,endLine=75,endColumn=21::examples/python/prompt_templates_demo.py:75:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=113,col=12,endLine=113,endColumn=21::examples/python/prompt_templates_demo.py:113:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=131,col=12,endLine=131,endColumn=21::examples/python/prompt_templates_demo.py:131:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=16,col=1,endLine=16,endColumn=38::examples/specialized/elo_liczby.py:16:1: ERA001 Found commented-out code
+::error title=Ruff (PLR0911),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=46,col=5,endLine=46,endColumn=28::examples/specialized/elo_liczby.py:46:5: PLR0911 Too many return statements (9 > 6)
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=46,col=5,endLine=46,endColumn=28::examples/specialized/elo_liczby.py:46:5: PLR0912 Too many branches (24 > 12)
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=46,col=5,endLine=46,endColumn=28::examples/specialized/elo_liczby.py:46:5: PLR0915 Too many statements (78 > 50)
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=170,col=16,endLine=170,endColumn=25::examples/specialized/elo_liczby.py:170:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=189,col=12,endLine=189,endColumn=21::examples/specialized/elo_liczby.py:189:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=2,col=1,endLine=2,endColumn=49::examples/python/advanced_testing.py:2:1: ERA001 Found commented-out code
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=10,col=5,endLine=10,endColumn=9::examples/python/advanced_testing.py:10:5: PLR0912 Too many branches (21 > 12)
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=10,col=5,endLine=10,endColumn=9::examples/python/advanced_testing.py:10:5: PLR0915 Too many statements (92 > 50)
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=46,col=12,endLine=46,endColumn=21::examples/python/advanced_testing.py:46:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=61,col=12,endLine=61,endColumn=21::examples/python/advanced_testing.py:61:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=71,col=12,endLine=71,endColumn=21::examples/python/advanced_testing.py:71:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=83,col=12,endLine=83,endColumn=21::examples/python/advanced_testing.py:83:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=99,col=12,endLine=99,endColumn=21::examples/python/advanced_testing.py:99:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/concrete_config.py,line=3,col=1,endLine=3,endColumn=49::src/lmstrix/core/concrete_config.py:3:1: ERA001 Found commented-out code
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/concrete_config.py,line=126,col=13,endLine=126,endColumn=24::src/lmstrix/core/concrete_config.py:126:13: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=127,col=13,endLine=127,endColumn=19::src/lmstrix/api/client.py:127:13: E722 Do not use bare `except`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=153,col=24,endLine=153,endColumn=33::src/lmstrix/api/client.py:153:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=155,col=13,endLine=155,endColumn=31::src/lmstrix/api/client.py:155:13: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=156,col=16,endLine=156,endColumn=25::src/lmstrix/api/client.py:156:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=184,col=9,endLine=184,endColumn=19::src/lmstrix/api/client.py:184:9: PLR0912 Too many branches (26 > 12)
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=184,col=9,endLine=184,endColumn=19::src/lmstrix/api/client.py:184:9: PLR0915 Too many statements (91 > 50)
+::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=198,col=11,endLine=198,endColumn=17::src/lmstrix/api/client.py:198:11: ARG002 Unused method argument: `kwargs`
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=376,col=9,endLine=376,endColumn=26::src/lmstrix/api/client.py:376:9: PLR0915 Too many statements (77 > 50)
+::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=383,col=9,endLine=383,endColumn=29::src/lmstrix/api/client.py:383:9: ARG002 Unused method argument: `model_context_length`
+::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=392,col=11,endLine=392,endColumn=17::src/lmstrix/api/client.py:392:11: ARG002 Unused method argument: `kwargs`
 ::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=31,col=5,endLine=31,endColumn=24::src/lmstrix/api/main.py:31:5: PLR0912 Too many branches (16 > 12)
 ::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=330,col=9,endLine=330,endColumn=20::src/lmstrix/api/main.py:330:9: PLR0912 Too many branches (16 > 12)
 ::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=438,col=9,endLine=438,endColumn=20::src/lmstrix/api/main.py:438:9: PLR0912 Too many branches (13 > 12)
@@ -3096,72 +3158,9 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=808,col=20,endLine=808,endColumn=29::src/lmstrix/api/main.py:808:20: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=850,col=9,endLine=850,endColumn=21::src/lmstrix/api/main.py:850:9: PLR0912 Too many branches (14 > 12)
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=950,col=16,endLine=950,endColumn=25::src/lmstrix/api/main.py:950:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=3,col=1,endLine=3,endColumn=40::src/lmstrix/utils/state.py:3:1: ERA001 Found commented-out code
-::error title=Ruff (PTH123),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=24,col=22,endLine=24,endColumn=26::src/lmstrix/utils/state.py:24:22: PTH123 `open()` should be replaced by `Path.open()`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=26,col=20,endLine=26,endColumn=29::src/lmstrix/utils/state.py:26:20: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PTH123),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=33,col=18,endLine=33,endColumn=22::src/lmstrix/utils/state.py:33:18: PTH123 `open()` should be replaced by `Path.open()`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=35,col=16,endLine=35,endColumn=25::src/lmstrix/utils/state.py:35:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (TRY301),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=47,col=21,endLine=47,endColumn=96::src/lmstrix/utils/context_parser.py:47:21: TRY301 Abstract `raise` to an inner function
-::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=47,col=27,endLine=47,endColumn=96::src/lmstrix/utils/context_parser.py:47:27: TRY003 Avoid specifying long messages outside the exception class
-::error title=Ruff (TRY301),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=53,col=21,endLine=55,endColumn=22::src/lmstrix/utils/context_parser.py:53:21: TRY301 Abstract `raise` to an inner function
-::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=53,col=27,endLine=55,endColumn=22::src/lmstrix/utils/context_parser.py:53:27: TRY003 Avoid specifying long messages outside the exception class
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=64,col=17,endLine=64,endColumn=35::src/lmstrix/utils/context_parser.py:64:17: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=67,col=23,endLine=67,endColumn=80::src/lmstrix/utils/context_parser.py:67:23: TRY003 Avoid specifying long messages outside the exception class
-::error title=Ruff (B904),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=73,col=13,endLine=75,endColumn=14::src/lmstrix/utils/context_parser.py:73:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
-::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=73,col=19,endLine=75,endColumn=14::src/lmstrix/utils/context_parser.py:73:19: TRY003 Avoid specifying long messages outside the exception class
-::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=77,col=11,endLine=77,endColumn=81::src/lmstrix/utils/context_parser.py:77:11: TRY003 Avoid specifying long messages outside the exception class
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_streaming.py,line=47,col=12,endLine=47,endColumn=21::test_streaming.py:47:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=127,col=13,endLine=127,endColumn=19::src/lmstrix/api/client.py:127:13: E722 Do not use bare `except`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=153,col=24,endLine=153,endColumn=33::src/lmstrix/api/client.py:153:24: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=155,col=13,endLine=155,endColumn=31::src/lmstrix/api/client.py:155:13: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=156,col=16,endLine=156,endColumn=25::src/lmstrix/api/client.py:156:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=184,col=9,endLine=184,endColumn=19::src/lmstrix/api/client.py:184:9: PLR0912 Too many branches (26 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=184,col=9,endLine=184,endColumn=19::src/lmstrix/api/client.py:184:9: PLR0915 Too many statements (91 > 50)
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=198,col=11,endLine=198,endColumn=17::src/lmstrix/api/client.py:198:11: ARG002 Unused method argument: `kwargs`
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=376,col=9,endLine=376,endColumn=26::src/lmstrix/api/client.py:376:9: PLR0915 Too many statements (77 > 50)
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=383,col=9,endLine=383,endColumn=29::src/lmstrix/api/client.py:383:9: ARG002 Unused method argument: `model_context_length`
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=392,col=11,endLine=392,endColumn=17::src/lmstrix/api/client.py:392:11: ARG002 Unused method argument: `kwargs`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=47,col=75,endLine=47,endColumn=81::tests/test_integration/test_cli_integration.py:47:75: ANN001 Missing type annotation for function argument `capsys`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=59,col=79,endLine=59,endColumn=85::tests/test_integration/test_cli_integration.py:59:79: ANN001 Missing type annotation for function argument `capsys`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=2,col=1,endLine=2,endColumn=49::examples/python/custom_inference.py:2:1: ERA001 Found commented-out code
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=13,col=5,endLine=13,endColumn=9::examples/python/custom_inference.py:13:5: PLR0915 Too many statements (89 > 50)
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=60,col=12,endLine=60,endColumn=21::examples/python/custom_inference.py:60:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=68,col=12,endLine=68,endColumn=21::examples/python/custom_inference.py:68:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=94,col=16,endLine=94,endColumn=25::examples/python/custom_inference.py:94:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=109,col=16,endLine=109,endColumn=25::examples/python/custom_inference.py:109:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=137,col=12,endLine=137,endColumn=21::examples/python/custom_inference.py:137:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=149,col=12,endLine=149,endColumn=21::examples/python/custom_inference.py:149:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=165,col=12,endLine=165,endColumn=21::examples/python/custom_inference.py:165:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=2,col=1,endLine=2,endColumn=49::examples/python/batch_processing.py:2:1: ERA001 Found commented-out code
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=12,col=5,endLine=12,endColumn=9::examples/python/batch_processing.py:12:5: PLR0912 Too many branches (16 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=12,col=5,endLine=12,endColumn=9::examples/python/batch_processing.py:12:5: PLR0915 Too many statements (86 > 50)
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=65,col=20,endLine=65,endColumn=29::examples/python/batch_processing.py:65:20: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=108,col=16,endLine=108,endColumn=25::examples/python/batch_processing.py:108:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/concrete_config.py,line=3,col=1,endLine=3,endColumn=49::src/lmstrix/core/concrete_config.py:3:1: ERA001 Found commented-out code
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/concrete_config.py,line=126,col=13,endLine=126,endColumn=24::src/lmstrix/core/concrete_config.py:126:13: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=2,col=1,endLine=2,endColumn=54::examples/python/prompt_templates_demo.py:2:1: ERA001 Found commented-out code
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=15,col=5,endLine=15,endColumn=9::examples/python/prompt_templates_demo.py:15:5: PLR0915 Too many statements (86 > 50)
-::error title=Ruff (PTH123),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=53,col=10,endLine=53,endColumn=14::examples/python/prompt_templates_demo.py:53:10: PTH123 `open()` should be replaced by `Path.open()`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=75,col=12,endLine=75,endColumn=21::examples/python/prompt_templates_demo.py:75:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=113,col=12,endLine=113,endColumn=21::examples/python/prompt_templates_demo.py:113:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=131,col=12,endLine=131,endColumn=21::examples/python/prompt_templates_demo.py:131:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=2,col=1,endLine=2,endColumn=49::examples/python/advanced_testing.py:2:1: ERA001 Found commented-out code
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=10,col=5,endLine=10,endColumn=9::examples/python/advanced_testing.py:10:5: PLR0912 Too many branches (21 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=10,col=5,endLine=10,endColumn=9::examples/python/advanced_testing.py:10:5: PLR0915 Too many statements (92 > 50)
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=46,col=12,endLine=46,endColumn=21::examples/python/advanced_testing.py:46:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=61,col=12,endLine=61,endColumn=21::examples/python/advanced_testing.py:61:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=71,col=12,endLine=71,endColumn=21::examples/python/advanced_testing.py:71:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=83,col=12,endLine=83,endColumn=21::examples/python/advanced_testing.py:83:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=99,col=12,endLine=99,endColumn=21::examples/python/advanced_testing.py:99:12: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/basic_usage.py,line=2,col=1,endLine=2,endColumn=44::examples/python/basic_usage.py:2:1: ERA001 Found commented-out code
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/basic_usage.py,line=87,col=12,endLine=87,endColumn=21::examples/python/basic_usage.py:87:12: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/basic_usage.py,line=103,col=12,endLine=103,endColumn=21::examples/python/basic_usage.py:103:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=16,col=1,endLine=16,endColumn=38::examples/specialized/elo_liczby.py:16:1: ERA001 Found commented-out code
-::error title=Ruff (PLR0911),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=46,col=5,endLine=46,endColumn=28::examples/specialized/elo_liczby.py:46:5: PLR0911 Too many return statements (9 > 6)
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=46,col=5,endLine=46,endColumn=28::examples/specialized/elo_liczby.py:46:5: PLR0912 Too many branches (24 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=46,col=5,endLine=46,endColumn=28::examples/specialized/elo_liczby.py:46:5: PLR0915 Too many statements (78 > 50)
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=170,col=16,endLine=170,endColumn=25::examples/specialized/elo_liczby.py:170:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=189,col=12,endLine=189,endColumn=21::examples/specialized/elo_liczby.py:189:12: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=99,col=13,endLine=99,endColumn=46::src/lmstrix/core/inference.py:99:13: TRY300 Consider moving this statement to an `else` block
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=101,col=16,endLine=101,endColumn=25::src/lmstrix/core/inference.py:101:16: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=109,col=24,endLine=109,endColumn=33::src/lmstrix/core/inference.py:109:24: BLE001 Do not catch blind exception: `Exception`
@@ -3175,11 +3174,6 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 ::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=406,col=9,endLine=406,endColumn=21::src/lmstrix/core/inference.py:406:9: PLR0912 Too many branches (21 > 12)
 ::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=406,col=9,endLine=406,endColumn=21::src/lmstrix/core/inference.py:406:9: PLR0915 Too many statements (75 > 50)
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=461,col=20,endLine=461,endColumn=29::src/lmstrix/core/inference.py:461:20: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=104,col=9,endLine=104,endColumn=17::src/lmstrix/core/context_tester.py:104:9: ARG002 Unused method argument: `log_path`
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=105,col=9,endLine=105,endColumn=14::src/lmstrix/core/context_tester.py:105:9: ARG002 Unused method argument: `model`
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=106,col=9,endLine=106,endColumn=17::src/lmstrix/core/context_tester.py:106:9: ARG002 Unused method argument: `registry`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=135,col=16,endLine=135,endColumn=25::src/lmstrix/core/context_tester.py:135:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=145,col=35,endLine=145,endColumn=40::src/lmstrix/core/context_tester.py:145:35: ANN001 Missing type annotation for function argument `model`
 ::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=3,col=1,endLine=3,endColumn=47::src/lmstrix/core/models.py:3:1: ERA001 Found commented-out code
 ::error title=Ruff (A002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=28,col=9,endLine=28,endColumn=11::src/lmstrix/core/models.py:28:9: A002 Function argument `id` is shadowing a Python builtin
 ::error title=Ruff (SIM102),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=140,col=9,endLine=142,endColumn=40::src/lmstrix/core/models.py:140:9: SIM102 Use a single `if` statement instead of nested `if` statements
@@ -3187,6 +3181,8 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 ::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=194,col=9,endLine=194,endColumn=64::src/lmstrix/core/models.py:194:9: PLC0415 `import` should be at the top-level of a file
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=219,col=24,endLine=219,endColumn=33::src/lmstrix/core/models.py:219:24: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=225,col=16,endLine=225,endColumn=25::src/lmstrix/core/models.py:225:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=47,col=75,endLine=47,endColumn=81::tests/test_integration/test_cli_integration.py:47:75: ANN001 Missing type annotation for function argument `capsys`
+::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=59,col=79,endLine=59,endColumn=85::tests/test_integration/test_cli_integration.py:59:79: ANN001 Missing type annotation for function argument `capsys`
 ::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=7,col=1,endLine=7,endColumn=51::src/lmstrix/core/inference_manager.py:7:1: ERA001 Found commented-out code
 ::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=46,col=9,endLine=46,endColumn=14::src/lmstrix/core/inference_manager.py:46:9: PLR0912 Too many branches (20 > 12)
 ::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=46,col=9,endLine=46,endColumn=14::src/lmstrix/core/inference_manager.py:46:9: PLR0915 Too many statements (73 > 50)
@@ -3208,6 +3204,11 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 ::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=394,col=21,endLine=394,endColumn=36::src/lmstrix/core/inference_manager.py:394:21: PLC0415 `import` should be at the top-level of a file
 ::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=404,col=17,endLine=404,endColumn=32::src/lmstrix/core/inference_manager.py:404:17: PLC0415 `import` should be at the top-level of a file
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=447,col=24,endLine=447,endColumn=33::src/lmstrix/core/inference_manager.py:447:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=104,col=9,endLine=104,endColumn=17::src/lmstrix/core/context_tester.py:104:9: ARG002 Unused method argument: `log_path`
+::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=105,col=9,endLine=105,endColumn=14::src/lmstrix/core/context_tester.py:105:9: ARG002 Unused method argument: `model`
+::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=106,col=9,endLine=106,endColumn=17::src/lmstrix/core/context_tester.py:106:9: ARG002 Unused method argument: `registry`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=135,col=16,endLine=135,endColumn=25::src/lmstrix/core/context_tester.py:135:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=145,col=35,endLine=145,endColumn=40::src/lmstrix/core/context_tester.py:145:35: ANN001 Missing type annotation for function argument `model`
 1 file left unchanged
 1 file left unchanged
 1 file left unchanged
@@ -6090,6 +6091,48 @@ Othello:adam adam$
 </document>
 
 <document index="44">
+<source>issues/311.txt</source>
+<document_content>
+# PROBLEM: --show is not working
+
+lmstrix list --help
+INFO: Showing help with the command 'lmstrix list -- --help'.
+
+NAME
+    lmstrix list - List all models from the registry with their test status.
+
+SYNOPSIS
+    lmstrix list <flags>
+
+DESCRIPTION
+    List all models from the registry with their test status.
+
+FLAGS
+    --sort=SORT
+        Type: str
+        Default: 'id'
+        Sort order. Options: id, idd, ctx, ctxd, dtx, dtxd, size, sized, smart, smartd (d = descending).
+    --show=SHOW
+        Type: Optional[str | None]
+        Default: None
+        Output format. Options: id (plain IDs), path (relative paths), json (JSON array).
+    -v, --verbose=VERBOSE
+        Type: bool
+        Default: False
+        Enable verbose output.
+Othello:adam adam$ lmstrix list --show id --sort model
+Othello:adam adam$ lmstrix list --show id
+Othello:adam adam$ lmstrix list --show model
+Othello:adam adam$ lmstrix list --show mname
+Othello:adam adam$ lmstrix list --show
+Othello:adam adam$ lmstrix list --show path
+
+# --sort id is not working by model id but --sort model does — but the docstring says something else  
+
+</document_content>
+</document>
+
+<document index="45">
 <source>publish.sh</source>
 <document_content>
 #!/usr/bin/env bash
@@ -6108,7 +6151,7 @@ uvx hatch publish
 </document_content>
 </document>
 
-<document index="45">
+<document index="46">
 <source>pyproject.toml</source>
 <document_content>
 [build-system]
@@ -6325,6 +6368,7 @@ ignore = [
   "S101",    # use of assert detected
   "PLR0913", # too many arguments
   "PLR2004", # magic value comparison
+  "COM812"
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -8028,7 +8072,7 @@ def save_prompts((
     """Save prompts to a TOML file."""
 
 
-<document index="46">
+<document index="47">
 <source>src/lmstrix/py.typed</source>
 <document_content>
 # This file indicates that the package supports type hints

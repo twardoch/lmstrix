@@ -382,19 +382,19 @@ class LMStrixService:
             if show == "id":
                 # Plain newline-delimited list of model IDs
                 for model in sorted_models:
-                    logger.info(model.id)
+                    print(model.id)
             elif show == "path":
                 # Newline-delimited list of relative paths
                 for model in sorted_models:
                     # Model.id is already the relative path
-                    logger.info(model.id)
+                    print(model.id)
             elif show == "json":
                 # JSON array of models (matching registry format)
                 models_dict = []
                 for model in sorted_models:
                     model_data = model.model_dump(by_alias=True, mode="json")
                     models_dict.append(model_data)
-                logger.info(json.dumps(models_dict, indent=2))
+                print(json.dumps(models_dict, indent=2))
             else:
                 logger.debug(f"Invalid show option: {show}. Options: id, path, json.")
                 return
@@ -981,64 +981,64 @@ class LMStrixService:
 
     def show_help(self) -> None:
         """Show comprehensive help text."""
-        logger.debug("[bold cyan]LMStrix - LM Studio Model Testing Toolkit[/bold cyan]")
-        logger.debug("\n[cyan]Available commands:[/cyan]")
-        logger.debug(
+        console.print("[bold cyan]LMStrix - LM Studio Model Testing Toolkit[/bold cyan]")
+        console.print("\n[cyan]Available commands:[/cyan]")
+        console.print(
             "  [green]scan[/green]            Scan for LM Studio models and update registry",
         )
-        logger.debug("    --failed          Re-scan only previously failed models")
-        logger.debug("    --reset           Re-scan all models (clear test data)")
-        logger.debug("    --verbose         Enable verbose output")
-        logger.debug("")
-        logger.debug(
+        console.print("    --failed          Re-scan only previously failed models")
+        console.print("    --reset           Re-scan all models (clear test data)")
+        console.print("    --verbose         Enable verbose output")
+        console.print("")
+        console.print(
             "  [green]list[/green]            List all models with their test status",
         )
-        logger.debug(
+        console.print(
             "    --sort id|ctx|dtx|size|smart  Sort by: id, tested context, declared context, size, smart",
         )
-        logger.debug("    --show id|path|json     Output format")
-        logger.debug("    --verbose         Enable verbose output")
-        logger.debug("")
-        logger.debug("  [green]test[/green]            Test model context limits")
-        logger.debug("    MODEL_ID          Test specific model")
-        logger.debug("    --all             Test all untested models")
-        logger.debug("    --reset           Re-test all models")
-        logger.debug("    --ctx SIZE        Test specific context size")
-        logger.debug(
+        console.print("    --show id|path|json     Output format")
+        console.print("    --verbose         Enable verbose output")
+        console.print("")
+        console.print("  [green]test[/green]            Test model context limits")
+        console.print("    MODEL_ID          Test specific model")
+        console.print("    --all             Test all untested models")
+        console.print("    --reset           Re-test all models")
+        console.print("    --ctx SIZE        Test specific context size")
+        console.print(
             "    --threshold SIZE  Max context for initial testing (default: 31744)",
         )
-        logger.debug(
+        console.print(
             "    --fast            Skip semantic verification (only test if inference completes)",
         )
-        logger.debug("    --verbose         Enable verbose output")
-        logger.debug("")
-        logger.debug("  [green]infer[/green]           Run inference on a model")
-        logger.debug("    PROMPT MODEL_ID   Required prompt and model")
-        logger.debug(
+        console.print("    --verbose         Enable verbose output")
+        console.print("")
+        console.print("  [green]infer[/green]           Run inference on a model")
+        console.print("    PROMPT MODEL_ID   Required prompt and model")
+        console.print(
             "    --out_ctx NUM|%   Maximum tokens to generate (e.g., 500 or '80%')",
         )
-        logger.debug("    --in_ctx NUM      Context size for loading model")
-        logger.debug("    --file_prompt PATH Load prompt from TOML file")
-        logger.debug("    --dict PARAMS     Parameters as key=value pairs")
-        logger.debug("    --temperature NUM Temperature for generation")
-        logger.debug("    --reload          Force reload model")
-        logger.debug("    --verbose         Enable verbose output")
-        logger.debug("")
-        logger.debug(
+        console.print("    --in_ctx NUM      Context size for loading model")
+        console.print("    --file_prompt PATH Load prompt from TOML file")
+        console.print("    --dict PARAMS     Parameters as key=value pairs")
+        console.print("    --temperature NUM Temperature for generation")
+        console.print("    --reload          Force reload model")
+        console.print("    --verbose         Enable verbose output")
+        console.print("")
+        console.print(
             "  [green]health[/green]          Check database health and backups",
         )
-        logger.debug("    --verbose         Show detailed health information")
-        logger.debug("")
-        logger.debug(
+        console.print("    --verbose         Show detailed health information")
+        console.print("")
+        console.print(
             "  [green]save[/green]            Save tested contexts to LM Studio configs",
         )
-        logger.debug("    --flash           Enable flash attention for GGUF models")
-        logger.debug("    --verbose         Enable verbose output")
-        logger.debug("")
-        logger.debug("Examples:")
-        logger.debug("  lmstrix scan --verbose")
-        logger.debug("  lmstrix list --sort ctx")
-        logger.debug("  lmstrix test --all")
-        logger.debug("  lmstrix test my-model --ctx 8192")
-        logger.debug('  lmstrix infer "Hello world" my-model')
-        logger.debug("  lmstrix save --flash")
+        console.print("    --flash           Enable flash attention for GGUF models")
+        console.print("    --verbose         Enable verbose output")
+        console.print("")
+        console.print("Examples:")
+        console.print("  lmstrix scan --verbose")
+        console.print("  lmstrix list --sort ctx")
+        console.print("  lmstrix test --all")
+        console.print("  lmstrix test my-model --ctx 8192")
+        console.print('  lmstrix infer "Hello world" my-model')
+        console.print("  lmstrix save --flash")
