@@ -904,11 +904,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### In Progress
-- **Issue #302**: Inference Output Mismatch Investigation
-  - Added comprehensive diagnostic logging for inference parameters
+## [1.0.66] - 2025-08-05
+
+### Fixed
+- **Issue #302**: Inference Output Mismatch Investigation - Major Progress
+  - Added comprehensive diagnostic logging for all inference parameters
   - Updated default temperature from 0.7 to 0.8 to match LM Studio GUI defaults
-  - Investigating stop token and context length configuration differences
+  - Added CLI parameters for configuring inference settings (top_k, temperature, etc.)
+  - Fixed Rich table display to use full console width with `expand=True`
+  - Enhanced response preview in test command from 20 to 60 characters for better readability
+  - Created diagnostic tools: `debug_inference.py`, `debug_test_logic.py`, `get_out_ctx.py`
+
+### Enhanced
+- **Table Display Improvements**
+  - All Rich tables now use full console width (9 tables updated)
+  - Removed fixed width parameters for better terminal utilization
+  - Improved response preview formatting with better truncation and cleanup
+
+### Added
+- **Diagnostic and Debug Tools**
+  - `debug_inference.py`: Tool for debugging inference parameter differences
+  - `debug_test_logic.py`: Tool for testing context logic
+  - `get_out_ctx.py`: Utility for analyzing output context calculations
+  - `test_model_out_ctx.py`: Testing script for model context handling
+
+### Testing
+- **Test Suite Stability Improvements**
+  - Fixed all critical AttributeError issues in test suite
+  - Resolved Model.validate_integrity() method errors
+  - Fixed PromptResolver and ContextTester method access issues
+  - Improved ModelScanner.sync_with_registry() reliability
 
 ### Added
 - **Compact Output for Test Command** ✅ COMPLETED
@@ -1876,301 +1901,53 @@ SOFTWARE.
 <document_content>
 # LMStrix Current Development Plan
 
-## Ruff Linting Improvements Plan
 
-### Overview
-This plan addresses the 143 Ruff linting errors identified in the codebase. The improvements will enhance code quality, maintainability, and robustness while ensuring backward compatibility.
+## ACTIVE: Issue #302 - Inference Output Mismatch (Major Progress Made)
 
-### Error Analysis Summary
+### Current Status
+**Major diagnostic improvements completed in v1.0.66:**
+- ✅ Added comprehensive diagnostic logging for all inference parameters
+- ✅ Updated default temperature from 0.7 to 0.8 to match LM Studio GUI
+- ✅ Added CLI parameters for configuring inference settings
+- ✅ Created diagnostic tools for parameter comparison
+- ✅ Fixed table display and response preview issues
 
-#### Critical Issues (High Priority)
-1. **BLE001 - Blind Exception Catching (46 occurrences)**
-   - Most prevalent issue affecting error handling quality
-   - Reduces debuggability and can hide serious errors
-   
-2. **E722 - Bare Except (2 occurrences)**
-   - Similar to BLE001 but even more dangerous
-   - Must be fixed for proper error handling
-
-#### Code Quality Issues (Medium Priority)
-3. **A002 - Shadowing Python Builtins (3 occurrences)**
-   - Variables named `all`, `dict`, `id` shadow builtins
-   - Can cause unexpected behavior
-   
-4. **TRY300 - Statement Placement (8 occurrences)**
-   - Logic that should be in else blocks
-   - Affects code clarity and exception handling flow
-   
-5. **PLC0415 - Non-Top-Level Imports (8 occurrences)**
-   - Dynamic imports within functions
-   - Can impact performance and code clarity
-
-#### Complexity Issues (Low Priority - May Exclude)
-6. **PLR0912 - Too Many Branches (12 occurrences)**
-7. **PLR0915 - Too Many Statements (11 occurrences)**
-8. **PLR0911 - Too Many Return Statements (2 occurrences)**
-   - These often indicate functions that need refactoring
-   - However, some complex logic legitimately requires many branches
-
-#### Maintainability Issues
-9. **ERA001 - Commented-Out Code (9 occurrences)**
-   - Dead code that should be removed
-   - Version control preserves history
-   
-10. **ARG002 - Unused Arguments (5 occurrences)**
-    - Method arguments that aren't used
-    - May indicate API design issues
-
-### Implementation Strategy
-
-#### Phase 1: Critical Fixes (Immediate)
-1. Fix all BLE001 errors by:
-   - Replacing `except Exception:` with specific exceptions
-   - Adding proper error context and logging
-   - Example transformation:
-   ```python
-   # Before
-   try:
-       result = some_operation()
-   except Exception as e:
-       logger.error(f"Operation failed: {e}")
-   
-   # After
-   try:
-       result = some_operation()
-   except (ValueError, TypeError, KeyError) as e:
-       logger.error(f"Operation failed with {type(e).__name__}: {e}")
-   except Exception as e:
-       logger.exception(f"Unexpected error in operation: {e}")
-       raise
-   ```
-
-2. Fix E722 bare except clauses
-3. Fix A002 builtin shadowing:
-   - `all` → `all_items` or `show_all`
-   - `dict` → `dict_params` or `params_dict`
-   - `id` → `model_id` or `identifier`
-
-#### Phase 2: Code Quality Improvements
-1. Fix TRY300 by restructuring try-except-else blocks
-2. Move dynamic imports to top-level where possible (PLC0415)
-3. Remove commented-out code (ERA001)
-4. Fix unused arguments (ARG002) by either:
-   - Using them if needed
-   - Adding `_` prefix for intentionally unused
-   - Removing if part of public API that can be changed
-
-#### Phase 3: Complexity Management
-1. For PLR0912/PLR0915 (too many branches/statements):
-   - Evaluate each case individually
-   - Refactor where it improves readability
-   - Add exclusions for legitimate complex logic
-   
-2. Consider breaking down large functions into smaller ones:
-   - Extract validation logic
-   - Extract error handling patterns
-   - Create helper methods
-
-### Ruff Configuration Updates
-
-Add to `pyproject.toml`:
-
-```toml
-[tool.ruff]
-# Existing configuration...
-
-# Per-file ignores for legitimate exceptions
-[tool.ruff.per-file-ignores]
-# Complex CLI and API endpoints may have many branches
-"src/lmstrix/api/main.py" = ["PLR0912", "PLR0915"]
-"src/lmstrix/core/inference_manager.py" = ["PLR0912", "PLR0915"]
-"src/lmstrix/core/inference.py" = ["PLR0912", "PLR0915"]
-
-# Example scripts may have different standards
-"examples/**/*.py" = ["PLR0915", "ERA001"]
-
-# Test files may need different rules
-"tests/**/*.py" = ["ARG002"]  # Test fixtures often have unused args
-
-# Ignore specific rules globally with justification
-ignore = [
-    # These will be addressed individually, not blanket ignored
-]
-```
-
-### Testing Strategy
-1. Run full test suite after each phase
-2. Add new tests for improved error handling
-3. Verify no regression in functionality
-4. Check performance impact of changes
-
-### Success Metrics
-- Reduce total Ruff errors from 143 to < 20
-- All remaining errors have explicit exclusions with justification
-- Improved error messages and debugging capability
-- No functionality regression
-- Better code maintainability
-
-### Timeline
-- Phase 1: 2-3 hours (Critical fixes)
-- Phase 2: 1-2 hours (Quality improvements)
-- Phase 3: 2-3 hours (Complexity management)
-- Testing & validation: 1 hour
-
-Total estimated time: 6-9 hours of focused work
-
-
-## Current Status
-### Problem Description
-When running inference with `--verbose`, loguru was outputting the prompt and model response through its handlers, causing:
-1. **Logging errors**: KeyError and ValueError exceptions in loguru handlers
-2. **Output pollution**: Model responses were mixed with loguru formatting
-3. **User requirement violation**: User explicitly stated to NEVER pass prompt or model output through loguru
-
-### Root Cause
-- In `api/client.py`, the prompt and model response were being logged via loguru
-- Loguru was trying to format the output, causing issues with special characters like `</translation-instructions>`
-- This violated the requirement to use `sys.stderr` for prompts and `sys.stdout` for model output
-
-
-## CRITICAL: Issue #302 - Inference Output Mismatch
-
-### Problem Description
-When running the same translation prompt through LM Studio GUI vs lmstrix CLI, we get drastically different results:
-- **LM Studio GUI**: Produces proper Polish translation (639 tokens)
-- **lmstrix CLI**: Only outputs `</translate>` (4 tokens)
-
-### Root Cause Analysis
-
-#### Configuration Differences Found
-1. **Temperature**: GUI uses 0.8, CLI uses 0.7
-2. **top_k**: GUI uses 20, CLI uses 40  
-3. **Context Length**: GUI uses full 131072, CLI uses 65536 (reduced)
-4. **max_predict**: GUI uses -1 (unlimited), CLI calculates 117964
-5. **Sampling Parameters**: Multiple differences in repeat_penalty, min_p, etc.
-
-#### Potential Issues
-1. **Early Stop Token**: Model might be hitting a stop token immediately
-2. **Prompt Format**: The prompt might be wrapped or modified differently
-3. **Chat Template**: Possible incorrect chat template application
-4. **Parameter Mismatch**: Inference parameters not matching LM Studio defaults
+### Remaining Issues to Investigate
+1. **Context Length**: GUI uses full 131072, CLI may reduce to 65536
+2. **max_predict**: GUI uses -1 (unlimited), CLI calculates specific values
+3. **Stop Token Configuration**: May differ between GUI and CLI
+4. **Prompt Formatting**: Possible differences in chat template application
 
 ## Current Top Priority
 
-### Issue #302 - Inference Output Mismatch (CRITICAL)
-**Priority: URGENT - Blocking Core Functionality**
-- Model outputs only `</translate>` instead of full translation
-- LM Studio GUI produces 639 tokens, lmstrix CLI produces 4 tokens  
-- Critical inference functionality is broken for users
+### Issue #302 - Inference Output Mismatch (FINAL PHASE)
+**Priority: HIGH - Core diagnostic work completed**
 
-#### Implementation Steps:
+#### Remaining Implementation Steps:
 
-##### Step 1: Add Diagnostic Logging
-- Log the exact prompt being sent (with escape sequences visible)
-- Log all inference parameters in detail
-- Log stop tokens being used
-- Add comparison with LM Studio expected values
+##### Step 1: Context Length Investigation ⚠️
+- Fix context reduction from full model context to reduced values
+- Use full model context by default unless explicitly limited
+- Add warning when context is automatically reduced
+- Test with full context vs reduced context
 
-##### Step 2: Parameter Alignment
-- Change default temperature from 0.7 to 0.8
-- Add CLI parameters for all inference settings
-- Remove or make optional the maxTokens calculation
+##### Step 2: Stop Token Configuration ⚠️
+- Compare stop token configuration between GUI and CLI
+- Test with stop tokens disabled to rule out early termination
+- Verify chat template application doesn't introduce stop tokens
 
-##### Step 3: Context Length Fix
-- Fix context reduction from 131072 to 65536
-- Use full model context unless explicitly limited
-- Add warning when context is reduced
+##### Step 3: Final Validation ⚠️
+- Run side-by-side comparison with identical parameters
+- Verify token counts match between lmstrix and LM Studio
+- Create regression test to prevent future issues
 
-##### Step 4: Stop Token Investigation  
-- Check why model stops at `</translate>`
-- Verify stop token configuration
-- Test with stop tokens disabled
-
-### 2. Issue #105 - Adam.toml Simplification
-**Priority: High** (after Issue #302)
+### Issue #105 - Adam.toml Simplification (Next Priority)
+**Priority: Medium** (after Issue #302 is resolved)
 - Simplify adam.toml structure to use flat format instead of nested groups
 - Add --text and --text_file parameters to infer command for direct text input
 - Update all prompt examples to use simplified approach
 - Ensure backward compatibility with existing TOML files
 
-## COMPLETED FEATURES ✅
-
-### Compact Test Output ✅ COMPLETED
-**Status: FULLY IMPLEMENTED AND WORKING**
-
-Successfully implemented compact output for the test command:
-- ✅ Live-updating rich tables for non-verbose mode
-- ✅ Clean display of model ID, context size, and status
-- ✅ Progress tracking for batch tests with `--all` flag
-- ✅ Maintains backward compatibility with verbose mode
-- ✅ Significantly improved readability for testing workflows
-
-### Issue #307: Streaming Inference Support ✅ COMPLETED
-**Status: FULLY IMPLEMENTED AND WORKING**
-
-All original requirements have been successfully implemented:
-- ✅ Async streaming API using lmstudio SDK's `complete_stream()`
-- ✅ Full backward compatibility maintained
-- ✅ CLI `--stream` and `--stream-timeout` flags
-- ✅ Robust error handling and cancellation support
-- ✅ Efficient token-by-token processing and display
-- ✅ Streaming statistics and progress monitoring
-
-### Issue #306: Batch Processing Tool ✅ COMPLETED  
-**Status: FULLY IMPLEMENTED AND WORKING**
-
-The adamall.py batch processing tool has been successfully created with all required features:
-- ✅ Smart model management with reuse detection
-- ✅ Processes all 6 target prompts efficiently
-- ✅ Safe filename generation using pathvalidate
-- ✅ Skip existing outputs for resumable processing
-- ✅ Comprehensive error handling and progress tracking
-- ✅ Intelligent model scheduling for optimal performance
-
-#### Usage:
-```bash
-cd _keep_this/adam
-python adamall.py
-```
-
-Output files are generated in `_keep_this/adam/out/` with safe naming patterns.
-
-## Current Active Development
-
-### Issue #105 - Adam.toml Simplification (Next Priority)
-**Priority: High** (after Issue #302 is resolved)
-
-#### Problem Statement
-Current adam.toml structure uses nested groups which is complex for users:
-```toml
-[prompts.translate]
-template = "Translate this to Polish: {text}"
-
-[prompts.think.aps]  
-template = "Think step by step: {text}"
-```
-
-#### Target Simplification
-Change to flat structure for better usability:
-```toml
-[translate]
-template = "Translate this to Polish: {text}"
-
-[think_aps]
-template = "Think step by step: {text}"
-```
-
-#### Implementation Requirements
-1. Update prompt loader to handle flat structure
-2. Add backward compatibility for existing nested files
-3. Add --text and --text_file parameters to infer command
-4. Update all examples to use simplified format
-5. Migration guide for existing users
-
-#### Success Criteria
-- Users can create simple, flat TOML prompt files
-- Existing nested files continue to work
-- CLI supports direct text input without files
 
 ## Future Development Phases
 
@@ -2659,133 +2436,57 @@ The test suite is designed to run in CI/CD pipelines:
 <document_content>
 # LMStrix TODO List
 
-### Recently Completed ✅
+## Current Active Work
 
-- [x] Add --prompt parameter to test command for custom prompts
-- [x] Add --file_prompt parameter to test command for loading prompts from files
-- [x] Update ContextTester and InferenceEngine to support custom prompts
-- [x] Update help documentation with custom prompt examples
-- [x] Implement compact output for test command with live-updating tables
-- [x] Add progress tracking for batch tests with --all flag
-- [x] Maintain backward compatibility with verbose mode
+### Priority 1: Issue #302 - Inference Output Mismatch (Final Phase)
 
-### Issue #302: Inference Output Mismatch (PRIORITY)
+**Major diagnostic work completed in v1.0.66. Remaining items:**
 
-- [ ] Compare output with LM Studio for identical prompts
-- [ ] Ensure token counts match between lmstrix and LM Studio
-- [ ] Verify translation quality matches expected output
-- [ ] Create regression test for this issue
-- [ ] Fix maxTokens calculation issue
-- [ ] Investigate stop token configuration differences
-- [ ] Fix context length handling (GUI uses 131072, CLI uses 65536)
+- [ ] Fix context length handling (GUI uses full 131072, CLI reduces to 65536)
+- [ ] Investigate stop token configuration differences between GUI and CLI
+- [ ] Compare maxTokens calculation: GUI uses -1 (unlimited), CLI calculates specific values
+- [ ] Run side-by-side comparison with identical parameters
+- [ ] Create regression test to prevent future recurrence
 
-### Model Loading Optimization (Medium Priority)
+### Priority 2: Issue #105 - Adam.toml Simplification
 
-- [ ] Improve model reuse detection to avoid unnecessary loading messages
-- [ ] Add context length display in enhanced logging when available
-- [ ] Optimize model loading workflow for better performance
-- [ ] Add better feedback when models are being reused vs loaded fresh
+- [ ] Update prompt loader to handle flat TOML structure (no nested groups)
+- [ ] Add --text and --text_file parameters to infer command for direct text input
+- [ ] Add backward compatibility for existing nested TOML files
+- [ ] Update examples to use simplified flat format
+- [ ] Create migration guide for existing users
 
-## Phase A: Core Simplification
-
-### Configuration Unification
-
-- [ ] Create utils/config.py for centralized configuration handling
-- [ ] Consolidate path handling functions (get_lmstudio_path, etc.)
-- [ ] Remove redundant configuration code
-- [ ] Update all imports to use centralized config
-
-### Error Handling Standardization
-
-- [ ] Review and simplify custom exception hierarchy
-- [ ] Standardize error messages across codebase
-- [ ] Implement consistent logging patterns
-- [ ] Update error handling to use standard exceptions where appropriate
+## Future Development (Lower Priority)
 
 ### Code Quality Improvements
 
+- [ ] Ruff linting improvements (143 errors identified)
+  - [ ] Fix BLE001 blind exception catching (46 occurrences)
+  - [ ] Fix A002 builtin shadowing (3 occurrences)
+  - [ ] Address TRY300 statement placement issues (8 occurrences)
+  - [ ] Remove commented-out code (ERA001)
 - [ ] Add comprehensive type hints to public APIs
 - [ ] Ensure all functions have proper docstrings
-- [ ] Remove deprecated TODO comments from code
-- [ ] Run code quality checks and fix issues
+- [ ] Standardize error handling patterns
 
-## Phase B: CLI Enhancement
+### Configuration and Utilities
 
-### Command Improvements
+- [ ] Create utils/config.py for centralized configuration handling
+- [ ] Consolidate path handling functions
+- [ ] Improve model loading optimization and reuse detection
 
-- [ ] Enhance `scan` command with better progress reporting
-- [ ] Improve `list` command with filtering and sorting options
+### CLI Enhancement
+
 - [ ] Add `reset` command for clearing model test data
 - [ ] Add `health` command for system diagnostics
+- [ ] Enhance `scan` and `list` commands with better filtering
 
-### User Experience
-
-- [ ] Better error messages with helpful suggestions
-- [ ] Improved help text and documentation
-- [ ] Enhanced progress indicators for long-running operations
-- [ ] Add command aliases for common operations
-
-## Phase C: Testing & Documentation
-
-### Test Suite Completion
+### Testing and Documentation
 
 - [ ] Ensure >90% test coverage maintained
-- [ ] Add integration tests for new features
-- [ ] Performance benchmarking of improvements
-- [ ] Add regression tests for fixed issues
-
-### Documentation Updates
-
 - [ ] Update README.md with latest features
 - [ ] Create comprehensive CLI reference
-- [ ] Update examples to demonstrate new capabilities
-- [ ] Create migration guide for any breaking changes
-
-## Technical Debt Reduction
-
-### Code Architecture
-
-- [ ] Review and simplify InferenceManager class structure
-- [ ] Consolidate duplicate logic across modules
-- [ ] Improve separation of concerns between CLI and core logic
-- [ ] Refactor overly complex functions
-
-### Performance Optimization
-
-- [ ] Profile model loading and caching behavior
-- [ ] Optimize JSON registry read/write operations
-- [ ] Reduce memory usage in context testing
-- [ ] Benchmark before/after performance improvements
-
-### Dependency Management
-
-- [ ] Review and minimize external dependencies
-- [ ] Ensure compatibility with latest Python versions
-- [ ] Update build and packaging configuration
-- [ ] Test installation on clean environments
-
-## Quality Assurance
-
-### Testing
-
-- [ ] Run full test suite on all changes
-- [ ] Test CLI commands with various model types
-- [ ] Verify backward compatibility
-- [ ] Performance regression testing
-
-### Documentation
-
-- [ ] Update CHANGELOG.md with all changes
-- [ ] Review and update docstrings
-- [ ] Ensure examples work correctly
-- [ ] Update any configuration documentation
-
-### Release Preparation
-
-- [ ] Version bump and release notes
-- [ ] Tag release in git
-- [ ] Test PyPI package build
-- [ ] Verify clean installation works
+- [ ] Add integration tests for new features
 
 
 </document_content>
@@ -2975,9 +2676,28 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 <document index="15">
 <source>cleanup.txt</source>
 <document_content>
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=5,col=1,endLine=5,endColumn=35::test_model_out_ctx.py:5:1: ERA001 Found commented-out code
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=61,col=12,endLine=61,endColumn=21::test_model_out_ctx.py:61:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=63,col=9,endLine=63,endColumn=25::test_model_out_ctx.py:63:9: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=87,col=12,endLine=87,endColumn=21::test_model_out_ctx.py:87:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=98,col=16,endLine=98,endColumn=25::test_model_out_ctx.py:98:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=107,col=12,endLine=107,endColumn=21::test_model_out_ctx.py:107:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/get_out_ctx.py,line=5,col=1,endLine=5,endColumn=28::get_out_ctx.py:5:1: ERA001 Found commented-out code
 ::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=106,col=9,endLine=106,endColumn=20::src/lmstrix/loaders/model_loader.py:106:9: TRY300 Consider moving this statement to an `else` block
 ::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=186,col=9,endLine=186,endColumn=25::src/lmstrix/loaders/model_loader.py:186:9: TRY300 Consider moving this statement to an `else` block
 ::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=361,col=9,endLine=361,endColumn=20::src/lmstrix/loaders/model_loader.py:361:9: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_streaming.py,line=47,col=12,endLine=47,endColumn=21::test_streaming.py:47:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=6,col=1,endLine=6,endColumn=33::debug_test_logic.py:6:1: ERA001 Found commented-out code
+::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=47,col=9,endLine=47,endColumn=15::debug_test_logic.py:47:9: E722 Do not use bare `except`
+::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=47,col=9,endLine=48,endColumn=17::debug_test_logic.py:47:9: S110 `try`-`except`-`pass` detected, consider logging the exception
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=117,col=12,endLine=117,endColumn=21::debug_test_logic.py:117:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=119,col=9,endLine=119,endColumn=25::debug_test_logic.py:119:9: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=137,col=9,endLine=137,endColumn=15::debug_test_logic.py:137:9: E722 Do not use bare `except`
+::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=137,col=9,endLine=138,endColumn=17::debug_test_logic.py:137:9: S110 `try`-`except`-`pass` detected, consider logging the exception
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=180,col=12,endLine=180,endColumn=21::debug_test_logic.py:180:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=208,col=13,endLine=208,endColumn=19::debug_test_logic.py:208:13: E722 Do not use bare `except`
+::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=208,col=13,endLine=209,endColumn=21::debug_test_logic.py:208:13: S110 `try`-`except`-`pass` detected, consider logging the exception
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=232,col=16,endLine=232,endColumn=25::debug_test_logic.py:232:16: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=602,col=9,endLine=602,endColumn=13::src/lmstrix/api/main.py:602:9: ARG002 Unused method argument: `sort`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=670,col=20,endLine=670,endColumn=29::src/lmstrix/api/main.py:670:20: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=834,col=24,endLine=834,endColumn=33::src/lmstrix/api/main.py:834:24: BLE001 Do not catch blind exception: `Exception`
@@ -2988,20 +2708,28 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=957,col=20,endLine=957,endColumn=29::src/lmstrix/api/main.py:957:20: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=1060,col=20,endLine=1060,endColumn=29::src/lmstrix/api/main.py:1060:20: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=1202,col=16,endLine=1202,endColumn=25::src/lmstrix/api/main.py:1202:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/concrete_config.py,line=3,col=1,endLine=3,endColumn=49::src/lmstrix/core/concrete_config.py:3:1: ERA001 Found commented-out code
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/concrete_config.py,line=126,col=13,endLine=126,endColumn=24::src/lmstrix/core/concrete_config.py:126:13: TRY300 Consider moving this statement to an `else` block
 ::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=3,col=1,endLine=3,endColumn=40::src/lmstrix/utils/state.py:3:1: ERA001 Found commented-out code
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=26,col=20,endLine=26,endColumn=29::src/lmstrix/utils/state.py:26:20: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=35,col=16,endLine=35,endColumn=25::src/lmstrix/utils/state.py:35:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=64,col=17,endLine=64,endColumn=35::src/lmstrix/utils/context_parser.py:64:17: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (B904),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=73,col=13,endLine=75,endColumn=14::src/lmstrix/utils/context_parser.py:73:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=127,col=20,endLine=127,endColumn=29::src/lmstrix/api/client.py:127:20: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=155,col=13,endLine=155,endColumn=31::src/lmstrix/api/client.py:155:13: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=198,col=11,endLine=198,endColumn=17::src/lmstrix/api/client.py:198:11: ARG002 Unused method argument: `kwargs`
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=383,col=9,endLine=383,endColumn=29::src/lmstrix/api/client.py:383:9: ARG002 Unused method argument: `model_context_length`
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=392,col=11,endLine=392,endColumn=17::src/lmstrix/api/client.py:392:11: ARG002 Unused method argument: `kwargs`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/concrete_config.py,line=3,col=1,endLine=3,endColumn=49::src/lmstrix/core/concrete_config.py:3:1: ERA001 Found commented-out code
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/concrete_config.py,line=126,col=13,endLine=126,endColumn=24::src/lmstrix/core/concrete_config.py:126:13: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=144,col=16,endLine=144,endColumn=25::src/lmstrix/core/context_tester.py:144:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=158,col=35,endLine=158,endColumn=40::src/lmstrix/core/context_tester.py:158:35: ANN001 Missing type annotation for function argument `model`
+::error title=Ruff (PTH123),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=53,col=10,endLine=53,endColumn=14::examples/python/prompt_templates_demo.py:53:10: PTH123 `open()` should be replaced by `Path.open()`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=6,col=1,endLine=6,endColumn=32::debug_inference.py:6:1: ERA001 Found commented-out code
+::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=75,col=9,endLine=75,endColumn=15::debug_inference.py:75:9: E722 Do not use bare `except`
+::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=75,col=9,endLine=76,endColumn=17::debug_inference.py:75:9: S110 `try`-`except`-`pass` detected, consider logging the exception
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=134,col=16,endLine=134,endColumn=25::debug_inference.py:134:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=137,col=9,endLine=137,endColumn=20::debug_inference.py:137:9: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=139,col=12,endLine=139,endColumn=21::debug_inference.py:139:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=142,col=9,endLine=142,endColumn=25::debug_inference.py:142:9: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=192,col=16,endLine=192,endColumn=25::debug_inference.py:192:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=195,col=9,endLine=195,endColumn=20::debug_inference.py:195:9: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=197,col=12,endLine=197,endColumn=21::debug_inference.py:197:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=200,col=9,endLine=200,endColumn=25::debug_inference.py:200:9: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (ANN201),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=206,col=5,endLine=206,endColumn=34::debug_inference.py:206:5: ANN201 Missing return type annotation for public function `test_lmstrix_inference_engine`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=221,col=13,endLine=221,endColumn=58::debug_inference.py:221:13: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=245,col=9,endLine=245,endColumn=32::debug_inference.py:245:9: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=247,col=12,endLine=247,endColumn=21::debug_inference.py:247:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=250,col=9,endLine=250,endColumn=25::debug_inference.py:250:9: PLC0415 `import` should be at the top-level of a file
 ::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=122,col=13,endLine=122,endColumn=46::src/lmstrix/core/inference.py:122:13: TRY300 Consider moving this statement to an `else` block
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=124,col=16,endLine=124,endColumn=25::src/lmstrix/core/inference.py:124:16: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=132,col=24,endLine=132,endColumn=33::src/lmstrix/core/inference.py:132:24: BLE001 Do not catch blind exception: `Exception`
@@ -3011,6 +2739,8 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 ::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=376,col=29,endLine=377,endColumn=37::src/lmstrix/core/inference.py:376:29: S110 `try`-`except`-`pass` detected, consider logging the exception
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=401,col=28,endLine=401,endColumn=37::src/lmstrix/core/inference.py:401:28: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=484,col=20,endLine=484,endColumn=29::src/lmstrix/core/inference.py:484:20: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=64,col=17,endLine=64,endColumn=35::src/lmstrix/utils/context_parser.py:64:17: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (B904),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=73,col=13,endLine=75,endColumn=14::src/lmstrix/utils/context_parser.py:73:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
 ::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=7,col=1,endLine=7,endColumn=51::src/lmstrix/core/inference_manager.py:7:1: ERA001 Found commented-out code
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=180,col=24,endLine=180,endColumn=33::src/lmstrix/core/inference_manager.py:180:24: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=202,col=13,endLine=210,endColumn=14::src/lmstrix/core/inference_manager.py:202:13: TRY300 Consider moving this statement to an `else` block
@@ -3020,46 +2750,17 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=318,col=16,endLine=318,endColumn=25::src/lmstrix/core/inference_manager.py:318:16: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=325,col=24,endLine=325,endColumn=33::src/lmstrix/core/inference_manager.py:325:24: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=454,col=24,endLine=454,endColumn=33::src/lmstrix/core/inference_manager.py:454:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=127,col=20,endLine=127,endColumn=29::src/lmstrix/api/client.py:127:20: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=155,col=13,endLine=155,endColumn=31::src/lmstrix/api/client.py:155:13: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=198,col=11,endLine=198,endColumn=17::src/lmstrix/api/client.py:198:11: ARG002 Unused method argument: `kwargs`
+::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=383,col=9,endLine=383,endColumn=29::src/lmstrix/api/client.py:383:9: ARG002 Unused method argument: `model_context_length`
+::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=392,col=11,endLine=392,endColumn=17::src/lmstrix/api/client.py:392:11: ARG002 Unused method argument: `kwargs`
 ::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=3,col=1,endLine=3,endColumn=47::src/lmstrix/core/models.py:3:1: ERA001 Found commented-out code
 ::error title=Ruff (SIM102),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=142,col=9,endLine=144,endColumn=40::src/lmstrix/core/models.py:142:9: SIM102 Use a single `if` statement instead of nested `if` statements
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=220,col=24,endLine=220,endColumn=33::src/lmstrix/core/models.py:220:24: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=226,col=16,endLine=226,endColumn=25::src/lmstrix/core/models.py:226:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=6,col=1,endLine=6,endColumn=32::debug_inference.py:6:1: ERA001 Found commented-out code
-::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=75,col=9,endLine=75,endColumn=15::debug_inference.py:75:9: E722 Do not use bare `except`
-::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=75,col=9,endLine=76,endColumn=17::debug_inference.py:75:9: S110 `try`-`except`-`pass` detected, consider logging the exception
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=134,col=16,endLine=134,endColumn=25::debug_inference.py:134:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=137,col=9,endLine=137,endColumn=20::debug_inference.py:137:9: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=139,col=12,endLine=139,endColumn=21::debug_inference.py:139:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=142,col=9,endLine=142,endColumn=25::debug_inference.py:142:9: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=195,col=16,endLine=195,endColumn=25::debug_inference.py:195:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=198,col=9,endLine=198,endColumn=20::debug_inference.py:198:9: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=200,col=12,endLine=200,endColumn=21::debug_inference.py:200:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=203,col=9,endLine=203,endColumn=25::debug_inference.py:203:9: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (ANN201),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=208,col=5,endLine=208,endColumn=34::debug_inference.py:208:5: ANN201 Missing return type annotation for public function `test_lmstrix_inference_engine`
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=223,col=13,endLine=223,endColumn=58::debug_inference.py:223:13: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=250,col=9,endLine=250,endColumn=32::debug_inference.py:250:9: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=252,col=12,endLine=252,endColumn=21::debug_inference.py:252:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=255,col=9,endLine=255,endColumn=25::debug_inference.py:255:9: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/get_out_ctx.py,line=5,col=1,endLine=5,endColumn=28::get_out_ctx.py:5:1: ERA001 Found commented-out code
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=6,col=1,endLine=6,endColumn=33::debug_test_logic.py:6:1: ERA001 Found commented-out code
-::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=47,col=9,endLine=47,endColumn=15::debug_test_logic.py:47:9: E722 Do not use bare `except`
-::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=47,col=9,endLine=48,endColumn=17::debug_test_logic.py:47:9: S110 `try`-`except`-`pass` detected, consider logging the exception
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=117,col=12,endLine=117,endColumn=21::debug_test_logic.py:117:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=119,col=9,endLine=119,endColumn=25::debug_test_logic.py:119:9: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=136,col=9,endLine=136,endColumn=15::debug_test_logic.py:136:9: E722 Do not use bare `except`
-::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=136,col=9,endLine=137,endColumn=17::debug_test_logic.py:136:9: S110 `try`-`except`-`pass` detected, consider logging the exception
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=179,col=12,endLine=179,endColumn=21::debug_test_logic.py:179:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=207,col=13,endLine=207,endColumn=19::debug_test_logic.py:207:13: E722 Do not use bare `except`
-::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=207,col=13,endLine=208,endColumn=21::debug_test_logic.py:207:13: S110 `try`-`except`-`pass` detected, consider logging the exception
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=231,col=16,endLine=231,endColumn=25::debug_test_logic.py:231:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=5,col=1,endLine=5,endColumn=35::test_model_out_ctx.py:5:1: ERA001 Found commented-out code
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=61,col=12,endLine=61,endColumn=21::test_model_out_ctx.py:61:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=63,col=9,endLine=63,endColumn=25::test_model_out_ctx.py:63:9: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=86,col=12,endLine=86,endColumn=21::test_model_out_ctx.py:86:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=97,col=16,endLine=97,endColumn=25::test_model_out_ctx.py:97:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=106,col=12,endLine=106,endColumn=21::test_model_out_ctx.py:106:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_streaming.py,line=47,col=12,endLine=47,endColumn=21::test_streaming.py:47:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PTH123),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=53,col=10,endLine=53,endColumn=14::examples/python/prompt_templates_demo.py:53:10: PTH123 `open()` should be replaced by `Path.open()`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=144,col=16,endLine=144,endColumn=25::src/lmstrix/core/context_tester.py:144:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=158,col=35,endLine=158,endColumn=40::src/lmstrix/core/context_tester.py:158:35: ANN001 Missing type annotation for function argument `model`
 1 file left unchanged
 1 file left unchanged
 1 file left unchanged
@@ -3083,17 +2784,6 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 1 file left unchanged
 1 file left unchanged
 1 file left unchanged
-1 file reformatted
-1 file left unchanged
-1 file left unchanged
-1 file left unchanged
-1 file left unchanged
-1 file left unchanged
-1 file left unchanged
-1 file left unchanged
-1 file left unchanged
-1 file left unchanged
-1 file reformatted
 1 file left unchanged
 1 file left unchanged
 1 file left unchanged
@@ -3111,7 +2801,18 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 1 file left unchanged
 1 file left unchanged
 1 file left unchanged
-1 file reformatted
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
 1 file left unchanged
 1 file left unchanged
 1 file left unchanged

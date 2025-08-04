@@ -7,11 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### In Progress
-- **Issue #302**: Inference Output Mismatch Investigation
-  - Added comprehensive diagnostic logging for inference parameters
+## [1.0.66] - 2025-08-05
+
+### Fixed
+- **Issue #302**: Inference Output Mismatch Investigation - Major Progress
+  - Added comprehensive diagnostic logging for all inference parameters
   - Updated default temperature from 0.7 to 0.8 to match LM Studio GUI defaults
-  - Investigating stop token and context length configuration differences
+  - Added CLI parameters for configuring inference settings (top_k, temperature, etc.)
+  - Fixed Rich table display to use full console width with `expand=True`
+  - Enhanced response preview in test command from 20 to 60 characters for better readability
+  - Created diagnostic tools: `debug_inference.py`, `debug_test_logic.py`, `get_out_ctx.py`
+
+### Enhanced
+- **Table Display Improvements**
+  - All Rich tables now use full console width (9 tables updated)
+  - Removed fixed width parameters for better terminal utilization
+  - Improved response preview formatting with better truncation and cleanup
+
+### Added
+- **Diagnostic and Debug Tools**
+  - `debug_inference.py`: Tool for debugging inference parameter differences
+  - `debug_test_logic.py`: Tool for testing context logic
+  - `get_out_ctx.py`: Utility for analyzing output context calculations
+  - `test_model_out_ctx.py`: Testing script for model context handling
+
+### Testing
+- **Test Suite Stability Improvements**
+  - Fixed all critical AttributeError issues in test suite
+  - Resolved Model.validate_integrity() method errors
+  - Fixed PromptResolver and ContextTester method access issues
+  - Improved ModelScanner.sync_with_registry() reliability
 
 ### Added
 - **Compact Output for Test Command** ✅ COMPLETED
