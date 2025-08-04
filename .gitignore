@@ -1,6 +1,7 @@
 __marimo__/
 __pycache__/
 __pypackages__/
+_keep_this/adam
 ._*
 .abstra/
 .AppleDouble
@@ -53,10 +54,10 @@ __pypackages__/
 *.spec
 *$py.class
 /site
-uv.lock
 build/
 celerybeat-schedule
 celerybeat.pid
+CLEANUP.txt
 cover/
 coverage.xml
 cython_debug/
@@ -77,6 +78,7 @@ instance/
 ipython_config.py
 lib/
 lib64/
+llms.txt
 local_settings.py
 MANIFEST
 marimo/_lsp/
@@ -89,14 +91,11 @@ profile_default/
 sdist/
 share/python-wheels/
 src/lmstrix/_version.py
+src/lmstrix/_version.py
 target/
 Thumbs.db
+uv.lock
 var/
 venv.bak/
 venv/
 wheels/
-llms.txt
-CLEANUP.txt
-src/lmstrix/_version.py
-
-_keep_this/adam

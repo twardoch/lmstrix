@@ -5,7 +5,10 @@ Project Structure:
 │       ├── 📁 analyse
 │       │   ├── 📁 input
 │       │   ├── 📁 output
-│       │   └── 📁 review
+│       │   ├── 📁 output-all
+│       │   ├── 📁 review
+│       │   ├── 📁 review-cla
+│       │   └── 📁 review-gemi
 │       └── 📁 out
 ├── 📁 context_tests
 ├── 📁 docs
@@ -114,11 +117,11 @@ Project Structure:
 ├── 📄 build.sh
 ├── 📄 CHANGELOG.md
 ├── 📄 CLAUDE.md
-├── 📄 cleanup.sh
 ├── 📄 cleanup.txt
 ├── 📄 GEMINI.md
 ├── 📄 LICENSE
 ├── 📄 PLAN.md
+├── 📄 publish.sh
 ├── 📄 pyproject.toml
 ├── 📄 README.md
 ├── 📄 test_streaming.py
@@ -434,6 +437,7 @@ When I say "/plan [requirement]", you must:
 __marimo__/
 __pycache__/
 __pypackages__/
+_keep_this/adam
 ._*
 .abstra/
 .AppleDouble
@@ -486,10 +490,10 @@ __pypackages__/
 *.spec
 *$py.class
 /site
-uv.lock
 build/
 celerybeat-schedule
 celerybeat.pid
+CLEANUP.txt
 cover/
 coverage.xml
 cython_debug/
@@ -510,6 +514,7 @@ instance/
 ipython_config.py
 lib/
 lib64/
+llms.txt
 local_settings.py
 MANIFEST
 marimo/_lsp/
@@ -522,17 +527,14 @@ profile_default/
 sdist/
 share/python-wheels/
 src/lmstrix/_version.py
+src/lmstrix/_version.py
 target/
 Thumbs.db
+uv.lock
 var/
 venv.bak/
 venv/
 wheels/
-llms.txt
-CLEANUP.txt
-src/lmstrix/_version.py
-
-_keep_this/adam
 </document_content>
 </document>
 
@@ -3061,944 +3063,208 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 </document>
 
 <document index="15">
-<source>cleanup.sh</source>
+<source>cleanup.txt</source>
 <document_content>
-#!/usr/bin/env bash
-cd "$(dirname "$0")" || exit
-
-fd -e py -x uvx autoflake -i {}
-fd -e py -x uvx pyupgrade --py312-plus {}
-fd -e py -x uvx ruff check --output-format=github --fix --unsafe-fixes {}
-fd -e py -x uvx ruff format --respect-gitignore --target-version py312 {}
-llms . "llms.txt"
-uvx hatch clean
-gitnextvers .
-uvx hatch build
-uvx hatch publish
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=63,col=9,endLine=63,endColumn=25::src/lmstrix/loaders/model_loader.py:63:9: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (PLR0911),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=69,col=5,endLine=69,endColumn=31::src/lmstrix/loaders/model_loader.py:69:5: PLR0911 Too many return statements (8 > 6)
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=105,col=9,endLine=105,endColumn=20::src/lmstrix/loaders/model_loader.py:105:9: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=185,col=9,endLine=185,endColumn=25::src/lmstrix/loaders/model_loader.py:185:9: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=205,col=5,endLine=205,endColumn=29::src/lmstrix/loaders/model_loader.py:205:5: PLR0912 Too many branches (15 > 12)
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=205,col=5,endLine=205,endColumn=29::src/lmstrix/loaders/model_loader.py:205:5: PLR0915 Too many statements (51 > 50)
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=346,col=9,endLine=346,endColumn=20::src/lmstrix/loaders/model_loader.py:346:9: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (A002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/__main__.py,line=40,col=9,endLine=40,endColumn=12::src/lmstrix/__main__.py:40:9: A002 Function argument `all` is shadowing a Python builtin
+::error title=Ruff (A002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/__main__.py,line=83,col=9,endLine=83,endColumn=13::src/lmstrix/__main__.py:83:9: A002 Function argument `dict` is shadowing a Python builtin
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=72,col=12,endLine=72,endColumn=21::src/lmstrix/loaders/prompt_loader.py:72:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=90,col=5,endLine=90,endColumn=23::src/lmstrix/loaders/prompt_loader.py:90:5: PLR0912 Too many branches (14 > 12)
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=143,col=12,endLine=143,endColumn=21::src/lmstrix/loaders/prompt_loader.py:143:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=221,col=9,endLine=221,endColumn=23::src/lmstrix/loaders/prompt_loader.py:221:9: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=226,col=13,endLine=226,endColumn=27::src/lmstrix/loaders/prompt_loader.py:226:13: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=231,col=13,endLine=231,endColumn=24::src/lmstrix/loaders/prompt_loader.py:231:13: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=31,col=5,endLine=31,endColumn=24::src/lmstrix/api/main.py:31:5: PLR0912 Too many branches (16 > 12)
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=330,col=9,endLine=330,endColumn=20::src/lmstrix/api/main.py:330:9: PLR0912 Too many branches (16 > 12)
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=438,col=9,endLine=438,endColumn=20::src/lmstrix/api/main.py:438:9: PLR0912 Too many branches (13 > 12)
+::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=445,col=9,endLine=445,endColumn=13::src/lmstrix/api/main.py:445:9: ARG002 Unused method argument: `sort`
+::error title=Ruff (PLR0911),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=547,col=9,endLine=547,endColumn=22::src/lmstrix/api/main.py:547:9: PLR0911 Too many return statements (10 > 6)
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=547,col=9,endLine=547,endColumn=22::src/lmstrix/api/main.py:547:9: PLR0912 Too many branches (54 > 12)
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=547,col=9,endLine=547,endColumn=22::src/lmstrix/api/main.py:547:9: PLR0915 Too many statements (139 > 50)
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=582,col=24,endLine=582,endColumn=33::src/lmstrix/api/main.py:582:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (SIM108),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=596,col=17,endLine=602,endColumn=51::src/lmstrix/api/main.py:596:17: SIM108 Use ternary operator `pairs = dict_params.split(",") if "," in dict_params else dict_params.split(",")` instead of `if`-`else`-block
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=597,col=21,endLine=597,endColumn=56::src/lmstrix/api/main.py:597:21: ERA001 Found commented-out code
+::error title=Ruff (PLW2901),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=605,col=21,endLine=605,endColumn=25::src/lmstrix/api/main.py:605:21: PLW2901 `for` loop variable `pair` overwritten by assignment target
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=622,col=24,endLine=622,endColumn=33::src/lmstrix/api/main.py:622:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=705,col=20,endLine=705,endColumn=29::src/lmstrix/api/main.py:705:20: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=808,col=20,endLine=808,endColumn=29::src/lmstrix/api/main.py:808:20: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=850,col=9,endLine=850,endColumn=21::src/lmstrix/api/main.py:850:9: PLR0912 Too many branches (14 > 12)
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=950,col=16,endLine=950,endColumn=25::src/lmstrix/api/main.py:950:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=3,col=1,endLine=3,endColumn=40::src/lmstrix/utils/state.py:3:1: ERA001 Found commented-out code
+::error title=Ruff (PTH123),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=24,col=22,endLine=24,endColumn=26::src/lmstrix/utils/state.py:24:22: PTH123 `open()` should be replaced by `Path.open()`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=26,col=20,endLine=26,endColumn=29::src/lmstrix/utils/state.py:26:20: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PTH123),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=33,col=18,endLine=33,endColumn=22::src/lmstrix/utils/state.py:33:18: PTH123 `open()` should be replaced by `Path.open()`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=35,col=16,endLine=35,endColumn=25::src/lmstrix/utils/state.py:35:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY301),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=47,col=21,endLine=47,endColumn=96::src/lmstrix/utils/context_parser.py:47:21: TRY301 Abstract `raise` to an inner function
+::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=47,col=27,endLine=47,endColumn=96::src/lmstrix/utils/context_parser.py:47:27: TRY003 Avoid specifying long messages outside the exception class
+::error title=Ruff (TRY301),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=53,col=21,endLine=55,endColumn=22::src/lmstrix/utils/context_parser.py:53:21: TRY301 Abstract `raise` to an inner function
+::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=53,col=27,endLine=55,endColumn=22::src/lmstrix/utils/context_parser.py:53:27: TRY003 Avoid specifying long messages outside the exception class
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=64,col=17,endLine=64,endColumn=35::src/lmstrix/utils/context_parser.py:64:17: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=67,col=23,endLine=67,endColumn=80::src/lmstrix/utils/context_parser.py:67:23: TRY003 Avoid specifying long messages outside the exception class
+::error title=Ruff (B904),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=73,col=13,endLine=75,endColumn=14::src/lmstrix/utils/context_parser.py:73:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=73,col=19,endLine=75,endColumn=14::src/lmstrix/utils/context_parser.py:73:19: TRY003 Avoid specifying long messages outside the exception class
+::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=77,col=11,endLine=77,endColumn=81::src/lmstrix/utils/context_parser.py:77:11: TRY003 Avoid specifying long messages outside the exception class
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_streaming.py,line=47,col=12,endLine=47,endColumn=21::test_streaming.py:47:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=127,col=13,endLine=127,endColumn=19::src/lmstrix/api/client.py:127:13: E722 Do not use bare `except`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=153,col=24,endLine=153,endColumn=33::src/lmstrix/api/client.py:153:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=155,col=13,endLine=155,endColumn=31::src/lmstrix/api/client.py:155:13: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=156,col=16,endLine=156,endColumn=25::src/lmstrix/api/client.py:156:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=184,col=9,endLine=184,endColumn=19::src/lmstrix/api/client.py:184:9: PLR0912 Too many branches (26 > 12)
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=184,col=9,endLine=184,endColumn=19::src/lmstrix/api/client.py:184:9: PLR0915 Too many statements (91 > 50)
+::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=198,col=11,endLine=198,endColumn=17::src/lmstrix/api/client.py:198:11: ARG002 Unused method argument: `kwargs`
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=376,col=9,endLine=376,endColumn=26::src/lmstrix/api/client.py:376:9: PLR0915 Too many statements (77 > 50)
+::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=383,col=9,endLine=383,endColumn=29::src/lmstrix/api/client.py:383:9: ARG002 Unused method argument: `model_context_length`
+::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=392,col=11,endLine=392,endColumn=17::src/lmstrix/api/client.py:392:11: ARG002 Unused method argument: `kwargs`
+::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=47,col=75,endLine=47,endColumn=81::tests/test_integration/test_cli_integration.py:47:75: ANN001 Missing type annotation for function argument `capsys`
+::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=59,col=79,endLine=59,endColumn=85::tests/test_integration/test_cli_integration.py:59:79: ANN001 Missing type annotation for function argument `capsys`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=2,col=1,endLine=2,endColumn=49::examples/python/custom_inference.py:2:1: ERA001 Found commented-out code
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=13,col=5,endLine=13,endColumn=9::examples/python/custom_inference.py:13:5: PLR0915 Too many statements (89 > 50)
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=60,col=12,endLine=60,endColumn=21::examples/python/custom_inference.py:60:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=68,col=12,endLine=68,endColumn=21::examples/python/custom_inference.py:68:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=94,col=16,endLine=94,endColumn=25::examples/python/custom_inference.py:94:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=109,col=16,endLine=109,endColumn=25::examples/python/custom_inference.py:109:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=137,col=12,endLine=137,endColumn=21::examples/python/custom_inference.py:137:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=149,col=12,endLine=149,endColumn=21::examples/python/custom_inference.py:149:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=165,col=12,endLine=165,endColumn=21::examples/python/custom_inference.py:165:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=2,col=1,endLine=2,endColumn=49::examples/python/batch_processing.py:2:1: ERA001 Found commented-out code
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=12,col=5,endLine=12,endColumn=9::examples/python/batch_processing.py:12:5: PLR0912 Too many branches (16 > 12)
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=12,col=5,endLine=12,endColumn=9::examples/python/batch_processing.py:12:5: PLR0915 Too many statements (86 > 50)
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=65,col=20,endLine=65,endColumn=29::examples/python/batch_processing.py:65:20: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=108,col=16,endLine=108,endColumn=25::examples/python/batch_processing.py:108:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/concrete_config.py,line=3,col=1,endLine=3,endColumn=49::src/lmstrix/core/concrete_config.py:3:1: ERA001 Found commented-out code
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/concrete_config.py,line=126,col=13,endLine=126,endColumn=24::src/lmstrix/core/concrete_config.py:126:13: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=2,col=1,endLine=2,endColumn=54::examples/python/prompt_templates_demo.py:2:1: ERA001 Found commented-out code
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=15,col=5,endLine=15,endColumn=9::examples/python/prompt_templates_demo.py:15:5: PLR0915 Too many statements (86 > 50)
+::error title=Ruff (PTH123),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=53,col=10,endLine=53,endColumn=14::examples/python/prompt_templates_demo.py:53:10: PTH123 `open()` should be replaced by `Path.open()`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=75,col=12,endLine=75,endColumn=21::examples/python/prompt_templates_demo.py:75:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=113,col=12,endLine=113,endColumn=21::examples/python/prompt_templates_demo.py:113:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=131,col=12,endLine=131,endColumn=21::examples/python/prompt_templates_demo.py:131:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=2,col=1,endLine=2,endColumn=49::examples/python/advanced_testing.py:2:1: ERA001 Found commented-out code
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=10,col=5,endLine=10,endColumn=9::examples/python/advanced_testing.py:10:5: PLR0912 Too many branches (21 > 12)
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=10,col=5,endLine=10,endColumn=9::examples/python/advanced_testing.py:10:5: PLR0915 Too many statements (92 > 50)
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=46,col=12,endLine=46,endColumn=21::examples/python/advanced_testing.py:46:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=61,col=12,endLine=61,endColumn=21::examples/python/advanced_testing.py:61:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=71,col=12,endLine=71,endColumn=21::examples/python/advanced_testing.py:71:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=83,col=12,endLine=83,endColumn=21::examples/python/advanced_testing.py:83:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=99,col=12,endLine=99,endColumn=21::examples/python/advanced_testing.py:99:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/basic_usage.py,line=2,col=1,endLine=2,endColumn=44::examples/python/basic_usage.py:2:1: ERA001 Found commented-out code
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/basic_usage.py,line=87,col=12,endLine=87,endColumn=21::examples/python/basic_usage.py:87:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/basic_usage.py,line=103,col=12,endLine=103,endColumn=21::examples/python/basic_usage.py:103:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=16,col=1,endLine=16,endColumn=38::examples/specialized/elo_liczby.py:16:1: ERA001 Found commented-out code
+::error title=Ruff (PLR0911),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=46,col=5,endLine=46,endColumn=28::examples/specialized/elo_liczby.py:46:5: PLR0911 Too many return statements (9 > 6)
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=46,col=5,endLine=46,endColumn=28::examples/specialized/elo_liczby.py:46:5: PLR0912 Too many branches (24 > 12)
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=46,col=5,endLine=46,endColumn=28::examples/specialized/elo_liczby.py:46:5: PLR0915 Too many statements (78 > 50)
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=170,col=16,endLine=170,endColumn=25::examples/specialized/elo_liczby.py:170:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=189,col=12,endLine=189,endColumn=21::examples/specialized/elo_liczby.py:189:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=99,col=13,endLine=99,endColumn=46::src/lmstrix/core/inference.py:99:13: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=101,col=16,endLine=101,endColumn=25::src/lmstrix/core/inference.py:101:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=109,col=24,endLine=109,endColumn=33::src/lmstrix/core/inference.py:109:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=160,col=9,endLine=160,endColumn=14::src/lmstrix/core/inference.py:160:9: PLR0912 Too many branches (27 > 12)
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=160,col=9,endLine=160,endColumn=14::src/lmstrix/core/inference.py:160:9: PLR0915 Too many statements (103 > 50)
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=211,col=20,endLine=211,endColumn=29::src/lmstrix/core/inference.py:211:20: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=316,col=16,endLine=316,endColumn=25::src/lmstrix/core/inference.py:316:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=353,col=29,endLine=353,endColumn=35::src/lmstrix/core/inference.py:353:29: E722 Do not use bare `except`
+::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=353,col=29,endLine=354,endColumn=37::src/lmstrix/core/inference.py:353:29: S110 `try`-`except`-`pass` detected, consider logging the exception
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=378,col=28,endLine=378,endColumn=37::src/lmstrix/core/inference.py:378:28: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=406,col=9,endLine=406,endColumn=21::src/lmstrix/core/inference.py:406:9: PLR0912 Too many branches (21 > 12)
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=406,col=9,endLine=406,endColumn=21::src/lmstrix/core/inference.py:406:9: PLR0915 Too many statements (75 > 50)
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=461,col=20,endLine=461,endColumn=29::src/lmstrix/core/inference.py:461:20: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=104,col=9,endLine=104,endColumn=17::src/lmstrix/core/context_tester.py:104:9: ARG002 Unused method argument: `log_path`
+::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=105,col=9,endLine=105,endColumn=14::src/lmstrix/core/context_tester.py:105:9: ARG002 Unused method argument: `model`
+::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=106,col=9,endLine=106,endColumn=17::src/lmstrix/core/context_tester.py:106:9: ARG002 Unused method argument: `registry`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=135,col=16,endLine=135,endColumn=25::src/lmstrix/core/context_tester.py:135:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=145,col=35,endLine=145,endColumn=40::src/lmstrix/core/context_tester.py:145:35: ANN001 Missing type annotation for function argument `model`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=3,col=1,endLine=3,endColumn=47::src/lmstrix/core/models.py:3:1: ERA001 Found commented-out code
+::error title=Ruff (A002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=28,col=9,endLine=28,endColumn=11::src/lmstrix/core/models.py:28:9: A002 Function argument `id` is shadowing a Python builtin
+::error title=Ruff (SIM102),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=140,col=9,endLine=142,endColumn=40::src/lmstrix/core/models.py:140:9: SIM102 Use a single `if` statement instead of nested `if` statements
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=171,col=9,endLine=171,endColumn=18::src/lmstrix/core/models.py:171:9: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=194,col=9,endLine=194,endColumn=64::src/lmstrix/core/models.py:194:9: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=219,col=24,endLine=219,endColumn=33::src/lmstrix/core/models.py:219:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=225,col=16,endLine=225,endColumn=25::src/lmstrix/core/models.py:225:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=7,col=1,endLine=7,endColumn=51::src/lmstrix/core/inference_manager.py:7:1: ERA001 Found commented-out code
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=46,col=9,endLine=46,endColumn=14::src/lmstrix/core/inference_manager.py:46:9: PLR0912 Too many branches (20 > 12)
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=46,col=9,endLine=46,endColumn=14::src/lmstrix/core/inference_manager.py:46:9: PLR0915 Too many statements (73 > 50)
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=100,col=21,endLine=100,endColumn=36::src/lmstrix/core/inference_manager.py:100:21: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=104,col=24,endLine=104,endColumn=33::src/lmstrix/core/inference_manager.py:104:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=121,col=21,endLine=121,endColumn=36::src/lmstrix/core/inference_manager.py:121:21: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=131,col=17,endLine=131,endColumn=32::src/lmstrix/core/inference_manager.py:131:17: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=174,col=24,endLine=174,endColumn=33::src/lmstrix/core/inference_manager.py:174:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=196,col=13,endLine=204,endColumn=14::src/lmstrix/core/inference_manager.py:196:13: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=206,col=16,endLine=206,endColumn=25::src/lmstrix/core/inference_manager.py:206:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=251,col=24,endLine=251,endColumn=33::src/lmstrix/core/inference_manager.py:251:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=310,col=13,endLine=310,endColumn=46::src/lmstrix/core/inference_manager.py:310:13: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=312,col=16,endLine=312,endColumn=25::src/lmstrix/core/inference_manager.py:312:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=319,col=24,endLine=319,endColumn=33::src/lmstrix/core/inference_manager.py:319:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=322,col=9,endLine=322,endColumn=21::src/lmstrix/core/inference_manager.py:322:9: PLR0912 Too many branches (17 > 12)
+::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=322,col=9,endLine=322,endColumn=21::src/lmstrix/core/inference_manager.py:322:9: PLR0915 Too many statements (59 > 50)
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=373,col=21,endLine=373,endColumn=36::src/lmstrix/core/inference_manager.py:373:21: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=377,col=24,endLine=377,endColumn=33::src/lmstrix/core/inference_manager.py:377:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=394,col=21,endLine=394,endColumn=36::src/lmstrix/core/inference_manager.py:394:21: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=404,col=17,endLine=404,endColumn=32::src/lmstrix/core/inference_manager.py:404:17: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=447,col=24,endLine=447,endColumn=33::src/lmstrix/core/inference_manager.py:447:24: BLE001 Do not catch blind exception: `Exception`
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
 
 </document_content>
 </document>
 
 <document index="16">
-<source>cleanup.txt</source>
-<document_content>
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
-  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
-  warnings.warn(
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
-  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
-  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
-  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
-  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
-  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
-  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
-  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
-  warnings.warn(
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
-  warnings.warn(
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
-  warnings.warn(
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
-  warnings.warn(
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
-  warnings.warn(
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fs/__init__.py:4: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
-  __import__("pkg_resources").declare_namespace(__name__)  # type: ignore
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
-  warnings.warn(
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
-  warnings.warn(
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_golden/plugin.py:53: GoldenTestUsageWarning: Add 'enable_assertion_pass_hook=true' to pytest.ini for safer usage of pytest-golden.
-  warnings.warn(
-============================= test session starts ==============================
-platform darwin -- Python 3.12.9, pytest-8.4.1, pluggy-1.6.0 -- /usr/local/bin/python
-cachedir: .pytest_cache
-hypothesis profile 'default' -> database=DirectoryBasedExampleDatabase(PosixPath('/Users/Shared/lmstudio/lmstrix/.hypothesis/examples'))
-benchmark: 5.1.0 (defaults: timer=time.perf_counter disable_gc=False min_rounds=5 min_time=0.000005 max_time=1.0 calibration_precision=10 warmup=False warmup_iterations=100000)
-Fugue tests will be initialized with options:
-rootdir: /Users/Shared/lmstudio/lmstrix
-configfile: pyproject.toml
-testpaths: tests
-plugins: recording-0.13.2, cov-6.0.0, subtests-0.14.1, darkgraylib-1.0.0, instafail-0.5.0, anyio-4.9.0, enabler-3.3.0, ignore-flaky-2.2.1, integration-0.2.3, sugar-1.0.0, langchain-0.1.0, env-1.1.5, flaky-3.8.1, time-machine-2.16.0, memray-1.7.0, shutil-1.8.1, checkdocs-2.13.0, hypothesis-6.124.7, black-0.6.0, golden-0.2.2, ruff-0.4.1, benchmark-5.1.0, pmxbot-1122.17.0, virtualenv-1.8.1, jaxtyping-0.0.1, perf-0.15.0, rerunfailures-15.0, typeguard-4.4.4, fugue-0.9.2.dev1, timeout-2.3.1, mock-3.14.0, hydra-core-1.3.2, asyncio-1.0.0, xdist-3.6.1, depends-1.0.1, jaraco.mongodb-0.0.0, requests-mock-1.12.1
-asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
-created: 8/8 workers
-8 workers [164 items]
-
-scheduling tests via LoadScheduling
-
-tests/__init__.py::ruff 
-tests/test_core/__init__.py::black 
-tests/test_api/__init__.py::ruff::format 
-tests/test_api/test_client.py::TestLMStudioClient::test_load_model_success 
-[gw4] [  0%] PASSED tests/test_api/test_client.py::TestLMStudioClient::test_load_model_success 
-tests/test_api/test_client.py::TestLMStudioClient::test_load_model_failure 
-[gw4] [  1%] FAILED tests/test_api/test_client.py::TestLMStudioClient::test_load_model_failure 
-tests/test_api/test_client.py::TestLMStudioClient::test_completion_success 
-[gw4] [  1%] FAILED tests/test_api/test_client.py::TestLMStudioClient::test_completion_success 
-tests/test_api/test_client.py::TestLMStudioClient::test_completion_failure 
-[gw4] [  2%] FAILED tests/test_api/test_client.py::TestLMStudioClient::test_completion_failure 
-tests/test_api/test_client.py::TestCompletionResponse::test_completion_response_creation 
-[gw3] [  3%] PASSED tests/test_api/test_client.py::TestCompletionResponse::test_completion_response_creation 
-tests/test_api/test_client.py::TestCompletionResponse::test_completion_response_minimal 
-[gw3] [  3%] PASSED tests/test_api/test_client.py::TestCompletionResponse::test_completion_response_minimal 
-tests/test_api/test_client.py::TestLMStudioClient::test_client_initialization 
-[gw3] [  4%] PASSED tests/test_api/test_client.py::TestLMStudioClient::test_client_initialization 
-tests/test_api/test_client.py::TestLMStudioClient::test_list_models_success 
-[gw3] [  4%] FAILED tests/test_api/test_client.py::TestLMStudioClient::test_list_models_success 
-tests/conftest.py::black 
-tests/test_api/test_exceptions.py::ruff 
-tests/test_api/test_client.py::TestLMStudioClient::test_list_models_failure 
-[gw2] [  5%] PASSED tests/test_api/__init__.py::ruff::format 
-[gw5] [  6%] PASSED tests/test_api/test_exceptions.py::ruff 
-tests/test_api/test_client.py::TestLMStudioClient::test_completion_with_defaults 
-tests/test_api/test_exceptions.py::TestAPIExceptions::test_model_load_error 
-[gw4] [  6%] FAILED tests/test_api/test_client.py::TestLMStudioClient::test_completion_with_defaults 
-tests/test_core/test_context_tester.py::TestContextTestResult::test_result_to_dict 
-[gw4] [  7%] PASSED tests/test_core/test_context_tester.py::TestContextTestResult::test_result_to_dict 
-tests/test_core/test_context_tester.py::TestContextTester::test_initialization 
-[gw4] [  7%] PASSED tests/test_core/test_context_tester.py::TestContextTester::test_initialization 
-tests/test_core/test_context_tester.py::TestContextTester::test_initialization_with_client 
-[gw4] [  8%] PASSED tests/test_core/test_context_tester.py::TestContextTester::test_initialization_with_client 
-tests/test_core/test_context_tester.py::TestContextTester::test_test_model_not_found 
-[gw4] [  9%] FAILED tests/test_core/test_context_tester.py::TestContextTester::test_test_model_not_found 
-tests/test_api/__init__.py::black 
-[gw6] [  9%] PASSED tests/test_api/test_exceptions.py::TestAPIExceptions::test_model_load_error 
-[gw3] [ 10%] PASSED tests/test_api/test_client.py::TestLMStudioClient::test_list_models_failure 
-[gw0] [ 10%] PASSED tests/__init__.py::ruff 
-tests/test_api/test_exceptions.py::TestAPIExceptions::test_inference_error 
-tests/test_api/test_exceptions.py::ruff::format 
-tests/test_core/test_inference.py::ruff 
-tests/__init__.py::ruff::format 
-tests/test_core/test_context_tester.py::TestContextTester::test_test_all_models 
-[gw5] [ 11%] PASSED tests/test_api/test_exceptions.py::ruff::format 
-[gw6] [ 12%] PASSED tests/test_api/test_exceptions.py::TestAPIExceptions::test_inference_error 
-tests/test_api/test_exceptions.py::TestAPIExceptions::test_exception_inheritance 
-[gw6] [ 12%] PASSED tests/test_api/test_exceptions.py::TestAPIExceptions::test_exception_inheritance 
-tests/test_core/__init__.py::ruff 
-[gw6] [ 13%] PASSED tests/test_core/__init__.py::ruff 
-[gw3] [ 14%] PASSED tests/test_core/test_inference.py::ruff 
-tests/test_core/test_inference.py::ruff::format 
-[gw0] [ 14%] PASSED tests/__init__.py::ruff::format 
-tests/test_api/test_exceptions.py::black 
-tests/__init__.py::black 
-[gw4] [ 15%] FAILED tests/test_core/test_context_tester.py::TestContextTester::test_test_all_models 
-tests/test_core/test_inference.py::TestInferenceDict::test_inference_dict_empty_response 
-[gw4] [ 15%] PASSED tests/test_core/test_inference.py::TestInferenceDict::test_inference_dict_empty_response 
-tests/test_core/test_inference.py::TestInferenceManager::test_manager_initialization 
-[gw4] [ 16%] PASSED tests/test_core/test_inference.py::TestInferenceManager::test_manager_initialization 
-tests/test_core/test_inference.py::TestInferenceManager::test_manager_with_custom_client 
-[gw4] [ 17%] PASSED tests/test_core/test_inference.py::TestInferenceManager::test_manager_with_custom_client 
-tests/test_core/test_inference.py::TestInferenceManager::test_infer_model_not_found 
-[gw4] [ 17%] PASSED tests/test_core/test_inference.py::TestInferenceManager::test_infer_model_not_found 
-tests/test_core/__init__.py::ruff::format 
-[gw3] [ 18%] PASSED tests/test_core/test_inference.py::ruff::format 
-tests/test_core/test_inference.py::black 
-tests/test_core/test_inference.py::TestInferenceManager::test_infer_basic_success 
-[gw4] [ 18%] PASSED tests/test_core/test_inference.py::TestInferenceManager::test_infer_basic_success 
-tests/test_core/test_models.py::TestModel::test_model_creation_minimal 
-[gw4] [ 19%] PASSED tests/test_core/test_models.py::TestModel::test_model_creation_minimal 
-tests/test_core/test_models.py::TestModel::test_model_creation_with_aliases 
-[gw4] [ 20%] PASSED tests/test_core/test_models.py::TestModel::test_model_creation_with_aliases 
-tests/test_core/test_models.py::TestModel::test_model_with_context_testing 
-[gw4] [ 20%] PASSED tests/test_core/test_models.py::TestModel::test_model_with_context_testing 
-[gw6] [ 21%] PASSED tests/test_core/__init__.py::ruff::format 
-tests/test_core/test_models.py::ruff 
-tests/test_core/test_models.py::TestModel::test_model_path_validation 
-[gw4] [ 21%] FAILED tests/test_core/test_models.py::TestModel::test_model_path_validation 
-tests/test_core/test_models.py::TestModel::test_model_sanitized_id 
-[gw4] [ 22%] PASSED tests/test_core/test_models.py::TestModel::test_model_sanitized_id 
-tests/test_core/test_models.py::TestModel::test_model_to_registry_dict 
-[gw4] [ 23%] PASSED tests/test_core/test_models.py::TestModel::test_model_to_registry_dict 
-tests/test_core/test_models.py::TestModel::test_model_validation_error 
-[gw4] [ 23%] FAILED tests/test_core/test_models.py::TestModel::test_model_validation_error 
-tests/test_core/test_models.py::TestModelRegistry::test_registry_initialization 
-[gw4] [ 24%] PASSED tests/test_core/test_models.py::TestModelRegistry::test_registry_initialization 
-tests/test_core/test_models.py::TestModelRegistry::test_registry_save_and_load 
-[gw4] [ 25%] PASSED tests/test_core/test_models.py::TestModelRegistry::test_registry_save_and_load 
-tests/test_core/test_models.py::TestModelRegistry::test_registry_get_model 
-[gw4] [ 25%] PASSED tests/test_core/test_models.py::TestModelRegistry::test_registry_get_model 
-tests/test_core/test_models.py::TestModelRegistry::test_registry_list_models 
-[gw4] [ 26%] PASSED tests/test_core/test_models.py::TestModelRegistry::test_registry_list_models 
-tests/test_core/test_models.py::TestModelRegistry::test_registry_remove_model 
-[gw4] [ 26%] PASSED tests/test_core/test_models.py::TestModelRegistry::test_registry_remove_model 
-tests/test_core/test_models.py::TestModelRegistry::test_registry_with_context_test_data 
-[gw4] [ 27%] PASSED tests/test_core/test_models.py::TestModelRegistry::test_registry_with_context_test_data 
-tests/test_core/test_models.py::TestModelRegistry::test_registry_json_format 
-[gw4] [ 28%] PASSED tests/test_core/test_models.py::TestModelRegistry::test_registry_json_format 
-tests/test_core/test_prompts.py::ruff 
-[gw6] [ 28%] PASSED tests/test_core/test_models.py::ruff 
-tests/test_core/test_models.py::ruff::format 
-[gw4] [ 29%] PASSED tests/test_core/test_prompts.py::ruff 
-[gw6] [ 29%] PASSED tests/test_core/test_models.py::ruff::format 
-tests/test_core/test_models.py::black 
-tests/test_core/test_prompts.py::ruff::format 
-[gw4] [ 30%] PASSED tests/test_core/test_prompts.py::ruff::format 
-tests/test_core/test_prompts.py::black 
-[gw7] [ 31%] PASSED tests/test_core/__init__.py::black 
-tests/test_core/test_context_tester.py::ruff 
-[gw1] [ 31%] PASSED tests/conftest.py::black 
-tests/run_tests.py::ruff 
-[gw5] [ 32%] PASSED tests/test_api/test_exceptions.py::black 
-tests/test_api/test_exceptions.py::TestAPIExceptions::test_api_error_base 
-[gw5] [ 32%] PASSED tests/test_api/test_exceptions.py::TestAPIExceptions::test_api_error_base 
-[gw0] [ 33%] PASSED tests/__init__.py::black 
-tests/test_api/test_exceptions.py::TestAPIExceptions::test_api_connection_error 
-[gw7] [ 34%] PASSED tests/test_core/test_context_tester.py::ruff 
-[gw2] [ 34%] PASSED tests/test_api/__init__.py::black 
-tests/conftest.py::ruff 
-tests/test_api/test_client.py::ruff 
-[gw5] [ 35%] PASSED tests/test_api/test_exceptions.py::TestAPIExceptions::test_api_connection_error 
-tests/test_core/test_prompts.py::TestPromptResolver::test_find_placeholders 
-tests/test_core/test_context_tester.py::ruff::format 
-[gw1] [ 35%] PASSED tests/run_tests.py::ruff 
-[gw3] [ 36%] PASSED tests/test_core/test_inference.py::black 
-[gw0] [ 37%] PASSED tests/conftest.py::ruff 
-tests/run_tests.py::ruff::format 
-[gw2] [ 37%] PASSED tests/test_api/test_client.py::ruff 
-[gw5] [ 38%] PASSED tests/test_core/test_prompts.py::TestPromptResolver::test_find_placeholders 
-tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_simple 
-tests/test_core/test_inference.py::TestInferenceDict::test_inference_dict_success 
-[gw3] [ 39%] PASSED tests/test_core/test_inference.py::TestInferenceDict::test_inference_dict_success 
-tests/test_api/test_client.py::ruff::format 
-[gw7] [ 39%] PASSED tests/test_core/test_context_tester.py::ruff::format 
-tests/test_core/test_context_tester.py::black 
-tests/test_core/test_inference.py::TestInferenceDict::test_inference_dict_failure 
-[gw3] [ 40%] PASSED tests/test_core/test_inference.py::TestInferenceDict::test_inference_dict_failure 
-tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_two_phase 
-[gw5] [ 40%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_simple 
-tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_missing_placeholder 
-[gw5] [ 41%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_missing_placeholder 
-tests/conftest.py::ruff::format 
-tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_extra_context 
-[gw5] [ 42%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_extra_context 
-tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_with_special_characters 
-[gw5] [ 42%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_with_special_characters 
-tests/test_core/test_scanner.py::ruff 
-[gw2] [ 43%] PASSED tests/test_api/test_client.py::ruff::format 
-[gw1] [ 43%] PASSED tests/run_tests.py::ruff::format 
-tests/run_tests.py::black 
-tests/test_api/test_client.py::black 
-[gw0] [ 44%] PASSED tests/conftest.py::ruff::format 
-tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_numeric_values 
-[gw3] [ 45%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_two_phase 
-tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_recursive 
-[gw5] [ 45%] PASSED tests/test_core/test_scanner.py::ruff 
-[gw3] [ 46%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_recursive 
-tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_circular_reference 
-[gw3] [ 46%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_circular_reference 
-tests/test_core/test_scanner.py::ruff::format 
-tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_no_placeholders 
-[gw3] [ 47%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_no_placeholders 
-tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_mlx_directory 
-[gw5] [ 48%] PASSED tests/test_core/test_scanner.py::ruff::format 
-tests/test_core/test_scanner.py::TestModelScanner::test_get_model_size_directory 
-[gw5] [ 48%] PASSED tests/test_core/test_scanner.py::TestModelScanner::test_get_model_size_directory 
-tests/test_core/test_scanner.py::TestModelScanner::test_get_model_size_nonexistent 
-[gw3] [ 49%] FAILED tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_mlx_directory 
-tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_hidden_file 
-[gw3] [ 50%] PASSED tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_hidden_file 
-[gw5] [ 50%] PASSED tests/test_core/test_scanner.py::TestModelScanner::test_get_model_size_nonexistent 
-tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_gguf_file 
-[gw0] [ 51%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_numeric_values 
-[gw5] [ 51%] FAILED tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_gguf_file 
-tests/test_integration/__init__.py::ruff 
-tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_empty_value 
-[gw0] [ 52%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_empty_value 
-tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_non_model_file 
-[gw3] [ 53%] PASSED tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_non_model_file 
-tests/test_core/test_scanner.py::TestModelScanner::test_scan_models 
-[gw3] [ 53%] FAILED tests/test_core/test_scanner.py::TestModelScanner::test_scan_models 
-tests/test_core/test_prompts.py::TestPromptResolver::test_count_tokens 
-[gw0] [ 54%] FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_count_tokens 
-tests/test_integration/__init__.py::black 
-tests/test_core/test_scanner.py::TestModelScanner::test_sync_with_registry 
-[gw3] [ 54%] FAILED tests/test_core/test_scanner.py::TestModelScanner::test_sync_with_registry 
-tests/test_integration/test_cli_integration.py::ruff::format 
-[gw5] [ 55%] PASSED tests/test_integration/__init__.py::ruff 
-[gw3] [ 56%] PASSED tests/test_integration/test_cli_integration.py::ruff::format 
-tests/test_integration/__init__.py::ruff::format 
-tests/test_integration/test_cli_integration.py::black 
-[gw5] [ 56%] PASSED tests/test_integration/__init__.py::ruff::format 
-tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_cli_initialization 
-[gw5] [ 57%] PASSED tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_cli_initialization 
-tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_list_command 
-[gw5] [ 57%] FAILED tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_list_command 
-tests/test_loaders/__init__.py::ruff 
-[gw5] [ 58%] PASSED tests/test_loaders/__init__.py::ruff 
-tests/test_loaders/__init__.py::ruff::format 
-[gw5] [ 59%] PASSED tests/test_loaders/__init__.py::ruff::format 
-tests/test_loaders/__init__.py::black 
-[gw4] [ 59%] PASSED tests/test_core/test_prompts.py::black 
-tests/test_core/test_prompts.py::TestResolvedPrompt::test_resolved_prompt_creation 
-[gw4] [ 60%] PASSED tests/test_core/test_prompts.py::TestResolvedPrompt::test_resolved_prompt_creation 
-tests/test_core/test_prompts.py::TestResolvedPrompt::test_resolved_prompt_minimal 
-[gw4] [ 60%] PASSED tests/test_core/test_prompts.py::TestResolvedPrompt::test_resolved_prompt_minimal 
-tests/test_core/test_prompts.py::TestPromptResolver::test_resolver_initialization 
-[gw6] [ 61%] PASSED tests/test_core/test_models.py::black 
-tests/test_core/test_models.py::TestContextTestStatus::test_enum_values 
-[gw6] [ 62%] PASSED tests/test_core/test_models.py::TestContextTestStatus::test_enum_values 
-tests/test_loaders/test_context_loader.py::black 
-[gw4] [ 62%] PASSED tests/test_core/test_prompts.py::TestPromptResolver::test_resolver_initialization 
-tests/test_loaders/test_context_loader.py::ruff::format 
-[gw4] [ 63%] PASSED tests/test_loaders/test_context_loader.py::ruff::format 
-tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_with_encoding 
-[gw4] [ 64%] PASSED tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_with_encoding 
-tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_nonexistent_file 
-[gw4] [ 64%] PASSED tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_nonexistent_file 
-tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_read_error 
-[gw4] [ 65%] PASSED tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_read_error 
-tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_string_path 
-[gw4] [ 65%] PASSED tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_string_path 
-tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_large_file 
-[gw4] [ 66%] PASSED tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_large_file 
-tests/test_loaders/test_model_loader.py::ruff 
-[gw4] [ 67%] PASSED tests/test_loaders/test_model_loader.py::ruff 
-tests/test_loaders/test_model_loader.py::ruff::format 
-[gw4] [ 67%] PASSED tests/test_loaders/test_model_loader.py::ruff::format 
-tests/test_loaders/test_model_loader.py::black 
-[gw0] [ 68%] PASSED tests/test_integration/__init__.py::black 
-tests/test_integration/test_cli_integration.py::ruff 
-[gw5] [ 68%] PASSED tests/test_loaders/__init__.py::black 
-[gw2] [ 69%] PASSED tests/test_api/test_client.py::black 
-tests/test_core/test_scanner.py::black 
-tests/test_loaders/test_context_loader.py::ruff 
-[gw5] [ 70%] PASSED tests/test_loaders/test_context_loader.py::ruff 
-tests/test_loaders/test_model_loader.py::TestModelLoader::test_load_model_registry_nonexistent_file 
-[gw5] [ 70%] PASSED tests/test_loaders/test_model_loader.py::TestModelLoader::test_load_model_registry_nonexistent_file 
-tests/test_loaders/test_model_loader.py::TestModelLoader::test_save_model_registry_default_path 
-[gw5] [ 71%] PASSED tests/test_loaders/test_model_loader.py::TestModelLoader::test_save_model_registry_default_path 
-tests/test_loaders/test_model_loader.py::TestModelLoader::test_save_model_registry_custom_path 
-[gw5] [ 71%] FAILED tests/test_loaders/test_model_loader.py::TestModelLoader::test_save_model_registry_custom_path 
-tests/test_loaders/test_model_loader.py::TestModelLoader::test_scan_and_update_models 
-[gw3] [ 72%] PASSED tests/test_integration/test_cli_integration.py::black 
-tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_list_json_format 
-[gw3] [ 73%] FAILED tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_list_json_format 
-[gw5] [ 73%] FAILED tests/test_loaders/test_model_loader.py::TestModelLoader::test_scan_and_update_models 
-tests/test_loaders/test_model_loader.py::TestModelLoader::test_scan_and_update_models_default_client 
-[gw5] [ 74%] PASSED tests/test_loaders/test_model_loader.py::TestModelLoader::test_scan_and_update_models_default_client 
-tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_infer_requires_parameters 
-tests/test_loaders/test_prompt_loader.py::ruff 
-[gw3] [ 75%] PASSED tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_infer_requires_parameters 
-[gw0] [ 75%] FAILED tests/test_integration/test_cli_integration.py::ruff 
-tests/test_loaders/test_prompt_loader.py::ruff::format 
-tests/test_loaders/test_model_loader.py::TestModelLoader::test_load_model_registry_custom_path 
-[gw0] [ 76%] PASSED tests/test_loaders/test_model_loader.py::TestModelLoader::test_load_model_registry_custom_path 
-tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_nonexistent_file 
-[gw0] [ 76%] PASSED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_nonexistent_file 
-tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_invalid_toml 
-[gw0] [ 77%] FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_invalid_toml 
-tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_nested_placeholders 
-[gw1] [ 78%] PASSED tests/run_tests.py::black 
-[gw0] [ 78%] FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_nested_placeholders 
-[gw5] [ 79%] PASSED tests/test_loaders/test_prompt_loader.py::ruff 
-[gw3] [ 79%] PASSED tests/test_loaders/test_prompt_loader.py::ruff::format 
-tests/test_api/__init__.py::ruff 
-tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_simple 
-tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_missing_params 
-[gw3] [ 80%] FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_simple 
-[gw0] [ 81%] FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_missing_params 
-tests/test_loaders/test_prompt_loader.py::black 
-[gw7] [ 81%] PASSED tests/test_core/test_context_tester.py::black 
-tests/test_utils/__init__.py::ruff 
-tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_custom_resolver 
-[gw0] [ 82%] FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_custom_resolver 
-tests/test_core/test_context_tester.py::TestContextTestResult::test_result_creation 
-[gw1] [ 82%] PASSED tests/test_api/__init__.py::ruff 
-tests/test_utils/test_paths.py::ruff 
-[gw7] [ 83%] PASSED tests/test_core/test_context_tester.py::TestContextTestResult::test_result_creation 
-tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_empty_file 
-tests/test_utils/test_paths.py::ruff::format 
-[gw3] [ 84%] PASSED tests/test_utils/__init__.py::ruff 
-tests/test_utils/__init__.py::black 
-[gw0] [ 84%] PASSED tests/test_utils/test_paths.py::ruff 
-[gw7] [ 85%] PASSED tests/test_utils/test_paths.py::ruff::format 
-tests/test_utils/test_paths.py::black 
-tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_fallback_locations 
-[gw7] [ 85%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_fallback_locations 
-tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstrix_data_dir 
-[gw7] [ 86%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstrix_data_dir 
-tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstrix_data_dir_exists 
-[gw7] [ 87%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstrix_data_dir_exists 
-tests/test_utils/test_paths.py::TestPathUtilities::test_get_default_models_file 
-[gw7] [ 87%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_default_models_file 
-tests/test_utils/test_paths.py::TestPathUtilities::test_get_context_tests_dir 
-[gw7] [ 88%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_context_tests_dir 
-[gw1] [ 89%] PASSED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_empty_file 
-tests/test_utils/test_paths.py::TestPathUtilities::test_get_context_test_log_path 
-[gw7] [ 89%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_context_test_log_path 
-tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_from_pointer 
-[gw1] [ 90%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_from_pointer 
-tests/test_utils/test_paths.py::TestPathUtilities::test_get_prompts_dir 
-tests/test_utils/test_paths.py::TestPathUtilities::test_get_contexts_dir 
-[gw1] [ 90%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_contexts_dir 
-[gw7] [ 91%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_get_prompts_dir 
-tests/test_utils/test_paths.py::TestPathUtilities::test_directory_creation_permissions_error 
-[gw7] [ 92%] PASSED tests/test_utils/test_paths.py::TestPathUtilities::test_directory_creation_permissions_error 
-[gw6] [ 92%] PASSED tests/test_loaders/test_context_loader.py::black 
-tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_simple 
-[gw6] [ 93%] PASSED tests/test_loaders/test_context_loader.py::TestContextLoader::test_load_context_simple 
-[gw4] [ 93%] PASSED tests/test_loaders/test_model_loader.py::black 
-tests/test_loaders/test_model_loader.py::TestModelLoader::test_load_model_registry_default_path 
-[gw4] [ 94%] PASSED tests/test_loaders/test_model_loader.py::TestModelLoader::test_load_model_registry_default_path 
-[gw2] [ 95%] PASSED tests/test_core/test_scanner.py::black 
-tests/test_core/test_scanner.py::TestModelScanner::test_scanner_initialization 
-[gw2] [ 95%] PASSED tests/test_core/test_scanner.py::TestModelScanner::test_scanner_initialization 
-tests/test_core/test_scanner.py::TestModelScanner::test_get_model_size_file 
-[gw2] [ 96%] PASSED tests/test_core/test_scanner.py::TestModelScanner::test_get_model_size_file 
-[gw5] [ 96%] PASSED tests/test_loaders/test_prompt_loader.py::black 
-tests/test_utils/__init__.py::ruff::format 
-[gw0] [ 97%] PASSED tests/test_utils/test_paths.py::black 
-tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_not_found 
-[gw0] [ 98%] FAILED tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_not_found 
-[gw5] [ 98%] PASSED tests/test_utils/__init__.py::ruff::format 
-[gw3] [ 99%] PASSED tests/test_utils/__init__.py::black 
-tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_shared_location 
-[gw3] [100%] FAILED tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_shared_location 
-
-=================================== FAILURES ===================================
-__________________ TestLMStudioClient.test_load_model_failure __________________
-[gw4] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_api/test_client.py:146: in test_load_model_failure
-    client.load_model("test-model", 4096)
-src/lmstrix/api/client.py:72: in load_model
-    return lmstudio.llm(model_path, config=config)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1139: in __call__
-    return self._mock_call(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1143: in _mock_call
-    return self._execute_mock_call(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1198: in _execute_mock_call
-    raise effect
-E   Exception: Model not found
-__________________ TestLMStudioClient.test_completion_success __________________
-[gw4] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_api/test_client.py:161: in test_completion_success
-    result = client.completion(
-src/lmstrix/api/client.py:221: in completion
-    logger.info(f"📏 CONTEXT: {llm.config.contextLength:,} tokens")
-                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E   TypeError: unsupported format string passed to Mock.__format__
-__________________ TestLMStudioClient.test_completion_failure __________________
-[gw4] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_api/test_client.py:187: in test_completion_failure
-    client.completion(mock_llm, "test prompt")
-src/lmstrix/api/client.py:221: in completion
-    logger.info(f"📏 CONTEXT: {llm.config.contextLength:,} tokens")
-                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E   TypeError: unsupported format string passed to Mock.__format__
-_________________ TestLMStudioClient.test_list_models_success __________________
-[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_api/test_client.py:109: in test_list_models_success
-    assert result == expected_result
-E   AssertionError: assert [{'architectu...': True, ...}] == [{'architectu...': True, ...}]
-E     
-E     At index 1 diff: {'id': 'model2', 'path': '/path/to/model2', 'size_bytes': 2000, 'context_length': 8192, 'display_name': 'Model Two', 'architecture': 'mistral', 'has_tools': True, 'has_vision': False, 'model_type': 'llm'} != {'id': 'model2', 'path': '/path/to/model2', 'size_bytes': 2000, 'context_length': 8192, 'display_name': 'Model Two', 'architecture': 'mistral', 'has_tools': True, 'has_vision': True, 'model_type': 'llm'}
-E     
-E     Full diff:
-E       [
-E           {
-E               'architecture': 'llama',...
-E     
-E     ...Full output truncated (24 lines hidden), use '-vv' to show
-_______________ TestLMStudioClient.test_completion_with_defaults _______________
-[gw4] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_api/test_client.py:201: in test_completion_with_defaults
-    client.completion(
-src/lmstrix/api/client.py:221: in completion
-    logger.info(f"📏 CONTEXT: {llm.config.contextLength:,} tokens")
-                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E   TypeError: unsupported format string passed to Mock.__format__
-_________________ TestContextTester.test_test_model_not_found __________________
-[gw4] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_context_tester.py:76: in test_test_model_not_found
-    with patch.object(tester, "_test_at_context") as mock_test:
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1467: in __enter__
-    original, local = self.get_original()
-                      ^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1437: in get_original
-    raise AttributeError(
-E   AttributeError: <lmstrix.core.context_tester.ContextTester object at 0x144403320> does not have the attribute '_test_at_context'
-____________________ TestContextTester.test_test_all_models ____________________
-[gw4] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_context_tester.py:107: in test_test_all_models
-    with patch.object(tester, "test_model") as mock_test:
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1467: in __enter__
-    original, local = self.get_original()
-                      ^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1437: in get_original
-    raise AttributeError(
-E   AttributeError: <lmstrix.core.context_tester.ContextTester object at 0x143bd68a0> does not have the attribute 'test_model'
-_____________________ TestModel.test_model_path_validation _____________________
-[gw4] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_models.py:94: in test_model_path_validation
-    assert isinstance(model.path, Path)
-E   AssertionError: assert False
-E    +  where False = isinstance('/string/path/model.gguf', Path)
-E    +    where '/string/path/model.gguf' = <lmstrix.core.models.Model object at 0x1444357c0>.path
-____________________ TestModel.test_model_validation_error _____________________
-[gw4] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_models.py:152: in test_model_validation_error
-    Model(id="test")  # Missing required fields
-    ^^^^^^^^^^^^^^^^
-E   TypeError: Model.__init__() missing 3 required positional arguments: 'path', 'size_bytes', and 'ctx_in'
-_________________ TestPromptResolver.test_resolve_phase_simple _________________
-[gw5] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_prompts.py:84: in test_resolve_phase_simple
-    resolved, found, resolved_list, unresolved = resolver._resolve_phase(template, context)
-                                                 ^^^^^^^^^^^^^^^^^^^^^^^
-E   AttributeError: 'PromptResolver' object has no attribute '_resolve_phase'
-__________ TestPromptResolver.test_resolve_phase_missing_placeholder ___________
-[gw5] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_prompts.py:98: in test_resolve_phase_missing_placeholder
-    resolved, found, resolved_list, unresolved = resolver._resolve_phase(template, context)
-                                                 ^^^^^^^^^^^^^^^^^^^^^^^
-E   AttributeError: 'PromptResolver' object has no attribute '_resolve_phase'
-_____________ TestPromptResolver.test_resolve_phase_extra_context ______________
-[gw5] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_prompts.py:112: in test_resolve_phase_extra_context
-    resolved, found, resolved_list, unresolved = resolver._resolve_phase(template, context)
-                                                 ^^^^^^^^^^^^^^^^^^^^^^^
-E   AttributeError: 'PromptResolver' object has no attribute '_resolve_phase'
-___________ TestPromptResolver.test_resolve_with_special_characters ____________
-[gw5] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_prompts.py:232: in test_resolve_with_special_characters
-    result = resolver.resolve_template("special", template, context, {})
-             ^^^^^^^^^^^^^^^^^^^^^^^^^
-E   AttributeError: 'PromptResolver' object has no attribute 'resolve_template'
-______________ TestPromptResolver.test_resolve_template_two_phase ______________
-[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_prompts.py:127: in test_resolve_template_two_phase
-    result = resolver.resolve_template("test", template, prompt_context, runtime_context)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^
-E   AttributeError: 'PromptResolver' object has no attribute 'resolve_template'
-______________ TestPromptResolver.test_resolve_template_recursive ______________
-[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_prompts.py:147: in test_resolve_template_recursive
-    result = resolver.resolve_template("recursive", template, prompt_context, {})
-             ^^^^^^^^^^^^^^^^^^^^^^^^^
-E   AttributeError: 'PromptResolver' object has no attribute 'resolve_template'
-_________ TestPromptResolver.test_resolve_template_circular_reference __________
-[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_prompts.py:164: in test_resolve_template_circular_reference
-    result = resolver.resolve_template("circular", template, prompt_context, {})
-             ^^^^^^^^^^^^^^^^^^^^^^^^^
-E   AttributeError: 'PromptResolver' object has no attribute 'resolve_template'
-___________ TestPromptResolver.test_resolve_template_no_placeholders ___________
-[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_prompts.py:176: in test_resolve_template_no_placeholders
-    result = resolver.resolve_template("static", template, {}, {})
-             ^^^^^^^^^^^^^^^^^^^^^^^^^
-E   AttributeError: 'PromptResolver' object has no attribute 'resolve_template'
-____________ TestModelScanner.test_extract_model_info_mlx_directory ____________
-[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_scanner.py:87: in test_extract_model_info_mlx_directory
-    info = scanner._extract_model_info(model_dir)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-src/lmstrix/core/scanner.py:62: in _extract_model_info
-    relative_path = model_path.relative_to(self.models_dir)
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py:682: in relative_to
-    raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
-E   ValueError: '/private/var/folders/wd/jx_fxd9d7wg_py26vfx_tz080000gn/T/pytest-of-adam/pytest-3/popen-gw3/test_extract_model_info_mlx_di0/llama-7b-mlx' is not in the subpath of '/Users/Shared/lmstudio/models'
-___________ TestPromptResolver.test_resolve_template_numeric_values ____________
-[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_prompts.py:190: in test_resolve_template_numeric_values
-    result = resolver.resolve_template("numeric", template, context, {})
-             ^^^^^^^^^^^^^^^^^^^^^^^^^
-E   AttributeError: 'PromptResolver' object has no attribute 'resolve_template'
-______________ TestModelScanner.test_extract_model_info_gguf_file ______________
-[gw5] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_scanner.py:69: in test_extract_model_info_gguf_file
-    info = scanner._extract_model_info(model_file)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-src/lmstrix/core/scanner.py:62: in _extract_model_info
-    relative_path = model_path.relative_to(self.models_dir)
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py:682: in relative_to
-    raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
-E   ValueError: '/private/var/folders/wd/jx_fxd9d7wg_py26vfx_tz080000gn/T/pytest-of-adam/pytest-3/popen-gw5/test_extract_model_info_gguf_f0/llama-7b.gguf' is not in the subpath of '/Users/Shared/lmstudio/models'
-_____________ TestPromptResolver.test_resolve_template_empty_value _____________
-[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_prompts.py:202: in test_resolve_template_empty_value
-    result = resolver.resolve_template("empty", template, context, {})
-             ^^^^^^^^^^^^^^^^^^^^^^^^^
-E   AttributeError: 'PromptResolver' object has no attribute 'resolve_template'
-______________________ TestModelScanner.test_scan_models _______________________
-[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_scanner.py:143: in test_scan_models
-    model_ids = [m["id"] for m in models]
-                 ^^^^^^^
-E   TypeError: string indices must be integers, not 'str'
-_____________________ TestPromptResolver.test_count_tokens _____________________
-[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_prompts.py:212: in test_count_tokens
-    count = resolver._count_tokens("Hello World!")
-            ^^^^^^^^^^^^^^^^^^^^^^
-E   AttributeError: 'PromptResolver' object has no attribute '_count_tokens'
-___________________ TestModelScanner.test_sync_with_registry ___________________
-[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_core/test_scanner.py:176: in test_sync_with_registry
-    new_models, removed_models = scanner.sync_with_registry(mock_registry)
-                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-E   AttributeError: 'ModelScanner' object has no attribute 'sync_with_registry'
-_____________________ TestCLIIntegration.test_list_command _____________________
-[gw5] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_integration/test_cli_integration.py:55: in test_list_command
-    assert "test-model" in captured.out
-E   AssertionError: assert 'test-model' in ''
-E    +  where '' = CaptureResult(out='', err='').out
-_____________ TestModelLoader.test_save_model_registry_custom_path _____________
-[gw5] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_loaders/test_model_loader.py:122: in test_save_model_registry_custom_path
-    assert custom_file.exists()
-E   AssertionError: assert False
-E    +  where False = exists()
-E    +    where exists = PosixPath('/private/var/folders/wd/jx_fxd9d7wg_py26vfx_tz080000gn/T/pytest-of-adam/pytest-3/popen-gw5/test_save_model_registry_custo0/custom.json').exists
-___________________ TestCLIIntegration.test_list_json_format ___________________
-[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_integration/test_cli_integration.py:68: in test_list_json_format
-    data = json.loads(captured.out)
-           ^^^^^^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/__init__.py:346: in loads
-    return _default_decoder.decode(s)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/decoder.py:338: in decode
-    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/decoder.py:356: in raw_decode
-    raise JSONDecodeError("Expecting value", s, err.value) from None
-E   json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
-_________________ TestModelLoader.test_scan_and_update_models __________________
-[gw5] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_loaders/test_model_loader.py:158: in test_scan_and_update_models
-    updated_registry = scan_and_update_registry(
-src/lmstrix/loaders/model_loader.py:275: in scan_and_update_registry
-    new_model = _add_new_model(model_data)
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^
-src/lmstrix/loaders/model_loader.py:181: in _add_new_model
-    if not new_model.validate_integrity():
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E   AttributeError: 'Model' object has no attribute 'validate_integrity'
------------------------------ Captured stderr call -----------------------------
---- Logging error in Loguru Handler #1 ---
-Record was: {'elapsed': datetime.timedelta(seconds=6, microseconds=96773), 'exception': None, 'extra': {}, 'file': (name='model_loader.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py'), 'function': 'scan_and_update_registry', 'level': (name='INFO', no=20, icon='ℹ️'), 'line': 234, 'message': 'Scanning for LM Studio models...', 'module': 'model_loader', 'name': 'lmstrix.loaders.model_loader', 'process': (id=17703, name='MainProcess'), 'thread': (id=8520598848, name='MainThread'), 'time': datetime(2025, 7, 31, 17, 10, 34, 542491, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
-Traceback (most recent call last):
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 206, in emit
-    self._sink.write(str_record)
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_simple_sinks.py", line 16, in write
-    self._stream.write(message)
-ValueError: I/O operation on closed file.
---- End of logging error ---
---- Logging error in Loguru Handler #1 ---
-Record was: {'elapsed': datetime.timedelta(seconds=6, microseconds=97821), 'exception': None, 'extra': {}, 'file': (name='model_loader.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py'), 'function': 'scan_and_update_registry', 'level': (name='INFO', no=20, icon='ℹ️'), 'line': 237, 'message': 'Found 1 models in LM Studio.', 'module': 'model_loader', 'name': 'lmstrix.loaders.model_loader', 'process': (id=17703, name='MainProcess'), 'thread': (id=8520598848, name='MainThread'), 'time': datetime(2025, 7, 31, 17, 10, 34, 543539, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
-Traceback (most recent call last):
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 206, in emit
-    self._sink.write(str_record)
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_simple_sinks.py", line 16, in write
-    self._stream.write(message)
-ValueError: I/O operation on closed file.
---- End of logging error ---
---- Logging error in Loguru Handler #1 ---
-Record was: {'elapsed': datetime.timedelta(seconds=6, microseconds=98214), 'exception': None, 'extra': {}, 'file': (name='model_loader.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py'), 'function': 'scan_and_update_registry', 'level': (name='INFO', no=20, icon='ℹ️'), 'line': 250, 'message': 'Processing 1 valid models (filtered from 1)', 'module': 'model_loader', 'name': 'lmstrix.loaders.model_loader', 'process': (id=17703, name='MainProcess'), 'thread': (id=8520598848, name='MainThread'), 'time': datetime(2025, 7, 31, 17, 10, 34, 543932, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
-Traceback (most recent call last):
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 206, in emit
-    self._sink.write(str_record)
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_simple_sinks.py", line 16, in write
-    self._stream.write(message)
-ValueError: I/O operation on closed file.
---- End of logging error ---
---- Logging error in Loguru Handler #1 ---
-Record was: {'elapsed': datetime.timedelta(seconds=6, microseconds=98573), 'exception': None, 'extra': {}, 'file': (name='model_loader.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py'), 'function': '_add_new_model', 'level': (name='INFO', no=20, icon='ℹ️'), 'line': 166, 'message': 'Discovered new model: /path/to/new-model.gguf', 'module': 'model_loader', 'name': 'lmstrix.loaders.model_loader', 'process': (id=17703, name='MainProcess'), 'thread': (id=8520598848, name='MainThread'), 'time': datetime(2025, 7, 31, 17, 10, 34, 544291, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
-Traceback (most recent call last):
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 206, in emit
-    self._sink.write(str_record)
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_simple_sinks.py", line 16, in write
-    self._stream.write(message)
-ValueError: I/O operation on closed file.
---- End of logging error ---
-_________________________________ test session _________________________________
-[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/_pytest/runner.py:344: in from_call
-    result: TResult | None = func()
-                             ^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/flaky/flaky_pytest_plugin.py:146: in <lambda>
-    lambda: ihook(item=item, **kwds), when=when, reraise=reraise
-            ^^^^^^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_hooks.py:512: in __call__
-    return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_manager.py:120: in _hookexec
-    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:167: in _multicall
-    raise exception
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:139: in _multicall
-    teardown.throw(exception)
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/_pytest/logging.py:850: in pytest_runtest_call
-    yield
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:139: in _multicall
-    teardown.throw(exception)
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:53: in run_old_style_hookwrapper
-    return result.get_result()
-           ^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_result.py:103: in get_result
-    raise exc.with_traceback(tb)
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:38: in run_old_style_hookwrapper
-    res = yield
-          ^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:139: in _multicall
-    teardown.throw(exception)
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/_pytest/capture.py:900: in pytest_runtest_call
-    return (yield)
-            ^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:139: in _multicall
-    teardown.throw(exception)
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:53: in run_old_style_hookwrapper
-    return result.get_result()
-           ^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_result.py:103: in get_result
-    raise exc.with_traceback(tb)
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:38: in run_old_style_hookwrapper
-    res = yield
-          ^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:139: in _multicall
-    teardown.throw(exception)
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:53: in run_old_style_hookwrapper
-    return result.get_result()
-           ^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_result.py:103: in get_result
-    raise exc.with_traceback(tb)
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:38: in run_old_style_hookwrapper
-    res = yield
-          ^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:139: in _multicall
-    teardown.throw(exception)
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/_pytest/skipping.py:263: in pytest_runtest_call
-    return (yield)
-            ^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pluggy/_callers.py:121: in _multicall
-    res = hook_impl.function(*args)
-          ^^^^^^^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/_pytest/runner.py:178: in pytest_runtest_call
-    item.runtest()
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_ruff/__init__.py:141: in runtest
-    self.handler(path=self.fspath)
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_ruff/__init__.py:151: in handler
-    return check_file(path)
-           ^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/pytest_ruff/__init__.py:101: in check_file
-    raise RuffError(stdout.decode())
-E   pytest_ruff.RuffError: tests/test_integration/test_cli_integration.py:47:75: ANN001 Missing type annotation for function argument `capsys`
-E      |
-E   46 |     @patch("lmstrix.cli.main.get_default_models_file")
-E   47 |     def test_list_command(self, mock_get_file: Mock, mock_registry: Path, capsys) -> None:
-E      |                                                                           ^^^^^^ ANN001
-E   48 |         """Test list command shows models."""
-E   49 |         mock_get_file.return_value = mock_registry
-E      |
-E   
-E   tests/test_integration/test_cli_integration.py:59:79: ANN001 Missing type annotation for function argument `capsys`
-E      |
-E   58 |     @patch("lmstrix.cli.main.get_default_models_file")
-E   59 |     def test_list_json_format(self, mock_get_file: Mock, mock_registry: Path, capsys) -> None:
-E      |                                                                               ^^^^^^ ANN001
-E   60 |         """Test list command with JSON output."""
-E   61 |         mock_get_file.return_value = mock_registry
-E      |
-_______________ TestPromptLoader.test_load_prompts_invalid_toml ________________
-[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_loaders/test_prompt_loader.py:68: in test_load_prompts_invalid_toml
-    assert "parse" in str(exc_info.value).lower()
-E   assert 'parse' in "configuration error for 'prompts_file': failed to load toml file: expected '=' after a key in a key/value pair (at line 1, column 6)"
-E    +  where "configuration error for 'prompts_file': failed to load toml file: expected '=' after a key in a key/value pair (at line 1, column 6)" = <built-in method lower of str object at 0x11fc87890>()
-E    +    where <built-in method lower of str object at 0x11fc87890> = "Configuration error for 'prompts_file': Failed to load TOML file: Expected '=' after a key in a key/value pair (at line 1, column 6)".lower
-E    +      where "Configuration error for 'prompts_file': Failed to load TOML file: Expected '=' after a key in a key/value pair (at line 1, column 6)" = str(ConfigurationError("Configuration error for 'prompts_file': Failed to load TOML file: Expected '=' after a key in a key/value pair (at line 1, column 6)"))
-E    +        where ConfigurationError("Configuration error for 'prompts_file': Failed to load TOML file: Expected '=' after a key in a key/value pair (at line 1, column 6)") = <ExceptionInfo ConfigurationError("Configuration error for 'prompts_file': Failed to load TOML file: Expected '=' after a key in a key/value pair (at line 1, column 6)") tblen=2>.value
-_________ TestPromptLoader.test_load_prompts_with_nested_placeholders __________
-[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_loaders/test_prompt_loader.py:89: in test_load_prompts_with_nested_placeholders
-    prompts = load_prompts(toml_file, content="Test message")
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-src/lmstrix/loaders/prompt_loader.py:80: in load_prompts
-    resolved_prompts = resolver.resolve_all_prompts(data, **params)
-                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-src/lmstrix/core/prompts.py:243: in resolve_all_prompts
-    process_prompts(prompts_data)
-src/lmstrix/core/prompts.py:241: in process_prompts
-    process_prompts(value, f"{full_key}.")
-src/lmstrix/core/prompts.py:237: in process_prompts
-    results[full_key] = self.resolve_prompt(full_key, prompts_data, **params)
-                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-src/lmstrix/core/prompts.py:196: in resolve_prompt
-    current_text, resolved = self._resolve_external(current_text, MappingProxyType(params))
-                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-src/lmstrix/core/prompts.py:133: in _resolve_external
-    result = temp.format_map(_SafeDict(params))
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E   ValueError: Invalid format specifier ' 'Important'' for object of type 'str'
-__________________ TestPromptLoader.test_load_prompts_simple ___________________
-[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_loaders/test_prompt_loader.py:35: in test_load_prompts_simple
-    assert len(prompts) == 2
-E   AssertionError: assert 4 == 2
-E    +  where 4 = len({'greeting.description': ResolvedPrompt(name='greeting.description', template='A simple greeting', resolved='A simple greeting', tokens=3, placeholders_found=[], placeholders_resolved=[], placeholders_unresolved=[]), 'greeting.template': ResolvedPrompt(name='greeting.template', template='Hello World!', resolved='Hello World!', tokens=3, placeholders_found=[], placeholders_resolved=[], placeholders_unresolved=[]), 'question.description': ResolvedPrompt(name='question.description', template='Question template', resolved='Question template', tokens=2, placeholders_found=[], placeholders_resolved=[], placeholders_unresolved=[]), 'question.template': ResolvedPrompt(name='question.template', template='What is Python? Please provide a detailed answer.', resolved='What is Python? Please provide a detailed answer.', tokens=10, placeholders_found=[], placeholders_resolved=[], placeholders_unresolved=[])})
------------------------------ Captured stderr call -----------------------------
---- Logging error in Loguru Handler #1 ---
-Record was: {'elapsed': datetime.timedelta(seconds=6, microseconds=542690), 'exception': None, 'extra': {}, 'file': (name='prompt_loader.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py'), 'function': 'load_prompts', 'level': (name='INFO', no=20, icon='ℹ️'), 'line': 57, 'message': 'Loaded prompts from /private/var/folders/wd/jx_fxd9d7wg_py26vfx_tz080000gn/T/pytest-of-adam/pytest-3/popen-gw3/test_load_prompts_simple0/prompts.toml', 'module': 'prompt_loader', 'name': 'lmstrix.loaders.prompt_loader', 'process': (id=17701, name='MainProcess'), 'thread': (id=8520598848, name='MainThread'), 'time': datetime(2025, 7, 31, 17, 10, 34, 761208, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
-Traceback (most recent call last):
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 206, in emit
-    self._sink.write(str_record)
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_simple_sinks.py", line 16, in write
-    self._stream.write(message)
-ValueError: I/O operation on closed file.
---- End of logging error ---
---- Logging error in Loguru Handler #1 ---
-Record was: {'elapsed': datetime.timedelta(seconds=6, microseconds=544098), 'exception': None, 'extra': {}, 'file': (name='prompt_loader.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py'), 'function': 'load_prompts', 'level': (name='INFO', no=20, icon='ℹ️'), 'line': 70, 'message': 'Resolved placeholders with TOPL', 'module': 'prompt_loader', 'name': 'lmstrix.loaders.prompt_loader', 'process': (id=17701, name='MainProcess'), 'thread': (id=8520598848, name='MainThread'), 'time': datetime(2025, 7, 31, 17, 10, 34, 762616, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
-Traceback (most recent call last):
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 206, in emit
-    self._sink.write(str_record)
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_simple_sinks.py", line 16, in write
-    self._stream.write(message)
-ValueError: I/O operation on closed file.
---- End of logging error ---
---- Logging error in Loguru Handler #1 ---
-Record was: {'elapsed': datetime.timedelta(seconds=6, microseconds=546309), 'exception': None, 'extra': {}, 'file': (name='prompt_loader.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py'), 'function': 'load_prompts', 'level': (name='INFO', no=20, icon='ℹ️'), 'line': 82, 'message': 'Resolved 4 prompts', 'module': 'prompt_loader', 'name': 'lmstrix.loaders.prompt_loader', 'process': (id=17701, name='MainProcess'), 'thread': (id=8520598848, name='MainThread'), 'time': datetime(2025, 7, 31, 17, 10, 34, 764827, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
-Traceback (most recent call last):
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 206, in emit
-    self._sink.write(str_record)
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_simple_sinks.py", line 16, in write
-    self._stream.write(message)
-ValueError: I/O operation on closed file.
---- End of logging error ---
---- Logging error in Loguru Handler #1 ---
-Record was: {'elapsed': datetime.timedelta(seconds=6, microseconds=546653), 'exception': None, 'extra': {}, 'file': (name='prompt_loader.py', path='/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py'), 'function': 'load_prompts', 'level': (name='INFO', no=20, icon='ℹ️'), 'line': 84, 'message': "Applied parameters: ['name', 'query']", 'module': 'prompt_loader', 'name': 'lmstrix.loaders.prompt_loader', 'process': (id=17701, name='MainProcess'), 'thread': (id=8520598848, name='MainThread'), 'time': datetime(2025, 7, 31, 17, 10, 34, 765171, tzinfo=datetime.timezone(datetime.timedelta(seconds=7200), 'CEST'))}
-Traceback (most recent call last):
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_handler.py", line 206, in emit
-    self._sink.write(str_record)
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/loguru/_simple_sinks.py", line 16, in write
-    self._stream.write(message)
-ValueError: I/O operation on closed file.
---- End of logging error ---
-____________ TestPromptLoader.test_load_prompts_with_missing_params ____________
-[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_loaders/test_prompt_loader.py:110: in test_load_prompts_with_missing_params
-    template1 = prompts["template1"]
-                ^^^^^^^^^^^^^^^^^^^^
-E   KeyError: 'template1'
------------------------------- Captured log call -------------------------------
-WARNING  topl.core:core.py:155 Could not resolve 1 placeholder(s): {{city}}
-___________ TestPromptLoader.test_load_prompts_with_custom_resolver ____________
-[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_loaders/test_prompt_loader.py:130: in test_load_prompts_with_custom_resolver
-    assert prompts["test"].resolved == "Result: 42"
-           ^^^^^^^^^^^^^^^
-E   KeyError: 'test'
-______________ TestPathUtilities.test_get_lmstudio_path_not_found ______________
-[gw0] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_utils/test_paths.py:96: in test_get_lmstudio_path_not_found
-    with pytest.raises(RuntimeError) as exc_info:
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E   Failed: DID NOT RAISE <class 'RuntimeError'>
-___________ TestPathUtilities.test_get_lmstudio_path_shared_location ___________
-[gw3] darwin -- Python 3.12.9 /usr/local/bin/python
-tests/test_utils/test_paths.py:86: in test_get_lmstudio_path_shared_location
-    result = get_lmstudio_path()
-             ^^^^^^^^^^^^^^^^^^^
-src/lmstrix/utils/paths.py:21: in get_lmstudio_path
-    if home_pointer.exists():
-       ^^^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1139: in __call__
-    return self._mock_call(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1143: in _mock_call
-    return self._execute_mock_call(*args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/unittest/mock.py:1204: in _execute_mock_call
-    result = effect(*args, **kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^
-E   TypeError: TestPathUtilities.test_get_lmstudio_path_shared_location.<locals>.exists_side_effect() missing 1 required positional argument: 'self'
-
----------- coverage: platform darwin, python 3.12.9-final-0 ----------
-Name                                    Stmts   Miss Branch BrPart   Cover
---------------------------------------------------------------------------
-src/lmstrix/__main__.py                     1      1      0      0   0.00%
-src/lmstrix/_version.py                    13      3      2      1  73.33%
-src/lmstrix/api/client.py                 154    103     50      3  28.43%
-src/lmstrix/api/exceptions.py              72     18      2      1  74.32%
-src/lmstrix/cli/main.py                   517    478    196      1   5.61%
-src/lmstrix/core/concrete_config.py        62     50     22      0  14.29%
-src/lmstrix/core/context.py                81     59     14      0  23.16%
-src/lmstrix/core/context_tester.py         27      1      0      0  96.30%
-src/lmstrix/core/inference.py             168    168     38      0   0.00%
-src/lmstrix/core/inference_manager.py     115     75     24      5  33.81%
-src/lmstrix/core/models.py                129     30     20      0  75.84%
-src/lmstrix/core/prompts.py               117     25     40      5  73.25%
-src/lmstrix/core/scanner.py                86     31     42      7  65.62%
-src/lmstrix/loaders/context_loader.py      63     39     12      0  37.33%
-src/lmstrix/loaders/model_loader.py       167     87     56     12  44.84%
-src/lmstrix/loaders/prompt_loader.py       77     42     18      0  45.26%
-src/lmstrix/utils/context_parser.py        32     28     14      0   8.70%
-src/lmstrix/utils/logging.py               23      6      4      2  70.37%
-src/lmstrix/utils/paths.py                 53      5     16      4  86.96%
-src/lmstrix/utils/state.py                 31     20      4      0  31.43%
---------------------------------------------------------------------------
-TOTAL                                    1988   1269    574     41  33.10%
-
-=========================== short test summary info ============================
-FAILED tests/test_api/test_client.py::TestLMStudioClient::test_load_model_failure
-FAILED tests/test_api/test_client.py::TestLMStudioClient::test_completion_success
-FAILED tests/test_api/test_client.py::TestLMStudioClient::test_completion_failure
-FAILED tests/test_api/test_client.py::TestLMStudioClient::test_list_models_success
-FAILED tests/test_api/test_client.py::TestLMStudioClient::test_completion_with_defaults
-FAILED tests/test_core/test_context_tester.py::TestContextTester::test_test_model_not_found
-FAILED tests/test_core/test_context_tester.py::TestContextTester::test_test_all_models
-FAILED tests/test_core/test_models.py::TestModel::test_model_path_validation
-FAILED tests/test_core/test_models.py::TestModel::test_model_validation_error
-FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_simple
-FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_missing_placeholder
-FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_phase_extra_context
-FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_with_special_characters
-FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_two_phase
-FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_recursive
-FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_circular_reference
-FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_no_placeholders
-FAILED tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_mlx_directory
-FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_numeric_values
-FAILED tests/test_core/test_scanner.py::TestModelScanner::test_extract_model_info_gguf_file
-FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_resolve_template_empty_value
-FAILED tests/test_core/test_scanner.py::TestModelScanner::test_scan_models - ...
-FAILED tests/test_core/test_prompts.py::TestPromptResolver::test_count_tokens
-FAILED tests/test_core/test_scanner.py::TestModelScanner::test_sync_with_registry
-FAILED tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_list_command
-FAILED tests/test_loaders/test_model_loader.py::TestModelLoader::test_save_model_registry_custom_path
-FAILED tests/test_integration/test_cli_integration.py::TestCLIIntegration::test_list_json_format
-FAILED tests/test_loaders/test_model_loader.py::TestModelLoader::test_scan_and_update_models
-FAILED tests/test_integration/test_cli_integration.py::ruff - pytest_ruff.Ruf...
-FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_invalid_toml
-FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_nested_placeholders
-FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_simple
-FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_missing_params
-FAILED tests/test_loaders/test_prompt_loader.py::TestPromptLoader::test_load_prompts_with_custom_resolver
-FAILED tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_not_found
-FAILED tests/test_utils/test_paths.py::TestPathUtilities::test_get_lmstudio_path_shared_location
-======================= 36 failed, 128 passed in 18.95s ========================
-
-</document_content>
-</document>
-
-<document index="17">
 <source>docs/_config.yml</source>
 <document_content>
 title: LMStrix
@@ -4020,7 +3286,7 @@ plugins:
 </document_content>
 </document>
 
-<document index="18">
+<document index="17">
 <source>docs/api.md</source>
 <document_content>
 ---
@@ -4069,7 +3335,7 @@ Represents the response from an inference request.
 </document_content>
 </document>
 
-<document index="19">
+<document index="18">
 <source>docs/how-it-works.md</source>
 <document_content>
 ---
@@ -4108,7 +3374,7 @@ The command saves the results of the test to a local registry, so you only need 
 </document_content>
 </document>
 
-<document index="20">
+<document index="19">
 <source>docs/index.md</source>
 <document_content>
 ---
@@ -4153,7 +3419,7 @@ This gives you a reliable, empirical measurement of the model's true capabilitie
 </document_content>
 </document>
 
-<document index="21">
+<document index="20">
 <source>docs/installation.md</source>
 <document_content>
 ---
@@ -4193,7 +3459,7 @@ pip install -e .[dev]
 </document_content>
 </document>
 
-<document index="22">
+<document index="21">
 <source>docs/usage.md</source>
 <document_content>
 ---
@@ -4314,7 +3580,7 @@ if __name__ == "__main__":
 </document_content>
 </document>
 
-<document index="23">
+<document index="22">
 <source>examples/README.md</source>
 <document_content>
 # LMStrix Usage Examples
@@ -4591,7 +3857,7 @@ For more help, see the main [LMStrix documentation](https://github.com/AdamAdli/
 </document_content>
 </document>
 
-<document index="24">
+<document index="23">
 <source>examples/cli/basic_workflow.sh</source>
 <document_content>
 #!/bin/bash
@@ -4656,7 +3922,7 @@ echo -e "\n### Workflow Demo Finished ###"
 </document_content>
 </document>
 
-<document index="25">
+<document index="24">
 <source>examples/cli/context_control_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -4758,7 +4024,7 @@ echo "- Test models first to find their true limits"
 </document_content>
 </document>
 
-<document index="26">
+<document index="25">
 <source>examples/cli/inference_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -4859,7 +4125,7 @@ echo "- Combine features for advanced use cases"
 </document_content>
 </document>
 
-<document index="27">
+<document index="26">
 <source>examples/cli/model_state_demo.sh</source>
 <document_content>
 #!/bin/bash
@@ -4917,7 +4183,7 @@ echo "- Third call: 'Using last-used model...'"
 </document_content>
 </document>
 
-<document index="28">
+<document index="27">
 <source>examples/cli/model_testing.sh</source>
 <document_content>
 #!/bin/bash
@@ -5019,7 +4285,7 @@ echo "- Tests automatically resume if interrupted"
 </document_content>
 </document>
 
-<document index="29">
+<document index="28">
 <source>examples/data/sample_context.txt</source>
 <document_content>
 This is a sample text file designed for context length testing in LMStrix. The purpose of this file is to provide a sufficiently large and repetitive block of text that can be used to fill the context window of a large language model. By feeding a model a long prompt composed of this text, we can determine the maximum number of tokens it can process before it fails to load or produce a coherent response. This process is crucial for understanding the true operational limits of a model, which may differ from the limits advertised by its developers. The text itself is not intended to be meaningful, but rather to serve as a consistent and measurable filler for the model's context buffer. The repetition ensures that the content is uniform and does not introduce unexpected variables into the testing process.
@@ -5035,7 +4301,7 @@ This is a sample text file designed for context length testing in LMStrix. The p
 </document_content>
 </document>
 
-<document index="30">
+<document index="29">
 <source>examples/data/test_questions.json</source>
 <document_content>
 [
@@ -5047,7 +4313,7 @@ This is a sample text file designed for context length testing in LMStrix. The p
 </document_content>
 </document>
 
-<document index="31">
+<document index="30">
 <source>examples/prompts/analysis.toml</source>
 <document_content>
 # examples/prompts/analysis.toml
@@ -5068,7 +4334,7 @@ description = "Analyzes the sentiment of a given text."
 </document_content>
 </document>
 
-<document index="32">
+<document index="31">
 <source>examples/prompts/coding.toml</source>
 <document_content>
 # examples/prompts/coding.toml
@@ -5090,7 +4356,7 @@ description = "Explains a snippet of code."
 </document_content>
 </document>
 
-<document index="33">
+<document index="32">
 <source>examples/prompts/creative.toml</source>
 <document_content>
 # examples/prompts/creative.toml
@@ -5107,7 +4373,7 @@ description = "Generates a story idea from a genre and character."
 </document_content>
 </document>
 
-<document index="34">
+<document index="33">
 <source>examples/prompts/qa.toml</source>
 <document_content>
 # examples/prompts/qa.toml
@@ -5128,7 +4394,7 @@ description = "Answers a question based on a provided context."
 </document_content>
 </document>
 
-<document index="35">
+<document index="34">
 <source>examples/prompts.toml</source>
 <document_content>
 # Example prompt templates for LMStrix
@@ -5281,7 +4547,7 @@ def main(()) -> None:
     """Demonstrates prompt template features."""
 
 
-<document index="36">
+<document index="35">
 <source>examples/run_all_examples.sh</source>
 <document_content>
 #!/bin/bash
@@ -5376,7 +4642,7 @@ def main(()) -> None:
     """Main entry point using Fire CLI."""
 
 
-<document index="37">
+<document index="36">
 <source>issues/301.txt</source>
 <document_content>
 ```
@@ -5424,7 +4690,7 @@ but our lmstrix.json database has
 </document_content>
 </document>
 
-<document index="38">
+<document index="37">
 <source>issues/302.txt</source>
 <document_content>
 I manually run this prompt in LM Studio with the model `llama-3.2-3b-instruct`: 
@@ -6180,7 +5446,7 @@ llama_perf_context_print:    graphs reused =          0
 </document_content>
 </document>
 
-<document index="39">
+<document index="38">
 <source>issues/303.txt</source>
 <document_content>
 ```
@@ -6309,7 +5575,7 @@ I said: NEVER pass the prompt or the model's output through 'loguru'. We must us
 </document_content>
 </document>
 
-<document index="40">
+<document index="39">
 <source>issues/304.txt</source>
 <document_content>
 TERMINAL: 
@@ -6473,7 +5739,7 @@ llama_perf_context_print:    graphs reused =          0
 </document_content>
 </document>
 
-<document index="41">
+<document index="40">
 <source>issues/305.txt</source>
 <document_content>
 TERM
@@ -6725,7 +5991,7 @@ What do you think we can do? Research how I can fix that.
 </document_content>
 </document>
 
-<document index="42">
+<document index="41">
 <source>issues/306.txt</source>
 <document_content>
 
@@ -6757,14 +6023,14 @@ We use logger from lmstrix.utils.logging
 </document_content>
 </document>
 
-<document index="43">
+<document index="42">
 <source>issues/307.txt</source>
 <document_content>
 Analyze how we can utilize inference streaming out of the `lmstudio` python module in our `lmstrix`. Research, then /plan into @PLAN.md and @TODO.md how to do it. Think about the plan, reflect, revise, refine the plan. 
 </document_content>
 </document>
 
-<document index="44">
+<document index="43">
 <source>issues/310.txt</source>
 <document_content>
 $ lmstrix test --all
@@ -6819,6 +6085,25 @@ Traceback (most recent call last):
 AttributeError: 'ContextTester' object has no attribute '_filter_models_for_testing'
 Othello:adam adam$
 
+
+</document_content>
+</document>
+
+<document index="44">
+<source>publish.sh</source>
+<document_content>
+#!/usr/bin/env bash
+cd "$(dirname "$0")" || exit
+
+fd -e py -x uvx autoflake -i {} &>cleanup.txt
+fd -e py -x uvx pyupgrade --py312-plus {} &>>cleanup.txt
+fd -e py -x uvx ruff check --output-format=github --fix --unsafe-fixes {} &>>cleanup.txt
+fd -e py -x uvx ruff format --respect-gitignore --target-version py312 {} &>>cleanup.txt
+llms . "llms.txt"
+uvx hatch clean
+gitnextvers .
+uvx hatch build
+uvx hatch publish
 
 </document_content>
 </document>
