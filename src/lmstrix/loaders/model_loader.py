@@ -60,10 +60,11 @@ def save_model_registry(
 
     try:
         registry.save()
-        return save_path
     except ModelRegistryError as e:
         logger.error(f"Failed to save registry due to validation errors: {e}")
         raise
+    else:
+        return save_path
 
 
 def _validate_discovered_model(model_data: dict) -> bool:
@@ -167,7 +168,7 @@ def _add_new_model(model_data: dict) -> Model | None:
         short_id = model_path.stem if model_path.name else model_data["id"]
 
         new_model = Model(
-            id=model_data["id"],
+            model_id=model_data["id"],
             short_id=short_id,
             path=str(model_path),
             size_bytes=model_data.get("size_bytes", 0),
@@ -191,15 +192,26 @@ def _add_new_model(model_data: dict) -> Model | None:
 
 def _remove_deleted_models(registry: ModelRegistry, discovered_models: list[dict]) -> None:
     """Remove models from the registry that are no longer discovered."""
-    registry_paths = {str(model.path) for model in registry.list_models()}
+    # Get registry models and their paths
+    registry_models = {str(model.path): model for model in registry.list_models()}
     discovered_paths = {
         str(Path(model["path"])) for model in discovered_models if model.get("path")
     }
-    deleted_paths = registry_paths - discovered_paths
+    deleted_paths = set(registry_models.keys()) - discovered_paths
 
     for model_path in deleted_paths:
-        logger.info(f"Removing deleted model: {model_path}")
-        registry.remove_model(model_path)
+        model = registry_models[model_path]
+        logger.info(f"Removing deleted model: {model.id} (path: {model_path})")
+        # Use the model's path for removal, as that's the key used in the registry
+        success = registry.remove_model(model_path)
+        if not success:
+            logger.warning(f"Failed to remove model: {model_path}")
+            # If path-based removal fails, try ID-based removal as fallback
+            success = registry.remove_model(model.id)
+            if success:
+                logger.info(f"Successfully removed model using ID: {model.id}")
+            else:
+                logger.error(f"Failed to remove model using both path and ID: {model.id}")
 
 
 def scan_and_update_registry(
@@ -253,7 +265,8 @@ def scan_and_update_registry(
 
     # Track updates for validation
     updates_made = 0
-    errors_encountered = 0
+    processing_errors = 0
+    validation_failures = 0
 
     for model_data in valid_discovered_models:
         try:
@@ -277,19 +290,21 @@ def scan_and_update_registry(
                     registry.update_model(model_path, new_model)
                     updates_made += 1
                 else:
-                    errors_encountered += 1
+                    # This is just a validation failure on a new model, not a critical error
+                    validation_failures += 1
 
         except (KeyError, ValueError, TypeError, ModelRegistryError) as e:
             logger.error(f"Error processing model {model_data.get('id', 'unknown')}: {e}")
-            errors_encountered += 1
+            processing_errors += 1
             continue
 
-    # Only remove deleted models if we successfully processed the scan
-    if errors_encountered == 0:
+    # Remove deleted models unless there were actual processing errors
+    # Validation failures on new models shouldn't prevent cleanup of deleted models
+    if processing_errors == 0:
         _remove_deleted_models(registry, valid_discovered_models)
     else:
         logger.warning(
-            f"Skipping deletion of models due to {errors_encountered} errors during scan",
+            f"Skipping deletion of models due to {processing_errors} processing errors during scan",
         )
 
     # Final validation
@@ -297,7 +312,7 @@ def scan_and_update_registry(
         # Attempt to save to validate the registry
         save_model_registry(registry)
         logger.info(
-            f"Model registry updated successfully. Original: {original_model_count}, Final: {len(registry)}, Updates: {updates_made}, Errors: {errors_encountered}",
+            f"Model registry updated successfully. Original: {original_model_count}, Final: {len(registry)}, Updates: {updates_made}, Processing errors: {processing_errors}, Validation failures: {validation_failures}",
         )
     except ModelRegistryError as e:
         logger.error(f"Registry validation failed after scan: {e}")

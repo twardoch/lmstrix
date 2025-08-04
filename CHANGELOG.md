@@ -7,15 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### In Progress
+- **Issue #302**: Inference Output Mismatch Investigation
+  - Added comprehensive diagnostic logging for inference parameters
+  - Updated default temperature from 0.7 to 0.8 to match LM Studio GUI defaults
+  - Investigating stop token and context length configuration differences
+
 ### Added
-- **Issue #307**: Streaming Inference Support
+- **Compact Output for Test Command** ✅ COMPLETED
+  - Added live-updating rich table display for non-verbose test output
+  - Shows model ID, context size, and test status in a clean format
+  - Progress tracking for batch tests with `--all` flag
+  - Maintains detailed logging in verbose mode for debugging
+  - Significantly improves readability when testing multiple models
+- **Custom Prompt Support for Context Testing** ✅ COMPLETED
+  - Added `--prompt` parameter to test command for using custom prompt strings
+  - Added `--file_prompt` parameter to test command for loading prompts from files
+  - Modified ContextTester and InferenceEngine to accept custom prompts
+  - Custom prompts replace the default dual-test prompts (96 digits + 2+3=5)
+  - Updated help documentation with examples of custom prompt usage
+  - Created test_prompt_example.txt as a demonstration file
+- **Issue #307**: Streaming Inference Support ✅ COMPLETED
   - Added `stream_completion()` method to LMStudioClient using lmstudio SDK's `complete_stream()`
   - Implemented token-by-token streaming with callbacks and progress monitoring
   - Added `stream_infer()` methods to InferenceEngine and InferenceManager
   - Added CLI `--stream` flag for real-time token display during inference
   - Added `--stream-timeout` parameter (default 120s) for hang detection
   - Streaming statistics: tokens/second, time to first token
-- **Issue #306**: Batch Processing Tool (`_keep_this/adam/adamall.py`)
+  - Full backward compatibility maintained with existing sync inference
+- **Issue #306**: Batch Processing Tool ✅ COMPLETED (`_keep_this/adam/adamall.py`)
   - Processes multiple prompts across all models automatically
   - Smart model management - reuses loaded models when possible
   - Skips existing outputs for resumable batch processing
@@ -23,6 +43,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Error capture to output files on failure
   - Progress tracking with percentage completion
   - Processes prompts: `think,aps`, `think,humanize`, `think,tldr`, `think,tts_optimize`, `translate`, `tldr`
+  - Loads models with 50% context, runs inference with 90% max context
+  - Intelligent model sorting by size for optimal processing
 - Created `src/lmstrix/api/main.py` with `LMStrixService` class containing all business logic
 - Implemented separation of concerns with thin CLI wrapper in `__main__.py`
 

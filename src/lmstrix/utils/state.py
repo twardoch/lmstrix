@@ -21,7 +21,7 @@ class StateManager:
         """Load state from file."""
         if self.state_file.exists():
             try:
-                with open(self.state_file) as f:
+                with self.state_file.open() as f:
                     return json.load(f)
             except Exception as e:
                 logger.warning(f"Failed to load state: {e}")
@@ -30,7 +30,7 @@ class StateManager:
     def _save_state(self) -> None:
         """Save state to file."""
         try:
-            with open(self.state_file, "w") as f:
+            with self.state_file.open("w") as f:
                 json.dump(self._state, f, indent=2)
         except Exception as e:
             logger.warning(f"Failed to save state: {e}")

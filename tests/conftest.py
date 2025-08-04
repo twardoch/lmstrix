@@ -52,7 +52,7 @@ def mock_llm() -> Mock:
 def sample_model_data() -> dict[str, Any]:
     """Sample model data for testing."""
     return {
-        "id": "test-model",
+        "model_id": "test-model",
         "path": "/path/to/test-model.gguf",
         "size_bytes": 1500000,
         "ctx_in": 4096,

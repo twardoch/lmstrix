@@ -3,12 +3,14 @@
 # this_file: src/lmstrix/core/models_simple.py
 
 import json
+import re
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any
 
 from lmstrix.utils.logging import logger
+from lmstrix.utils.paths import get_default_models_file
 
 
 class ContextTestStatus(str, Enum):
@@ -25,7 +27,7 @@ class Model:
 
     def __init__(
         self,
-        id: str,
+        model_id: str,
         path: str,
         size_bytes: int,
         ctx_in: int,
@@ -38,7 +40,7 @@ class Model:
         **kwargs: Any,  # Ignore extra fields
     ) -> None:
         """Initialize a model with essential fields only."""
-        self.id = id
+        self.id = model_id
         self.path = path
         self.size = size_bytes
         self.context_limit = ctx_in
@@ -168,8 +170,6 @@ class Model:
 
     def sanitized_id(self) -> str:
         """Return a sanitized version of the model ID for filenames."""
-        import re
-
         # Replace problematic characters with underscores
         # Also replace @ and ! for the test case
         return re.sub(r'[<>:"/\\|?*@!]', "_", self.id)
@@ -191,8 +191,6 @@ class ModelRegistry:
 
     def _get_default_models_file(self) -> Path:
         """Get the default models file path."""
-        from lmstrix.utils.paths import get_default_models_file
-
         return get_default_models_file()
 
     def load(self) -> None:
@@ -212,8 +210,11 @@ class ModelRegistry:
 
             for model_id, model_info in models_data.items():
                 try:
-                    # Ensure id field exists
-                    model_info["id"] = model_info.get("id", model_id)
+                    # Ensure model_id field exists (handle legacy "id" field)
+                    if "id" in model_info and "model_id" not in model_info:
+                        model_info["model_id"] = model_info.pop("id")
+                    elif "model_id" not in model_info:
+                        model_info["model_id"] = model_id
                     model = Model(**model_info)
                     self._models[model_id] = model
                 except Exception as e:

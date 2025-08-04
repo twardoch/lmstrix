@@ -95,7 +95,7 @@ class TestInferenceManager:
         # Setup registry
         mock_registry = Mock()
         model = Model(
-            id="test-model",
+            model_id="test-model",
             path="/path/to/model",
             size_bytes=1000000,
             ctx_in=4096,

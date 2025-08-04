@@ -11,6 +11,7 @@ LMStrix is a professional Python toolkit designed to supercharge your interactio
 - **📋 Comprehensive Model Registry**: Track models, their context limits, and test results with JSON persistence
 - **🛡️ Safety Controls**: Configurable thresholds and fail-safes to prevent system crashes
 - **💻 Rich CLI Interface**: Beautiful terminal output with progress indicators and formatted tables
+- **📈 Compact Test Output**: Live-updating tables show test progress without verbose logging clutter
 
 ## Installation
 
@@ -125,7 +126,25 @@ lmstrix test --all --ctx 32768
 
 # Reset and re-test a model
 lmstrix test llama-3.2-3b-instruct --reset
+
+# Test with custom prompt
+lmstrix test llama-3.2-3b-instruct --prompt "What is 2+2?"
+
+# Test with file-based prompt
+lmstrix test llama-3.2-3b-instruct --file_prompt test_prompt.txt
 ```
+
+### Compact Output (Default)
+When running without `--verbose`, tests display a clean, live-updating table:
+```
+Model                                   Context      Status
+llama-3.2-3b-instruct                   32,768      Testing...
+→
+Model                                   Context      Status  
+llama-3.2-3b-instruct                   32,768      ✓ Success
+```
+
+For batch testing with `--all`, a progress column is added to track multiple models.
 
 ## Model Management
 

@@ -1,0 +1,21 @@
+I’m struggling to understand why `lmstrix test -c 2047 -m MODEL_ID` fails if MODEL_ID is one of these: 
+
+```
+slim-extract-tool            1.59    4,096      ✗ Failed
+slim-extract-qwen-1.5b       1.04    131,072    ✗ Failed
+slim-extract-qwen-0.5b       0.46    131,072    ✗ Failed
+slim-summary-tool            1.59    4,096      ✗ Failed
+dragon-mistral-answer-tool   4.07    32,768     ✗ Failed
+dragon-mistral-7b-v0         4.07    32,768     ✗ Failed
+dragon-llama-3.1             4.58    131,072    ✗ Failed
+bling-qwen-mini-tool         1.04    131,072    ✗ Failed
+mistral-7b-claim-extractor   7.17    32,768     ✗ Failed
+llama3.2-entity-1b           2.31    131,072    ✗ Failed
+llama3.2-entity              3.19    131,072    ✗ Failed
+```
+
+Basically the inference from these models fails when called via the code that `lmstrix test` uses. 
+
+But in the LM Studio GUI the inference works. 
+
+Write some code that uses the `lmstrix infer` code but also more direct `lmstudio` code, with just the model `slim-extract-qwen-0.5b` so we can pinpoint the issue. 

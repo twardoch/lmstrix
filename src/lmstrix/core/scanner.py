@@ -90,7 +90,7 @@ class ModelScanner:
             ctx_in = 1024 * 1024
 
         return {
-            "id": model_id,
+            "model_id": model_id,
             "path": str(model_path),
             "size_bytes": self._get_model_size(model_path),
             "ctx_in": ctx_in,
@@ -117,8 +117,8 @@ class ModelScanner:
             try:
                 model_info = self._extract_model_info(path)
                 if model_info:
-                    models[model_info["id"]] = model_info
-                    logger.debug(f"Found model: {model_info['id']}")
+                    models[model_info["model_id"]] = model_info
+                    logger.debug(f"Found model: {model_info['model_id']}")
             except (OSError, FileNotFoundError) as e:
                 logger.warning(f"Error scanning {path}: {e}")
 

@@ -212,12 +212,31 @@ ignore = [
   "S101",    # use of assert detected
   "PLR0913", # too many arguments
   "PLR2004", # magic value comparison
-  "COM812"
+  "COM812",  # missing trailing comma (handled by formatter)
+  # Complexity rules - these are often legitimate in complex business logic
+  "PLR0911", # too many return statements
+  "PLR0912", # too many branches
+  "PLR0915", # too many statements
+  # Exception handling patterns that may be intentional
+  "TRY003",  # long messages outside exception class
+  "TRY301",  # abstract raise to inner function
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
-"tests/**/*.py" = ["S101", "ARG", "PLR2004"]
+"tests/**/*.py" = ["S101", "ARG", "PLR2004", "ARG002", "ANN001"]
+
+# Example scripts may have different standards
+"examples/**/*.py" = ["ERA001", "BLE001", "ANN001"]
+
+# CLI main file needs some builtin shadows for Fire compatibility
+"src/lmstrix/__main__.py" = ["A002"]
+
+# Context tester has legitimate unused args for interface consistency
+"src/lmstrix/core/context_tester.py" = ["ARG002"]
+
+# Client has some necessary bare excepts for connection handling
+"src/lmstrix/api/client.py" = ["E722"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

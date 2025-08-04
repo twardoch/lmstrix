@@ -77,6 +77,7 @@ class ContextTester:
         client: LMStudioClient | None = None,
         verbose: bool = False,
         fast_mode: bool = False,
+        custom_prompt: str | None = None,
     ) -> None:
         """Initialize context tester.
 
@@ -84,9 +85,12 @@ class ContextTester:
             client: LMStudioClient instance for model operations.
             verbose: Enable verbose logging output.
             fast_mode: Skip semantic verification - only test if inference completes.
+            custom_prompt: Custom prompt to use for testing instead of built-in prompts.
         """
         self.client = client or LMStudioClient()
-        self.inference_engine = InferenceEngine(client=self.client, verbose=verbose)
+        self.inference_engine = InferenceEngine(
+            client=self.client, verbose=verbose, custom_prompt=custom_prompt
+        )
         # Enhanced dual testing prompts
         self.test_prompt_1 = "Write 'ninety-six' as a number using only digits"
         self.test_prompt_2 = "2+3="
@@ -94,6 +98,7 @@ class ContextTester:
         self.test_prompt = "Say hello"
         self.verbose = verbose
         self.fast_mode = fast_mode
+        self.custom_prompt = custom_prompt
         self.inference_timeout = 90.0  # Increased to 90 seconds for better reliability
         self.max_retries = 2  # Retry timeouts up to 2 times
 
@@ -128,7 +133,11 @@ class ContextTester:
                 context_size=context_size,
                 load_success=True,  # If we got here, model loaded
                 inference_success=success,
-                prompt="Dual inference test (96 digits + 2+3=5)",
+                prompt=(
+                    self.custom_prompt
+                    if self.custom_prompt
+                    else "Dual inference test (96 digits + 2+3=5)"
+                ),
                 response=response,
                 error=None if success else response,
             )
@@ -137,7 +146,11 @@ class ContextTester:
                 context_size=context_size,
                 load_success=False,
                 inference_success=False,
-                prompt="Dual inference test (96 digits + 2+3=5)",
+                prompt=(
+                    self.custom_prompt
+                    if self.custom_prompt
+                    else "Dual inference test (96 digits + 2+3=5)"
+                ),
                 response="",
                 error=str(e),
             )
@@ -217,7 +230,7 @@ class ContextTester:
 
         return updated_models
 
-    def test_model(
+    def test_model_by_id(
         self,
         model_id: str,
         min_context: int = 512,
@@ -258,3 +271,48 @@ class ContextTester:
             "test_results": [r.to_dict() for r in results],
             "final_status": "completed" if last_good else "failed",
         }
+
+    def test_model(
+        self,
+        model: "Model",
+        max_context: int = 131072,
+        registry: "ModelRegistry" = None,
+    ) -> "Model":
+        """Test a model to find its maximum working context.
+
+        Args:
+            model: Model object to test.
+            max_context: Maximum context to test.
+            registry: Model registry for updating results.
+
+        Returns:
+            Updated Model object with test results.
+        """
+        # Test the model at the specified context size
+        result = self._test_at_context(
+            model.id,
+            max_context,
+            log_path=None,
+            model=model,
+            registry=registry,
+        )
+
+        # Update model with test results
+        if result.load_success and result.inference_success:
+            model.tested_max_context = max_context
+            model.context_test_status = ContextTestStatus.COMPLETED
+            model.last_known_good_context = max_context
+            # Store response preview temporarily for display
+            model._test_response_preview = result.response[:12] if result.response else ""
+        else:
+            model.context_test_status = ContextTestStatus.FAILED
+            model.last_known_bad_context = max_context
+            model._test_response_preview = ""
+
+        model.context_test_date = datetime.now()
+
+        # Update registry if provided
+        if registry:
+            registry.update_model_by_id(model)
+
+        return model

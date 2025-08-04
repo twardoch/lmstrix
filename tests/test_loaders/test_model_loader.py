@@ -82,7 +82,7 @@ class TestModelLoader:
         # Create a registry with models
         registry = ModelRegistry(models_file=registry_file)
         model = Model(
-            id="test-model",
+            model_id="test-model",
             path="/path/to/model.gguf",
             size_bytes=1000000,
             ctx_in=4096,
@@ -108,7 +108,7 @@ class TestModelLoader:
         # Create a registry
         registry = ModelRegistry(models_file=original_file)
         model = Model(
-            id="model1",
+            model_id="model1",
             path="/path/to/model1.gguf",
             size_bytes=500000,
             ctx_in=2048,

@@ -37,11 +37,13 @@ class InferenceEngine:
         client: LMStudioClient | None = None,
         model_registry: ModelRegistry | None = None,
         verbose: bool = False,
+        custom_prompt: str | None = None,
     ) -> None:
         """Initialize the inference engine."""
         self.client = client or LMStudioClient(verbose=verbose)
         self.registry = model_registry or ModelRegistry()
         self.verbose = verbose
+        self.custom_prompt = custom_prompt
 
         if verbose:
             logger.enable("lmstrix")
@@ -60,41 +62,62 @@ class InferenceEngine:
         """
         llm = None
         try:
+            # Get model-specific context_out value from registry
+            model = self.registry.find_model(model_id)
+            model_out_ctx = (
+                model.context_out if model else 4096
+            )  # Default to 4096 if model not found
+
             llm = self.client.load_model_by_id(model_id, context_len=context_len)
 
-            # Test 1: Number words to digits
-            test_prompt_1 = "Write 'ninety-six' as a number using only digits"
-            response_1 = self.client.completion(
-                llm=llm,
-                prompt=test_prompt_1,
-                out_ctx=10,
-                temperature=0.1,
-                model_id=model_id,
-            )
+            if self.custom_prompt:
+                # Use custom prompt for testing
+                response = self.client.completion(
+                    llm=llm,
+                    prompt=self.custom_prompt,
+                    out_ctx=model_out_ctx,  # Use model-specific context_out value
+                    temperature=1.0,
+                    model_id=model_id,
+                )
 
-            test_1_pass = "96" in response_1.content
+                # For custom prompts, we consider any non-empty response as success
+                success = bool(response.content.strip())
+                combined_response = response.content.strip()
+            else:
+                # Use default dual-test prompts
+                # Test 1: Number words to digits
+                test_prompt_1 = "Write 'ninety-six' as a number using only digits"
+                response_1 = self.client.completion(
+                    llm=llm,
+                    prompt=test_prompt_1,
+                    out_ctx=model_out_ctx,
+                    temperature=1.0,
+                    model_id=model_id,
+                )
 
-            # Test 2: Simple arithmetic
-            test_prompt_2 = "2+3="
-            response_2 = self.client.completion(
-                llm=llm,
-                prompt=test_prompt_2,
-                out_ctx=10,
-                temperature=0.1,
-                model_id=model_id,
-            )
+                test_1_pass = "96" in response_1.content
 
-            test_2_pass = "5" in response_2.content
+                # Test 2: Simple arithmetic
+                test_prompt_2 = "2+3="
+                response_2 = self.client.completion(
+                    llm=llm,
+                    prompt=test_prompt_2,
+                    out_ctx=model_out_ctx,
+                    temperature=1.0,
+                    model_id=model_id,
+                )
 
-            # Success if ANY test passes
-            success = test_1_pass or test_2_pass
+                test_2_pass = "5" in response_2.content
 
-            test1_status = "✓" if test_1_pass else "✗"
-            test2_status = "✓" if test_2_pass else "✗"
-            combined_response = (
-                f"Test1: '{response_1.content.strip()}' ({test1_status}), "
-                f"Test2: '{response_2.content.strip()}' ({test2_status})"
-            )
+                # Success if ANY test passes
+                success = test_1_pass or test_2_pass
+
+                test1_status = "✓" if test_1_pass else "✗"
+                test2_status = "✓" if test_2_pass else "✗"
+                combined_response = (
+                    f"Test1: '{response_1.content.strip()}' ({test1_status}), "
+                    f"Test2: '{response_2.content.strip()}' ({test2_status})"
+                )
 
             return success, combined_response
 

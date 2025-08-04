@@ -45,6 +45,8 @@ class LMStrixCLI:
         fast: bool = False,
         verbose: bool = False,
         force: bool = False,
+        prompt: str | None = None,
+        file_prompt: str | None = None,
     ) -> None:
         """Test the context limits for models.
 
@@ -59,6 +61,8 @@ class LMStrixCLI:
             fast: Skip semantic verification - only test if inference completes technically.
             verbose: Enable verbose output.
             force: Override safety limits and test at contexts marked as bad.
+            prompt: Custom prompt string to use for testing instead of built-in prompts.
+            file_prompt: Path to file containing the prompt to use for testing.
         """
         self.service.test_models(
             model_id=model_id,
@@ -70,6 +74,8 @@ class LMStrixCLI:
             fast=fast,
             verbose=verbose,
             force=force,
+            prompt=prompt,
+            file_prompt=file_prompt,
         )
 
     def infer(

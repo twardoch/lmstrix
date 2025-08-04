@@ -11,6 +11,24 @@ except ImportError:
     # Fall back to tomli for older Python versions
     import tomli as tomllib
 
+# Import TOML writers for save_prompts function
+try:
+    import tomli_w
+
+    toml_writer = tomli_w
+except ImportError:
+    try:
+        import tomlkit
+
+        toml_writer = tomlkit
+    except ImportError:
+        try:
+            import toml
+
+            toml_writer = toml
+        except ImportError:
+            toml_writer = None
+
 from topl.core import resolve_placeholders
 
 from lmstrix.api.exceptions import ConfigurationError
@@ -69,7 +87,7 @@ def load_prompts(
         # Convert back to dict
         data = dict(resolved_data)
         logger.info("Resolved placeholders with TOPL")
-    except Exception as e:
+    except (ValueError, TypeError, AttributeError) as e:
         logger.warning(f"TOPL placeholder resolution failed: {e}")
         # Continue with unresolved data
 
@@ -140,7 +158,7 @@ def load_single_prompt(
         # Convert back to dict
         data = dict(resolved_data)
         logger.info("Resolved placeholders with TOPL")
-    except Exception as e:
+    except (ValueError, TypeError, AttributeError) as e:
         logger.warning(f"TOPL placeholder resolution failed: {e}")
         # Continue with unresolved data
 
@@ -216,31 +234,18 @@ def save_prompts(
         prompts: Dictionary of prompts to save.
         toml_path: Path where to save the TOML file.
     """
-    # We need toml-w or tomlkit for writing
-    try:
-        import tomli_w
-
-        writer = tomli_w
-    except ImportError:
-        try:
-            import tomlkit
-
-            writer = tomlkit
-        except ImportError:
-            # Fall back to old toml if needed
-            import toml
-
-            writer = toml
+    if toml_writer is None:
+        raise ImportError("No TOML writing library available. Install tomli-w, tomlkit, or toml")
 
     # Ensure parent directory exists
     toml_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Save to TOML
     with toml_path.open("w") as f:
-        if hasattr(writer, "dump"):
-            writer.dump(prompts, f)
+        if hasattr(toml_writer, "dump"):
+            toml_writer.dump(prompts, f)
         else:
             # tomli_w uses dumps
-            f.write(writer.dumps(prompts))
+            f.write(toml_writer.dumps(prompts))
 
     logger.info(f"Saved {len(prompts)} prompts to {toml_path}")

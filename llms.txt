@@ -11,6 +11,7 @@ Project Structure:
 │       │   ├── 📁 review-cla
 │       │   └── 📁 review-gemi
 │       └── 📁 out
+├── 📁 context_tests
 ├── 📁 docs
 │   ├── 📄 _config.yml
 │   ├── 📄 api.md
@@ -46,6 +47,7 @@ Project Structure:
 │   ├── 📄 README.md
 │   └── 📄 run_all_examples.sh
 ├── 📁 issues
+│   └── 📄 401.txt
 ├── 📁 src
 │   ├── 📁 lmstrix
 │   │   ├── 📁 api
@@ -110,12 +112,17 @@ Project Structure:
 ├── 📄 CHANGELOG.md
 ├── 📄 CLAUDE.md
 ├── 📄 cleanup.txt
+├── 📄 debug_inference.py
+├── 📄 debug_test_logic.py
 ├── 📄 GEMINI.md
+├── 📄 get_out_ctx.py
 ├── 📄 LICENSE
 ├── 📄 PLAN.md
 ├── 📄 publish.sh
 ├── 📄 pyproject.toml
 ├── 📄 README.md
+├── 📄 test_model_out_ctx.py
+├── 📄 test_prompt_example.txt
 ├── 📄 test_streaming.py
 ├── 📄 TESTING.md
 ├── 📄 TODO.md
@@ -897,15 +904,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### In Progress
+- **Issue #302**: Inference Output Mismatch Investigation
+  - Added comprehensive diagnostic logging for inference parameters
+  - Updated default temperature from 0.7 to 0.8 to match LM Studio GUI defaults
+  - Investigating stop token and context length configuration differences
+
 ### Added
-- **Issue #307**: Streaming Inference Support
+- **Compact Output for Test Command** ✅ COMPLETED
+  - Added live-updating rich table display for non-verbose test output
+  - Shows model ID, context size, and test status in a clean format
+  - Progress tracking for batch tests with `--all` flag
+  - Maintains detailed logging in verbose mode for debugging
+  - Significantly improves readability when testing multiple models
+- **Custom Prompt Support for Context Testing** ✅ COMPLETED
+  - Added `--prompt` parameter to test command for using custom prompt strings
+  - Added `--file_prompt` parameter to test command for loading prompts from files
+  - Modified ContextTester and InferenceEngine to accept custom prompts
+  - Custom prompts replace the default dual-test prompts (96 digits + 2+3=5)
+  - Updated help documentation with examples of custom prompt usage
+  - Created test_prompt_example.txt as a demonstration file
+- **Issue #307**: Streaming Inference Support ✅ COMPLETED
   - Added `stream_completion()` method to LMStudioClient using lmstudio SDK's `complete_stream()`
   - Implemented token-by-token streaming with callbacks and progress monitoring
   - Added `stream_infer()` methods to InferenceEngine and InferenceManager
   - Added CLI `--stream` flag for real-time token display during inference
   - Added `--stream-timeout` parameter (default 120s) for hang detection
   - Streaming statistics: tokens/second, time to first token
-- **Issue #306**: Batch Processing Tool (`_keep_this/adam/adamall.py`)
+  - Full backward compatibility maintained with existing sync inference
+- **Issue #306**: Batch Processing Tool ✅ COMPLETED (`_keep_this/adam/adamall.py`)
   - Processes multiple prompts across all models automatically
   - Smart model management - reuses loaded models when possible
   - Skips existing outputs for resumable batch processing
@@ -913,6 +940,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Error capture to output files on failure
   - Progress tracking with percentage completion
   - Processes prompts: `think,aps`, `think,humanize`, `think,tldr`, `think,tts_optimize`, `translate`, `tldr`
+  - Loads models with 50% context, runs inference with 90% max context
+  - Intelligent model sorting by size for optimal processing
 - Created `src/lmstrix/api/main.py` with `LMStrixService` class containing all business logic
 - Implemented separation of concerns with thin CLI wrapper in `__main__.py`
 
@@ -1847,6 +1876,149 @@ SOFTWARE.
 <document_content>
 # LMStrix Current Development Plan
 
+## Ruff Linting Improvements Plan
+
+### Overview
+This plan addresses the 143 Ruff linting errors identified in the codebase. The improvements will enhance code quality, maintainability, and robustness while ensuring backward compatibility.
+
+### Error Analysis Summary
+
+#### Critical Issues (High Priority)
+1. **BLE001 - Blind Exception Catching (46 occurrences)**
+   - Most prevalent issue affecting error handling quality
+   - Reduces debuggability and can hide serious errors
+   
+2. **E722 - Bare Except (2 occurrences)**
+   - Similar to BLE001 but even more dangerous
+   - Must be fixed for proper error handling
+
+#### Code Quality Issues (Medium Priority)
+3. **A002 - Shadowing Python Builtins (3 occurrences)**
+   - Variables named `all`, `dict`, `id` shadow builtins
+   - Can cause unexpected behavior
+   
+4. **TRY300 - Statement Placement (8 occurrences)**
+   - Logic that should be in else blocks
+   - Affects code clarity and exception handling flow
+   
+5. **PLC0415 - Non-Top-Level Imports (8 occurrences)**
+   - Dynamic imports within functions
+   - Can impact performance and code clarity
+
+#### Complexity Issues (Low Priority - May Exclude)
+6. **PLR0912 - Too Many Branches (12 occurrences)**
+7. **PLR0915 - Too Many Statements (11 occurrences)**
+8. **PLR0911 - Too Many Return Statements (2 occurrences)**
+   - These often indicate functions that need refactoring
+   - However, some complex logic legitimately requires many branches
+
+#### Maintainability Issues
+9. **ERA001 - Commented-Out Code (9 occurrences)**
+   - Dead code that should be removed
+   - Version control preserves history
+   
+10. **ARG002 - Unused Arguments (5 occurrences)**
+    - Method arguments that aren't used
+    - May indicate API design issues
+
+### Implementation Strategy
+
+#### Phase 1: Critical Fixes (Immediate)
+1. Fix all BLE001 errors by:
+   - Replacing `except Exception:` with specific exceptions
+   - Adding proper error context and logging
+   - Example transformation:
+   ```python
+   # Before
+   try:
+       result = some_operation()
+   except Exception as e:
+       logger.error(f"Operation failed: {e}")
+   
+   # After
+   try:
+       result = some_operation()
+   except (ValueError, TypeError, KeyError) as e:
+       logger.error(f"Operation failed with {type(e).__name__}: {e}")
+   except Exception as e:
+       logger.exception(f"Unexpected error in operation: {e}")
+       raise
+   ```
+
+2. Fix E722 bare except clauses
+3. Fix A002 builtin shadowing:
+   - `all` → `all_items` or `show_all`
+   - `dict` → `dict_params` or `params_dict`
+   - `id` → `model_id` or `identifier`
+
+#### Phase 2: Code Quality Improvements
+1. Fix TRY300 by restructuring try-except-else blocks
+2. Move dynamic imports to top-level where possible (PLC0415)
+3. Remove commented-out code (ERA001)
+4. Fix unused arguments (ARG002) by either:
+   - Using them if needed
+   - Adding `_` prefix for intentionally unused
+   - Removing if part of public API that can be changed
+
+#### Phase 3: Complexity Management
+1. For PLR0912/PLR0915 (too many branches/statements):
+   - Evaluate each case individually
+   - Refactor where it improves readability
+   - Add exclusions for legitimate complex logic
+   
+2. Consider breaking down large functions into smaller ones:
+   - Extract validation logic
+   - Extract error handling patterns
+   - Create helper methods
+
+### Ruff Configuration Updates
+
+Add to `pyproject.toml`:
+
+```toml
+[tool.ruff]
+# Existing configuration...
+
+# Per-file ignores for legitimate exceptions
+[tool.ruff.per-file-ignores]
+# Complex CLI and API endpoints may have many branches
+"src/lmstrix/api/main.py" = ["PLR0912", "PLR0915"]
+"src/lmstrix/core/inference_manager.py" = ["PLR0912", "PLR0915"]
+"src/lmstrix/core/inference.py" = ["PLR0912", "PLR0915"]
+
+# Example scripts may have different standards
+"examples/**/*.py" = ["PLR0915", "ERA001"]
+
+# Test files may need different rules
+"tests/**/*.py" = ["ARG002"]  # Test fixtures often have unused args
+
+# Ignore specific rules globally with justification
+ignore = [
+    # These will be addressed individually, not blanket ignored
+]
+```
+
+### Testing Strategy
+1. Run full test suite after each phase
+2. Add new tests for improved error handling
+3. Verify no regression in functionality
+4. Check performance impact of changes
+
+### Success Metrics
+- Reduce total Ruff errors from 143 to < 20
+- All remaining errors have explicit exclusions with justification
+- Improved error messages and debugging capability
+- No functionality regression
+- Better code maintainability
+
+### Timeline
+- Phase 1: 2-3 hours (Critical fixes)
+- Phase 2: 1-2 hours (Quality improvements)
+- Phase 3: 2-3 hours (Complexity management)
+- Testing & validation: 1 hour
+
+Total estimated time: 6-9 hours of focused work
+
 
 ## Current Status
 ### Problem Description
@@ -1883,13 +2055,13 @@ When running the same translation prompt through LM Studio GUI vs lmstrix CLI, w
 3. **Chat Template**: Possible incorrect chat template application
 4. **Parameter Mismatch**: Inference parameters not matching LM Studio defaults
 
-## Immediate Priorities
+## Current Top Priority
 
-### 1. Fix Issue #302 - Inference Output Mismatch
-**Priority: CRITICAL - NOW TOP PRIORITY**
-- This is blocking proper inference functionality
-- Users cannot get correct model outputs
-- Model only outputs `</translation>` instead of full translation
+### Issue #302 - Inference Output Mismatch (CRITICAL)
+**Priority: URGENT - Blocking Core Functionality**
+- Model outputs only `</translate>` instead of full translation
+- LM Studio GUI produces 639 tokens, lmstrix CLI produces 4 tokens  
+- Critical inference functionality is broken for users
 
 #### Implementation Steps:
 
@@ -1921,298 +2093,84 @@ When running the same translation prompt through LM Studio GUI vs lmstrix CLI, w
 - Update all prompt examples to use simplified approach
 - Ensure backward compatibility with existing TOML files
 
-## NEW FEATURES: Issues #306 & #307 - Streaming & Batch Processing
+## COMPLETED FEATURES ✅
 
-### Issue #307: Streaming Inference Support
-**Priority: HIGH** - Modern inference capability
+### Compact Test Output ✅ COMPLETED
+**Status: FULLY IMPLEMENTED AND WORKING**
+
+Successfully implemented compact output for the test command:
+- ✅ Live-updating rich tables for non-verbose mode
+- ✅ Clean display of model ID, context size, and status
+- ✅ Progress tracking for batch tests with `--all` flag
+- ✅ Maintains backward compatibility with verbose mode
+- ✅ Significantly improved readability for testing workflows
+
+### Issue #307: Streaming Inference Support ✅ COMPLETED
+**Status: FULLY IMPLEMENTED AND WORKING**
+
+All original requirements have been successfully implemented:
+- ✅ Async streaming API using lmstudio SDK's `complete_stream()`
+- ✅ Full backward compatibility maintained
+- ✅ CLI `--stream` and `--stream-timeout` flags
+- ✅ Robust error handling and cancellation support
+- ✅ Efficient token-by-token processing and display
+- ✅ Streaming statistics and progress monitoring
+
+### Issue #306: Batch Processing Tool ✅ COMPLETED  
+**Status: FULLY IMPLEMENTED AND WORKING**
+
+The adamall.py batch processing tool has been successfully created with all required features:
+- ✅ Smart model management with reuse detection
+- ✅ Processes all 6 target prompts efficiently
+- ✅ Safe filename generation using pathvalidate
+- ✅ Skip existing outputs for resumable processing
+- ✅ Comprehensive error handling and progress tracking
+- ✅ Intelligent model scheduling for optimal performance
+
+#### Usage:
+```bash
+cd _keep_this/adam
+python adamall.py
+```
+
+Output files are generated in `_keep_this/adam/out/` with safe naming patterns.
+
+## Current Active Development
+
+### Issue #105 - Adam.toml Simplification (Next Priority)
+**Priority: High** (after Issue #302 is resolved)
 
 #### Problem Statement
-Current lmstrix only supports synchronous inference via `llm.complete()`, which:
-- Blocks until entire response is complete
-- Provides no real-time feedback during generation
-- Cannot handle interrupted inference gracefully
-- Missing modern streaming UX that users expect
+Current adam.toml structure uses nested groups which is complex for users:
+```toml
+[prompts.translate]
+template = "Translate this to Polish: {text}"
 
-#### Technical Requirements
-1. **Async Streaming API**: Integrate lmstudio SDK's `complete_stream()` capability
-2. **Backward Compatibility**: Maintain existing sync API while adding streaming
-3. **CLI Integration**: Add `--stream` flag to inference commands
-4. **Error Handling**: Robust streaming error recovery and cancellation
-5. **Performance**: Efficient token-by-token processing without blocking
-
-#### Implementation Architecture
-
-##### Core Components:
-1. **StreamingInferenceManager** - Async counterpart to InferenceManager
-2. **LMStudioClient.stream_completion()** - Async streaming method  
-3. **CLI streaming support** - `--stream` flag with real-time output
-4. **Error resilience** - Handle network interruptions, model failures
-5. **Token callbacks** - Extensible handler system for streaming tokens
-
-##### API Design:
-```python
-# Async streaming interface
-async def stream_infer(
-    model_id: str, 
-    prompt: str,
-    on_token: Callable[[str], None] = None,
-    **kwargs
-) -> AsyncGenerator[str, None]:
-    """Stream inference tokens as they arrive"""
-    
-# CLI usage
-lmstrix infer translate --stream -m model-id --text "Hello world"
+[prompts.think.aps]  
+template = "Think step by step: {text}"
 ```
 
-### Issue #306: Batch Processing Tool (adamall.py)
-**Priority: HIGH** - Essential automation tool
+#### Target Simplification
+Change to flat structure for better usability:
+```toml
+[translate]
+template = "Translate this to Polish: {text}"
 
-#### Problem Statement
-Users need to efficiently run multiple prompts across multiple models:
-- Manual inference is time-consuming and error-prone
-- Need to process 6 specific prompts against all available models
-- Must avoid unnecessary model loading/unloading
-- Require robust error handling and progress tracking
-- Output organization for downstream processing
-
-#### Technical Requirements
-1. **Smart Model Management**: Load models only when needed, reuse when possible
-2. **Prompt Processing**: Handle multiple prompts from adam.toml efficiently
-3. **File Organization**: Safe output naming with pathvalidate sanitization
-4. **Skip Existing**: Don't regenerate outputs that already exist
-5. **Error Recovery**: Capture errors in output files, continue processing
-6. **Progress Tracking**: Clear feedback on processing status
-
-#### Implementation Architecture
-
-##### Core Components:
-1. **BatchProcessor** - Main orchestration class
-2. **ModelManager** - Efficient model loading/unloading
-3. **PromptRunner** - Individual prompt execution with error handling
-4. **OutputManager** - File naming, existence checking, error capture
-5. **ProgressTracker** - Status reporting and logging
-
-##### Workflow Design:
-```python
-# Processing strategy
-1. Load all models from registry, sort by "smart" method
-2. Load all required prompts from adam.toml  
-3. Build execution matrix (model × prompt combinations)
-4. Filter out existing outputs to skip redundant work
-5. Group by model to minimize loading operations
-6. Execute with comprehensive error handling
-7. Progress reporting throughout
+[think_aps]
+template = "Think step by step: {text}"
 ```
 
-##### Target Prompts:
-- `think,aps`
-- `think,humanize` 
-- `think,tldr`
-- `think,tts_optimize`
-- `translate`
-- `tldr`
+#### Implementation Requirements
+1. Update prompt loader to handle flat structure
+2. Add backward compatibility for existing nested files
+3. Add --text and --text_file parameters to infer command
+4. Update all examples to use simplified format
+5. Migration guide for existing users
 
-#### File Management Strategy:
-- **Input**: `_keep_this/adam/fontlab8.md`
-- **Output Pattern**: `_keep_this/adam/out/{safe_prompt_name}--{safe_model_id}.txt`
-- **Safety**: Use pathvalidate for filename sanitization
-- **Existence Check**: Skip files that already exist
-- **Error Capture**: Write error messages to output files on failure
-
-## Detailed Technical Implementation
-
-### Issue #307: Streaming Implementation Breakdown
-
-#### Phase 1: Core Infrastructure (Day 1-2)
-1. **LMStudioClient Async Methods**:
-   ```python
-   async def stream_completion(
-       self, llm, prompt: str, 
-       on_token: Callable[[str], None] = None,
-       **kwargs
-   ) -> AsyncGenerator[str, None]:
-       """Stream tokens from lmstudio SDK async API"""
-   ```
-
-2. **StreamingInferenceManager Class**:
-   ```python
-   class StreamingInferenceManager:
-       async def stream_infer(self, model_id: str, prompt: str, **kwargs):
-           """Async streaming counterpart to InferenceManager.infer()"""
-   ```
-
-3. **Integration Points**:
-   - Extend existing InferenceManager with async methods
-   - Maintain backward compatibility with sync interface
-   - Use asyncio for event loop management
-
-#### Phase 2: CLI Integration (Day 2-3)
-1. **Command Line Interface**:
-   - Add `--stream` flag to `lmstrix infer` command
-   - Real-time token display to stdout
-   - Handle Ctrl+C gracefully for cancellation
-
-2. **Error Handling**:
-   - Network interruption recovery
-   - Model loading failures during streaming
-   - Graceful degradation to sync mode if streaming fails
-
-#### Phase 3: Testing & Polish (Day 3-5)
-1. **Unit Tests**: Async streaming functionality
-2. **Integration Tests**: CLI streaming with real models
-3. **Performance Tests**: Compare streaming vs sync performance
-4. **Documentation**: Usage examples and API documentation
-
-### Issue #306: Batch Tool Implementation Breakdown
-
-#### Phase 1: Core Architecture (Day 1-2)
-1. **BatchProcessor Class**:
-   ```python
-   class BatchProcessor:
-       def __init__(self, adam_toml_path, fontlab_md_path, output_dir):
-           self.models = self.load_and_sort_models()
-           self.prompts = self.load_prompts()
-           self.matrix = self.build_execution_matrix()
-   ```
-
-2. **Smart Model Management**:
-   ```python
-   class ModelManager:
-       def __init__(self, inference_manager):
-           self.current_model = None
-           self.inference_manager = inference_manager
-           
-       async def ensure_model_loaded(self, model_id: str, context_size: int):
-           """Load model only if not already loaded"""
-   ```
-
-3. **Output Management**:
-   ```python
-   class OutputManager:
-       def __init__(self, output_dir: Path):
-           self.output_dir = output_dir
-           
-       def get_output_path(self, prompt_name: str, model_id: str) -> Path:
-           """Generate safe output path using pathvalidate"""
-           
-       def should_skip(self, output_path: Path) -> bool:
-           """Check if output already exists"""
-   ```
-
-#### Phase 2: Execution Engine (Day 2-3)
-1. **Execution Matrix**:
-   - Build combinations of models × prompts
-   - Filter existing outputs to avoid redundant work
-   - Group by model to minimize loading overhead
-
-2. **Progress Tracking**:
-   ```python
-   class ProgressTracker:
-       def __init__(self, total_tasks: int):
-           self.completed = 0
-           self.total = total_tasks
-           self.start_time = time.time()
-           
-       def update(self, prompt_name: str, model_id: str, status: str):
-           """Update progress and display to user"""
-   ```
-
-3. **Error Resilience**:
-   - Wrap each inference in try/except
-   - Write error messages to output files
-   - Continue processing despite individual failures
-   - Log all errors for debugging
-
-#### Phase 3: Integration & Testing (Day 3-4)
-1. **CLI Tool Creation**: `_keep_this/adam/adamall.py`
-2. **Integration**: Use existing lmstrix components
-3. **Memory Management**: [[memory:4463738]] Unload models between tests
-4. **Context Management**: [[memory:4875704]] Use ctx_out from registry
-5. **Testing**: End-to-end validation with real models and prompts
-
-#### Target Integration Points:
-- **Model Registry**: `src/lmstrix/core/models.py` for model listing and smart sorting
-- **Prompt Loader**: `src/lmstrix/loaders/prompt_loader.py` for adam.toml processing  
-- **Inference Manager**: `src/lmstrix/core/inference_manager.py` for actual inference
-- **Logging**: `src/lmstrix/utils/logging.py` for consistent logging
-
-#### Execution Strategy:
-```python
-# Pseudo-code for batch execution
-for model in sorted_models:
-    for prompt_name in target_prompts:
-        output_path = get_safe_output_path(prompt_name, model.id)
-        if output_path.exists():
-            continue  # Skip existing
-            
-        try:
-            ensure_model_loaded(model.id, context_size=int(model.context_limit * 0.5))
-            resolved_prompt = load_prompt(prompt_name, text=fontlab8_content)
-            result = inference_manager.infer(
-                model_id=model.id,
-                prompt=resolved_prompt.resolved,
-                out_ctx=int(model.context_out * 0.9)  # Use 90% of max context
-            )
-            write_output(output_path, result.response)
-        except Exception as e:
-            write_error(output_path, str(e))
-        finally:
-            progress_tracker.update(prompt_name, model.id, "completed")
-```
-
-## Implementation Order
-
-1. **Issue #302 - Inference Fix** (NOW TOP PRIORITY):
-   - Align parameters with LM Studio
-   - Fix context length handling
-   - Investigate stop token issue
-
-### Phase 1: New Features Implementation (After Issue #302)
-1. **Issue #307 - Streaming Inference** (3-5 days):
-   - Implement async streaming infrastructure
-   - Add CLI streaming support
-   - Comprehensive testing
-   
-2. **Issue #306 - Batch Processing Tool** (3-4 days):
-   - Build adamall.py with smart model management
-   - Integrate with existing prompt/model systems
-   - Output management and error handling
-
-### Phase 2: Normal Development (After new features)
-- Continue with Issue #105 and other planned improvements
-
-## Key Design Decisions & Risk Mitigation
-
-### Issue #307: Streaming Implementation Decisions
-1. **Async-First Approach**: Use Python asyncio for true non-blocking streaming
-2. **Backward Compatibility**: Keep existing sync API unchanged, add streaming as enhancement
-3. **Error Resilience**: Graceful fallback to sync mode if streaming fails
-4. **Memory Management**: Stream tokens without buffering entire response
-5. **CLI Integration**: Simple `--stream` flag, no breaking changes to existing commands
-
-### Issue #306: Batch Tool Design Decisions  
-1. **Smart Model Loading**: Minimize model loading overhead by grouping operations by model
-2. **Idempotent Execution**: Skip existing outputs to support resumable batch processing
-3. **Error Isolation**: Individual task failures don't stop entire batch
-4. **Memory Safety**: [[memory:4463738]] Always unload models between major operations
-5. **Context Optimization**: [[memory:4875704]] Use model-specific ctx_out values for optimal performance
-6. **File Safety**: Use pathvalidate for cross-platform filename sanitization
-
-### Risk Assessment & Mitigation
-1. **Memory Pressure**: Batch tool could exhaust system memory
-   - *Mitigation*: Explicit model unloading, memory monitoring
-2. **Long Processing Times**: Large batch jobs could take hours
-   - *Mitigation*: Progress tracking, resumable execution, early skip existing
-3. **Network Failures**: Streaming could be interrupted
-   - *Mitigation*: Graceful degradation, retry logic, fallback to sync
-4. **File System Issues**: Output file conflicts or permission errors
-   - *Mitigation*: Safe filename generation, directory creation, error capture
-
-### Performance Considerations
-1. **Streaming**: Real-time token display vs sync waiting
-2. **Batch Processing**: Model reuse vs loading overhead
-3. **Memory Usage**: Stream buffering vs batch model loading
-4. **I/O Efficiency**: File existence checking vs redundant processing
+#### Success Criteria
+- Users can create simple, flat TOML prompt files
+- Existing nested files continue to work
+- CLI supports direct text input without files
 
 ## Future Development Phases
 
@@ -2257,60 +2215,6 @@ for model in sorted_models:
 - **Maintainability**: Reduced complexity, better code organization
 - **Documentation**: Up-to-date and comprehensive user guides
 
-## NEW DEVELOPMENT PRIORITIES
-
-### Issue #307 - Implement LM Studio Streaming Inference
-**Priority: High** (Modern SDK capability)
-
-#### Problem Analysis
-- Current lmstrix uses synchronous `llm.complete()` which blocks until full response
-- LM Studio SDK 1.4+ supports `llm.complete_stream()` with real-time token streaming
-- Streaming enables: real-time progress feedback, automatic hang detection, better UX
-
-#### Implementation Strategy
-
-##### Phase 1: Core Streaming Migration
-- Replace `llm.complete()` with `llm.complete_stream()` in `LMStudioClient.completion()`
-- Implement progress callbacks: `on_prediction_fragment`, `on_first_token`
-- Add no-progress timeout watchdog to abort stalled generations
-- Maintain backward compatibility with existing response format
-
-##### Phase 2: CLI Enhancement
-- Add `--stream-timeout` flag (default 120s) for hang detection
-- Add `--show-progress` flag for real-time token display
-- Update inference logging to show streaming status
-
-##### Phase 3: Advanced Features
-- Implement token-by-token display in verbose mode
-- Add streaming statistics (tokens/second, time to first token)
-- Enable streaming cancellation via Ctrl+C
-
-### Issue #306 - Batch Inference Tool (adamall.py)
-**Priority: Medium** (User productivity tool)
-
-#### Requirements Analysis
-- Batch process multiple models × multiple prompts
-- Smart model loading/unloading to minimize operations
-- Output management with safe filename generation
-- Error handling and recovery
-
-#### Implementation Strategy
-
-##### Phase 1: Core Infrastructure
-- Create `_keep_this/adam/adamall.py` using lmstrix API
-- Implement smart model state detection and caching
-- Add pathvalidate-based safe filename generation
-- Configure batch prompts: `think,aps`, `think,humanize`, `think,tldr`, `think,tts_optimize`, `translate`, `tldr`
-
-##### Phase 2: Output Management
-- Implement file existence checking to skip completed inference
-- Generate output paths: `f"_keep_this/adam/out/{safe_prompt_name}--{safe_model_id}.txt"`
-- Add error message capture to output files on failure
-
-##### Phase 3: Performance Optimization
-- Sort models by "smart" method (as in `lmstrix list`)
-- Load models with 50% input context, inference with 90% max context
-- Minimize model loading/unloading through intelligent scheduling
 
 ## Long-term Vision
 
@@ -2340,6 +2244,7 @@ LMStrix is a professional Python toolkit designed to supercharge your interactio
 - **📋 Comprehensive Model Registry**: Track models, their context limits, and test results with JSON persistence
 - **🛡️ Safety Controls**: Configurable thresholds and fail-safes to prevent system crashes
 - **💻 Rich CLI Interface**: Beautiful terminal output with progress indicators and formatted tables
+- **📈 Compact Test Output**: Live-updating tables show test progress without verbose logging clutter
 
 ## Installation
 
@@ -2454,7 +2359,25 @@ lmstrix test --all --ctx 32768
 
 # Reset and re-test a model
 lmstrix test llama-3.2-3b-instruct --reset
+
+# Test with custom prompt
+lmstrix test llama-3.2-3b-instruct --prompt "What is 2+2?"
+
+# Test with file-based prompt
+lmstrix test llama-3.2-3b-instruct --file_prompt test_prompt.txt
 ```
+
+### Compact Output (Default)
+When running without `--verbose`, tests display a clean, live-updating table:
+```
+Model                                   Context      Status
+llama-3.2-3b-instruct                   32,768      Testing...
+→
+Model                                   Context      Status  
+llama-3.2-3b-instruct                   32,768      ✓ Success
+```
+
+For batch testing with `--all`, a progress column is added to track multiple models.
 
 ## Model Management
 
@@ -2736,19 +2659,25 @@ The test suite is designed to run in CI/CD pipelines:
 <document_content>
 # LMStrix TODO List
 
-### Issue #307: Streaming Inference Support 
+### Recently Completed ✅
 
-- [ ] Write unit tests for streaming functionality
-- [ ] Write integration tests with real models
-- [ ] Update documentation with streaming examples
-- [ ] Performance testing: streaming vs sync comparison
+- [x] Add --prompt parameter to test command for custom prompts
+- [x] Add --file_prompt parameter to test command for loading prompts from files
+- [x] Update ContextTester and InferenceEngine to support custom prompts
+- [x] Update help documentation with custom prompt examples
+- [x] Implement compact output for test command with live-updating tables
+- [x] Add progress tracking for batch tests with --all flag
+- [x] Maintain backward compatibility with verbose mode
 
-### Testing and Validation
+### Issue #302: Inference Output Mismatch (PRIORITY)
 
 - [ ] Compare output with LM Studio for identical prompts
 - [ ] Ensure token counts match between lmstrix and LM Studio
 - [ ] Verify translation quality matches expected output
 - [ ] Create regression test for this issue
+- [ ] Fix maxTokens calculation issue
+- [ ] Investigate stop token configuration differences
+- [ ] Fix context length handling (GUI uses 131072, CLI uses 65536)
 
 ### Model Loading Optimization (Medium Priority)
 
@@ -2858,33 +2787,6 @@ The test suite is designed to run in CI/CD pipelines:
 - [ ] Test PyPI package build
 - [ ] Verify clean installation works
 
-## NEW DEVELOPMENT PRIORITIES
-
-### Issue #307 - LM Studio Streaming Inference (High Priority)
-- [ ] Research LM Studio SDK streaming API (`complete_stream()`, callbacks)
-- [ ] Replace `llm.complete()` with `llm.complete_stream()` in `LMStudioClient.completion()`
-- [ ] Implement progress callbacks: `on_prediction_fragment`, `on_first_token`
-- [ ] Add no-progress timeout watchdog to abort stalled generations
-- [ ] Add CLI flags: `--stream-timeout` (default 120s), `--show-progress`
-- [ ] Update inference logging to show streaming status
-- [ ] Implement token-by-token display in verbose mode
-- [ ] Add streaming statistics (tokens/second, time to first token)
-- [ ] Enable streaming cancellation via Ctrl+C
-- [ ] Maintain backward compatibility with existing response format
-
-### Issue #306 - Batch Inference Tool (Medium Priority)
-- [ ] Create `_keep_this/adam/adamall.py` using lmstrix API
-- [ ] Implement smart model state detection and caching
-- [ ] Add pathvalidate for safe filename generation (`safe_model_id`, `safe_prompt_name`)
-- [ ] Configure batch prompts: `think,aps`, `think,humanize`, `think,tldr`, `think,tts_optimize`, `translate`, `tldr`
-- [ ] Implement file existence checking to skip completed inference
-- [ ] Generate output paths: `f"_keep_this/adam/out/{safe_prompt_name}--{safe_model_id}.txt"`
-- [ ] Add error message capture to output files on failure
-- [ ] Sort models by "smart" method (as in `lmstrix list`)
-- [ ] Load models with 50% input context, inference with 90% max context
-- [ ] Minimize model loading/unloading through intelligent scheduling
-- [ ] Use logger from `lmstrix.utils.logging`
-- [ ] Process text from `_keep_this/adam/fontlab8.md`
 
 </document_content>
 </document>
@@ -2894,11 +2796,11 @@ The test suite is designed to run in CI/CD pipelines:
 <document_content>
 # Current Work Progress
 
-## Recently Completed Work
+## 1. Recently Completed Work
 
-### Issue #307 - Streaming Inference Support ✅
+### 1.1. Issue #307 - Streaming Inference Support ✅
 
-#### What was done:
+#### 1.1.1. What was done:
 1. **Added streaming support to LMStudioClient** (`src/lmstrix/api/client.py`):
    - Implemented `stream_completion()` method using lmstudio SDK's `complete_stream()`
    - Added token-by-token callbacks with `on_prediction_fragment` and `on_first_token`
@@ -2915,7 +2817,7 @@ The test suite is designed to run in CI/CD pipelines:
    - Tokens are displayed in real-time to stdout as they are generated
    - Maintains backward compatibility - regular inference still works
 
-#### How to use:
+#### 1.1.2. How to use:
 ```bash
 # Regular inference (blocking)
 lmstrix infer "Hello world" -m model-id
@@ -2927,9 +2829,9 @@ lmstrix infer "Hello world" -m model-id --stream
 lmstrix infer "Hello world" -m model-id --stream --stream-timeout 180
 ```
 
-### Issue #306 - Batch Processing Tool ✅
+### 1.2. Issue #306 - Batch Processing Tool ✅
 
-#### What was done:
+#### 1.2.1. What was done:
 1. **Created adamall.py batch processing tool** (`_keep_this/adam/adamall.py`):
    - Processes 6 specific prompts: `think,aps`, `think,humanize`, `think,tldr`, `think,tts_optimize`, `translate`, `tldr`
    - Smart model management - reuses loaded models when possible
@@ -2943,7 +2845,7 @@ lmstrix infer "Hello world" -m model-id --stream --stream-timeout 180
    - Progress tracking with percentage and ETA
    - Comprehensive error handling and logging
 
-#### How to use:
+#### 1.2.2. How to use:
 ```bash
 cd _keep_this/adam
 python adamall.py
@@ -2953,14 +2855,14 @@ Output files will be generated in `_keep_this/adam/out/` with names like:
 - `think_aps--model_name.txt`
 - `translate--model_name.txt`
 
-## ACTIVE: Issue #302 - Fix Inference Output Mismatch
+## 2. ACTIVE: Issue #302 - Fix Inference Output Mismatch
 
-### Problem Summary
+### 2.1. Problem Summary
 When running the same translation prompt:
 - **LM Studio GUI**: Produces proper Polish translation (639 tokens)
 - **lmstrix CLI**: Only outputs `</translate>` (4 tokens)
 
-### Root Cause Analysis
+### 2.2. Root Cause Analysis
 Found several configuration differences:
 1. Temperature: GUI=0.8, CLI=0.7 → Updated default to 0.8 ✅
 2. top_k: GUI=20, CLI=40 → Now configurable via CLI ✅
@@ -2968,47 +2870,63 @@ Found several configuration differences:
 4. max_predict: GUI=-1, CLI=117964
 5. Stop tokens configuration may differ
 
-### Current Work Items
+### 2.3. Current Work Items
 
-#### 1. Add Diagnostic Logging ✅
+#### 2.3.1. Add Diagnostic Logging ✅
 - [x] Log exact prompt with escape sequences visible
 - [x] Log all inference parameters in detail
 - [x] Add comparison with LM Studio defaults
 - [x] Log stop token configuration
 
-#### 2. Parameter Alignment
+#### 2.3.2. Parameter Alignment
 - [x] Change default temperature to 0.8
 - [x] Add CLI flags for inference parameters
 - [ ] Fix maxTokens calculation
 - [ ] Add stop token configuration
 
-#### 3. Context Length Fix
+#### 2.3.3. Context Length Fix
 - [ ] Fix context reduction issue
 - [ ] Use full model context by default
 - [ ] Add warning for context reduction
 
-#### 4. Testing
+#### 2.3.4. Testing
 - [ ] Compare with LM Studio output
 - [ ] Verify token counts match
 - [ ] Test translation quality
 
-### Implementation Progress
+### 2.4. Implementation Progress
 Added diagnostic logging and streaming support. Need to investigate stop token issue next...
 
-### Test Suite Fixes (Priority 0) ✅
+### 2.5. Rich Table Width Fix ✅
+Updated all Rich tables to take 100% console width:
+- Added `expand=True` to all Table constructors (9 tables total)
+- Removed all fixed `width` parameters from `add_column()` calls
+- Tables now automatically use full terminal width for better readability
+
+### 2.6. Response Preview Enhancement ✅
+Fixed response preview display in `lmstrix test` command:
+- **Problem**: Response preview was truncated to only 20 characters, showing "||Custom prompt respon||" instead of meaningful content
+- **Solution**: Created `_format_response_preview()` helper function that:
+  - Increases preview length from 20 to 60 characters (configurable)
+  - Cleans up whitespace and newlines for better table display
+  - Adds ellipsis ("...") when truncated
+  - Maintains "❌" for failed responses
+- **Result**: Users now see more meaningful response content like "||Custom prompt response for testing context limits and model inference...||"
+
+### 2.7. Test Suite Fixes (Priority 0) ✅
 All critical AttributeError issues have been resolved:
 1. **Model.validate_integrity()** ✅
 2. **PromptResolver methods** ✅  
 3. **ContextTester methods** ✅
 4. **ModelScanner.sync_with_registry()** ✅
 
-### Issues 201-204 ✅
+### 2.7. Issues 201-204 ✅
 - Model persistence between calls
 - Beautiful enhanced logging
 - Fixed model lookup for paths/IDs
 - Comprehensive inference statistics
 
-## Next Steps After Issue #302
+## 3. Next Steps After Issue #302
 1. Complete remaining test fixes
 2. Issue #105 - Adam.toml simplification
 3. Context testing streamlining
@@ -3057,149 +2975,91 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 <document index="15">
 <source>cleanup.txt</source>
 <document_content>
-::error title=Ruff (A002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/__main__.py,line=40,col=9,endLine=40,endColumn=12::src/lmstrix/__main__.py:40:9: A002 Function argument `all` is shadowing a Python builtin
-::error title=Ruff (A002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/__main__.py,line=83,col=9,endLine=83,endColumn=13::src/lmstrix/__main__.py:83:9: A002 Function argument `dict` is shadowing a Python builtin
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=63,col=9,endLine=63,endColumn=25::src/lmstrix/loaders/model_loader.py:63:9: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (PLR0911),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=69,col=5,endLine=69,endColumn=31::src/lmstrix/loaders/model_loader.py:69:5: PLR0911 Too many return statements (8 > 6)
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=105,col=9,endLine=105,endColumn=20::src/lmstrix/loaders/model_loader.py:105:9: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=185,col=9,endLine=185,endColumn=25::src/lmstrix/loaders/model_loader.py:185:9: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=205,col=5,endLine=205,endColumn=29::src/lmstrix/loaders/model_loader.py:205:5: PLR0912 Too many branches (15 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=205,col=5,endLine=205,endColumn=29::src/lmstrix/loaders/model_loader.py:205:5: PLR0915 Too many statements (51 > 50)
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=346,col=9,endLine=346,endColumn=20::src/lmstrix/loaders/model_loader.py:346:9: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=72,col=12,endLine=72,endColumn=21::src/lmstrix/loaders/prompt_loader.py:72:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=90,col=5,endLine=90,endColumn=23::src/lmstrix/loaders/prompt_loader.py:90:5: PLR0912 Too many branches (14 > 12)
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=143,col=12,endLine=143,endColumn=21::src/lmstrix/loaders/prompt_loader.py:143:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=221,col=9,endLine=221,endColumn=23::src/lmstrix/loaders/prompt_loader.py:221:9: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=226,col=13,endLine=226,endColumn=27::src/lmstrix/loaders/prompt_loader.py:226:13: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/prompt_loader.py,line=231,col=13,endLine=231,endColumn=24::src/lmstrix/loaders/prompt_loader.py:231:13: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=31,col=5,endLine=31,endColumn=24::src/lmstrix/api/main.py:31:5: PLR0912 Too many branches (16 > 12)
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=330,col=9,endLine=330,endColumn=20::src/lmstrix/api/main.py:330:9: PLR0912 Too many branches (16 > 12)
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=438,col=9,endLine=438,endColumn=20::src/lmstrix/api/main.py:438:9: PLR0912 Too many branches (13 > 12)
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=445,col=9,endLine=445,endColumn=13::src/lmstrix/api/main.py:445:9: ARG002 Unused method argument: `sort`
-::error title=Ruff (PLR0911),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=547,col=9,endLine=547,endColumn=22::src/lmstrix/api/main.py:547:9: PLR0911 Too many return statements (10 > 6)
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=547,col=9,endLine=547,endColumn=22::src/lmstrix/api/main.py:547:9: PLR0912 Too many branches (54 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=547,col=9,endLine=547,endColumn=22::src/lmstrix/api/main.py:547:9: PLR0915 Too many statements (139 > 50)
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=582,col=24,endLine=582,endColumn=33::src/lmstrix/api/main.py:582:24: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (SIM108),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=596,col=17,endLine=602,endColumn=51::src/lmstrix/api/main.py:596:17: SIM108 Use ternary operator `pairs = dict_params.split(",") if "," in dict_params else dict_params.split(",")` instead of `if`-`else`-block
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=597,col=21,endLine=597,endColumn=56::src/lmstrix/api/main.py:597:21: ERA001 Found commented-out code
-::error title=Ruff (PLW2901),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=605,col=21,endLine=605,endColumn=25::src/lmstrix/api/main.py:605:21: PLW2901 `for` loop variable `pair` overwritten by assignment target
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=622,col=24,endLine=622,endColumn=33::src/lmstrix/api/main.py:622:24: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=705,col=20,endLine=705,endColumn=29::src/lmstrix/api/main.py:705:20: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=808,col=20,endLine=808,endColumn=29::src/lmstrix/api/main.py:808:20: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=850,col=9,endLine=850,endColumn=21::src/lmstrix/api/main.py:850:9: PLR0912 Too many branches (14 > 12)
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=950,col=16,endLine=950,endColumn=25::src/lmstrix/api/main.py:950:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=127,col=13,endLine=127,endColumn=19::src/lmstrix/api/client.py:127:13: E722 Do not use bare `except`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=153,col=24,endLine=153,endColumn=33::src/lmstrix/api/client.py:153:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=106,col=9,endLine=106,endColumn=20::src/lmstrix/loaders/model_loader.py:106:9: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=186,col=9,endLine=186,endColumn=25::src/lmstrix/loaders/model_loader.py:186:9: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/loaders/model_loader.py,line=361,col=9,endLine=361,endColumn=20::src/lmstrix/loaders/model_loader.py:361:9: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=602,col=9,endLine=602,endColumn=13::src/lmstrix/api/main.py:602:9: ARG002 Unused method argument: `sort`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=670,col=20,endLine=670,endColumn=29::src/lmstrix/api/main.py:670:20: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=834,col=24,endLine=834,endColumn=33::src/lmstrix/api/main.py:834:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (SIM108),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=848,col=17,endLine=854,endColumn=51::src/lmstrix/api/main.py:848:17: SIM108 Use ternary operator `pairs = dict_params.split(",") if "," in dict_params else dict_params.split(",")` instead of `if`-`else`-block
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=849,col=21,endLine=849,endColumn=56::src/lmstrix/api/main.py:849:21: ERA001 Found commented-out code
+::error title=Ruff (PLW2901),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=857,col=21,endLine=857,endColumn=25::src/lmstrix/api/main.py:857:21: PLW2901 `for` loop variable `pair` overwritten by assignment target
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=874,col=24,endLine=874,endColumn=33::src/lmstrix/api/main.py:874:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=957,col=20,endLine=957,endColumn=29::src/lmstrix/api/main.py:957:20: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=1060,col=20,endLine=1060,endColumn=29::src/lmstrix/api/main.py:1060:20: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=1202,col=16,endLine=1202,endColumn=25::src/lmstrix/api/main.py:1202:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=3,col=1,endLine=3,endColumn=40::src/lmstrix/utils/state.py:3:1: ERA001 Found commented-out code
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=26,col=20,endLine=26,endColumn=29::src/lmstrix/utils/state.py:26:20: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=35,col=16,endLine=35,endColumn=25::src/lmstrix/utils/state.py:35:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=64,col=17,endLine=64,endColumn=35::src/lmstrix/utils/context_parser.py:64:17: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (B904),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=73,col=13,endLine=75,endColumn=14::src/lmstrix/utils/context_parser.py:73:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=127,col=20,endLine=127,endColumn=29::src/lmstrix/api/client.py:127:20: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=155,col=13,endLine=155,endColumn=31::src/lmstrix/api/client.py:155:13: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=156,col=16,endLine=156,endColumn=25::src/lmstrix/api/client.py:156:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=184,col=9,endLine=184,endColumn=19::src/lmstrix/api/client.py:184:9: PLR0912 Too many branches (26 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=184,col=9,endLine=184,endColumn=19::src/lmstrix/api/client.py:184:9: PLR0915 Too many statements (91 > 50)
 ::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=198,col=11,endLine=198,endColumn=17::src/lmstrix/api/client.py:198:11: ARG002 Unused method argument: `kwargs`
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=376,col=9,endLine=376,endColumn=26::src/lmstrix/api/client.py:376:9: PLR0915 Too many statements (77 > 50)
 ::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=383,col=9,endLine=383,endColumn=29::src/lmstrix/api/client.py:383:9: ARG002 Unused method argument: `model_context_length`
 ::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=392,col=11,endLine=392,endColumn=17::src/lmstrix/api/client.py:392:11: ARG002 Unused method argument: `kwargs`
-::error title=Ruff (TRY301),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=47,col=21,endLine=47,endColumn=96::src/lmstrix/utils/context_parser.py:47:21: TRY301 Abstract `raise` to an inner function
-::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=47,col=27,endLine=47,endColumn=96::src/lmstrix/utils/context_parser.py:47:27: TRY003 Avoid specifying long messages outside the exception class
-::error title=Ruff (TRY301),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=53,col=21,endLine=55,endColumn=22::src/lmstrix/utils/context_parser.py:53:21: TRY301 Abstract `raise` to an inner function
-::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=53,col=27,endLine=55,endColumn=22::src/lmstrix/utils/context_parser.py:53:27: TRY003 Avoid specifying long messages outside the exception class
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=64,col=17,endLine=64,endColumn=35::src/lmstrix/utils/context_parser.py:64:17: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=67,col=23,endLine=67,endColumn=80::src/lmstrix/utils/context_parser.py:67:23: TRY003 Avoid specifying long messages outside the exception class
-::error title=Ruff (B904),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=73,col=13,endLine=75,endColumn=14::src/lmstrix/utils/context_parser.py:73:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
-::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=73,col=19,endLine=75,endColumn=14::src/lmstrix/utils/context_parser.py:73:19: TRY003 Avoid specifying long messages outside the exception class
-::error title=Ruff (TRY003),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=77,col=11,endLine=77,endColumn=81::src/lmstrix/utils/context_parser.py:77:11: TRY003 Avoid specifying long messages outside the exception class
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=3,col=1,endLine=3,endColumn=40::src/lmstrix/utils/state.py:3:1: ERA001 Found commented-out code
-::error title=Ruff (PTH123),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=24,col=22,endLine=24,endColumn=26::src/lmstrix/utils/state.py:24:22: PTH123 `open()` should be replaced by `Path.open()`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=26,col=20,endLine=26,endColumn=29::src/lmstrix/utils/state.py:26:20: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PTH123),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=33,col=18,endLine=33,endColumn=22::src/lmstrix/utils/state.py:33:18: PTH123 `open()` should be replaced by `Path.open()`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=35,col=16,endLine=35,endColumn=25::src/lmstrix/utils/state.py:35:16: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/concrete_config.py,line=3,col=1,endLine=3,endColumn=49::src/lmstrix/core/concrete_config.py:3:1: ERA001 Found commented-out code
 ::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/concrete_config.py,line=126,col=13,endLine=126,endColumn=24::src/lmstrix/core/concrete_config.py:126:13: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=144,col=16,endLine=144,endColumn=25::src/lmstrix/core/context_tester.py:144:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=158,col=35,endLine=158,endColumn=40::src/lmstrix/core/context_tester.py:158:35: ANN001 Missing type annotation for function argument `model`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=122,col=13,endLine=122,endColumn=46::src/lmstrix/core/inference.py:122:13: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=124,col=16,endLine=124,endColumn=25::src/lmstrix/core/inference.py:124:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=132,col=24,endLine=132,endColumn=33::src/lmstrix/core/inference.py:132:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=234,col=20,endLine=234,endColumn=29::src/lmstrix/core/inference.py:234:20: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=339,col=16,endLine=339,endColumn=25::src/lmstrix/core/inference.py:339:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=376,col=29,endLine=376,endColumn=35::src/lmstrix/core/inference.py:376:29: E722 Do not use bare `except`
+::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=376,col=29,endLine=377,endColumn=37::src/lmstrix/core/inference.py:376:29: S110 `try`-`except`-`pass` detected, consider logging the exception
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=401,col=28,endLine=401,endColumn=37::src/lmstrix/core/inference.py:401:28: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=484,col=20,endLine=484,endColumn=29::src/lmstrix/core/inference.py:484:20: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=7,col=1,endLine=7,endColumn=51::src/lmstrix/core/inference_manager.py:7:1: ERA001 Found commented-out code
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=46,col=9,endLine=46,endColumn=14::src/lmstrix/core/inference_manager.py:46:9: PLR0912 Too many branches (20 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=46,col=9,endLine=46,endColumn=14::src/lmstrix/core/inference_manager.py:46:9: PLR0915 Too many statements (73 > 50)
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=100,col=21,endLine=100,endColumn=36::src/lmstrix/core/inference_manager.py:100:21: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=104,col=24,endLine=104,endColumn=33::src/lmstrix/core/inference_manager.py:104:24: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=121,col=21,endLine=121,endColumn=36::src/lmstrix/core/inference_manager.py:121:21: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=131,col=17,endLine=131,endColumn=32::src/lmstrix/core/inference_manager.py:131:17: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=174,col=24,endLine=174,endColumn=33::src/lmstrix/core/inference_manager.py:174:24: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=196,col=13,endLine=204,endColumn=14::src/lmstrix/core/inference_manager.py:196:13: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=206,col=16,endLine=206,endColumn=25::src/lmstrix/core/inference_manager.py:206:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=251,col=24,endLine=251,endColumn=33::src/lmstrix/core/inference_manager.py:251:24: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=310,col=13,endLine=310,endColumn=46::src/lmstrix/core/inference_manager.py:310:13: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=312,col=16,endLine=312,endColumn=25::src/lmstrix/core/inference_manager.py:312:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=319,col=24,endLine=319,endColumn=33::src/lmstrix/core/inference_manager.py:319:24: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=322,col=9,endLine=322,endColumn=21::src/lmstrix/core/inference_manager.py:322:9: PLR0912 Too many branches (17 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=322,col=9,endLine=322,endColumn=21::src/lmstrix/core/inference_manager.py:322:9: PLR0915 Too many statements (59 > 50)
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=373,col=21,endLine=373,endColumn=36::src/lmstrix/core/inference_manager.py:373:21: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=377,col=24,endLine=377,endColumn=33::src/lmstrix/core/inference_manager.py:377:24: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=394,col=21,endLine=394,endColumn=36::src/lmstrix/core/inference_manager.py:394:21: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=404,col=17,endLine=404,endColumn=32::src/lmstrix/core/inference_manager.py:404:17: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=447,col=24,endLine=447,endColumn=33::src/lmstrix/core/inference_manager.py:447:24: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=99,col=13,endLine=99,endColumn=46::src/lmstrix/core/inference.py:99:13: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=101,col=16,endLine=101,endColumn=25::src/lmstrix/core/inference.py:101:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=109,col=24,endLine=109,endColumn=33::src/lmstrix/core/inference.py:109:24: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=160,col=9,endLine=160,endColumn=14::src/lmstrix/core/inference.py:160:9: PLR0912 Too many branches (27 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=160,col=9,endLine=160,endColumn=14::src/lmstrix/core/inference.py:160:9: PLR0915 Too many statements (103 > 50)
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=211,col=20,endLine=211,endColumn=29::src/lmstrix/core/inference.py:211:20: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=316,col=16,endLine=316,endColumn=25::src/lmstrix/core/inference.py:316:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=353,col=29,endLine=353,endColumn=35::src/lmstrix/core/inference.py:353:29: E722 Do not use bare `except`
-::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=353,col=29,endLine=354,endColumn=37::src/lmstrix/core/inference.py:353:29: S110 `try`-`except`-`pass` detected, consider logging the exception
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=378,col=28,endLine=378,endColumn=37::src/lmstrix/core/inference.py:378:28: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=406,col=9,endLine=406,endColumn=21::src/lmstrix/core/inference.py:406:9: PLR0912 Too many branches (21 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=406,col=9,endLine=406,endColumn=21::src/lmstrix/core/inference.py:406:9: PLR0915 Too many statements (75 > 50)
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=461,col=20,endLine=461,endColumn=29::src/lmstrix/core/inference.py:461:20: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=104,col=9,endLine=104,endColumn=17::src/lmstrix/core/context_tester.py:104:9: ARG002 Unused method argument: `log_path`
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=105,col=9,endLine=105,endColumn=14::src/lmstrix/core/context_tester.py:105:9: ARG002 Unused method argument: `model`
-::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=106,col=9,endLine=106,endColumn=17::src/lmstrix/core/context_tester.py:106:9: ARG002 Unused method argument: `registry`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=135,col=16,endLine=135,endColumn=25::src/lmstrix/core/context_tester.py:135:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=145,col=35,endLine=145,endColumn=40::src/lmstrix/core/context_tester.py:145:35: ANN001 Missing type annotation for function argument `model`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=180,col=24,endLine=180,endColumn=33::src/lmstrix/core/inference_manager.py:180:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=202,col=13,endLine=210,endColumn=14::src/lmstrix/core/inference_manager.py:202:13: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=212,col=16,endLine=212,endColumn=25::src/lmstrix/core/inference_manager.py:212:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=257,col=24,endLine=257,endColumn=33::src/lmstrix/core/inference_manager.py:257:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=316,col=13,endLine=316,endColumn=46::src/lmstrix/core/inference_manager.py:316:13: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=318,col=16,endLine=318,endColumn=25::src/lmstrix/core/inference_manager.py:318:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=325,col=24,endLine=325,endColumn=33::src/lmstrix/core/inference_manager.py:325:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=454,col=24,endLine=454,endColumn=33::src/lmstrix/core/inference_manager.py:454:24: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=3,col=1,endLine=3,endColumn=47::src/lmstrix/core/models.py:3:1: ERA001 Found commented-out code
-::error title=Ruff (A002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=28,col=9,endLine=28,endColumn=11::src/lmstrix/core/models.py:28:9: A002 Function argument `id` is shadowing a Python builtin
-::error title=Ruff (SIM102),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=140,col=9,endLine=142,endColumn=40::src/lmstrix/core/models.py:140:9: SIM102 Use a single `if` statement instead of nested `if` statements
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=171,col=9,endLine=171,endColumn=18::src/lmstrix/core/models.py:171:9: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=194,col=9,endLine=194,endColumn=64::src/lmstrix/core/models.py:194:9: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=219,col=24,endLine=219,endColumn=33::src/lmstrix/core/models.py:219:24: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=225,col=16,endLine=225,endColumn=25::src/lmstrix/core/models.py:225:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (SIM102),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=142,col=9,endLine=144,endColumn=40::src/lmstrix/core/models.py:142:9: SIM102 Use a single `if` statement instead of nested `if` statements
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=220,col=24,endLine=220,endColumn=33::src/lmstrix/core/models.py:220:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=226,col=16,endLine=226,endColumn=25::src/lmstrix/core/models.py:226:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=6,col=1,endLine=6,endColumn=32::debug_inference.py:6:1: ERA001 Found commented-out code
+::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=75,col=9,endLine=75,endColumn=15::debug_inference.py:75:9: E722 Do not use bare `except`
+::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=75,col=9,endLine=76,endColumn=17::debug_inference.py:75:9: S110 `try`-`except`-`pass` detected, consider logging the exception
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=134,col=16,endLine=134,endColumn=25::debug_inference.py:134:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=137,col=9,endLine=137,endColumn=20::debug_inference.py:137:9: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=139,col=12,endLine=139,endColumn=21::debug_inference.py:139:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=142,col=9,endLine=142,endColumn=25::debug_inference.py:142:9: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=195,col=16,endLine=195,endColumn=25::debug_inference.py:195:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=198,col=9,endLine=198,endColumn=20::debug_inference.py:198:9: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=200,col=12,endLine=200,endColumn=21::debug_inference.py:200:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=203,col=9,endLine=203,endColumn=25::debug_inference.py:203:9: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (ANN201),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=208,col=5,endLine=208,endColumn=34::debug_inference.py:208:5: ANN201 Missing return type annotation for public function `test_lmstrix_inference_engine`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=223,col=13,endLine=223,endColumn=58::debug_inference.py:223:13: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=250,col=9,endLine=250,endColumn=32::debug_inference.py:250:9: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=252,col=12,endLine=252,endColumn=21::debug_inference.py:252:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=255,col=9,endLine=255,endColumn=25::debug_inference.py:255:9: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/get_out_ctx.py,line=5,col=1,endLine=5,endColumn=28::get_out_ctx.py:5:1: ERA001 Found commented-out code
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=6,col=1,endLine=6,endColumn=33::debug_test_logic.py:6:1: ERA001 Found commented-out code
+::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=47,col=9,endLine=47,endColumn=15::debug_test_logic.py:47:9: E722 Do not use bare `except`
+::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=47,col=9,endLine=48,endColumn=17::debug_test_logic.py:47:9: S110 `try`-`except`-`pass` detected, consider logging the exception
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=117,col=12,endLine=117,endColumn=21::debug_test_logic.py:117:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=119,col=9,endLine=119,endColumn=25::debug_test_logic.py:119:9: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=136,col=9,endLine=136,endColumn=15::debug_test_logic.py:136:9: E722 Do not use bare `except`
+::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=136,col=9,endLine=137,endColumn=17::debug_test_logic.py:136:9: S110 `try`-`except`-`pass` detected, consider logging the exception
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=179,col=12,endLine=179,endColumn=21::debug_test_logic.py:179:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=207,col=13,endLine=207,endColumn=19::debug_test_logic.py:207:13: E722 Do not use bare `except`
+::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=207,col=13,endLine=208,endColumn=21::debug_test_logic.py:207:13: S110 `try`-`except`-`pass` detected, consider logging the exception
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=231,col=16,endLine=231,endColumn=25::debug_test_logic.py:231:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=5,col=1,endLine=5,endColumn=35::test_model_out_ctx.py:5:1: ERA001 Found commented-out code
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=61,col=12,endLine=61,endColumn=21::test_model_out_ctx.py:61:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=63,col=9,endLine=63,endColumn=25::test_model_out_ctx.py:63:9: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=86,col=12,endLine=86,endColumn=21::test_model_out_ctx.py:86:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=97,col=16,endLine=97,endColumn=25::test_model_out_ctx.py:97:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=106,col=12,endLine=106,endColumn=21::test_model_out_ctx.py:106:12: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_streaming.py,line=47,col=12,endLine=47,endColumn=21::test_streaming.py:47:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=16,col=1,endLine=16,endColumn=38::examples/specialized/elo_liczby.py:16:1: ERA001 Found commented-out code
-::error title=Ruff (PLR0911),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=46,col=5,endLine=46,endColumn=28::examples/specialized/elo_liczby.py:46:5: PLR0911 Too many return statements (9 > 6)
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=46,col=5,endLine=46,endColumn=28::examples/specialized/elo_liczby.py:46:5: PLR0912 Too many branches (24 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=46,col=5,endLine=46,endColumn=28::examples/specialized/elo_liczby.py:46:5: PLR0915 Too many statements (78 > 50)
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=170,col=16,endLine=170,endColumn=25::examples/specialized/elo_liczby.py:170:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/specialized/elo_liczby.py,line=189,col=12,endLine=189,endColumn=21::examples/specialized/elo_liczby.py:189:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=47,col=75,endLine=47,endColumn=81::tests/test_integration/test_cli_integration.py:47:75: ANN001 Missing type annotation for function argument `capsys`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/tests/test_integration/test_cli_integration.py,line=59,col=79,endLine=59,endColumn=85::tests/test_integration/test_cli_integration.py:59:79: ANN001 Missing type annotation for function argument `capsys`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=2,col=1,endLine=2,endColumn=49::examples/python/custom_inference.py:2:1: ERA001 Found commented-out code
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=13,col=5,endLine=13,endColumn=9::examples/python/custom_inference.py:13:5: PLR0915 Too many statements (89 > 50)
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=60,col=12,endLine=60,endColumn=21::examples/python/custom_inference.py:60:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=68,col=12,endLine=68,endColumn=21::examples/python/custom_inference.py:68:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=94,col=16,endLine=94,endColumn=25::examples/python/custom_inference.py:94:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=109,col=16,endLine=109,endColumn=25::examples/python/custom_inference.py:109:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=137,col=12,endLine=137,endColumn=21::examples/python/custom_inference.py:137:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=149,col=12,endLine=149,endColumn=21::examples/python/custom_inference.py:149:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/custom_inference.py,line=165,col=12,endLine=165,endColumn=21::examples/python/custom_inference.py:165:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/basic_usage.py,line=2,col=1,endLine=2,endColumn=44::examples/python/basic_usage.py:2:1: ERA001 Found commented-out code
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/basic_usage.py,line=87,col=12,endLine=87,endColumn=21::examples/python/basic_usage.py:87:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/basic_usage.py,line=103,col=12,endLine=103,endColumn=21::examples/python/basic_usage.py:103:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=2,col=1,endLine=2,endColumn=49::examples/python/advanced_testing.py:2:1: ERA001 Found commented-out code
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=10,col=5,endLine=10,endColumn=9::examples/python/advanced_testing.py:10:5: PLR0912 Too many branches (21 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=10,col=5,endLine=10,endColumn=9::examples/python/advanced_testing.py:10:5: PLR0915 Too many statements (92 > 50)
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=46,col=12,endLine=46,endColumn=21::examples/python/advanced_testing.py:46:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=61,col=12,endLine=61,endColumn=21::examples/python/advanced_testing.py:61:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=71,col=12,endLine=71,endColumn=21::examples/python/advanced_testing.py:71:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=83,col=12,endLine=83,endColumn=21::examples/python/advanced_testing.py:83:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/advanced_testing.py,line=99,col=12,endLine=99,endColumn=21::examples/python/advanced_testing.py:99:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=2,col=1,endLine=2,endColumn=54::examples/python/prompt_templates_demo.py:2:1: ERA001 Found commented-out code
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=15,col=5,endLine=15,endColumn=9::examples/python/prompt_templates_demo.py:15:5: PLR0915 Too many statements (86 > 50)
 ::error title=Ruff (PTH123),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=53,col=10,endLine=53,endColumn=14::examples/python/prompt_templates_demo.py:53:10: PTH123 `open()` should be replaced by `Path.open()`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=75,col=12,endLine=75,endColumn=21::examples/python/prompt_templates_demo.py:75:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=113,col=12,endLine=113,endColumn=21::examples/python/prompt_templates_demo.py:113:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=131,col=12,endLine=131,endColumn=21::examples/python/prompt_templates_demo.py:131:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=2,col=1,endLine=2,endColumn=49::examples/python/batch_processing.py:2:1: ERA001 Found commented-out code
-::error title=Ruff (PLR0912),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=12,col=5,endLine=12,endColumn=9::examples/python/batch_processing.py:12:5: PLR0912 Too many branches (16 > 12)
-::error title=Ruff (PLR0915),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=12,col=5,endLine=12,endColumn=9::examples/python/batch_processing.py:12:5: PLR0915 Too many statements (86 > 50)
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=65,col=20,endLine=65,endColumn=29::examples/python/batch_processing.py:65:20: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/examples/python/batch_processing.py,line=108,col=16,endLine=108,endColumn=25::examples/python/batch_processing.py:108:16: BLE001 Do not catch blind exception: `Exception`
 1 file left unchanged
 1 file left unchanged
 1 file left unchanged
@@ -3223,6 +3083,17 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 1 file left unchanged
 1 file left unchanged
 1 file left unchanged
+1 file reformatted
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file left unchanged
+1 file reformatted
 1 file left unchanged
 1 file left unchanged
 1 file left unchanged
@@ -3240,14 +3111,7 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 1 file left unchanged
 1 file left unchanged
 1 file left unchanged
-1 file left unchanged
-1 file left unchanged
-1 file left unchanged
-1 file left unchanged
-1 file left unchanged
-1 file left unchanged
-1 file left unchanged
-1 file left unchanged
+1 file reformatted
 1 file left unchanged
 1 file left unchanged
 1 file left unchanged
@@ -3255,6 +3119,63 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 
 </document_content>
 </document>
+
+# File: /Users/Shared/lmstudio/lmstrix/debug_inference.py
+# Language: python
+
+import sys
+import time
+from pathlib import Path
+import lmstudio
+from lmstrix.api.client import LMStudioClient
+from lmstrix.core.inference import InferenceEngine
+from lmstrix.core.models import ModelRegistry
+from lmstrix.utils.logging import logger
+import traceback
+import traceback
+from lmstrix.core.scanner import ModelScanner
+import traceback
+
+def print_separator((title: str)) -> None:
+    """Print a nice separator."""
+
+def test_direct_lmstudio(()) -> bool | None:
+    """Test direct lmstudio calls without lmstrix wrapper."""
+
+def test_lmstrix_client(()) -> bool | None:
+    """Test lmstrix client calls."""
+
+def test_lmstrix_inference_engine(()):
+    """Test lmstrix inference engine."""
+
+def main(()) -> None:
+    """Run all diagnostic tests."""
+
+
+# File: /Users/Shared/lmstudio/lmstrix/debug_test_logic.py
+# Language: python
+
+import sys
+import time
+from pathlib import Path
+import builtins
+import contextlib
+import lmstudio
+from lmstrix.utils.logging import logger
+import traceback
+
+def test_both_prompts(()) -> None:
+    """Test both standard prompts and show why tests fail."""
+
+def test_with_more_tokens(()) -> None:
+    """Test with more output tokens to see if model just needs more space."""
+
+def test_other_models(()) -> None:
+    """Test a few other models to see if they behave differently."""
+
+def main(()) -> None:
+    """Run all diagnostic tests."""
+
 
 <document index="16">
 <source>docs/_config.yml</source>
@@ -4634,7 +4555,52 @@ def main(()) -> None:
     """Main entry point using Fire CLI."""
 
 
+# File: /Users/Shared/lmstudio/lmstrix/get_out_ctx.py
+# Language: python
+
+import sys
+from pathlib import Path
+from lmstrix.core.models import ModelRegistry
+
+def get_out_ctx_for_model((model_id: str)) -> int | None:
+    """Get the out_ctx value for a specific model."""
+
+def get_all_out_ctx_values(()) -> dict[str, int]:
+    """Get out_ctx values for all models in the registry."""
+
+def main(()) -> None:
+    """Main function to demonstrate getting out_ctx values."""
+
+
 <document index="36">
+<source>issues/401.txt</source>
+<document_content>
+I’m struggling to understand why `lmstrix test -c 2047 -m MODEL_ID` fails if MODEL_ID is one of these: 
+
+```
+slim-extract-tool            1.59    4,096      ✗ Failed
+slim-extract-qwen-1.5b       1.04    131,072    ✗ Failed
+slim-extract-qwen-0.5b       0.46    131,072    ✗ Failed
+slim-summary-tool            1.59    4,096      ✗ Failed
+dragon-mistral-answer-tool   4.07    32,768     ✗ Failed
+dragon-mistral-7b-v0         4.07    32,768     ✗ Failed
+dragon-llama-3.1             4.58    131,072    ✗ Failed
+bling-qwen-mini-tool         1.04    131,072    ✗ Failed
+mistral-7b-claim-extractor   7.17    32,768     ✗ Failed
+llama3.2-entity-1b           2.31    131,072    ✗ Failed
+llama3.2-entity              3.19    131,072    ✗ Failed
+```
+
+Basically the inference from these models fails when called via the code that `lmstrix test` uses. 
+
+But in the LM Studio GUI the inference works. 
+
+Write some code that uses the `lmstrix infer` code but also more direct `lmstudio` code, with just the model `slim-extract-qwen-0.5b` so we can pinpoint the issue. 
+
+</document_content>
+</document>
+
+<document index="37">
 <source>publish.sh</source>
 <document_content>
 #!/usr/bin/env bash
@@ -4653,7 +4619,7 @@ uvx hatch publish
 </document_content>
 </document>
 
-<document index="37">
+<document index="38">
 <source>pyproject.toml</source>
 <document_content>
 [build-system]
@@ -4870,12 +4836,31 @@ ignore = [
   "S101",    # use of assert detected
   "PLR0913", # too many arguments
   "PLR2004", # magic value comparison
-  "COM812"
+  "COM812",  # missing trailing comma (handled by formatter)
+  # Complexity rules - these are often legitimate in complex business logic
+  "PLR0911", # too many return statements
+  "PLR0912", # too many branches
+  "PLR0915", # too many statements
+  # Exception handling patterns that may be intentional
+  "TRY003",  # long messages outside exception class
+  "TRY301",  # abstract raise to inner function
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
-"tests/**/*.py" = ["S101", "ARG", "PLR2004"]
+"tests/**/*.py" = ["S101", "ARG", "PLR2004", "ARG002", "ANN001"]
+
+# Example scripts may have different standards
+"examples/**/*.py" = ["ERA001", "BLE001", "ANN001"]
+
+# CLI main file needs some builtin shadows for Fire compatibility
+"src/lmstrix/__main__.py" = ["A002"]
+
+# Context tester has legitimate unused args for interface consistency
+"src/lmstrix/core/context_tester.py" = ["ARG002"]
+
+# Client has some necessary bare excepts for connection handling
+"src/lmstrix/api/client.py" = ["E722"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -5063,6 +5048,8 @@ class LMStrixCLI:
         fast: bool = False,
         verbose: bool = False,
         force: bool = False,
+        prompt: str | None = None,
+        file_prompt: str | None = None,
     )) -> None:
         """Test the context limits for models."""
     def infer((
@@ -5111,6 +5098,8 @@ def test((
         fast: bool = False,
         verbose: bool = False,
         force: bool = False,
+        prompt: str | None = None,
+        file_prompt: str | None = None,
     )) -> None:
     """Test the context limits for models."""
 
@@ -5436,6 +5425,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 from rich.console import Console
+from rich.live import Live
 from rich.table import Table
 from lmstrix.api.exceptions import APIConnectionError, ModelRegistryError
 from lmstrix.core.concrete_config import ConcreteConfigManager
@@ -5480,6 +5470,8 @@ class LMStrixService:
         fast: bool = False,
         verbose: bool = False,
         force: bool = False,
+        prompt: str | None = None,
+        file_prompt: str | None = None,
     )) -> None:
         """Test the context limits for models."""
     def run_inference((
@@ -5510,6 +5502,9 @@ class LMStrixService:
     def show_help((self)) -> None:
         """Show comprehensive help text."""
 
+def _format_response_preview((response: str | None, max_length: int = 60)) -> str:
+    """Format response text for table display."""
+
 def _get_models_to_test((
     registry: ModelRegistry,
     test_all: bool,
@@ -5529,6 +5524,7 @@ def _test_single_model((
     ctx: int,
     registry: ModelRegistry,
     force: bool = False,
+    verbose: bool = False,
 )) -> None:
     """Test a single model at a specific context size."""
 
@@ -5537,6 +5533,7 @@ def _test_all_models_at_ctx((
     models_to_test: list[Model],
     ctx: int,
     registry: ModelRegistry,
+    verbose: bool = False,
 )) -> list[Model]:
     """Test all models at a specific context size."""
 
@@ -5578,6 +5575,8 @@ def test_models((
         fast: bool = False,
         verbose: bool = False,
         force: bool = False,
+        prompt: str | None = None,
+        file_prompt: str | None = None,
     )) -> None:
     """Test the context limits for models."""
 
@@ -5786,6 +5785,7 @@ class ContextTester:
         client: LMStudioClient | None = None,
         verbose: bool = False,
         fast_mode: bool = False,
+        custom_prompt: str | None = None,
     )) -> None:
         """Initialize context tester."""
     def _test_at_context((
@@ -5808,12 +5808,19 @@ class ContextTester:
         registry: "ModelRegistry" = None,
     )) -> list["Model"]:
         """Test all models to find their maximum working context."""
-    def test_model((
+    def test_model_by_id((
         self,
         model_id: str,
         min_context: int = 512,
         max_context: int = 131072,
     )) -> dict:
+        """Test a model to find its maximum working context."""
+    def test_model((
+        self,
+        model: "Model",
+        max_context: int = 131072,
+        registry: "ModelRegistry" = None,
+    )) -> "Model":
         """Test a model to find its maximum working context."""
 
 def __init__((
@@ -5838,6 +5845,7 @@ def __init__((
         client: LMStudioClient | None = None,
         verbose: bool = False,
         fast_mode: bool = False,
+        custom_prompt: str | None = None,
     )) -> None:
     """Initialize context tester."""
 
@@ -5865,12 +5873,20 @@ def test_all_models((
     )) -> list["Model"]:
     """Test all models to find their maximum working context."""
 
-def test_model((
+def test_model_by_id((
         self,
         model_id: str,
         min_context: int = 512,
         max_context: int = 131072,
     )) -> dict:
+    """Test a model to find its maximum working context."""
+
+def test_model((
+        self,
+        model: "Model",
+        max_context: int = 131072,
+        registry: "ModelRegistry" = None,
+    )) -> "Model":
     """Test a model to find its maximum working context."""
 
 
@@ -5897,6 +5913,7 @@ class InferenceEngine:
         client: LMStudioClient | None = None,
         model_registry: ModelRegistry | None = None,
         verbose: bool = False,
+        custom_prompt: str | None = None,
     )) -> None:
         """Initialize the inference engine."""
     def _test_inference_capability((self, model_id: str, context_len: int)) -> tuple[bool, str]:
@@ -5934,6 +5951,7 @@ def __init__((
         client: LMStudioClient | None = None,
         model_registry: ModelRegistry | None = None,
         verbose: bool = False,
+        custom_prompt: str | None = None,
     )) -> None:
     """Initialize the inference engine."""
 
@@ -5976,16 +5994,11 @@ import contextlib
 import time
 from collections.abc import Callable, Iterator
 from typing import Any
+import lmstudio
 from lmstrix.api.client import LMStudioClient
 from lmstrix.api.exceptions import ModelNotFoundError
 from lmstrix.core.models import Model, ModelRegistry
 from lmstrix.utils.logging import logger
-import lmstudio
-import lmstudio
-import lmstudio
-import lmstudio
-import lmstudio
-import lmstudio
 
 class InferenceManager:
     """Unified manager for model inference operations."""
@@ -6077,12 +6090,12 @@ def stream_infer((
 # Language: python
 
 import json
+import re
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any
 from lmstrix.utils.logging import logger
-import re
 from lmstrix.utils.paths import get_default_models_file
 
 class ContextTestStatus(s, t, r, ,,  , E, n, u, m):
@@ -6092,7 +6105,7 @@ class Model:
     """Represents a model in the registry."""
     def __init__((
         self,
-        id: str,
+        model_id: str,
         path: str,
         size_bytes: int,
         ctx_in: int,
@@ -6152,7 +6165,7 @@ class ModelRegistry:
 
 def __init__((
         self,
-        id: str,
+        model_id: str,
         path: str,
         size_bytes: int,
         ctx_in: int,
@@ -6542,13 +6555,13 @@ from pathlib import Path
 from typing import Any
 import tomllib
 import tomli as tomllib
+import tomli_w
+import tomlkit
+import toml
 from topl.core import resolve_placeholders
 from lmstrix.api.exceptions import ConfigurationError
 from lmstrix.core.prompts import PromptResolver, ResolvedPrompt
 from lmstrix.utils.logging import logger
-import tomli_w
-import tomlkit
-import toml
 
 def load_prompts((
     toml_path: Path,
@@ -6574,7 +6587,7 @@ def save_prompts((
     """Save prompts to a TOML file."""
 
 
-<document index="38">
+<document index="39">
 <source>src/lmstrix/py.typed</source>
 <document_content>
 # This file indicates that the package supports type hints
@@ -6702,6 +6715,31 @@ def set_last_used_model((self, model_id: str)) -> None:
 def clear_last_used_model((self)) -> None:
     """Clear the last used model ID."""
 
+
+# File: /Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py
+# Language: python
+
+import sys
+from pathlib import Path
+from lmstrix.api.client import LMStudioClient
+from lmstrix.core.inference import InferenceEngine
+from lmstrix.core.models import ModelRegistry
+from lmstrix.utils.logging import logger
+import traceback
+
+def test_context_out_usage(()) -> None:
+    """Test that model-specific context_out values are used in testing."""
+
+def compare_inference_modes(()) -> None:
+    """Compare inference with different out_ctx values."""
+
+
+<document index="40">
+<source>test_prompt_example.txt</source>
+<document_content>
+Write a haiku about artificial intelligence.
+</document_content>
+</document>
 
 # File: /Users/Shared/lmstudio/lmstrix/test_streaming.py
 # Language: python

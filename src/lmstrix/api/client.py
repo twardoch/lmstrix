@@ -124,7 +124,7 @@ class LMStudioClient:
                 error_msg = (
                     f"Failed to load model '{model_id}'. Available models: {available_models[:5]}"
                 )
-            except:
+            except Exception:
                 error_msg = f"Failed to load model '{model_id}': {e}"
             raise ModelLoadError(model_id, error_msg) from e
 
@@ -150,10 +150,10 @@ class LMStudioClient:
                         ),
                     }
                     models_info.append(model_info)
-                except Exception as e:
+                except (AttributeError, TypeError) as e:
                     logger.warning(f"Failed to extract info from loaded model: {e}")
             return models_info
-        except Exception as e:
+        except (ImportError, RuntimeError) as e:
             logger.warning(f"Failed to list loaded models: {e}")
             return []
 

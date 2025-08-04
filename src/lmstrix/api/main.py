@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 from rich.console import Console
+from rich.live import Live
 from rich.table import Table
 
 from lmstrix.api.exceptions import APIConnectionError, ModelRegistryError
@@ -26,6 +27,20 @@ from lmstrix.utils.paths import get_default_models_file, get_lmstudio_path
 from lmstrix.utils.state import StateManager
 
 console = Console()
+
+
+def _format_response_preview(response: str | None, max_length: int = 60) -> str:
+    """Format response text for table display."""
+    if not response:
+        return "❌"
+
+    # Clean up whitespace and newlines
+    cleaned = " ".join(response.strip().split())
+
+    # Truncate if needed
+    if len(cleaned) <= max_length:
+        return cleaned
+    return cleaned[: max_length - 3] + "..."
 
 
 def _get_models_to_test(
@@ -125,6 +140,7 @@ def _test_single_model(
     ctx: int,
     registry: ModelRegistry,
     force: bool = False,
+    verbose: bool = False,
 ) -> None:
     """Test a single model at a specific context size."""
     if ctx > model.context_limit:
@@ -150,10 +166,29 @@ def _test_single_model(
             f"FORCE MODE: Testing context ({ctx:,}) despite being at/above last known bad context ({model.last_known_bad_context:,}).",
         )
 
-    logger.info(
-        f"\n[bold cyan]Testing model: {model.id} at specific context: {ctx:,}[/bold cyan]",
-    )
-    logger.info(f"Declared context limit: {model.context_limit:,} tokens")
+    if verbose:
+        logger.info(
+            f"\n[bold cyan]Testing model: {model.id} at specific context: {ctx:,}[/bold cyan]",
+        )
+        logger.info(f"Declared context limit: {model.context_limit:,} tokens")
+    else:
+        # Compact output - create a live table for testing progress
+        table = Table(show_header=False, header_style="bold cyan", box=None, expand=False)
+        table.add_column("Model", style="cyan", no_wrap=True)
+        table.add_column("Context", justify="right", style="yellow")
+        table.add_column("Status", style="blue")
+        table.add_column("Response", style="white")
+
+        # Initial row
+        table.add_row(
+            model.id[:40] + "..." if len(model.id) > 40 else model.id,
+            f"{ctx:,}",
+            "[blue]Testing...[/blue]",
+            "",
+        )
+
+        live = Live(table, console=console, refresh_per_second=4)
+        live.start()
 
     log_path = get_context_test_log_path(model.id)
 
@@ -164,16 +199,53 @@ def _test_single_model(
     result = tester._test_at_context(model.id, ctx, log_path, model, registry)
 
     if result.load_success and result.inference_success:
-        logger.success(f"✓ Test successful at context {ctx:,}")
-        logger.debug(f"Response length: {len(result.response)} chars")
+        # Format response for display
+        response_preview = _format_response_preview(result.response)
+        if verbose:
+            logger.success(f"✓ Test successful at context {ctx:,}")
+            logger.debug(f"Response length: {len(result.response)} chars")
+            logger.info(f"Response preview: ||{response_preview}||")
+        else:
+            # Update the table with success
+            table = Table(show_header=False, header_style="bold cyan", box=None, expand=False)
+            table.add_column("Model", style="cyan", no_wrap=True)
+            table.add_column("Context", justify="right", style="yellow")
+            table.add_column("Status", style="green")
+            table.add_column("Response", style="white")
+
+            table.add_row(
+                model.id[:40] + "..." if len(model.id) > 40 else model.id,
+                f"{ctx:,}",
+                "[green]✓ Success[/green]",
+                f"||{response_preview}||",
+            )
+            live.update(table)
+            live.stop()
         model.last_known_good_context = ctx
         if not model.tested_max_context or ctx > model.tested_max_context:
             model.tested_max_context = ctx
         model.context_test_status = ContextTestStatus.COMPLETED
     else:
         error_type = "load" if not result.load_success else "inference"
-        logger.error(f"✗ Test failed at context {ctx:,} ({error_type} failed)")
-        logger.error(f"Error: {result.error}")
+        if verbose:
+            logger.error(f"✗ Test failed at context {ctx:,} ({error_type} failed)")
+            logger.error(f"Error: {result.error}")
+        else:
+            # Update the table with failure
+            table = Table(show_header=False, header_style="bold cyan", box=None, expand=False)
+            table.add_column("Model", style="cyan", no_wrap=True)
+            table.add_column("Context", justify="right", style="yellow")
+            table.add_column("Status", style="red")
+            table.add_column("Response", style="white")
+
+            table.add_row(
+                model.id[:40] + "..." if len(model.id) > 40 else model.id,
+                f"{ctx:,}",
+                f"[red]✗ {error_type.capitalize()} failed[/red]",
+                "",
+            )
+            live.update(table)
+            live.stop()
         model.last_known_bad_context = ctx
         model.context_test_status = ContextTestStatus.FAILED
 
@@ -186,20 +258,70 @@ def _test_all_models_at_ctx(
     models_to_test: list[Model],
     ctx: int,
     registry: ModelRegistry,
+    verbose: bool = False,
 ) -> list[Model]:
     """Test all models at a specific context size."""
-    logger.debug(
-        f"[bold]Testing {len(models_to_test)} models at context size {ctx:,}[/bold]\n",
-    )
+    if verbose:
+        logger.debug(
+            f"[bold]Testing {len(models_to_test)} models at context size {ctx:,}[/bold]\n",
+        )
+    else:
+        # Compact output - create a live table for testing progress
+        table = Table(show_header=False, header_style="bold cyan", box=None, expand=False)
+        table.add_column("Model", style="cyan", no_wrap=True)
+        table.add_column("Context", justify="right", style="yellow")
+        table.add_column("Status", style="blue")
+        table.add_column("Response", style="white")
+        table.add_column("Progress", justify="right", style="magenta")
+
+        live = Live(table, console=console, refresh_per_second=4)
+        live.start()
 
     updated_models = []
     for i, model in enumerate(models_to_test, 1):
-        logger.info(f"[{i}/{len(models_to_test)}] Testing {model.id}...")
+        if verbose:
+            logger.info(f"[{i}/{len(models_to_test)}] Testing {model.id}...")
+        else:
+            # Update table with current model
+            table = Table(show_header=False, header_style="bold cyan", box=None, expand=False)
+            table.add_column("Model", style="cyan", no_wrap=True)
+            table.add_column("Context", justify="right", style="yellow")
+            table.add_column("Status", style="blue")
+            table.add_column("Response", style="white")
+            table.add_column("Progress", justify="right", style="magenta")
+
+            # Add previous results
+            for j, prev_model in enumerate(updated_models):
+                status = (
+                    "[green]✓ Success[/green]"
+                    if prev_model.last_known_good_context == ctx
+                    else "[red]✗ Failed[/red]"
+                )
+                response_preview = getattr(prev_model, "_test_response_preview", "❌")
+                table.add_row(
+                    prev_model.id[:40] + "..." if len(prev_model.id) > 40 else prev_model.id,
+                    f"{ctx:,}",
+                    status,
+                    f"||{response_preview}||" if response_preview else "❌",
+                    f"{j + 1}/{len(models_to_test)}",
+                )
+
+            # Add current testing model
+            table.add_row(
+                model.id[:40] + "..." if len(model.id) > 40 else model.id,
+                f"{ctx:,}",
+                "[blue]Testing...[/blue]",
+                "",
+                f"{i}/{len(models_to_test)}",
+            )
+
+            live.update(table)
 
         if i > 1:
-            logger.info(
-                "\n\n  ⏳ Waiting 3 seconds before next model (resource cleanup)...",
-            )
+            if verbose:
+                logger.info(
+                    "\n\n  ⏳ Waiting 3 seconds before next model (resource cleanup)...",
+                )
             time.sleep(3.0)
 
         log_path = get_context_test_log_path(model.id)
@@ -210,21 +332,56 @@ def _test_all_models_at_ctx(
 
         result = tester._test_at_context(model.id, ctx, log_path, model, registry)
 
+        # Store the response preview on the model for later display
         if result.load_success and result.inference_success:
-            logger.debug(f"  ✓ Success at context {ctx:,}")
+            response_preview = _format_response_preview(result.response)
+            if verbose:
+                logger.debug(f"  ✓ Success at context {ctx:,}")
+                logger.info(f"  Response preview: ||{response_preview}||")
             model.last_known_good_context = ctx
             if not model.tested_max_context or ctx > model.tested_max_context:
                 model.tested_max_context = ctx
             model.context_test_status = ContextTestStatus.TESTING
+            # Store response preview temporarily for display
+            model._test_response_preview = response_preview if response_preview else "❌"
         else:
             error_type = "load" if not result.load_success else "inference"
-            logger.debug(f"  ✗ Failed at context {ctx:,} ({error_type} failed)")
+            if verbose:
+                logger.debug(f"  ✗ Failed at context {ctx:,} ({error_type} failed)")
             model.last_known_bad_context = ctx
             model.context_test_status = ContextTestStatus.FAILED
+            model._test_response_preview = "❌"
 
         model.context_test_date = datetime.now()
         registry.update_model_by_id(model)
         updated_models.append(model)
+
+    if not verbose:
+        # Final update with all results
+        table = Table(show_header=False, header_style="bold cyan", box=None, expand=False)
+        table.add_column("Model", style="cyan", no_wrap=True)
+        table.add_column("Context", justify="right", style="yellow")
+        table.add_column("Status", style="blue")
+        table.add_column("Response", style="white")
+        table.add_column("Progress", justify="right", style="magenta")
+
+        for j, model in enumerate(updated_models):
+            status = (
+                "[green]✓ Success[/green]"
+                if model.last_known_good_context == ctx
+                else "[red]✗ Failed[/red]"
+            )
+            response_preview = getattr(model, "_test_response_preview", "❌")
+            table.add_row(
+                model.id[:40] + "..." if len(model.id) > 40 else model.id,
+                f"{ctx:,}",
+                status,
+                f"||{response_preview}||" if response_preview else "❌",
+                f"{j + 1}/{len(models_to_test)}",
+            )
+
+        live.update(table)
+        live.stop()
 
     return updated_models
 
@@ -254,7 +411,7 @@ def _print_final_results(updated_models: list[Model]) -> None:
     logger.info("Final Results:")
     logger.info(f"{'=' * 60}\n")
 
-    table = Table(show_header=True, header_style="bold cyan")
+    table = Table(show_header=False, header_style="bold cyan", expand=False)
     table.add_column("Model", style="cyan", no_wrap=True)
     table.add_column("Status", style="green")
     table.add_column("Optimal Context", justify="right")
@@ -400,14 +557,14 @@ class LMStrixService:
                 return
             return
 
-        table = Table(title="LM Studio Models", show_lines=False, box=None)
+        table = Table(show_lines=False, box=None, expand=False)
         table.add_column("Model ID", style="cyan", no_wrap=False)
-        table.add_column("Size(GB)", style="magenta", width=8)
-        table.add_column("Declared", style="yellow", width=10)
-        table.add_column("Tested", style="green", width=10)
-        table.add_column("Good", style="green", width=10)
-        table.add_column("Bad", style="red", width=10)
-        table.add_column("Status", style="blue", width=10)
+        table.add_column("Size(GB)", style="magenta")
+        table.add_column("Declared", style="yellow")
+        table.add_column("Tested", style="green")
+        table.add_column("Good", style="green")
+        table.add_column("Bad", style="red")
+        table.add_column("Status", style="blue")
 
         for model in sorted_models:
             tested_ctx = f"{model.tested_max_context:,}" if model.tested_max_context else "-"
@@ -446,6 +603,8 @@ class LMStrixService:
         fast: bool = False,
         verbose: bool = False,
         force: bool = False,
+        prompt: str | None = None,
+        file_prompt: str | None = None,
     ) -> None:
         """Test the context limits for models."""
         setup_logging(verbose=verbose)
@@ -481,9 +640,40 @@ class LMStrixService:
             registry.save()
             logger.success(f"Reset {len(models_to_test)} models for re-testing")
 
+        # Handle custom prompt loading
+        custom_prompt = None
+        if prompt and file_prompt:
+            logger.error("Cannot use both --prompt and --file_prompt together.")
+            return
+        if prompt:
+            custom_prompt = prompt
+            if verbose:
+                logger.debug(
+                    f"Using custom prompt: {prompt[:50]}..."
+                    if len(prompt) > 50
+                    else f"Using custom prompt: {prompt}"
+                )
+        elif file_prompt:
+            try:
+                prompt_path = Path(file_prompt).expanduser()
+                if not prompt_path.exists():
+                    logger.error(f"Prompt file not found: {file_prompt}")
+                    return
+                custom_prompt = prompt_path.read_text(encoding="utf-8").strip()
+                if verbose:
+                    logger.debug(f"Loaded prompt from file: {file_prompt}")
+                    logger.debug(
+                        f"Prompt: {custom_prompt[:50]}..."
+                        if len(custom_prompt) > 50
+                        else f"Prompt: {custom_prompt}"
+                    )
+            except Exception as e:
+                logger.error(f"Error reading prompt file: {e}")
+                return
+
         if test_all:
             # Filter out embedding models for --all flag
-            tester = ContextTester(verbose=verbose, fast_mode=fast)
+            tester = ContextTester(verbose=verbose, fast_mode=fast, custom_prompt=custom_prompt)
             models_to_test = tester._filter_models_for_testing(models_to_test)
             if not models_to_test:
                 logger.debug(
@@ -500,7 +690,7 @@ class LMStrixService:
                 "[cyan]Sorting models by optimal testing order (size + context priority).[/cyan]",
             )
 
-        tester = ContextTester(verbose=verbose, fast_mode=fast)
+        tester = ContextTester(verbose=verbose, fast_mode=fast, custom_prompt=custom_prompt)
 
         if ctx is not None:
             if test_all:
@@ -509,10 +699,11 @@ class LMStrixService:
                     models_to_test,
                     ctx,
                     registry,
+                    verbose,
                 )
                 _print_final_results(updated_models)
             else:
-                _test_single_model(tester, models_to_test[0], ctx, registry, force)
+                _test_single_model(tester, models_to_test[0], ctx, registry, force, verbose)
             return
 
         if test_all:
@@ -525,11 +716,31 @@ class LMStrixService:
             _print_final_results(updated_models)
         else:
             model = models_to_test[0]
-            logger.debug(f"\n[bold cyan]Testing model: {model.id}[/bold cyan]")
-            logger.debug(f"Declared context limit: {model.context_limit:,} tokens")
-            logger.debug(f"Threshold: {threshold:,} tokens")
-
             max_test_context = min(threshold, model.context_limit)
+
+            if verbose:
+                logger.debug(f"\n[bold cyan]Testing model: {model.id}[/bold cyan]")
+                logger.debug(f"Declared context limit: {model.context_limit:,} tokens")
+                logger.debug(f"Threshold: {threshold:,} tokens")
+            else:
+                # Compact output - create a live table for testing progress
+                table = Table(show_header=False, header_style="bold cyan", box=None, expand=False)
+                table.add_column("Model", style="cyan", no_wrap=True)
+                table.add_column("Context", justify="right", style="yellow")
+                table.add_column("Status", style="blue")
+                table.add_column("Response", style="white")
+
+                # Initial row
+                table.add_row(
+                    model.id[:40] + "..." if len(model.id) > 40 else model.id,
+                    f"{max_test_context:,}",
+                    "[blue]Testing...[/blue]",
+                    "",
+                )
+
+                live = Live(table, console=console, refresh_per_second=4)
+                live.start()
+
             updated_model = tester.test_model(
                 model,
                 max_context=max_test_context,
@@ -537,12 +748,53 @@ class LMStrixService:
             )
 
             if updated_model.context_test_status.value == "completed":
-                logger.debug(
-                    f"[green]✓ Test complete. Optimal context: {updated_model.tested_max_context:,}[/green]",
-                )
+                response_preview = getattr(updated_model, "_test_response_preview", "❌")
+                if verbose:
+                    logger.debug(
+                        f"[green]✓ Test complete. Optimal context: {updated_model.tested_max_context:,}[/green]",
+                    )
+                    if response_preview:
+                        logger.info(f"Response preview: ||{response_preview}||")
+                else:
+                    # Update the table with success
+                    table = Table(
+                        show_header=False, header_style="bold cyan", box=None, expand=False
+                    )
+                    table.add_column("Model", style="cyan", no_wrap=True)
+                    table.add_column("Context", justify="right", style="yellow")
+                    table.add_column("Status", style="green")
+                    table.add_column("Response", style="white")
+
+                    table.add_row(
+                        model.id[:40] + "..." if len(model.id) > 40 else model.id,
+                        f"{updated_model.tested_max_context:,}",
+                        "[green]✓ Success[/green]",
+                        f"||{response_preview}||" if response_preview else "❌",
+                    )
+                    live.update(table)
+                    live.stop()
             else:
                 error_msg = getattr(updated_model, "error_msg", "Unknown error")
-                logger.debug(f"✗ Test failed: {error_msg}")
+                if verbose:
+                    logger.debug(f"✗ Test failed: {error_msg}")
+                else:
+                    # Update the table with failure
+                    table = Table(
+                        show_header=False, header_style="bold cyan", box=None, expand=False
+                    )
+                    table.add_column("Model", style="cyan", no_wrap=True)
+                    table.add_column("Context", justify="right", style="yellow")
+                    table.add_column("Status", style="red")
+                    table.add_column("Response", style="white")
+
+                    table.add_row(
+                        model.id[:40] + "..." if len(model.id) > 40 else model.id,
+                        f"{max_test_context:,}",
+                        "[red]✗ Failed[/red]",
+                        "",
+                    )
+                    live.update(table)
+                    live.stop()
 
     def run_inference(
         self,
@@ -1010,6 +1262,8 @@ class LMStrixService:
         console.print(
             "    --fast            Skip semantic verification (only test if inference completes)",
         )
+        console.print("    --prompt TEXT     Custom prompt to use for testing")
+        console.print("    --file_prompt PATH Load prompt from file for testing")
         console.print("    --verbose         Enable verbose output")
         console.print("")
         console.print("  [green]infer[/green]           Run inference on a model")
@@ -1040,5 +1294,7 @@ class LMStrixService:
         console.print("  lmstrix list --sort ctx")
         console.print("  lmstrix test --all")
         console.print("  lmstrix test my-model --ctx 8192")
+        console.print('  lmstrix test my-model --prompt "What is 2+2?"')
+        console.print("  lmstrix test my-model --file_prompt test_prompt.txt")
         console.print('  lmstrix infer "Hello world" my-model')
         console.print("  lmstrix save --flash")

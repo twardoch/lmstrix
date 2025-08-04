@@ -66,7 +66,7 @@ class TestContextTester:
 
         tester = ContextTester(mock_lmstudio_client)
         model = Model(
-            id="test-model",
+            model_id="test-model",
             path="/path/to/model",
             size_bytes=1000000,
             ctx_in=4096,
@@ -90,13 +90,13 @@ class TestContextTester:
 
         models = {
             "model1": Model(
-                id="model1",
+                model_id="model1",
                 path="/path/to/model1",
                 size_bytes=1000000,
                 ctx_in=4096,
             ),
             "model2": Model(
-                id="model2",
+                model_id="model2",
                 path="/path/to/model2",
                 size_bytes=2000000,
                 ctx_in=8192,

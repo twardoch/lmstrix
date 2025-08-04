@@ -1,18 +1,24 @@
 # LMStrix TODO List
 
-### Issue #307: Streaming Inference Support 
+### Recently Completed ✅
 
-- [ ] Write unit tests for streaming functionality
-- [ ] Write integration tests with real models
-- [ ] Update documentation with streaming examples
-- [ ] Performance testing: streaming vs sync comparison
+- [x] Add --prompt parameter to test command for custom prompts
+- [x] Add --file_prompt parameter to test command for loading prompts from files
+- [x] Update ContextTester and InferenceEngine to support custom prompts
+- [x] Update help documentation with custom prompt examples
+- [x] Implement compact output for test command with live-updating tables
+- [x] Add progress tracking for batch tests with --all flag
+- [x] Maintain backward compatibility with verbose mode
 
-### Testing and Validation
+### Issue #302: Inference Output Mismatch (PRIORITY)
 
 - [ ] Compare output with LM Studio for identical prompts
 - [ ] Ensure token counts match between lmstrix and LM Studio
 - [ ] Verify translation quality matches expected output
 - [ ] Create regression test for this issue
+- [ ] Fix maxTokens calculation issue
+- [ ] Investigate stop token configuration differences
+- [ ] Fix context length handling (GUI uses 131072, CLI uses 65536)
 
 ### Model Loading Optimization (Medium Priority)
 
@@ -122,30 +128,3 @@
 - [ ] Test PyPI package build
 - [ ] Verify clean installation works
 
-## NEW DEVELOPMENT PRIORITIES
-
-### Issue #307 - LM Studio Streaming Inference (High Priority)
-- [ ] Research LM Studio SDK streaming API (`complete_stream()`, callbacks)
-- [ ] Replace `llm.complete()` with `llm.complete_stream()` in `LMStudioClient.completion()`
-- [ ] Implement progress callbacks: `on_prediction_fragment`, `on_first_token`
-- [ ] Add no-progress timeout watchdog to abort stalled generations
-- [ ] Add CLI flags: `--stream-timeout` (default 120s), `--show-progress`
-- [ ] Update inference logging to show streaming status
-- [ ] Implement token-by-token display in verbose mode
-- [ ] Add streaming statistics (tokens/second, time to first token)
-- [ ] Enable streaming cancellation via Ctrl+C
-- [ ] Maintain backward compatibility with existing response format
-
-### Issue #306 - Batch Inference Tool (Medium Priority)
-- [ ] Create `_keep_this/adam/adamall.py` using lmstrix API
-- [ ] Implement smart model state detection and caching
-- [ ] Add pathvalidate for safe filename generation (`safe_model_id`, `safe_prompt_name`)
-- [ ] Configure batch prompts: `think,aps`, `think,humanize`, `think,tldr`, `think,tts_optimize`, `translate`, `tldr`
-- [ ] Implement file existence checking to skip completed inference
-- [ ] Generate output paths: `f"_keep_this/adam/out/{safe_prompt_name}--{safe_model_id}.txt"`
-- [ ] Add error message capture to output files on failure
-- [ ] Sort models by "smart" method (as in `lmstrix list`)
-- [ ] Load models with 50% input context, inference with 90% max context
-- [ ] Minimize model loading/unloading through intelligent scheduling
-- [ ] Use logger from `lmstrix.utils.logging`
-- [ ] Process text from `_keep_this/adam/fontlab8.md`

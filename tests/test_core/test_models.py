@@ -148,7 +148,7 @@ class TestModel:
     def test_model_validation_error(self: "TestModel") -> None:
         """Test that model validation raises appropriate errors."""
         with pytest.raises(TypeError):
-            Model(id="test")  # Missing required fields
+            Model(model_id="test")  # Missing required fields
 
 
 class TestModelRegistry:
@@ -174,7 +174,7 @@ class TestModelRegistry:
 
         model1 = Model(**sample_model_data)
         model2_data = sample_model_data.copy()
-        model2_data.update({"id": "test-model-2", "size_bytes": 2000000})
+        model2_data.update({"model_id": "test-model-2", "size_bytes": 2000000})
         model2 = Model(**model2_data)
 
         registry.update_model("test-model", model1)
@@ -222,7 +222,7 @@ class TestModelRegistry:
         # Add multiple models
         for i in range(3):
             data = sample_model_data.copy()
-            data["id"] = f"model-{i}"
+            data["model_id"] = f"model-{i}"
             model = Model(**data)
             registry.update_model(f"model-{i}", model)
 

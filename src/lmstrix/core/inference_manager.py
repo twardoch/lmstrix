@@ -12,6 +12,11 @@ import time
 from collections.abc import Callable, Iterator
 from typing import Any
 
+try:
+    import lmstudio
+except ImportError:
+    lmstudio = None
+
 from lmstrix.api.client import LMStudioClient
 from lmstrix.api.exceptions import ModelNotFoundError
 from lmstrix.core.models import Model, ModelRegistry
@@ -97,11 +102,12 @@ class InferenceManager:
             if is_loaded:
                 logger.info(f"Model currently loaded with context {loaded_context:,}, will reload")
                 try:
-                    import lmstudio
-
-                    lmstudio.unload()
-                    time.sleep(0.5)
-                except Exception as e:
+                    if lmstudio is not None:
+                        lmstudio.unload()
+                        time.sleep(0.5)
+                    else:
+                        logger.warning("lmstudio module not available")
+                except (ImportError, RuntimeError) as e:
                     logger.warning(f"Failed to unload existing models: {e}")
 
             context_to_use = None if in_ctx == 0 else in_ctx
@@ -118,8 +124,8 @@ class InferenceManager:
             if context_to_use is not None or not is_loaded:
                 if context_to_use == 0:
                     # Load without specific context
-                    import lmstudio
-
+                    if lmstudio is None:
+                        raise ImportError("lmstudio module not available")
                     llm = lmstudio.llm(model.id)
                 else:
                     llm = self.client.load_model_by_id(
@@ -128,8 +134,8 @@ class InferenceManager:
                     )
             else:
                 # Get reference to already loaded model
-                import lmstudio
-
+                if lmstudio is None:
+                    raise ImportError("lmstudio module not available")
                 loaded_models = lmstudio.list_loaded_models()
                 logger.debug(f"Found {len(loaded_models)} loaded models, searching for {model.id}")
 
@@ -370,11 +376,12 @@ class InferenceManager:
             if is_loaded:
                 logger.info(f"Model currently loaded with context {loaded_context:,}, will reload")
                 try:
-                    import lmstudio
-
-                    lmstudio.unload()
-                    time.sleep(0.5)
-                except Exception as e:
+                    if lmstudio is not None:
+                        lmstudio.unload()
+                        time.sleep(0.5)
+                    else:
+                        logger.warning("lmstudio module not available")
+                except (ImportError, RuntimeError) as e:
                     logger.warning(f"Failed to unload existing models: {e}")
 
             context_to_use = None if in_ctx == 0 else in_ctx
@@ -391,8 +398,8 @@ class InferenceManager:
             if context_to_use is not None or not is_loaded:
                 if context_to_use == 0:
                     # Load without specific context
-                    import lmstudio
-
+                    if lmstudio is None:
+                        raise ImportError("lmstudio module not available")
                     llm = lmstudio.llm(model.id)
                 else:
                     llm = self.client.load_model_by_id(
@@ -401,8 +408,8 @@ class InferenceManager:
                     )
             else:
                 # Get reference to already loaded model
-                import lmstudio
-
+                if lmstudio is None:
+                    raise ImportError("lmstudio module not available")
                 loaded_models = lmstudio.list_loaded_models()
                 logger.debug(f"Found {len(loaded_models)} loaded models, searching for {model.id}")
 
