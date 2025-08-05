@@ -1,0 +1,262 @@
+# this_file: _github/workflows/docs.yml
+
+name: Build and Deploy Documentation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src_docs/**'
+      - 'src/lmstrix/**'
+      - '_github/workflows/docs.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src_docs/**'
+      - 'src/lmstrix/**'
+      - '_github/workflows/docs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for proper git-revision-date-localized plugin
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install mkdocs
+        pip install mkdocs-material
+        pip install mkdocs-minify-plugin
+        pip install mkdocs-git-revision-date-localized-plugin
+        pip install mkdocs-git-committers-plugin-2
+        pip install pymdown-extensions
+        pip install mkdocs-awesome-pages-plugin
+        pip install mkdocs-redirects
+    
+    - name: Verify MkDocs configuration
+      run: |
+        cd src_docs
+        mkdocs --version
+        python -c "import yaml; yaml.safe_load(open('mkdocs.yml'))"
+        echo "✅ MkDocs configuration is valid"
+    
+    - name: Build documentation
+      run: |
+        cd src_docs
+        mkdocs build --verbose --strict
+        echo "✅ Documentation built successfully"
+    
+    - name: Verify build output
+      run: |
+        ls -la docs/
+        echo "📁 Generated files:"
+        find docs/ -name "*.html" | head -10
+        echo "📊 Total HTML files: $(find docs/ -name "*.html" | wc -l)"
+    
+    - name: Setup Pages
+      if: github.ref == 'refs/heads/main'
+      uses: actions/configure-pages@v3
+    
+    - name: Upload artifact
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: docs/
+
+  # Deployment job (only on main branch)
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2
+
+  # Documentation quality checks
+  quality-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install mkdocs mkdocs-material
+        pip install markdown-link-check || echo "markdown-link-check not available"
+    
+    - name: Check for broken internal links
+      run: |
+        cd src_docs
+        # Create a simple link checker script
+        cat << 'EOF' > check_links.py
+        import os
+        import re
+        import sys
+        from pathlib import Path
+        
+        def check_internal_links():
+            md_dir = Path("md")
+            errors = []
+            
+            # Get all markdown files
+            md_files = list(md_dir.glob("*.md"))
+            file_names = {f.stem for f in md_files}
+            
+            for md_file in md_files:
+                content = md_file.read_text()
+                
+                # Find markdown links [text](link.md)
+                links = re.findall(r'\[([^\]]+)\]\(([^)]+\.md)\)', content)
+                
+                for link_text, link_path in links:
+                    # Remove .md extension and check if file exists
+                    target_file = link_path.replace('.md', '')
+                    if target_file not in file_names:
+                        errors.append(f"Broken link in {md_file.name}: [{link_text}]({link_path})")
+            
+            return errors
+        
+        errors = check_internal_links()
+        if errors:
+            print("❌ Found broken internal links:")
+            for error in errors:
+                print(f"  {error}")
+            sys.exit(1)
+        else:
+            print("✅ All internal links are valid")
+        EOF
+        
+        python check_links.py
+    
+    - name: Check documentation structure
+      run: |
+        cd src_docs
+        echo "📋 Checking documentation structure..."
+        
+        # Check required files exist
+        required_files=(
+          "mkdocs.yml"
+          "md/index.md"
+          "md/installation.md"
+          "md/quickstart.md"
+          "md/configuration.md"
+          "md/cli-interface.md"
+          "md/python-api.md"
+          "md/context-testing.md"
+          "md/model-management.md"
+          "md/prompt-templating.md"
+          "md/performance.md"
+        )
+        
+        for file in "${required_files[@]}"; do
+          if [[ -f "$file" ]]; then
+            echo "✅ $file exists"
+          else
+            echo "❌ $file is missing"
+            exit 1
+          fi
+        done
+        
+        echo "📊 Documentation statistics:"
+        echo "  Total markdown files: $(find md/ -name "*.md" | wc -l)"
+        echo "  Total words: $(cat md/*.md | wc -w)"
+        echo "  Total lines: $(cat md/*.md | wc -l)"
+    
+    - name: Validate MkDocs navigation
+      run: |
+        cd src_docs
+        python -c "
+        import yaml
+        with open('mkdocs.yml') as f:
+            config = yaml.safe_load(f)
+        
+        nav = config.get('nav', [])
+        print('📖 Navigation structure:')
+        
+        def print_nav(items, indent=0):
+            for item in items:
+                if isinstance(item, dict):
+                    for key, value in item.items():
+                        print('  ' * indent + f'- {key}')
+                        if isinstance(value, list):
+                            print_nav(value, indent + 1)
+                        elif isinstance(value, str):
+                            print('  ' * (indent + 1) + f'→ {value}')
+                else:
+                    print('  ' * indent + f'- {item}')
+        
+        print_nav(nav)
+        print('✅ Navigation structure is valid')
+        "
+
+  # Performance test (build speed)
+  performance:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install mkdocs mkdocs-material mkdocs-minify-plugin
+    
+    - name: Benchmark build performance
+      run: |
+        cd src_docs
+        echo "⏱️ Testing documentation build performance..."
+        
+        # Warm-up build
+        time mkdocs build --quiet
+        
+        # Timed builds
+        echo "🏃 Running 3 timed builds..."
+        for i in {1..3}; do
+          rm -rf ../docs/*
+          echo "Build $i:"
+          time mkdocs build --quiet
+        done
+        
+        echo "✅ Performance test completed"

@@ -1,0 +1,214 @@
+# this_file: _github/workflows/docs-preview.yml
+
+name: Documentation Preview
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src_docs/**'
+      - 'src/lmstrix/**'
+      - '_github/workflows/docs-preview.yml'
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install mkdocs
+        pip install mkdocs-material
+        pip install mkdocs-minify-plugin
+        pip install mkdocs-git-revision-date-localized-plugin
+        pip install pymdown-extensions
+    
+    - name: Build documentation preview
+      run: |
+        cd src_docs
+        mkdocs build --verbose
+        echo "✅ Documentation preview built successfully"
+    
+    - name: Generate preview summary
+      run: |
+        cd src_docs
+        echo "📊 Documentation Preview Summary" > preview_summary.md
+        echo "=====================================" >> preview_summary.md
+        echo "" >> preview_summary.md
+        echo "**Built from:** \`${{ github.head_ref }}\`" >> preview_summary.md
+        echo "**Commit:** \`${{ github.sha }}\`" >> preview_summary.md
+        echo "**Author:** ${{ github.actor }}" >> preview_summary.md
+        echo "" >> preview_summary.md
+        echo "### 📈 Build Statistics" >> preview_summary.md
+        echo "- **Total pages:** $(find ../docs -name "*.html" | wc -l)" >> preview_summary.md
+        echo "- **Build time:** $(date)" >> preview_summary.md
+        echo "- **Size:** $(du -sh ../docs | cut -f1)" >> preview_summary.md
+        echo "" >> preview_summary.md
+        echo "### 📝 Changed Files" >> preview_summary.md
+        git diff --name-only origin/main...HEAD | grep -E '\.(md|yml)$' | while read file; do
+          echo "- \`$file\`" >> preview_summary.md
+        done
+        echo "" >> preview_summary.md
+        echo "### 🔗 Navigation Structure" >> preview_summary.md
+        echo "\`\`\`" >> preview_summary.md
+        python -c "
+        import yaml
+        with open('mkdocs.yml') as f:
+            config = yaml.safe_load(f)
+        nav = config.get('nav', [])
+        def print_nav(items, indent=0):
+            for item in items:
+                if isinstance(item, dict):
+                    for key, value in item.items():
+                        print('  ' * indent + f'- {key}')
+                        if isinstance(value, list):
+                            print_nav(value, indent + 1)
+                        elif isinstance(value, str):
+                            print('  ' * (indent + 1) + f'→ {value}')
+                else:
+                    print('  ' * indent + f'- {item}')
+        print_nav(nav)
+        " >> preview_summary.md
+        echo "\`\`\`" >> preview_summary.md
+    
+    - name: Upload preview artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: documentation-preview
+        path: |
+          docs/
+          src_docs/preview_summary.md
+        retention-days: 7
+    
+    - name: Comment PR with preview info
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const summary = fs.readFileSync('src_docs/preview_summary.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `## 📖 Documentation Preview Ready!
+            
+            The documentation has been built successfully from this PR.
+            
+            ${summary}
+            
+            📦 **Download Preview:** Check the "documentation-preview" artifact in the workflow run.
+            
+            > 💡 To test locally: \`cd src_docs && mkdocs serve\``
+          });
+
+  accessibility-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install mkdocs mkdocs-material
+        pip install accessibility-checker || echo "accessibility-checker not available"
+    
+    - name: Build documentation
+      run: |
+        cd src_docs
+        mkdocs build
+    
+    - name: Basic accessibility check
+      run: |
+        cd docs
+        echo "🔍 Running basic accessibility checks..."
+        
+        # Check for basic accessibility issues
+        echo "Checking for missing alt text..."
+        if grep -r "img.*src" . | grep -v "alt="; then
+          echo "⚠️ Found images without alt text"
+        else
+          echo "✅ All images have alt text"
+        fi
+        
+        echo "Checking for proper heading structure..."
+        for file in $(find . -name "*.html"); do
+          h1_count=$(grep -o "<h1" "$file" | wc -l)
+          if [ "$h1_count" -gt 1 ]; then
+            echo "⚠️ Multiple H1 tags found in $file"
+          fi
+        done
+        
+        echo "Checking for color contrast indicators..."
+        if grep -r "color.*#" . | head -5; then
+          echo "ℹ️ Found color definitions (manual review recommended)"
+        fi
+        
+        echo "✅ Basic accessibility check completed"
+
+  mobile-preview:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install mkdocs mkdocs-material
+    
+    - name: Build documentation
+      run: |
+        cd src_docs
+        mkdocs build
+    
+    - name: Check mobile responsiveness indicators
+      run: |
+        cd docs
+        echo "📱 Checking mobile responsiveness indicators..."
+        
+        # Check for viewport meta tag
+        if grep -r "viewport" . | head -5; then
+          echo "✅ Viewport meta tags found"
+        else
+          echo "⚠️ No viewport meta tags detected"
+        fi
+        
+        # Check for responsive CSS indicators
+        if grep -r "media.*screen" . | head -5; then
+          echo "✅ Responsive media queries found"
+        else
+          echo "ℹ️ No obvious media queries detected"
+        fi
+        
+        # Check Material theme responsive features
+        if grep -r "md-nav" . | head -3; then
+          echo "✅ Material theme navigation components found"
+        fi
+        
+        echo "📊 Mobile check completed"
