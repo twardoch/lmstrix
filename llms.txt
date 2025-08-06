@@ -19,7 +19,6 @@ Project Structure:
 │       │   ├── 📁 review
 │       │   └── 📁 untitled folder
 │       └── 📁 out
-├── 📁 context_tests
 ├── 📁 docs
 │   ├── 📄 _config.yml
 │   ├── 📄 api.md
@@ -3549,25 +3548,16 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/main.py,line=1202,col=16,endLine=1202,endColumn=25::src/lmstrix/api/main.py:1202:16: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=64,col=17,endLine=64,endColumn=35::src/lmstrix/utils/context_parser.py:64:17: TRY300 Consider moving this statement to an `else` block
 ::error title=Ruff (B904),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/context_parser.py,line=73,col=13,endLine=75,endColumn=14::src/lmstrix/utils/context_parser.py:73:13: B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=3,col=1,endLine=3,endColumn=40::src/lmstrix/utils/state.py:3:1: ERA001 Found commented-out code
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=26,col=20,endLine=26,endColumn=29::src/lmstrix/utils/state.py:26:20: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=35,col=16,endLine=35,endColumn=25::src/lmstrix/utils/state.py:35:16: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=127,col=20,endLine=127,endColumn=29::src/lmstrix/api/client.py:127:20: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=155,col=13,endLine=155,endColumn=31::src/lmstrix/api/client.py:155:13: TRY300 Consider moving this statement to an `else` block
 ::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=198,col=11,endLine=198,endColumn=17::src/lmstrix/api/client.py:198:11: ARG002 Unused method argument: `kwargs`
 ::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=383,col=9,endLine=383,endColumn=29::src/lmstrix/api/client.py:383:9: ARG002 Unused method argument: `model_context_length`
 ::error title=Ruff (ARG002),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/api/client.py,line=392,col=11,endLine=392,endColumn=17::src/lmstrix/api/client.py:392:11: ARG002 Unused method argument: `kwargs`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=3,col=1,endLine=3,endColumn=40::src/lmstrix/utils/state.py:3:1: ERA001 Found commented-out code
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=26,col=20,endLine=26,endColumn=29::src/lmstrix/utils/state.py:26:20: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/utils/state.py,line=35,col=16,endLine=35,endColumn=25::src/lmstrix/utils/state.py:35:16: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/concrete_config.py,line=3,col=1,endLine=3,endColumn=49::src/lmstrix/core/concrete_config.py:3:1: ERA001 Found commented-out code
 ::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/concrete_config.py,line=126,col=13,endLine=126,endColumn=24::src/lmstrix/core/concrete_config.py:126:13: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=7,col=1,endLine=7,endColumn=51::src/lmstrix/core/inference_manager.py:7:1: ERA001 Found commented-out code
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=180,col=24,endLine=180,endColumn=33::src/lmstrix/core/inference_manager.py:180:24: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=202,col=13,endLine=210,endColumn=14::src/lmstrix/core/inference_manager.py:202:13: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=212,col=16,endLine=212,endColumn=25::src/lmstrix/core/inference_manager.py:212:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=257,col=24,endLine=257,endColumn=33::src/lmstrix/core/inference_manager.py:257:24: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=316,col=13,endLine=316,endColumn=46::src/lmstrix/core/inference_manager.py:316:13: TRY300 Consider moving this statement to an `else` block
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=318,col=16,endLine=318,endColumn=25::src/lmstrix/core/inference_manager.py:318:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=325,col=24,endLine=325,endColumn=33::src/lmstrix/core/inference_manager.py:325:24: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=454,col=24,endLine=454,endColumn=33::src/lmstrix/core/inference_manager.py:454:24: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=122,col=13,endLine=122,endColumn=46::src/lmstrix/core/inference.py:122:13: TRY300 Consider moving this statement to an `else` block
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=124,col=16,endLine=124,endColumn=25::src/lmstrix/core/inference.py:124:16: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=132,col=24,endLine=132,endColumn=33::src/lmstrix/core/inference.py:132:24: BLE001 Do not catch blind exception: `Exception`
@@ -3577,32 +3567,21 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 ::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=376,col=29,endLine=377,endColumn=37::src/lmstrix/core/inference.py:376:29: S110 `try`-`except`-`pass` detected, consider logging the exception
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=401,col=28,endLine=401,endColumn=37::src/lmstrix/core/inference.py:401:28: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference.py,line=484,col=20,endLine=484,endColumn=29::src/lmstrix/core/inference.py:484:20: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=144,col=16,endLine=144,endColumn=25::src/lmstrix/core/context_tester.py:144:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=158,col=35,endLine=158,endColumn=40::src/lmstrix/core/context_tester.py:158:35: ANN001 Missing type annotation for function argument `model`
 ::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=3,col=1,endLine=3,endColumn=47::src/lmstrix/core/models.py:3:1: ERA001 Found commented-out code
 ::error title=Ruff (SIM102),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=142,col=9,endLine=144,endColumn=40::src/lmstrix/core/models.py:142:9: SIM102 Use a single `if` statement instead of nested `if` statements
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=220,col=24,endLine=220,endColumn=33::src/lmstrix/core/models.py:220:24: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/models.py,line=226,col=16,endLine=226,endColumn=25::src/lmstrix/core/models.py:226:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/get_out_ctx.py,line=5,col=1,endLine=5,endColumn=28::get_out_ctx.py:5:1: ERA001 Found commented-out code
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_streaming.py,line=47,col=12,endLine=47,endColumn=21::test_streaming.py:47:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=6,col=1,endLine=6,endColumn=33::debug_test_logic.py:6:1: ERA001 Found commented-out code
-::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=47,col=9,endLine=47,endColumn=15::debug_test_logic.py:47:9: E722 Do not use bare `except`
-::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=47,col=9,endLine=48,endColumn=17::debug_test_logic.py:47:9: S110 `try`-`except`-`pass` detected, consider logging the exception
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=117,col=12,endLine=117,endColumn=21::debug_test_logic.py:117:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=119,col=9,endLine=119,endColumn=25::debug_test_logic.py:119:9: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=137,col=9,endLine=137,endColumn=15::debug_test_logic.py:137:9: E722 Do not use bare `except`
-::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=137,col=9,endLine=138,endColumn=17::debug_test_logic.py:137:9: S110 `try`-`except`-`pass` detected, consider logging the exception
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=180,col=12,endLine=180,endColumn=21::debug_test_logic.py:180:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=208,col=13,endLine=208,endColumn=19::debug_test_logic.py:208:13: E722 Do not use bare `except`
-::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=208,col=13,endLine=209,endColumn=21::debug_test_logic.py:208:13: S110 `try`-`except`-`pass` detected, consider logging the exception
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=232,col=16,endLine=232,endColumn=25::debug_test_logic.py:232:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PTH123),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=53,col=10,endLine=53,endColumn=14::examples/python/prompt_templates_demo.py:53:10: PTH123 `open()` should be replaced by `Path.open()`
-::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=5,col=1,endLine=5,endColumn=35::test_model_out_ctx.py:5:1: ERA001 Found commented-out code
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=61,col=12,endLine=61,endColumn=21::test_model_out_ctx.py:61:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=63,col=9,endLine=63,endColumn=25::test_model_out_ctx.py:63:9: PLC0415 `import` should be at the top-level of a file
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=87,col=12,endLine=87,endColumn=21::test_model_out_ctx.py:87:12: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=98,col=16,endLine=98,endColumn=25::test_model_out_ctx.py:98:16: BLE001 Do not catch blind exception: `Exception`
-::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=107,col=12,endLine=107,endColumn=21::test_model_out_ctx.py:107:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=7,col=1,endLine=7,endColumn=51::src/lmstrix/core/inference_manager.py:7:1: ERA001 Found commented-out code
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=180,col=24,endLine=180,endColumn=33::src/lmstrix/core/inference_manager.py:180:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=202,col=13,endLine=210,endColumn=14::src/lmstrix/core/inference_manager.py:202:13: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=212,col=16,endLine=212,endColumn=25::src/lmstrix/core/inference_manager.py:212:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=257,col=24,endLine=257,endColumn=33::src/lmstrix/core/inference_manager.py:257:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=316,col=13,endLine=316,endColumn=46::src/lmstrix/core/inference_manager.py:316:13: TRY300 Consider moving this statement to an `else` block
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=318,col=16,endLine=318,endColumn=25::src/lmstrix/core/inference_manager.py:318:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=325,col=24,endLine=325,endColumn=33::src/lmstrix/core/inference_manager.py:325:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/inference_manager.py,line=454,col=24,endLine=454,endColumn=33::src/lmstrix/core/inference_manager.py:454:24: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=144,col=16,endLine=144,endColumn=25::src/lmstrix/core/context_tester.py:144:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ANN001),file=/Users/Shared/lmstudio/lmstrix/src/lmstrix/core/context_tester.py,line=158,col=35,endLine=158,endColumn=40::src/lmstrix/core/context_tester.py:158:35: ANN001 Missing type annotation for function argument `model`
 ::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=6,col=1,endLine=6,endColumn=32::debug_inference.py:6:1: ERA001 Found commented-out code
 ::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=75,col=9,endLine=75,endColumn=15::debug_inference.py:75:9: E722 Do not use bare `except`
 ::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=75,col=9,endLine=76,endColumn=17::debug_inference.py:75:9: S110 `try`-`except`-`pass` detected, consider logging the exception
@@ -3619,6 +3598,26 @@ echo "Check $LOG_FILE and $ERR_FILE for details."
 ::error title=Ruff (TRY300),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=245,col=9,endLine=245,endColumn=32::debug_inference.py:245:9: TRY300 Consider moving this statement to an `else` block
 ::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=247,col=12,endLine=247,endColumn=21::debug_inference.py:247:12: BLE001 Do not catch blind exception: `Exception`
 ::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_inference.py,line=250,col=9,endLine=250,endColumn=25::debug_inference.py:250:9: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_streaming.py,line=47,col=12,endLine=47,endColumn=21::test_streaming.py:47:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=5,col=1,endLine=5,endColumn=35::test_model_out_ctx.py:5:1: ERA001 Found commented-out code
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=61,col=12,endLine=61,endColumn=21::test_model_out_ctx.py:61:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=63,col=9,endLine=63,endColumn=25::test_model_out_ctx.py:63:9: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=87,col=12,endLine=87,endColumn=21::test_model_out_ctx.py:87:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=98,col=16,endLine=98,endColumn=25::test_model_out_ctx.py:98:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/test_model_out_ctx.py,line=107,col=12,endLine=107,endColumn=21::test_model_out_ctx.py:107:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=6,col=1,endLine=6,endColumn=33::debug_test_logic.py:6:1: ERA001 Found commented-out code
+::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=47,col=9,endLine=47,endColumn=15::debug_test_logic.py:47:9: E722 Do not use bare `except`
+::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=47,col=9,endLine=48,endColumn=17::debug_test_logic.py:47:9: S110 `try`-`except`-`pass` detected, consider logging the exception
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=117,col=12,endLine=117,endColumn=21::debug_test_logic.py:117:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (PLC0415),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=119,col=9,endLine=119,endColumn=25::debug_test_logic.py:119:9: PLC0415 `import` should be at the top-level of a file
+::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=137,col=9,endLine=137,endColumn=15::debug_test_logic.py:137:9: E722 Do not use bare `except`
+::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=137,col=9,endLine=138,endColumn=17::debug_test_logic.py:137:9: S110 `try`-`except`-`pass` detected, consider logging the exception
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=180,col=12,endLine=180,endColumn=21::debug_test_logic.py:180:12: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (E722),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=208,col=13,endLine=208,endColumn=19::debug_test_logic.py:208:13: E722 Do not use bare `except`
+::error title=Ruff (S110),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=208,col=13,endLine=209,endColumn=21::debug_test_logic.py:208:13: S110 `try`-`except`-`pass` detected, consider logging the exception
+::error title=Ruff (BLE001),file=/Users/Shared/lmstudio/lmstrix/debug_test_logic.py,line=232,col=16,endLine=232,endColumn=25::debug_test_logic.py:232:16: BLE001 Do not catch blind exception: `Exception`
+::error title=Ruff (ERA001),file=/Users/Shared/lmstudio/lmstrix/get_out_ctx.py,line=5,col=1,endLine=5,endColumn=28::get_out_ctx.py:5:1: ERA001 Found commented-out code
+::error title=Ruff (PTH123),file=/Users/Shared/lmstudio/lmstrix/examples/python/prompt_templates_demo.py,line=53,col=10,endLine=53,endColumn=14::examples/python/prompt_templates_demo.py:53:10: PTH123 `open()` should be replaced by `Path.open()`
 1 file left unchanged
 1 file left unchanged
 1 file left unchanged
