@@ -141,7 +141,7 @@ class LMStrixCLI:
             verbose=verbose,
         )
 
-    def health(self, verbose: bool = False) -> None:
+    def doctor(self, verbose: bool = False) -> None:
         """Check database health and backup status.
 
         Args:

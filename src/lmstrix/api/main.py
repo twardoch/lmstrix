@@ -1105,7 +1105,7 @@ class LMStrixService:
 
         models_file = get_default_models_file()
         logger.debug("[blue]Database Health Check[/blue]")
-        logger.debug(f"Registry file: {models_file}")
+        logger.info(f"Registry file: {models_file}")
 
         # Check if registry exists
         if not models_file.exists():
@@ -1118,7 +1118,7 @@ class LMStrixService:
         try:
             with models_file.open() as f:
                 json.load(f)
-            logger.success("✓ Registry file is valid JSO")
+            logger.success("✓ Registry file is valid JSON")
         except json.JSONDecodeError as e:
             logger.debug(f"✗ Registry file is corrupted: {e}")
 
@@ -1130,7 +1130,7 @@ class LMStrixService:
 
             # Check for validation issues
             invalid_models = []
-            for model_path, model in registry.models.items():
+            for model_path, model in registry._models.items():
                 if not model.validate_integrity():
                     invalid_models.append(model_path)
 
