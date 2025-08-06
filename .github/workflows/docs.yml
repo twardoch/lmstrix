@@ -1,4 +1,4 @@
-# this_file: _github/workflows/docs.yml
+# this_file: .github/workflows/docs.yml
 
 name: Build and Deploy Documentation
 
@@ -8,13 +8,13 @@ on:
     paths:
       - 'src_docs/**'
       - 'src/lmstrix/**'
-      - '_github/workflows/docs.yml'
+      - '.github/workflows/docs.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'src_docs/**'
       - 'src/lmstrix/**'
-      - '_github/workflows/docs.yml'
+      - '.github/workflows/docs.yml'
   workflow_dispatch:
 
 permissions:

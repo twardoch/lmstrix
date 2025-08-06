@@ -6,7 +6,7 @@ labels: documentation
 assignees: ''
 ---
 
-<!-- this_file: _github/ISSUE_TEMPLATE/documentation.md -->
+<!-- this_file: .github/ISSUE_TEMPLATE/documentation.md -->
 
 ## Documentation Issue Type
 <!-- Select the type of documentation issue -->

@@ -1,4 +1,4 @@
-<!-- this_file: _github/pull_request_template.md -->
+<!-- this_file: .github/pull_request_template.md -->
 
 ## Description
 <!-- Provide a brief description of the changes -->

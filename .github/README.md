@@ -1,13 +1,13 @@
-# _github Directory
+# .github Directory
 
-<!-- this_file: _github/README.md -->
+<!-- this_file: .github/README.md -->
 
 This directory contains GitHub workflow configurations and templates for the LMStrix documentation system.
 
 ## 📁 Directory Structure
 
 ```
-_github/
+.github/
 ├── workflows/
 │   ├── docs.yml           # Main documentation build and deploy workflow
 │   └── docs-preview.yml   # PR preview and quality checks
@@ -60,29 +60,20 @@ _github/
 
 ## 🛠️ Setup Instructions
 
-### 1. Copy to `.github` Directory
-
-To activate these workflows, copy this entire `_github` directory to `.github` in your repository root:
-
-```bash
-# From the repository root
-cp -r _github .github
-```
-
-### 2. Enable GitHub Pages
+### 1. Enable GitHub Pages
 
 1. Go to your repository **Settings** → **Pages**
 2. Set **Source** to "GitHub Actions"
 3. The documentation will be available at: `https://[username].github.io/[repository]/`
 
-### 3. Configure Repository Permissions
+### 2. Configure Repository Permissions
 
 Ensure the following permissions in **Settings** → **Actions** → **General**:
 
 - ✅ **Workflow permissions**: "Read and write permissions"
 - ✅ **Allow GitHub Actions to create and approve pull requests**
 
-### 4. Set Branch Protection (Optional)
+### 3. Set Branch Protection (Optional)
 
 For production repositories, consider setting up branch protection:
 

@@ -1,4 +1,4 @@
-# this_file: _github/workflows/docs-preview.yml
+# this_file: .github/workflows/docs-preview.yml
 
 name: Documentation Preview
 
@@ -8,7 +8,7 @@ on:
     paths:
       - 'src_docs/**'
       - 'src/lmstrix/**'
-      - '_github/workflows/docs-preview.yml'
+      - '.github/workflows/docs-preview.yml'
 
 jobs:
   preview:
