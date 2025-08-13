@@ -1,0 +1,1 @@
+Analyze @adamall.py and write a tool @vexylines.py which uses Fire CLI, reads `--prompt` from a text file and then goes through each model in the lmstrix database and performs very careful benchmarking by running the prompt, recording the output in the @out folder and in the @bench.txt recording the name and the duration of the processing.

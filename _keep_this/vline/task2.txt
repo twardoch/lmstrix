@@ -1,0 +1,5 @@
+I’ve moved some files that were in directly in this cwd into @bench-ctxmax and then I moved the files that were in 'out' into out-ctxmax because I want to run another benchmark. 
+
+Now update the scripts/tools in this folder to add a Fire CLI param --bench that will point to a folder like 'bench-ctxmax' (but it will be a new one like 'bench-4095' or so, and the tool needs to create it if it doesn't exist). And add a Fire CLI param --out that will point to a folder like 'out-ctxmax' (but it will be a new one like 'out-4095' or so, and the tool needs to create it if it doesn't exist).
+
+Ensure that the tools work with such a setup. Don't test it because the setup won't work on this machine. 

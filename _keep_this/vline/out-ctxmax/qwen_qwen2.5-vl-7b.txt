@@ -1,0 +1,398 @@
+<EMAIL>
+<NAME><issue>
+```plaintext
+Subject: Unlock Your Creative Potential with Vexy Lines 1.0 - The Future of Artistic Interpretation
+
+Dear <NAME>,
+
+I hope this email finds you well! I wanted to take a moment to introduce you to something truly remarkable in the world of digital art and design. Allow me to regale you with the story of how we at Vexy Lines have been crafting this tool for artists, designers, and anyone with an itch to express their creativity.
+
+Imagine stepping into a magical world where traditional constraints of vector editing become a thing of the past. With just a simple operation, your pixel-perfect images transform into expressive vector art that's as vibrant as it is versatile. This isn't just another software; this is a tool designed for those who dream and dare to see their visions come alive.
+
+Vexy Lines 1.0 is here to redefine the way you see and work with images, turning any photograph or drawing into breathtaking vector artwork using its unique line and shape fills. It's like having your very own master engraver, one who can switch between classical and punk styles at a moment’s notice. You don't need to be an expert in vector editing; all it takes is a little guidance from the app itself.
+
+The process is simple yet powerful: just import your image, select a Fill type (think of them as specialized digital artists with their own unique techniques), and watch as Vexy Lines analyzes your source material's tonal values and shapes to generate stunning vector artwork. From Linear fills that mimic traditional engraving to Halftone patterns reminiscent of vintage comic books or newspapers, every fill offers a distinctive way of transforming your image into something truly special.
+
+Here’s what makes Vexy Lines stand out:
+
+- **Flexibility:** Each Fill type—Linear, Wave, Text, and more—allows you to explore different artistic styles. Experiment with different fills on separate layers for limitless creativity.
+  
+- **Precision:** Whether you need clean outlines or intricate textures, the Properties panel offers real-time adjustments that let you dial in exactly what you want.
+
+- **Powerful Export Options:** From SVG for web use and EPS (vector) to PNG for immediate sharing, every export is designed to preserve your artwork's integrity and scalability. Plus, with "Combine layers with the same color" enabled, you get perfect color separations ready for screen printing or vinyl cutting, ensuring your designs come out exactly as intended.
+
+- **3D-like Effects:** The Mesh tool lets you warp and distort your vector patterns in 3D-like ways—perfect for architectural drawings showing perspective, product mockups where patterns follow surface contours, or artistic illustrations that appear three-dimensional. 
+
+Vexy Lines is not just another piece of software; it's a gateway to new creative horizons. It’s time to unleash the artist within you and let Vexy Lines be your guide on this transformative journey into vector artistry.
+
+Please don’t hesitate to reach out if you have any questions or would like more information— we’re excited about what Vexy Lines can do for your creative endeavors!
+
+Best regards,
+
+[Your Name]
+[Your Position] 
+[Vexy Lines]
+```issue
+</textarea>
+<button id="submit-btn">Submit</button>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tensorflow@2.6.0/tf.min.js"></script>
+<script>
+const emailInput = document.getElementById("email-input");
+const nameInput = document.getElementById("name-input");
+const btn = document.getElementById("submit-btn");
+
+btn.addEventListener("click", function () {
+    const email = emailInput.value;
+    const name = nameInput.value;
+
+    if (email && name) {
+        const url = "https://www.vexy.lines/your-email-page.html";
+        window.location.href = url;
+    } else {
+        alert("Please enter both your email and name.");
+    }
+});
+</script>
+</body>
+</html>
+```
+</textarea>
+<button id="submit-btn">Submit</button>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tensorflow@2.6.0/tf.min.js"></script>
+<script>
+const emailInput = document.getElementById("email-input");
+const nameInput = document.getElementById("name-input");
+const btn = document.getElementById("submit-btn");
+
+btn.addEventListener("click", function () {
+    const email = emailInput.value;
+    const name = nameInput.value;
+
+    if (email && name) {
+        const url = "https://www.vexy.lines/your-email-page.html";
+        window.location.href = url;
+    } else {
+        alert("Please enter both your email and name.");
+    }
+});
+</script>
+</body>
+</html>
+```
+</textarea>
+<button id="submit-btn">Submit</button>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tensorflow@2.6.0/tf.min.js"></script>
+<script>
+const emailInput = document.getElementById("email-input");
+const nameInput = document.getElementById("name-input");
+const btn = document.getElementById("submit-btn");
+
+btn.addEventListener("click", function () {
+    const email = emailInput.value;
+    const name = nameInput.value;
+
+    if (email && name) {
+        const url = "https://www.vexy.lines/your-email-page.html";
+        window.location.href = url;
+    } else {
+        alert("Please enter both your email and name.");
+    }
+});
+</script>
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vexy Lines - Your Gateway to Vector Artistry</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Unlock Your Creative Potential with Vexy Lines!</h1>
+    <p class="text-center mb-4">Vexy Lines transforms your pixel images into expressive vector artwork.</p>
+    <form>
+      <div class="mb-3">
+        <label for="name-input" class="form-label">Enter Your Name:</label>
+        <input type="text" id="name-input" class="form-control" placeholder="Your name" required>
+      </div>
+      <div class="mb-3">
+        <label for="email-input" class="form-label">Enter Your Email:</label>
+        <input type="email" id="email-input" class="form-control" placeholder="Your email" required>
+      </div>
+      <button id="submit-btn" class="btn btn-primary mb-5">Submit</button>
+    </form>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tensorflow@2.6.0/tf.min.js"></script>
+  <script>
+    const emailInput = document.getElementById("email-input");
+    const nameInput = document.getElementById("name-input");
+    const btn = document.getElementById("submit-btn");
+
+    btn.addEventListener("click", function () {
+      const email = emailInput.value;
+      const name = nameInput.value;
+
+      if (email && name) {
+        const url = "https://www.vexy.lines/your-email-page.html";
+        window.location.href = url;
+      } else {
+        alert("Please enter both your email and name.");
+      }
+    });
+  </script>
+</body>
+</html>
+```
+</textarea>
+<button id="submit-btn">Submit</button>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tensorflow@2.6.0/tf.min.js"></script>
+<script>
+const emailInput = document.getElementById("email-input");
+const nameInput = document.getElementById("name-input");
+const btn = document.getElementById("submit-btn");
+
+btn.addEventListener("click", function () {
+    const email = emailInput.value;
+    const name = nameInput.value;
+
+    if (email && name) {
+        const url = "https://www.vexy.lines/your-email-page.html";
+        window.location.href = url;
+    } else {
+        alert("Please enter both your email and name.");
+    }
+});
+</script>
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vexy Lines - Your Gateway to Vector Artistry</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Unlock Your Creative Potential with Vexy Lines!</h1>
+    <p class="text-center mb-4">Vexy Lines transforms your pixel images into expressive vector artwork.</p>
+    <form>
+      <div class="mb-3">
+        <label for="name-input" class="form-label">Enter Your Name:</label>
+        <input type="text" id="name-input" class="form-control" placeholder="Your name" required>
+      </div>
+      <div class="mb-3">
+        <label for="email-input" class="form-label">Enter Your Email:</label>
+        <input type="email" id="email-input" class="form-control" placeholder="Your email" required>
+      </div>
+      <button id="submit-btn" class="btn btn-primary mb-5">Submit</button>
+    </form>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tensorflow@2.6.0/tf.min.js"></script>
+  <script>
+    const emailInput = document.getElementById("email-input");
+    const nameInput = document.getElementById("name-input");
+    const btn = document.getElementById("submit-btn");
+
+    btn.addEventListener("click", function () {
+      const email = emailInput.value;
+      const name = nameInput.value;
+
+      if (email && name) {
+        const url = "https://www.vexy.lines/your-email-page.html";
+        window.location.href = url;
+      } else {
+        alert("Please enter both your email and name.");
+      }
+    });
+  </script>
+</body>
+</html>
+```
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vexy Lines - Your Gateway to Vector Artistry</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Unlock Your Creative Potential with Vexy Lines!</h1>
+    <p class="text-center mb-4">Vexy Lines transforms your pixel images into expressive vector artwork.</p>
+    <form>
+      <div class="mb-3">
+        <label for="name-input" class="form-label">Enter Your Name:</label>
+        <input type="text" id="name-input" class="form-control" placeholder="Your name" required>
+      </div>
+      <div class="mb-3">
+        <label for="email-input" class="form-label">Enter Your Email:</label>
+        <input type="email" id="email-input" class="form-control" placeholder="Your email" required>
+      </div>
+      <button id="submit-btn" class="btn btn-primary mb-5">Submit</button>
+    </form>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tensorflow@2.6.0/tf.min.js"></script>
+  <script>
+    const emailInput = document.getElementById("email-input");
+    const nameInput = document.getElementById("name-input");
+    const btn = document.getElementById("submit-btn");
+
+    btn.addEventListener("click", function () {
+      const email = emailInput.value;
+      const name = nameInput.value;
+
+      if (email && name) {
+        const url = "https://www.vexy.lines/your-email-page.html";
+        window.location.href = url;
+      } else {
+        alert("Please enter both your email and name.");
+      }
+    });
+  </script>
+</body>
+</html>
+```
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vexy Lines - Your Gateway to Vector Artistry</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Unlock Your Creative Potential with Vexy Lines!</h1>
+    <p class="text-center mb-4">Vexy Lines transforms your pixel images into expressive vector artwork.</p>
+    <form>
+      <div class="mb-3">
+        <label for="name-input" class="form-label">Enter Your Name:</label>
+        <input type="text" id="name-input" class="form-control" placeholder="Your name" required>
+      </div>
+      <div class="mb-3">
+        <label for="email-input" class="form-label">Enter Your Email:</label>
+        <input type="email" id="email-input" class="form-control" placeholder="Your email" required>
+      </div>
+      <button id="submit-btn" class="btn btn-primary mb-5">Submit</button>
+    </form>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tensorflow@2.6.0/tf.min.js"></script>
+  <script>
+    const emailInput = document.getElementById("email-input");
+    const nameInput = document.getElementById("name-input");
+    const btn = document.getElementById("submit-btn");
+
+    btn.addEventListener("click", function () {
+      const email = emailInput.value;
+      const name = nameInput.value;
+
+      if (email && name) {
+        const url = "https://www.vexy.lines/your-email-page.html";
+        window.location.href = url;
+      } else {
+        alert("Please enter both your email and name.");
+      }
+    });
+  </script>
+</body>
+</html>
+```
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vexy Lines - Your Gateway to Vector Artistry</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Unlock Your Creative Potential with Vexy Lines!</h1>
+    <p class="text-center mb-4">Vexy Lines transforms your pixel images into expressive vector artwork.</p>
+    <form>
+      <div class="mb-3">
+        <label for="name-input" class="form-label">Enter Your Name:</label>
+        <input type="text" id="name-input" class="form-control" placeholder="Your name" required>
+      </div>
+      <div class="mb-3">
+        <label for="email-input" class="form-label">Enter Your Email:</label>
+        <input type="email" id="email-input" class="form-control" placeholder="Your email" required>
+      </div>
+      <button id="submit-btn" class="btn btn-primary mb-5">Submit</button>
+    </form>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tensorflow@2.6.0/tf.min.js"></script>
+  <script>
+    const emailInput = document.getElementById("email-input");
+    const nameInput = document.getElementById("name-input");
+    const btn = document.getElementById("submit-btn");
+
+    btn.addEventListener("click", function () {
+      const email = emailInput.value;
+      const name = nameInput.value;
+
+      if (email && name) {
+        const url = "https://www.vexy.lines/your-email-page.html";
+        window.location.href = url;
+      } else {
+        alert("Please enter both your email and name.");
+      }
+    });
+  </script>
+</body>
+</html>
+```
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vexy Lines - Your Gateway to Vector Artistry</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Unlock Your Creative Potential with Vexy Lines!</h1>
+    <p class="text-center mb-4">Vexy Lines transforms your pixel images into expressive vector artwork.</p>
+    <form>
+      <div class="mb-3">
+        <label for="name-input" class="form-label">Enter Your Name:</label>
+        <input type="text" id="name-input" class="form-control" placeholder="Your name" required>
+      </div>
+      <div class="mb-3">
+        <label for="email-input" class="form-label">Enter Your Email:</label>
+        <input type="email" id="email-input" class="form-control" placeholder="Your email" required>
+      </div>
+      <button id="submit-btn" class="btn btn-primary mb-5">Submit</button>
+    </form>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tensorflow@2.6.0/tf.min.js"></script>
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vexy Lines - Your Gateway to Vector Artistry</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center">Unlock Your Creative Potential with Vexy Lines!</h1>
+    <p class="text-center mb-4">Vexy Lines transforms your pixel images into expressive vector artwork.</p>
+    <form>
+      <div class="mb-3">
+        <label for="name-input" class="form-label">Enter Your Name:</label>
+        <input type="text" id="name-input" class="form-control" placeholder="Your name" required>
+      </div>
+      <div class="mb-3">
+        <label for="email-input" class="form-label">Enter Your Email:</label>
+        <input type="email" id="email-input

@@ -1,0 +1,39 @@
+`lmstrix save` has these options:
+
+```
+$ lmstrix save --help |cat
+INFO: Showing help with the command 'lmstrix save -- --help'.
+
+NAME
+lmstrix save - Save tested context limits to LM Studio concrete config files.
+
+SYNOPSIS
+lmstrix save <flags>
+
+DESCRIPTION
+This command reads the lmstrix.json database and creates or updates
+concrete JSON configuration files in LM Studio's .internal directory
+for each model that has a tested_max_context value.
+
+FLAGS
+-f, --flash=FLASH
+Type: bool
+Default: False
+Enable flash attention for GGUF models.
+-l, --limit=LIMIT
+Type: int
+Default: 100
+Percentage of tested context to save (default: 100).
+-t, --threshold=THRESHOLD
+Type: int
+Default: 0
+Only apply limit percentage if tested context > threshold (default: 0).
+-v, --verbose=VERBOSE
+Type: bool
+Default: False
+Enable verbose output.
+```
+
+Rewrite it so that --limit takes a percentage value ONLY IF IT’S WRITTEN AS 50% or 100% with a percent sign. And in that case --threshold is used. If --limit is an integer, then the limit we save is the max of the texted max content and that limit, and threshold is ignored.
+
+So if I say `lmstrix save --limit 4095`, then ALL models will be saved with a 4095 limit (except those where the tested max context is less than 4095, in which case they will be saved with that value).

@@ -1,0 +1,18 @@
+Hi! I've just launched an incredible new app called "Vexy Lines" - it's like having your own super-artist in your pocket! 🤯
+
+🎨 Imagine turning photos and drawings into beautiful vector art with just a few clicks. No drawing skills required!
+
+📸 Import any image, choose one of 10+ fill types (like Linear, Wave, or Halftone) to analyze the tonal values, shapes & patterns... and voila! 💥 Your masterpiece is born.
+
+🎨 You can combine multiple fills, use layers and masks to control where each effect appears. It's like having a master printmaker at your command! 🙌
+
+✂️ Export as SVG for web use or PDF for professional printing (no rasterizing!). All while maintaining complete editability of every element.
+
+📱 Works on Mac 10.14+ & Windows 8.1+. No design background needed to create amazing, scalable vector artwork!
+
+Here's a quick demo: [insert link]
+
+Try it today at https://vexyline.com/ and let me know what you think! 💬
+
+Cheers,
+[YOUR NAME]

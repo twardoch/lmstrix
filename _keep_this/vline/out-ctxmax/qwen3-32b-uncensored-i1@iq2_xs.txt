@@ -1,0 +1,62 @@
+</FAQ>
+<|im_start|>
+
+<|im_start|>
+
+Subject: Unleash Your Creative Potential with Vexy Lines 1.0!
+
+**Vexy Lines 1.0 - Where Art Meets Innovation**
+
+At last, the tool you've been waiting for! Introducing **Vexy Lines 1.0**, a groundbreaking software that transforms your pixel images into expressive vector artwork using unique line and shape fills.
+
+**What is Vexy Lines?**
+Vexy Lines is an innovative software that allows you to convert photos and drawings into beautiful, scalable vector art. It's like having a master engraver who can go from classical to punk, and reinterpret any photo or image. With just a few simple operations, the app takes over and does the creative work for you.
+
+**Why Choose Vexy Lines?**
+- **Easy-to-use Interface**: Simply import a photo or bitmap, and apply a Fill.
+- **Versatile Fills**: Choose from a dozen different fill types, each with its own unique style and personality. From Linear fills that mimic traditional engraving to Halftone fills that generate dot patterns similar to vintage printing techniques, Vexy Lines offers something for everyone.
+- **High-Quality Output**: The result is scalable vector artwork perfect for any application - from business card logos that print crisp at any size, to large format posters for gallery walls.
+
+**System Requirements**
+Mac 10.14+ or Windows 8.1+, with 4GB RAM minimum (8GB recommended for complex projects).
+
+**Getting Started**
+Choose File > New, then drag your image into the dialog or click the image icon to browse.
+
+**What is a "fill"?**
+In Vexy Lines, a Fill is like a specialized digital artist who only knows one technique but executes it perfectly. Each Fill type analyzes your source image's brightness, and transforms it using its unique approach: Linear creates parallel lines reminiscent of classical engraving, Wave adds flowing curves like wind-blown grass, and Halftone generates dot patterns similar to vintage comic books or newspapers.
+
+**Layers, Groups, and Masks**
+- **Layers**: Hold your fills.
+- **Groups**: Organize multiple layers.
+- **Masks**: Control which parts of fills are visible.
+
+**See Your Original Image While Working**
+Use the Show Images button in the toolbar, or adjust Source Image Opacity in the Properties panel.
+
+**Which Fill Should You Use?**
+Linear and Wave for classic engraving, Trace for clean logo conversion, Scribble for hand-drawn looks, Halftone for pop art effects.
+
+**Why Doesn't Your Artwork Look Like the Original?**
+Vexy Lines creates artistic interpretations, not exact copies. That's the creative magic!
+
+**Adjust Line Spacing, Thickness, and Direction**
+Select any fill and use the Properties panel sliders - changes update in real-time.
+
+**Use Colors from Your Original Image**
+Yes! Enable Dynamic Color in the Properties panel to sample hues from your source image.
+
+**File Formats You Can Import and Export**
+- **Import**: PNG, JPEG, TIFF, BMP, SVG, PDF.
+- **Export**: SVG, PDF, EPS (vector) and PNG, JPEG (raster).
+
+**Maintain Layers When Moving to Other Design Software**
+Yes! Export as SVG with "Export Layers Separately" checked to preserve your layer structure.
+
+**Is Vexy Lines Suitable for Screen Printing or Vinyl Cutting?**
+Absolutely! Use the "Combine layers with the same color" export option for automatic color separation.
+
+**What is the Mesh Tool?**
+The Mesh tool allows you to warp and distort your vector artwork in 3D-like ways. It maintains perfect vector quality and editability throughout.
+
+With Vexy Lines, you'll be able to unleash your creativity like never before. Whether you're a seasoned professional or just starting out, Vexy Lines is the perfect tool for transforming your ideas into stunning vector art. So why not give it a try today? We know you won't want to miss out on this incredible opportunity!

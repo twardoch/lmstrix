@@ -1176,9 +1176,51 @@ class LMStrixService:
         else:
             logger.debug("No backup files found")
 
-    def save_configs(self, flash: bool = False, verbose: bool = False) -> None:
-        """Save tested context limits to LM Studio concrete config files."""
+    def save_configs(
+        self, 
+        flash: bool = False, 
+        limit: str | int = "100%",
+        threshold: int = 0,
+        verbose: bool = False
+    ) -> None:
+        """Save tested context limits to LM Studio concrete config files.
+        
+        Args:
+            flash: Enable flash attention for GGUF models
+            limit: Context limit - either percentage (e.g. "50%") or absolute value (e.g. 4096)
+            threshold: Only used with percentage limit - apply percentage if context > threshold
+            verbose: Enable verbose output
+        """
         setup_logging(verbose=verbose)
+
+        # Parse the limit parameter
+        is_percentage = False
+        limit_value = 100  # default
+        
+        if isinstance(limit, str):
+            if limit.endswith("%"):
+                # It's a percentage
+                is_percentage = True
+                try:
+                    limit_value = int(limit.rstrip("%"))
+                    if limit_value < 1 or limit_value > 100:
+                        logger.error(f"Invalid percentage: {limit}. Must be between 1% and 100%.")
+                        return
+                except ValueError:
+                    logger.error(f"Invalid percentage format: {limit}")
+                    return
+            else:
+                # It's a string representing an integer
+                try:
+                    limit_value = int(limit)
+                    is_percentage = False
+                except ValueError:
+                    logger.error(f"Invalid limit value: {limit}. Must be an integer or percentage (e.g., '50%').")
+                    return
+        else:
+            # It's already an integer
+            limit_value = limit
+            is_percentage = False
 
         # Load the model registry
         registry = load_model_registry(verbose=verbose)
@@ -1206,11 +1248,14 @@ class LMStrixService:
         # Create concrete config manager
         config_manager = ConcreteConfigManager(lms_path)
 
-        # Save configurations
+        # Save configurations with parsed limit and threshold
         with console.status("Saving concrete configurations..."):
             successful, failed = config_manager.save_all_configs(
                 models_with_context,
                 enable_flash=flash,
+                limit_value=limit_value,
+                is_percentage=is_percentage,
+                threshold=threshold,
             )
 
         # Report results
@@ -1230,6 +1275,21 @@ class LMStrixService:
                 logger.debug(
                     f"[blue]Flash attention enabled for {gguf_count} GGUF models[/blue]",
                 )
+        
+        # Report the limit mode used
+        if is_percentage:
+            if threshold > 0:
+                logger.debug(
+                    f"[blue]Applied limit: {limit_value}% for contexts > {threshold:,} tokens[/blue]",
+                )
+            else:
+                logger.debug(
+                    f"[blue]Applied limit: {limit_value}% to all models[/blue]",
+                )
+        else:
+            logger.debug(
+                f"[blue]Applied absolute limit: {limit_value:,} tokens (or tested max if lower)[/blue]",
+            )
 
     def show_help(self) -> None:
         """Show comprehensive help text."""
@@ -1287,6 +1347,10 @@ class LMStrixService:
             "  [green]save[/green]            Save tested contexts to LM Studio configs",
         )
         console.print("    --flash           Enable flash attention for GGUF models")
+        console.print("    --limit NUM|%     Context limit - percentage (e.g. '50%') or absolute (e.g. 4096)")
+        console.print("                      With %: applies to contexts > threshold")
+        console.print("                      Without %: sets min(tested_context, limit) for all")
+        console.print("    --threshold NUM   With % limit: apply percentage if context > threshold")
         console.print("    --verbose         Enable verbose output")
         console.print("")
         console.print("Examples:")
@@ -1298,3 +1362,4 @@ class LMStrixService:
         console.print("  lmstrix test my-model --file_prompt test_prompt.txt")
         console.print('  lmstrix infer "Hello world" my-model')
         console.print("  lmstrix save --flash")
+        console.print("  lmstrix save --limit 75 --threshold 20000")

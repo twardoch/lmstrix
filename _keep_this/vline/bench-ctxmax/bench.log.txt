@@ -1,0 +1,149 @@
+$ python vexylines.py prompt.txt
+
+Found 73 models to benchmark.
+Skipping slim-extract-qwen-0.5b: output already exists
+Benchmarking model: slim-extract-qwen-1.5b
+Success! Output saved to out/slim-extract-qwen-1.5b.txt
+Benchmarking model: bling-qwen-mini-tool
+Success! Output saved to out/bling-qwen-mini-tool.txt
+Benchmarking model: slim-xsum-tool
+Success! Output saved to out/slim-xsum-tool.txt
+Benchmarking model: slim-tags-3b-tool
+Success! Output saved to out/slim-tags-3b-tool.txt
+Benchmarking model: slim-sa-ner-tool
+Success! Output saved to out/slim-sa-ner-tool.txt
+Benchmarking model: slim-extract-tool
+Success! Output saved to out/slim-extract-tool.txt
+Benchmarking model: slim-summary-tool
+Success! Output saved to out/slim-summary-tool.txt
+Benchmarking model: qwen2.5-coder-3b-instruct-extract-entity
+Success! Output saved to out/qwen2.5-coder-3b-instruct-extract-entity.txt
+Benchmarking model: slim-xsum-phi-3
+Success! Output saved to out/slim-xsum-phi-3.txt
+Benchmarking model: slim-sa-ner-phi-3
+Success! Output saved to out/slim-sa-ner-phi-3.txt
+Benchmarking model: slim-extract-phi-3
+Success! Output saved to out/slim-extract-phi-3.txt
+Benchmarking model: slim-summary-phi-3
+Success! Output saved to out/slim-summary-phi-3.txt
+Benchmarking model: slim-qa-gen-phi-3-tool
+Success! Output saved to out/slim-qa-gen-phi-3-tool.txt
+Benchmarking model: slim-q-gen-phi-3-tool
+Success! Output saved to out/slim-q-gen-phi-3-tool.txt
+Benchmarking model: slim-boolean-phi-3
+Success! Output saved to out/slim-boolean-phi-3.txt
+Benchmarking model: llama3.2-entity-1b
+Success! Output saved to out/llama3.2-entity-1b.txt
+Benchmarking model: llama3.2-entity
+Success! Output saved to out/llama3.2-entity.txt
+Benchmarking model: qwen3-4b
+Success! Output saved to out/qwen3-4b.txt
+Benchmarking model: kmdb-keyword-extraction
+Success! Output saved to out/kmdb-keyword-extraction.txt
+Benchmarking model: dragon-mistral-7b-v0
+Success! Output saved to out/dragon-mistral-7b-v0.txt
+Benchmarking model: mistral-7b-pii-entity-extractor
+Success! Output saved to out/mistral-7b-pii-entity-extractor.txt
+Benchmarking model: mistralai_voxtral-mini-3b-2507
+Success! Output saved to out/mistralai_voxtral-mini-3b-2507.txt
+Benchmarking model: qwen3-jan-nano-128k-6b-brainstorm20x-i1
+Success! Output saved to out/qwen3-jan-nano-128k-6b-brainstorm20x-i1.txt
+Benchmarking model: meta-llama-3.1-8b-instruct-summarizer
+Success! Output saved to out/meta-llama-3.1-8b-instruct-summarizer.txt
+Benchmarking model: longwriter-v-7b-i1
+Success! Output saved to out/longwriter-v-7b-i1.txt
+Benchmarking model: qwen3-8b-64k-josiefied-uncensored-neo-max
+Success! Output saved to out/qwen3-8b-64k-josiefied-uncensored-neo-max.txt
+Benchmarking model: llama-3.1-8b-sarcasm
+Success! Output saved to out/llama-3.1-8b-sarcasm.txt
+Benchmarking model: darkidol-longwriter-v13-8b-uncensored-1048k
+Success! Output saved to out/darkidol-longwriter-v13-8b-uncensored-1048k.txt
+Benchmarking model: santa-gemma-2-9b-keyword-extractor-preview
+Failed: Inference failed for model 'santa-gemma-2-9b-keyword-extractor-preview': Model returned empty response - may be unresponsive
+Benchmarking model: qwen2.5-vl-7b-instruct@q4_k_m
+Success! Output saved to out/qwen2.5-vl-7b-instruct@q4_k_m.txt
+Benchmarking model: qwen/qwen2.5-vl-7b
+Success! Output saved to out/qwen_qwen2.5-vl-7b.txt
+Benchmarking model: longwriter-qwen2.5-7b-instruct
+Success! Output saved to out/longwriter-qwen2.5-7b-instruct.txt
+Benchmarking model: longwriter-v-7b-dpo-i1
+Success! Output saved to out/longwriter-v-7b-dpo-i1.txt
+Benchmarking model: mistral-7b-instruct-v0.3-196k-dq68-mlx
+Success! Output saved to out/mistral-7b-instruct-v0.3-196k-dq68-mlx.txt
+Benchmarking model: llama-3-soliloquy-8b-v1.5-64k-i
+Success! Output saved to out/llama-3-soliloquy-8b-v1.5-64k-i.txt
+Benchmarking model: qwen3-8b-256k-context-8x-grand-i1
+Failed: Inference failed for model 'qwen3-8b-256k-context-8x-grand-i1': LM Studio server error: Completion error: Unknown remote error
+Benchmarking model: llama-3.2-4x3b-moe-hell-california-uncensored-10b
+Success! Output saved to out/llama-3.2-4x3b-moe-hell-california-uncensored-10b.txt
+Benchmarking model: granite-4.0-tiny-preview
+Success! Output saved to out/granite-4.0-tiny-preview.txt
+Benchmarking model: mistral-7b-sarcasm-scrolls-v2
+Success! Output saved to out/mistral-7b-sarcasm-scrolls-v2.txt
+Benchmarking model: qwen3-14b-mlx
+Success! Output saved to out/qwen3-14b-mlx.txt
+Benchmarking model: pixtral-12b-i1
+Success! Output saved to out/pixtral-12b-i1.txt
+Benchmarking model: deepseek-r1-entity-8b-quantized-v2.0
+Success! Output saved to out/deepseek-r1-entity-8b-quantized-v2.0.txt
+Benchmarking model: summllama3.1-8b
+Success! Output saved to out/summllama3.1-8b.txt
+Benchmarking model: llama3.1-8b-reasoning-summarizer
+Success! Output saved to out/llama3.1-8b-reasoning-summarizer.txt
+Benchmarking model: r3-qwen3-14b-skywork-i1
+Success! Output saved to out/r3-qwen3-14b-skywork-i1.txt
+Benchmarking model: deepseek-r1-0528-qwen3-8b
+Success! Output saved to out/deepseek-r1-0528-qwen3-8b.txt
+Benchmarking model: qwen3-8b-320k-context-10x-massive
+Success! Output saved to out/qwen3-8b-320k-context-10x-massive.txt
+Benchmarking model: qwen3-8b-256k-context-8x-grand
+Success! Output saved to out/qwen3-8b-256k-context-8x-grand.txt
+Benchmarking model: deepseek/deepseek-r1-0528-qwen3-8b
+Success! Output saved to out/deepseek_deepseek-r1-0528-qwen3-8b.txt
+Benchmarking model: deepseek-r1-distill-qwen-14b
+Success! Output saved to out/deepseek-r1-distill-qwen-14b.txt
+Benchmarking model: internlm3-8b-instruct
+Success! Output saved to out/internlm3-8b-instruct.txt
+Benchmarking model: qwen3-32b-uncensored-i1@iq2_xs
+Success! Output saved to out/qwen3-32b-uncensored-i1@iq2_xs.txt
+Benchmarking model: rombo-llm-v2.5-qwen-32b-i1
+Success! Output saved to out/rombo-llm-v2.5-qwen-32b-i1.txt
+Benchmarking model: deepseek-r1-qwen-2.5-32b-ablated-i1
+Success! Output saved to out/deepseek-r1-qwen-2.5-32b-ablated-i1.txt
+Benchmarking model: qwq-32b-abliterated-i1
+Success! Output saved to out/qwq-32b-abliterated-i1.txt
+Benchmarking model: huihui-qwen3-14b-abliterated-v2
+Success! Output saved to out/huihui-qwen3-14b-abliterated-v2.txt
+Benchmarking model: mistral-small-24b-instruct-2501-writer-i1
+Success! Output saved to out/mistral-small-24b-instruct-2501-writer-i1.txt
+Benchmarking model: magistral-small-2507-rebased-vision-i1
+Success! Output saved to out/magistral-small-2507-rebased-vision-i1.txt
+Benchmarking model: smoothie-qwen3-14b-i1
+Success! Output saved to out/smoothie-qwen3-14b-i1.txt
+Benchmarking model: qwen3-14b-128k
+Failed: Failed to load model 'qwen3-14b-128k': Failed to load model 'qwen3-14b-128k'. Available models: ['qwen3-4b-instruct-2507', 'qwen3-4b-thinking-2507',
+'text-embedding-nomic-embed-text-v1.5', 'openai/gpt-oss-20b', 'text-embedding-bge-m3']
+Benchmarking model: qwen3-128k-30b-a3b-neo-max-imatrix
+Success! Output saved to out/qwen3-128k-30b-a3b-neo-max-imatrix.txt
+Benchmarking model: huihui-mistral-small-3.2-24b-instruct-2506-abliterated-llamacppfixed-i1
+Success! Output saved to out/huihui-mistral-small-3.2-24b-instruct-2506-abliterated-llamacppfixed-i1.txt
+Benchmarking model: llama-3.2-8x3b-moe-dark-champion-instruct-uncensored-abliterated-18.4b
+Success! Output saved to out/llama-3.2-8x3b-moe-dark-champion-instruct-uncensored-abliterated-18.4b.txt
+Benchmarking model: qwen3-30b-a3b-thinking-2507
+Success! Output saved to out/qwen3-30b-a3b-thinking-2507.txt
+Benchmarking model: qwen3-30b-a3b-instruct-2507
+Success! Output saved to out/qwen3-30b-a3b-instruct-2507.txt
+Benchmarking model: qwen3-coder-30b-a3b-instruct-1m
+Success! Output saved to out/qwen3-coder-30b-a3b-instruct-1m.txt
+Benchmarking model: deepseek-moe-4x8b-r1-distill-llama-3.1-deep-thinker-uncensored-24b
+Success! Output saved to out/deepseek-moe-4x8b-r1-distill-llama-3.1-deep-thinker-uncensored-24b.txt
+Benchmarking model: mlabonne_qwen3-14b-abliterated
+Success! Output saved to out/mlabonne_qwen3-14b-abliterated.txt
+Benchmarking model: magistral-small-2506-reasoning-24b-neo-max-imatrix
+Failed: Failed to load model 'magistral-small-2506-reasoning-24b-neo-max-imatrix': Failed to load model 'magistral-small-2506-reasoning-24b-neo-max-imatrix'.
+Available models: ['qwen3-4b-instruct-2507', 'qwen3-4b-thinking-2507', 'text-embedding-nomic-embed-text-v1.5', 'openai/gpt-oss-20b', 'text-embedding-bge-m3']
+Benchmarking model: qwen3-32b-uncensored-i1@q2_k_s
+Success! Output saved to out/qwen3-32b-uncensored-i1@q2_k_s.txt
+Benchmarking model: openai_gpt-oss-20b
+Success! Output saved to out/openai_gpt-oss-20b.txt
+Skipping openai/gpt-oss-20b: output already exists

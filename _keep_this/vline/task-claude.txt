@@ -1,0 +1,98 @@
+Note: whenever I say `${YOU}`, you know I mean `claude`.
+
+Read the files in this folder:
+
+.
+├── bench.jsonl
+├── bench.log.txt
+├── benchread.py
+├── benchtimes.txt
+├── out-ctxmax
+│   ├── bling-qwen-mini-tool.txt
+│   ├── darkidol-longwriter-v13-8b-uncensored-1048k.txt
+│   ├── deepseek_deepseek-r1-0528-qwen3-8b.txt
+│   ├── deepseek-moe-4x8b-r1-distill-llama-3.1-deep-thinker-uncensored-24b.txt
+│   ├── deepseek-r1-0528-qwen3-8b.txt
+│   ├── deepseek-r1-distill-qwen-14b.txt
+│   ├── deepseek-r1-entity-8b-quantized-v2.0.txt
+│   ├── deepseek-r1-qwen-2.5-32b-ablated-i1.txt
+│   ├── dragon-mistral-7b-v0.txt
+│   ├── granite-4.0-tiny-preview.txt
+│   ├── huihui-mistral-small-3.2-24b-instruct-2506-abliterated-llamacppfixed-i1.txt
+│   ├── huihui-qwen3-14b-abliterated-v2.txt
+│   ├── internlm3-8b-instruct.txt
+│   ├── kmdb-keyword-extraction.txt
+│   ├── llama-3-soliloquy-8b-v1.5-64k-i.txt
+│   ├── llama-3.1-8b-sarcasm.txt
+│   ├── llama-3.2-4x3b-moe-hell-california-uncensored-10b.txt
+│   ├── llama-3.2-8x3b-moe-dark-champion-instruct-uncensored-abliterated-18.4b.txt
+│   ├── llama3.1-8b-reasoning-summarizer.txt
+│   ├── llama3.2-entity-1b.txt
+│   ├── llama3.2-entity.txt
+│   ├── longwriter-qwen2.5-7b-instruct.txt
+│   ├── longwriter-v-7b-dpo-i1.txt
+│   ├── longwriter-v-7b-i1.txt
+│   ├── magistral-small-2507-rebased-vision-i1.txt
+│   ├── meta-llama-3.1-8b-instruct-summarizer.txt
+│   ├── mistral-7b-instruct-v0.3-196k-dq68-mlx.txt
+│   ├── mistral-7b-pii-entity-extractor.txt
+│   ├── mistral-7b-sarcasm-scrolls-v2.txt
+│   ├── mistral-small-24b-instruct-2501-writer-i1.txt
+│   ├── mistralai_voxtral-mini-3b-2507.txt
+│   ├── mlabonne_qwen3-14b-abliterated.txt
+│   ├── openai_gpt-oss-20b.txt
+│   ├── pixtral-12b-i1.txt
+│   ├── qwen_qwen2.5-vl-7b.txt
+│   ├── qwen2.5-coder-3b-instruct-extract-entity.txt
+│   ├── qwen2.5-vl-7b-instruct@q4_k_m.txt
+│   ├── qwen3-128k-30b-a3b-neo-max-imatrix.txt
+│   ├── qwen3-14b-mlx.txt
+│   ├── qwen3-30b-a3b-instruct-2507.txt
+│   ├── qwen3-30b-a3b-thinking-2507.txt
+│   ├── qwen3-32b-uncensored-i1@iq2_xs.txt
+│   ├── qwen3-32b-uncensored-i1@q2_k_s.txt
+│   ├── qwen3-4b.txt
+│   ├── qwen3-8b-256k-context-8x-grand.txt
+│   ├── qwen3-8b-320k-context-10x-massive.txt
+│   ├── qwen3-8b-64k-josiefied-uncensored-neo-max.txt
+│   ├── qwen3-coder-30b-a3b-instruct-1m.txt
+│   ├── qwen3-jan-nano-128k-6b-brainstorm20x-i1.txt
+│   ├── qwq-32b-abliterated-i1.txt
+│   ├── r3-qwen3-14b-skywork-i1.txt
+│   ├── rombo-llm-v2.5-qwen-32b-i1.txt
+│   ├── slim-boolean-phi-3.txt
+│   ├── slim-extract-phi-3.txt
+│   ├── slim-extract-qwen-0.5b.txt
+│   ├── slim-extract-qwen-1.5b.txt
+│   ├── slim-extract-tool.txt
+│   ├── slim-q-gen-phi-3-tool.txt
+│   ├── slim-qa-gen-phi-3-tool.txt
+│   ├── slim-sa-ner-phi-3.txt
+│   ├── slim-sa-ner-tool.txt
+│   ├── slim-summary-phi-3.txt
+│   ├── slim-summary-tool.txt
+│   ├── slim-tags-3b-tool.txt
+│   ├── slim-xsum-phi-3.txt
+│   ├── slim-xsum-tool.txt
+│   ├── smoothie-qwen3-14b-i1.txt
+│   └── summllama3.1-8b.txt
+├── prompt.txt
+├── task.md
+├── task2.txt
+└── vexylines.py
+
+2 directories, 76 files
+
+Our original task was a simple task of writing a marketing email based on a 4000-token text, and I executed it on 73 LOCAL models (that I have in my LM Studio in my macOS).
+
+We have a simple tool @benchread.py that read @bench.jsonl and produced a very simple @benchtimes.txt file that only has the DURATION (as the first entry) then a SPACE and then the model ID. They are SORTED BY DURATION ascendingly.
+
+Analyze @benchtimes.txt and analyze all the 68 @out-ctxmax results.
+
+Into @review-${YOU}.md write your own review of the results. Start with an intro.
+
+Then go model by model in the order found in @benchtimes.txt (= ascending running time) and into @review-${YOU}.md write a H2 markdown header followed by the model ID then in parentheses the execution time and then after that a 1 to 7 emoji stars quality rating of the model’s response to the original task. That’s the heading. Below the heading, write a one-paragraph, possibly sarcastic, review of the model’s output (take the execution time into account as well).
+
+Work through every single out of the 68 model results, don’t drop any.
+
+Then at the end of the @review-${YOU}.md write a summary, and a recommendation of which models I should definitely keep, which models ara “okay” and which models I should drop. Take into account not just the quality but also the execution time.

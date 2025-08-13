@@ -1,0 +1,2 @@
+
+<bot>:['Vexy Lines is an amazing new software tool for creating unique and dynamic vector art, available on MacOS X 10.14 or Windows 8.1+ with 4GB RAM minimum (8GB recommended for complex projects).']

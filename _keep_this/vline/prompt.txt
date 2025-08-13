@@ -1,0 +1,137 @@
+<FAQ>
+## Q01: What is Vexy Lines?
+
+#### Vexy Lines transforms your pixel images (like photos and drawings) into expressive vector artwork using unique line and shape fills.
+
+It’s like having a master engraver who can go from classical to punk, and reinterpret any photo or image. Traditional vector editors require you to draw from scratch. But in Vexy Lines, you guide the app with some simple operations, and the app performs the creative image conversion through intelligent analysis of your source material.
+
+Simply import a photo or bitmap, and apply a Fill. Vexy Lines analyzes the tonal values and shapes, and generates beautiful patterns. You choose between a dozen different fill types. For example, the Linear fill creates parallel lines that mimic traditional engraving. The Halftone fill generates dot patterns similar to vintage printing techniques. The Text fill even builds your image from actual letters and characters.
+
+The result is scalable vector artwork perfect for any application — from business card logos that print crisp at any size, to large format posters for gallery walls. Export as SVG for web use, PDF for professional printing, or PNG for immediate sharing, all while maintaining complete editability of every element.
+
+## Q02: What are the system requirements?
+
+#### Mac 10.14+ or Windows 8.1+, with 4GB RAM minimum (8GB recommended for complex projects).
+
+## Q04: How do I start my first project?
+
+#### Choose File > New, then drag your image into the dialog or click the image icon to browse.
+
+The vector artwork that you create with Vexy Lines looks best when your Source Image has strong contrast and clear, defined shapes. Think objects against clear or transparent backgrounds or black-and-white photographs with clear transitions of light and dark. Avoid complex, noisy images like crowded street scenes or heavily textured surfaces until you’re comfortable with the basic workflow.
+
+Once your Source Image loads, try adding your first Linear fill (Fill > New > Linear) and watch as Vexy Lines transforms your image into parallel lines that follow the image’s shading.
+
+Adjust the Interval slider in the Properties panel to make lines denser or more sparse, and experiment with the Angle to change line direction — you’ll quickly see how powerful yet intuitive the software can be.
+
+## Q05: What is a “fill” in Vexy Lines?
+
+#### A fill is a pattern-generating engine that creates vector artwork from your source image.
+
+In Vexy Lines, a Fill is like a specialized digital artist who only knows one technique but executes it perfectly. Each Fill type analyzes your source image’s brightness, and transforms it using its unique approach: Linear creates parallel lines reminiscent of classical engraving, Wave adds flowing curves like wind-blown grass, and Halftone generates dot patterns similar to vintage comic books or newspapers.
+
+Vexy Lines offers a dozen of distinct fill types, each with its own personality and purpose. For example, the Text fill builds your entire image from letters and characters, creating typography-based art perfect for literary projects. The Fractals fill uses math algorithms to generate intricate space-filling patterns. The Scribble fill mimics hand-drawn sketchy lines for a more organic, artistic feel.
+
+Even more power emerges when you combine multiple fills on different layers, like a master printmaker layering different techniques. Use Linear fills for the main structure of a portrait, add Wave fills for hair texture, and apply a subtle Halftone fill for background tone. Each layer can have its own mask to control exactly where each effect appears, giving you unlimited creative flexibility.
+
+## Q06: What's the difference between layers, groups, and masks?
+
+#### Layers hold your fills, groups organize multiple layers, and masks control which parts of fills are visible.
+
+Imagine building a complex illustration like a traditional animator working with transparent cel sheets. Layers are like individual transparent sheets, each containing specific vector fills — one layer might hold the Linear fills for a portrait's main structure, while another contains Wave fills for hair texture. Every layer can hold multiple fills of different types, giving you incredible flexibility in building your artwork.
+
+Groups work like folders in your file system, bundling related layers together for easier management. For example, when creating a landscape, you might group all the "sky" layers together, all the "mountains" layers in another group, and all the "foreground" elements in a third. Groups can even contain other groups, creating nested hierarchies perfect for complex projects. Each group can also have its own source image, allowing different parts of your artwork to reference different source materials.
+
+Masks function like stencils or tape used by spray painters — they define exactly which parts of your fills should be visible. You paint masks using tools like the Brush (B), Rectangle (I), Ellipse (O), or Freeform (S), creating precise control over where effects appear. For example, you might mask a Linear fill to only show hair strands, or mask a Halftone fill to create selective shading on a face, while leaving other areas untouched by that particular effect.
+
+## Q07: How do I see my original image while working?
+
+#### Use the Show Images button in the toolbar, or adjust Source Image Opacity in the Properties panel.
+
+Vexy Lines gives you several ways to manage the visual balance between your work and the reference image. The Show Images button in the toolbar acts like a light switch: it instantly turns your source image visibility on or off. This is perfect when you want to see your vector artwork in isolation or check your progress.
+
+For more nuanced comparison, use the Source Image Opacity setting in the Properties panel. You can create a subtle “ghost” overlay at 20–30% opacity. This lets you see your vector art developing on top of the original without visual interference. This approach is particularly useful when fine-tuning fill properties or positioning masks.
+
+Many artists develop their own workflow rhythms. Start with full image visibility while placing initial fills. Reduce to 50% opacity while adjusting properties. Drop to 10% opacity for final refinements.
+
+## Q08: Which fill should I use for my project?
+
+#### Linear and Wave for classic engraving, Trace for clean logo conversion, Scribble for hand-drawn looks, Halftone for pop art effects.
+
+Each Fill type is like a specialized tool designed for specific artistic effects. Linear fill creates the foundation for most projects with their clean, parallel lines reminiscent of classical engraving or technical drawings. Wave fill adds organic flow, perfect for hair, water, or fabric textures. Trace fill analyzes edges and creates clean outlines automatically when you need precise shape reproduction, like when you convert a company logo to vector format.
+
+For artistic expression, Scribble fill mimics the spontaneous energy of hand-drawn sketches. Halftone fill recreates the nostalgic dot patterns of vintage comics and pop art. The Text fill builds entire images from letters and characters of the font you choose (even variable OpenType fonts work!). Fractals generate math-based precise patterns perfect for decorative borders or complex geometric art.
+
+Combine fills strategically for advanced techniques. Make professional cross-hatching by layering two Linear fills at 45° and -45° angles on separate layers. Use Trace for the main structure of a technical illustration, then add Linear for shading. The Handmade fill with the Pencil tool (P) gives you complete manual control, perfect for adding custom flourishes or corrections that automated fills can’t achieve.
+
+## Q09: Why doesn’t my artwork look like the original?
+
+#### Vexy Lines creates artistic interpretations, not exact copies. That’s the creative magic!
+
+Most fills are designed as interpretive tools that analyze your source image’s tonal values, edges, and patterns to create stylized artistic effects. A Linear fill doesn’t simply trace every detail. Instead, it transforms your image into parallel lines that capture the essence and flow of the original while creating something entirely new and visually striking.
+
+This interpretive approach opens creative possibilities impossible with exact reproduction. A portrait processed with Wave fills might emphasize the subject’s hair texture in ways the original photo never could. A landscape interpreted through Fractals might reveal hidden geometric beauty in natural forms. The Halftone fill transforms any image into comic book or pop art styling that’s far more interesting than a literal copy.
+
+When you do need precise shape reproduction — like converting a logo or technical drawing — the Trace fill is specifically designed for literal reproduction. You can also fine-tune other fills for more accurate results. Adjust the Image Threshold to focus on specific tonal ranges. Increase Smoothing for cleaner edges. Use lower Interval values for more detailed line density. The key is matching your tool choice to your creative intent.
+
+## Q10: How do I adjust line spacing, thickness, and direction?
+
+#### Select any fill and use the Properties panel sliders — changes update in real-time.
+
+The Properties panel controls different aspects of your fill's appearance. You can see the results instantly as you make adjustments. The core controls work across most fill types: Interval determines how densely packed your lines or elements are (lower values create more detailed, tighter patterns). Angle rotates the entire pattern to match your artistic vision. Thickness controls how bold or delicate your strokes appear.
+
+Fill-specific controls give each type its unique personality. Wave fills offer Height to control how dramatically the lines curve, and Curviness to adjust whether the waves are smooth and flowing or sharp and jagged. Text fills provide Font selection from your system fonts plus Tracking to adjust character spacing. You can create everything from tightly-packed typography to airy, spaced-out lettering. Halftone fills include Pattern Size for controlling dot density and Dot Rotation for changing the grid orientation.
+
+For example, when working on a portrait, you might use tight Interval settings (around 2-3 pixels) with varying Thickness based on image tone to create detailed cross-hatching in shadow areas. Use wider Intervals (8-10 pixels) with consistent thin lines for highlight areas. Real-time updates mean you can experiment freely and find the perfect balance for your artistic vision.
+
+## Q11: Can I use colors from my original image?
+
+#### Yes! Enable Dynamic Color in the Properties panel to sample hues from your source image.
+
+Dynamic Color adapts its color to match whatever part of your source image it's currently drawing over. When enabled in the Properties panel, Vexy Lines continuously analyzes your source image and applies those exact colors along each stroke. This creates artwork that maintains the original's color relationships while expressing them through your chosen fill style.
+
+This creates remarkably sophisticated results, especially with photographic source material. A portrait with Dynamic Color enabled on Linear fills will show warm skin tones in the face, darker browns in the hair, and accurate eye colors. All of this is expressed through parallel lines that maintain the natural color transitions. The Color Segment Length setting controls how frequently the system samples new colors. Shorter segments create more color variation and detail, while longer segments produce smoother, more simplified color transitions.
+
+You can also blend approaches creatively. Use Static Color for fills that need consistent branding colors (like company logos). Apply Dynamic Color to fills that should integrate naturally with the source material. The Image Threshold slider becomes particularly powerful with Dynamic Color. Set a narrow threshold to only colorize the darkest shadows or brightest highlights. This creates selective color effects impossible to achieve manually.
+
+## Q12: What file formats can I import and export?
+
+#### Import: PNG, JPEG, TIFF, BMP, SVG, PDF. Export: SVG, PDF, EPS (vector) and PNG, JPEG (raster).
+
+Each format serves specific needs in your creative workflow. For import, Vexy Lines accepts virtually any image you're likely to have. Common photo formats (PNG, JPEG, TIFF, BMP) work perfectly as source references. Vector formats (SVG, PDF) can serve as either source material or as precise shapes to trace and reinterpret.
+
+When exporting your finished artwork, vector formats (SVG, PDF, EPS) preserve the math precision of your fills. They'll look crisp whether printed on a business card or scaled up for a highway billboard. SVG files work perfectly for web use and can be edited in browsers or other software. PDF and EPS files are professional printing standards that maintain layers and color information. These formats are ideal for logos, illustrations destined for print, or artwork that needs further editing in Adobe Illustrator or other vector programs.
+
+Raster exports (PNG, JPEG) convert your vector art to pixels at a specific resolution. They're perfect when you need fixed-size images for social media posts, website headers, or email attachments. PNG preserves transparency and works well for overlays. JPEG creates smaller files ideal for sharing complex artwork. For example, you might export a logo as SVG for the website developer, PDF for the print shop, and PNG for the social media manager.
+
+## Q13: Can I maintain layers when moving to other design software?
+
+#### Yes! Export as SVG with "Export Layers Separately" checked to preserve your layer structure.
+
+When you export as SVG with "Export Layers Separately" enabled, Vexy Lines preserves your entire layer hierarchy. Each layer transforms into organized groups that other vector programs can understand and work with seamlessly.
+
+This creates immediate compatibility with professional design software like Adobe Illustrator, Affinity Designer, or the open-source Inkscape. If your Vexy Lines project has separate layers for "Background Texture," "Main Portrait," and "Decorative Border," these same three layers will appear as distinct groups in Illustrator. You can adjust opacity, apply additional effects, or recolor elements independently.
+
+The workflow becomes incredibly powerful for collaborative projects. You might create the initial artistic interpretation in Vexy Lines, then hand off the layered SVG to a colleague for typography addition, or to a client for brand color adjustments. All your carefully crafted fills become standard vector paths that can be modified, combined with other design elements, or adapted for different applications while maintaining their math precision and scalability.
+
+## Q14: Is Vexy Lines suitable for screen printing or vinyl cutting?
+
+#### Absolutely! Use the "Combine layers with the same color" export option for automatic color separation.
+
+The "Combine layers with the same color" export feature automatically organizes your artwork by color. It analyzes your entire artwork and intelligently groups all objects sharing identical colors into separate layers. This eliminates the tedious manual work of color separation that traditionally takes hours.
+
+For screen printing, this creates perfect color separations where each ink color gets its own layer. A t-shirt design with black line work and red highlights will export as two distinct layers, ready for the print shop to create screens without additional preparation. The vector format (SVG, PDF, or EPS) ensures crisp edges at any size, whether you're printing business cards or large format posters.
+
+Vinyl cutting applications benefit enormously from this workflow. Each color automatically becomes a separate cutting file, perfect for creating multi-color decals, signs, or apparel. The math precision of vector output means your cuts will be exact, with no pixelation or edge artifacts that can cause weeding problems. Many users report that print shops and cutting services prefer Vexy Lines output because it arrives pre-separated and production-ready.
+
+## Q15: What is the Mesh tool for?
+
+#### Mesh lets you warp and distort your vector artwork in 3D-like ways.
+
+The Mesh tool transforms your flat vector patterns into artwork that appears to wrap around spheres, wave like flags in the wind, or twist like silk ribbons. It maintains perfect vector quality and editability throughout.
+
+To activate Mesh, select any layer and click the "Set Mesh" option in the Layers Panel, then choose your initial grid shape. Vexy Lines creates an invisible control grid that you can manipulate using the Editor Tool (V) to drag individual grid points, or the Transform Tool (T) for broader adjustments. You might apply a cylindrical mesh to make Linear fills appear to wrap around a bottle, or use a wave mesh to make Halftone patterns follow the contours of flowing fabric.
+
+The Hidden Strokes Removal feature adds realistic 3D depth by automatically hiding line segments that would be invisible on the "back" side of curved surfaces. This creates convincing folding and wrapping effects. The tool opens creative possibilities impossible with traditional vector tools: architectural drawings that show perspective, product mockups where patterns follow surface contours, or artistic illustrations where 2D fills transform into seemingly three-dimensional forms.
+</FAQ>
+
+TASK: Read the above, think carefully, then write a great emotive marketing e-mail that introduces Vexy Lines 1.0

@@ -1,0 +1,1 @@
+<bot>:{'tag': ['PNG', 'JPEG', 'TIFF', 'BMP', 'SVG', 'PDF', 'EPS', 'Adobe Illustrator', 'Affinity Designer', 'Inkscape']}

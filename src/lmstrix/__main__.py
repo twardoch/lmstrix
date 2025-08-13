@@ -149,7 +149,13 @@ class LMStrixCLI:
         """
         self.service.check_health(verbose=verbose)
 
-    def save(self, flash: bool = False, verbose: bool = False) -> None:
+    def save(
+        self, 
+        flash: bool = False,
+        limit: str | int = "100%",
+        threshold: int = 0,
+        verbose: bool = False
+    ) -> None:
         """Save tested context limits to LM Studio concrete config files.
 
         This command reads the lmstrix.json database and creates or updates
@@ -158,9 +164,13 @@ class LMStrixCLI:
 
         Args:
             flash: Enable flash attention for GGUF models.
+            limit: Context limit - either percentage (e.g. "50%") or absolute value (e.g. 4096).
+                   With percentage: applies to contexts > threshold.
+                   With absolute: sets max(tested_context, limit) for all models.
+            threshold: Only used with percentage limit - apply percentage if context > threshold.
             verbose: Enable verbose output.
         """
-        self.service.save_configs(flash=flash, verbose=verbose)
+        self.service.save_configs(flash=flash, limit=limit, threshold=threshold, verbose=verbose)
 
 
 def main() -> None:
