@@ -1,0 +1,1460 @@
+Running linter and formatter...
+ERA001 Found commented-out code
+ --> _keep_this/vline/benchread.py:5:1
+  |
+3 | # dependencies = ["orjson", "rich", "fire"]
+4 | # ///
+5 | # this_file: benchread.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^
+6 |
+7 | """
+  |
+help: Remove commented-out code
+
+F401 [*] `sys` imported but unused
+  --> _keep_this/vline/benchread.py:18:8
+   |
+16 | from __future__ import annotations
+17 |
+18 | import sys
+   |        ^^^
+19 | from pathlib import Path
+20 | from typing import Any, Iterable, Tuple
+   |
+help: Remove unused import: `sys`
+
+UP035 [*] Import from `collections.abc` instead: `Iterable`
+  --> _keep_this/vline/benchread.py:20:1
+   |
+18 | import sys
+19 | from pathlib import Path
+20 | from typing import Any, Iterable, Tuple
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+21 |
+22 | try:
+   |
+help: Import from `collections.abc`
+
+UP035 `typing.Tuple` is deprecated, use `tuple` instead
+  --> _keep_this/vline/benchread.py:20:1
+   |
+18 | import sys
+19 | from pathlib import Path
+20 | from typing import Any, Iterable, Tuple
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+21 |
+22 | try:
+   |
+
+BLE001 Do not catch blind exception: `Exception`
+  --> _keep_this/vline/benchread.py:24:8
+   |
+22 | try:
+23 |     import orjson as json
+24 | except Exception:  # pragma: no cover - tiny fallback
+   |        ^^^^^^^^^
+25 |     import json  # type: ignore[misc]
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> _keep_this/vline/benchread.py:27:1
+   |
+25 |       import json  # type: ignore[misc]
+26 |
+27 | / import fire
+28 | | from rich.console import Console
+29 | | from rich.table import Table
+   | |____________________________^
+   |
+help: Organize imports
+
+BLE001 Do not catch blind exception: `Exception`
+  --> _keep_this/vline/benchread.py:67:12
+   |
+65 |             return float(s[:-1].strip())
+66 |         return float(s)
+67 |     except Exception:
+   |            ^^^^^^^^^
+68 |         return None
+   |
+
+UP006 [*] Use `tuple` instead of `Tuple` for type annotation
+  --> _keep_this/vline/benchread.py:71:40
+   |
+71 | def extract_kv(obj: dict[str, Any]) -> Tuple[float | None, str | None]:
+   |                                        ^^^^^
+72 |     dur = None
+73 |     for k in DURATION_KEYS:
+   |
+help: Replace with `tuple`
+
+BLE001 Do not catch blind exception: `Exception`
+  --> _keep_this/vline/benchread.py:95:20
+   |
+93 |             try:
+94 |                 yield json.loads(line)
+95 |             except Exception as e:  # pragma: no cover
+   |                    ^^^^^^^^^
+96 |                 console.print(f"[yellow]Skipping invalid JSON on line {i}: {e}")
+   |
+
+W293 Blank line contains whitespace
+   --> _keep_this/vline/benchread.py:101:1
+    |
+ 99 | def main(bench: str = ".", out: str | None = None) -> int:
+100 |     """Process benchmark data from JSONL file and generate timing report.
+101 |     
+    | ^^^^
+102 |     Args:
+103 |         bench: Benchmark directory containing bench.jsonl (creates if doesn't exist)
+    |
+help: Remove whitespace from blank line
+
+W293 [*] Blank line contains whitespace
+   --> _keep_this/vline/benchread.py:108:1
+    |
+106 |     bench_dir = Path(bench)
+107 |     bench_dir.mkdir(exist_ok=True)
+108 |     
+    | ^^^^
+109 |     if out is None:
+110 |         out_dir = bench_dir
+    |
+help: Remove whitespace from blank line
+
+W293 [*] Blank line contains whitespace
+   --> _keep_this/vline/benchread.py:114:1
+    |
+112 |         out_dir = Path(out)
+113 |         out_dir.mkdir(exist_ok=True)
+114 |     
+    | ^^^^
+115 |     bench_path = bench_dir / "bench.jsonl"
+116 |     out_path = out_dir / "benchtimes.txt"
+    |
+help: Remove whitespace from blank line
+
+ERA001 Found commented-out code
+ --> _keep_this/vline/vexylines.py:7:1
+  |
+5 | """Vexy Lines: A tool for benchmarking prompts against LM-Studio models."""
+6 |
+7 | # this_file: vexylines.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^
+8 |
+9 | import json
+  |
+help: Remove commented-out code
+
+ANN204 Missing return type annotation for special method `__init__`
+  --> _keep_this/vline/vexylines.py:29:9
+   |
+27 |     """A tool for benchmarking prompts against LM-Studio models."""
+28 |
+29 |     def __init__(self, verbose: bool = False):
+   |         ^^^^^^^^
+30 |         """Initialize VexyLines.
+   |
+help: Add return type annotation: `None`
+
+ANN202 Missing return type annotation for private function `_write_bench_record`
+  --> _keep_this/vline/vexylines.py:44:9
+   |
+42 |         )
+43 |
+44 |     def _write_bench_record(self, record: dict, bench_file: Path):
+   |         ^^^^^^^^^^^^^^^^^^^
+45 |         """Write a record to the benchmark JSONL file.
+   |
+help: Add return type annotation: `None`
+
+W293 Blank line contains whitespace
+  --> _keep_this/vline/vexylines.py:46:1
+   |
+44 |     def _write_bench_record(self, record: dict, bench_file: Path):
+45 |         """Write a record to the benchmark JSONL file.
+46 |         
+   | ^^^^^^^^
+47 |         Args:
+48 |             record: Dictionary containing benchmark data.
+   |
+help: Remove whitespace from blank line
+
+ANN201 Missing return type annotation for public function `run`
+  --> _keep_this/vline/vexylines.py:55:9
+   |
+53 |             f.flush()  # Ensure immediate write
+54 |
+55 |     def run(self, prompt_path: str, dry_run: bool = False, bench: str = ".", out: str = "out"):
+   |         ^^^
+56 |         """Run the benchmarking tool.
+   |
+help: Add return type annotation: `None`
+
+W293 [*] Blank line contains whitespace
+  --> _keep_this/vline/vexylines.py:67:1
+   |
+65 |         bench_dir = Path(bench)
+66 |         bench_dir.mkdir(exist_ok=True)
+67 |         
+   | ^^^^^^^^
+68 |         output_dir = Path(out)
+69 |         output_dir.mkdir(exist_ok=True)
+   |
+help: Remove whitespace from blank line
+
+W293 [*] Blank line contains whitespace
+  --> _keep_this/vline/vexylines.py:70:1
+   |
+68 |         output_dir = Path(out)
+69 |         output_dir.mkdir(exist_ok=True)
+70 |         
+   | ^^^^^^^^
+71 |         bench_file = bench_dir / "bench.jsonl"
+   |
+help: Remove whitespace from blank line
+
+W293 [*] Blank line contains whitespace
+  --> _keep_this/vline/vexylines.py:72:1
+   |
+71 |         bench_file = bench_dir / "bench.jsonl"
+72 |         
+   | ^^^^^^^^
+73 |         try:
+74 |             prompt = Path(prompt_path).read_text(encoding="utf-8")
+   |
+help: Remove whitespace from blank line
+
+W293 [*] Blank line contains whitespace
+  --> _keep_this/vline/vexylines.py:80:1
+   |
+79 |         models = self.registry.list_models()
+80 |         
+   | ^^^^^^^^
+81 |         # Sort models by size (assuming size is stored in bytes)
+82 |         models.sort(key=lambda m: m.size if hasattr(m, 'size') else 0)
+   |
+help: Remove whitespace from blank line
+
+Q000 [*] Single quotes found but double quotes preferred
+  --> _keep_this/vline/vexylines.py:82:56
+   |
+81 |         # Sort models by size (assuming size is stored in bytes)
+82 |         models.sort(key=lambda m: m.size if hasattr(m, 'size') else 0)
+   |                                                        ^^^^^^
+83 |         
+84 |         if dry_run:
+   |
+help: Replace single quotes with double quotes
+
+W293 [*] Blank line contains whitespace
+  --> _keep_this/vline/vexylines.py:83:1
+   |
+81 |         # Sort models by size (assuming size is stored in bytes)
+82 |         models.sort(key=lambda m: m.size if hasattr(m, 'size') else 0)
+83 |         
+   | ^^^^^^^^
+84 |         if dry_run:
+85 |             models = models[:2]  # Only test 2 smallest models
+   |
+help: Remove whitespace from blank line
+
+W293 [*] Blank line contains whitespace
+  --> _keep_this/vline/vexylines.py:96:1
+   |
+94 |                 self.console.print(f"Skipping {model.id}: output already exists", style="dim")
+95 |                 continue
+96 |             
+   | ^^^^^^^^^^^^
+97 |             self.console.print(f"Benchmarking model: {model.id}", style="cyan")
+   |
+help: Remove whitespace from blank line
+
+W293 [*] Blank line contains whitespace
+   --> _keep_this/vline/vexylines.py:98:1
+    |
+ 97 |             self.console.print(f"Benchmarking model: {model.id}", style="cyan")
+ 98 |             
+    | ^^^^^^^^^^^^
+ 99 |             # Record before starting inference
+100 |             start_record = {
+    |
+help: Remove whitespace from blank line
+
+Q000 [*] Single quotes found but double quotes preferred
+   --> _keep_this/vline/vexylines.py:102:46
+    |
+100 |             start_record = {
+101 |                 "model_id": model.id,
+102 |                 "model_size": getattr(model, 'size', None),
+    |                                              ^^^^^^
+103 |                 "event": "start",
+104 |                 "timestamp": datetime.now().isoformat(),
+    |
+help: Replace single quotes with double quotes
+
+W293 [*] Blank line contains whitespace
+   --> _keep_this/vline/vexylines.py:108:1
+    |
+106 |             }
+107 |             self._write_bench_record(start_record, bench_file)
+108 |             
+    | ^^^^^^^^^^^^
+109 |             start_time = time.time()
+    |
+help: Remove whitespace from blank line
+
+Q000 [*] Single quotes found but double quotes preferred
+   --> _keep_this/vline/vexylines.py:123:46
+    |
+121 |             end_record = {
+122 |                 "model_id": model.id,
+123 |                 "model_size": getattr(model, 'size', None),
+    |                                              ^^^^^^
+124 |                 "event": "end",
+125 |                 "timestamp": datetime.now().isoformat(),
+    |
+help: Replace single quotes with double quotes
+
+W293 [*] Blank line contains whitespace
+   --> _keep_this/vline/vexylines.py:130:1
+    |
+128 |                 "succeeded": result["succeeded"]
+129 |             }
+130 |             
+    | ^^^^^^^^^^^^
+131 |             if result["succeeded"]:
+132 |                 output_path.write_text(result["response"], encoding="utf-8")
+    |
+help: Remove whitespace from blank line
+
+W293 [*] Blank line contains whitespace
+   --> _keep_this/vline/vexylines.py:139:1
+    |
+137 |                 self.console.print(f"  Failed: {result['error']}", style="red")
+138 |                 end_record["error"] = result.get("error", "Unknown error")
+139 |             
+    | ^^^^^^^^^^^^
+140 |             self._write_bench_record(end_record, bench_file)
+    |
+help: Remove whitespace from blank line
+
+ERA001 Found commented-out code
+ --> debug_inference.py:6:1
+  |
+4 | Focuses on slim-extract-qwen-0.5b model to identify inference issues.
+5 | """
+6 | # this_file: debug_inference.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7 |
+8 | import sys
+  |
+help: Remove commented-out code
+
+E722 Do not use bare `except`
+  --> debug_inference.py:75:9
+   |
+73 |             lmstudio.unload()
+74 |             time.sleep(0.5)
+75 |         except:
+   |         ^^^^^^
+76 |             pass
+   |
+
+S110 `try`-`except`-`pass` detected, consider logging the exception
+  --> debug_inference.py:75:9
+   |
+73 |               lmstudio.unload()
+74 |               time.sleep(0.5)
+75 | /         except:
+76 | |             pass
+   | |________________^
+77 |
+78 |           # Load with explicit config
+   |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> debug_inference.py:134:16
+    |
+132 |             llm.unload()
+133 |             print("✓ Model unloaded successfully")
+134 |         except Exception as e:
+    |                ^^^^^^^^^
+135 |             print(f"⚠️  Unload warning: {e}")
+    |
+
+TRY300 Consider moving this statement to an `else` block
+   --> debug_inference.py:137:9
+    |
+135 |             print(f"⚠️  Unload warning: {e}")
+136 |
+137 |         return True
+    |         ^^^^^^^^^^^
+138 |
+139 |     except Exception as e:
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> debug_inference.py:139:12
+    |
+137 |         return True
+138 |
+139 |     except Exception as e:
+    |            ^^^^^^^^^
+140 |         print(f"❌ Direct lmstudio test failed: {e}")
+141 |         print(f"   Error type: {type(e)}")
+    |
+
+PLC0415 `import` should be at the top-level of a file
+   --> debug_inference.py:142:9
+    |
+140 |         print(f"❌ Direct lmstudio test failed: {e}")
+141 |         print(f"   Error type: {type(e)}")
+142 |         import traceback
+    |         ^^^^^^^^^^^^^^^^
+143 |
+144 |         traceback.print_exc()
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> debug_inference.py:192:16
+    |
+190 |             llm.unload()
+191 |             print("✓ Model unloaded via client")
+192 |         except Exception as e:
+    |                ^^^^^^^^^
+193 |             print(f"⚠️  Client unload warning: {e}")
+    |
+
+TRY300 Consider moving this statement to an `else` block
+   --> debug_inference.py:195:9
+    |
+193 |             print(f"⚠️  Client unload warning: {e}")
+194 |
+195 |         return True
+    |         ^^^^^^^^^^^
+196 |
+197 |     except Exception as e:
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> debug_inference.py:197:12
+    |
+195 |         return True
+196 |
+197 |     except Exception as e:
+    |            ^^^^^^^^^
+198 |         print(f"❌ LMStrix client test failed: {e}")
+199 |         print(f"   Error type: {type(e)}")
+    |
+
+PLC0415 `import` should be at the top-level of a file
+   --> debug_inference.py:200:9
+    |
+198 |         print(f"❌ LMStrix client test failed: {e}")
+199 |         print(f"   Error type: {type(e)}")
+200 |         import traceback
+    |         ^^^^^^^^^^^^^^^^
+201 |
+202 |         traceback.print_exc()
+    |
+
+ANN201 Missing return type annotation for public function `test_lmstrix_inference_engine`
+   --> debug_inference.py:206:5
+    |
+206 | def test_lmstrix_inference_engine():
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+207 |     """Test lmstrix inference engine."""
+208 |     print_separator("LMSTRIX INFERENCE ENGINE TEST")
+    |
+help: Add return type annotation
+
+PLC0415 `import` should be at the top-level of a file
+   --> debug_inference.py:221:13
+    |
+219 |             # Try to scan for models
+220 |             print("🔍 Scanning for models...")
+221 |             from lmstrix.core.scanner import ModelScanner
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+222 |
+223 |             scanner = ModelScanner(registry=registry)
+    |
+
+TRY300 Consider moving this statement to an `else` block
+   --> debug_inference.py:245:9
+    |
+243 |         print(f"   Inference time: {result.inference_time:.2f}s")
+244 |
+245 |         return result.succeeded
+    |         ^^^^^^^^^^^^^^^^^^^^^^^
+246 |
+247 |     except Exception as e:
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> debug_inference.py:247:12
+    |
+245 |         return result.succeeded
+246 |
+247 |     except Exception as e:
+    |            ^^^^^^^^^
+248 |         print(f"❌ LMStrix inference engine test failed: {e}")
+249 |         print(f"   Error type: {type(e)}")
+    |
+
+PLC0415 `import` should be at the top-level of a file
+   --> debug_inference.py:250:9
+    |
+248 |         print(f"❌ LMStrix inference engine test failed: {e}")
+249 |         print(f"   Error type: {type(e)}")
+250 |         import traceback
+    |         ^^^^^^^^^^^^^^^^
+251 |
+252 |         traceback.print_exc()
+    |
+
+ERA001 Found commented-out code
+ --> debug_test_logic.py:6:1
+  |
+4 | Shows exactly what the test prompts produce vs expectations.
+5 | """
+6 | # this_file: debug_test_logic.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7 |
+8 | import sys
+  |
+help: Remove commented-out code
+
+E722 Do not use bare `except`
+  --> debug_test_logic.py:47:9
+   |
+45 |                     llm_obj.unload()
+46 |             time.sleep(0.5)
+47 |         except:
+   |         ^^^^^^
+48 |             pass
+   |
+
+S110 `try`-`except`-`pass` detected, consider logging the exception
+  --> debug_test_logic.py:47:9
+   |
+45 |                       llm_obj.unload()
+46 |               time.sleep(0.5)
+47 | /         except:
+48 | |             pass
+   | |________________^
+49 |
+50 |           config = {"contextLength": TEST_CONTEXT}
+   |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> debug_test_logic.py:117:12
+    |
+115 |         llm.unload()
+116 |
+117 |     except Exception as e:
+    |            ^^^^^^^^^
+118 |         print(f"❌ Error during testing: {e}")
+119 |         import traceback
+    |
+
+PLC0415 `import` should be at the top-level of a file
+   --> debug_test_logic.py:119:9
+    |
+117 |     except Exception as e:
+118 |         print(f"❌ Error during testing: {e}")
+119 |         import traceback
+    |         ^^^^^^^^^^^^^^^^
+120 |
+121 |         traceback.print_exc()
+    |
+
+E722 Do not use bare `except`
+   --> debug_test_logic.py:137:9
+    |
+135 |                     llm_obj.unload()
+136 |             time.sleep(0.5)
+137 |         except:
+    |         ^^^^^^
+138 |             pass
+    |
+
+S110 `try`-`except`-`pass` detected, consider logging the exception
+   --> debug_test_logic.py:137:9
+    |
+135 |                       llm_obj.unload()
+136 |               time.sleep(0.5)
+137 | /         except:
+138 | |             pass
+    | |________________^
+139 |
+140 |           config = {"contextLength": TEST_CONTEXT}
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> debug_test_logic.py:180:12
+    |
+178 |         llm.unload()
+179 |
+180 |     except Exception as e:
+    |            ^^^^^^^^^
+181 |         print(f"❌ Error during extended testing: {e}")
+    |
+
+E722 Do not use bare `except`
+   --> debug_test_logic.py:208:13
+    |
+206 |                         llm_obj.unload()
+207 |                 time.sleep(0.5)
+208 |             except:
+    |             ^^^^^^
+209 |                 pass
+    |
+
+S110 `try`-`except`-`pass` detected, consider logging the exception
+   --> debug_test_logic.py:208:13
+    |
+206 |                           llm_obj.unload()
+207 |                   time.sleep(0.5)
+208 | /             except:
+209 | |                 pass
+    | |____________________^
+210 |
+211 |               config = {"contextLength": TEST_CONTEXT}
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> debug_test_logic.py:232:16
+    |
+230 |             llm.unload()
+231 |
+232 |         except Exception as e:
+    |                ^^^^^^^^^
+233 |             print(f"  ❌ Failed to test {model_id}: {e}")
+    |
+
+PTH123 `open()` should be replaced by `Path.open()`
+  --> examples/python/prompt_templates_demo.py:53:10
+   |
+51 |     # Save to temporary TOML file
+52 |     temp_prompts = Path("temp_prompts.toml")
+53 |     with open(temp_prompts, "w") as f:
+   |          ^^^^
+54 |         toml.dump(prompts_data, f)
+55 |     logger.info(f"Created temporary prompts file: {temp_prompts}")
+   |
+help: Replace with `Path.open()`
+
+ERA001 Found commented-out code
+ --> get_out_ctx.py:5:1
+  |
+3 | Script to retrieve out_ctx values from the lmstrix database.
+4 | """
+5 | # this_file: get_out_ctx.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+6 |
+7 | import sys
+  |
+help: Remove commented-out code
+
+W291 [*] Trailing whitespace
+   --> src/lmstrix/__main__.py:153:14
+    |
+152 |     def save(
+153 |         self, 
+    |              ^
+154 |         flash: bool = False,
+155 |         limit: str | int = "100%",
+    |
+help: Remove trailing whitespace
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/api/client.py:127:20
+    |
+125 |                     f"Failed to load model '{model_id}'. Available models: {available_models[:5]}"
+126 |                 )
+127 |             except Exception:
+    |                    ^^^^^^^^^
+128 |                 error_msg = f"Failed to load model '{model_id}': {e}"
+129 |             raise ModelLoadError(model_id, error_msg) from e
+    |
+
+TRY300 Consider moving this statement to an `else` block
+   --> src/lmstrix/api/client.py:155:13
+    |
+153 |                 except (AttributeError, TypeError) as e:
+154 |                     logger.warning(f"Failed to extract info from loaded model: {e}")
+155 |             return models_info
+    |             ^^^^^^^^^^^^^^^^^^
+156 |         except (ImportError, RuntimeError) as e:
+157 |             logger.warning(f"Failed to list loaded models: {e}")
+    |
+
+ARG002 Unused method argument: `kwargs`
+   --> src/lmstrix/api/client.py:198:11
+    |
+196 |         repeat_penalty: float = 1.1,  # repeatPenalty - penalty for repeated tokens
+197 |         min_p: float = 0.05,  # minPSampling - minimum token probability threshold
+198 |         **kwargs: Any,  # Accept additional parameters
+    |           ^^^^^^
+199 |     ) -> CompletionResponse:
+200 |         """Make a completion request to a loaded LM Studio model."""
+    |
+
+ARG002 Unused method argument: `model_context_length`
+   --> src/lmstrix/api/client.py:383:9
+    |
+381 |         temperature: float = 0.8,  # Temperature for generation (LM Studio default)
+382 |         model_id: str | None = None,  # Pass model_id separately
+383 |         model_context_length: (
+    |         ^^^^^^^^^^^^^^^^^^^^
+384 |             int | None
+385 |         ) = None,  # Model's total context length for percentage calculation
+    |
+
+ARG002 Unused method argument: `kwargs`
+   --> src/lmstrix/api/client.py:392:11
+    |
+390 |         on_token: Callable[[str], None] | None = None,  # Callback for each token
+391 |         stream_timeout: int = 120,  # Timeout in seconds for no progress
+392 |         **kwargs: Any,  # Accept additional parameters
+    |           ^^^^^^
+393 |     ) -> Iterator[str]:
+394 |         """Stream a completion request to a loaded LM Studio model."""
+    |
+
+ARG002 Unused method argument: `sort`
+   --> src/lmstrix/api/main.py:602:9
+    |
+600 |         threshold: int = 31744,
+601 |         ctx: int | None = None,
+602 |         sort: str = "id",
+    |         ^^^^
+603 |         fast: bool = False,
+604 |         verbose: bool = False,
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/api/main.py:670:20
+    |
+668 |                         else f"Prompt: {custom_prompt}"
+669 |                     )
+670 |             except Exception as e:
+    |                    ^^^^^^^^^
+671 |                 logger.error(f"Error reading prompt file: {e}")
+672 |                 return
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/api/main.py:834:24
+    |
+832 |                         return
+833 |                     text_content = text_path.read_text(encoding="utf-8")
+834 |                 except Exception as e:
+    |                        ^^^^^^^^^
+835 |                     logger.debug(f"Error reading text file: {e}")
+836 |                     return
+    |
+
+SIM108 Use ternary operator `pairs = dict_params.split(",") if "," in dict_params else dict_params.split(",")` instead of `if`-`else`-block
+   --> src/lmstrix/api/main.py:848:17
+    |
+846 |               if dict_params:
+847 |                   # Support both comma-separated and space-separated formats
+848 | /                 if "," in dict_params:
+849 | |                     # Format: "key1=value1,key2=value2"
+850 | |                     pairs = dict_params.split(",")
+851 | |                 else:
+852 | |                     # Format: "key1=value1 key2=value2" (fire might split this)
+853 | |                     # For now, assume comma-separated
+854 | |                     pairs = dict_params.split(",")
+    | |__________________________________________________^
+855 |
+856 |                   for pair in pairs:
+    |
+help: Replace `if`-`else`-block with `pairs = dict_params.split(",") if "," in dict_params else dict_params.split(",")`
+
+ERA001 Found commented-out code
+   --> src/lmstrix/api/main.py:849:21
+    |
+847 |                 # Support both comma-separated and space-separated formats
+848 |                 if "," in dict_params:
+849 |                     # Format: "key1=value1,key2=value2"
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+850 |                     pairs = dict_params.split(",")
+851 |                 else:
+    |
+help: Remove commented-out code
+
+PLW2901 `for` loop variable `pair` overwritten by assignment target
+   --> src/lmstrix/api/main.py:857:21
+    |
+856 |                 for pair in pairs:
+857 |                     pair = pair.strip()
+    |                     ^^^^
+858 |                     if "=" in pair:
+859 |                         key, value = pair.split("=", 1)
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/api/main.py:874:24
+    |
+872 |                         return
+873 |                     prompt_params["text"] = text_path.read_text(encoding="utf-8")
+874 |                 except Exception as e:
+    |                        ^^^^^^^^^
+875 |                     logger.debug(f"Error reading text file: {e}")
+876 |                     return
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/api/main.py:957:20
+    |
+955 |                             )
+956 |
+957 |             except Exception as e:
+    |                    ^^^^^^^^^
+958 |                 logger.debug(f"Error loading prompt from file: {e}")
+959 |                 return
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> src/lmstrix/api/main.py:1060:20
+     |
+1058 |                 print("", file=sys.stdout)
+1059 |
+1060 |             except Exception as e:
+     |                    ^^^^^^^^^
+1061 |                 # Use stderr for error messages
+1062 |                 print(f"\nStreaming inference failed: {e}", file=sys.stderr)
+     |
+
+W291 [*] Trailing whitespace
+    --> src/lmstrix/api/main.py:1180:14
+     |
+1179 |     def save_configs(
+1180 |         self, 
+     |              ^
+1181 |         flash: bool = False, 
+1182 |         limit: str | int = "100%",
+     |
+help: Remove trailing whitespace
+
+W291 [*] Trailing whitespace
+    --> src/lmstrix/api/main.py:1181:29
+     |
+1179 |     def save_configs(
+1180 |         self, 
+1181 |         flash: bool = False, 
+     |                             ^
+1182 |         limit: str | int = "100%",
+1183 |         threshold: int = 0,
+     |
+help: Remove trailing whitespace
+
+W293 Blank line contains whitespace
+    --> src/lmstrix/api/main.py:1187:1
+     |
+1185 |     ) -> None:
+1186 |         """Save tested context limits to LM Studio concrete config files.
+1187 |         
+     | ^^^^^^^^
+1188 |         Args:
+1189 |             flash: Enable flash attention for GGUF models
+     |
+help: Remove whitespace from blank line
+
+W293 [*] Blank line contains whitespace
+    --> src/lmstrix/api/main.py:1199:1
+     |
+1197 |         is_percentage = False
+1198 |         limit_value = 100  # default
+1199 |         
+     | ^^^^^^^^
+1200 |         if isinstance(limit, str):
+1201 |             if limit.endswith("%"):
+     |
+help: Remove whitespace from blank line
+
+BLE001 Do not catch blind exception: `Exception`
+    --> src/lmstrix/api/main.py:1244:16
+     |
+1242 |         try:
+1243 |             lms_path = get_lmstudio_path()
+1244 |         except Exception as e:
+     |                ^^^^^^^^^
+1245 |             logger.debug(f"Failed to find LM Studio installation: {e}")
+1246 |             return
+     |
+
+W293 [*] Blank line contains whitespace
+    --> src/lmstrix/api/main.py:1278:1
+     |
+1276 |                     f"[blue]Flash attention enabled for {gguf_count} GGUF models[/blue]",
+1277 |                 )
+1278 |         
+     | ^^^^^^^^
+1279 |         # Report the limit mode used
+1280 |         if is_percentage:
+     |
+help: Remove whitespace from blank line
+
+ERA001 Found commented-out code
+ --> src/lmstrix/core/concrete_config.py:3:1
+  |
+1 | """Concrete config manager for LM Studio model configurations."""
+2 |
+3 | # this_file: src/lmstrix/core/concrete_config.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+4 |
+5 | import json
+  |
+help: Remove commented-out code
+
+W291 [*] Trailing whitespace
+  --> src/lmstrix/core/concrete_config.py:71:14
+   |
+70 |     def save_model_config(
+71 |         self, 
+   |              ^
+72 |         model: Model, 
+73 |         enable_flash: bool = False,
+   |
+help: Remove trailing whitespace
+
+W291 [*] Trailing whitespace
+  --> src/lmstrix/core/concrete_config.py:72:22
+   |
+70 |     def save_model_config(
+71 |         self, 
+72 |         model: Model, 
+   |                      ^
+73 |         enable_flash: bool = False,
+74 |         limit_value: int = 100,
+   |
+help: Remove trailing whitespace
+
+W293 [*] Blank line contains whitespace
+   --> src/lmstrix/core/concrete_config.py:116:1
+    |
+114 |         # Calculate the context value to save based on limit mode
+115 |         tested_context = model.tested_max_context
+116 |         
+    | ^^^^^^^^
+117 |         if is_percentage:
+118 |             # Percentage mode: apply percentage with threshold
+    |
+help: Remove whitespace from blank line
+
+W293 [*] Blank line contains whitespace
+   --> src/lmstrix/core/concrete_config.py:139:1
+    |
+137 |                     f"Using absolute limit for {model.id}: {tested_context} -> {context_to_save}"
+138 |                 )
+139 |         
+    | ^^^^^^^^
+140 |         # Update context length
+141 |         self._update_field(
+    |
+help: Remove whitespace from blank line
+
+TRY300 Consider moving this statement to an `else` block
+   --> src/lmstrix/core/concrete_config.py:162:13
+    |
+160 |                 f"Saved concrete config for {model.id} with context {context_to_save}",
+161 |             )
+162 |             return True
+    |             ^^^^^^^^^^^
+163 |         except OSError as e:
+164 |             logger.error(f"Failed to save concrete config {config_path}: {e}")
+    |
+
+W291 [*] Trailing whitespace
+   --> src/lmstrix/core/concrete_config.py:168:14
+    |
+167 |     def save_all_configs(
+168 |         self, 
+    |              ^
+169 |         models: list[Model], 
+170 |         enable_flash: bool = False,
+    |
+help: Remove trailing whitespace
+
+W291 [*] Trailing whitespace
+   --> src/lmstrix/core/concrete_config.py:169:29
+    |
+167 |     def save_all_configs(
+168 |         self, 
+169 |         models: list[Model], 
+    |                             ^
+170 |         enable_flash: bool = False,
+171 |         limit_value: int = 100,
+    |
+help: Remove trailing whitespace
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/context_tester.py:144:16
+    |
+142 |                 error=None if success else response,
+143 |             )
+144 |         except Exception as e:
+    |                ^^^^^^^^^
+145 |             return ContextTestResult(
+146 |                 context_size=context_size,
+    |
+
+ANN001 Missing type annotation for function argument `model`
+   --> src/lmstrix/core/context_tester.py:158:35
+    |
+156 |             )
+157 |
+158 |     def _is_embedding_model(self, model) -> bool:
+    |                                   ^^^^^
+159 |         """Check if a model is an embedding model.
+    |
+
+TRY300 Consider moving this statement to an `else` block
+   --> src/lmstrix/core/inference.py:122:13
+    |
+120 |                 )
+121 |
+122 |             return success, combined_response
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+123 |
+124 |         except Exception as e:
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/inference.py:124:16
+    |
+122 |             return success, combined_response
+123 |
+124 |         except Exception as e:
+    |                ^^^^^^^^^
+125 |             return False, str(e)
+126 |         finally:
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/inference.py:132:24
+    |
+130 |                     llm.unload()
+131 |                     logger.debug(f"Successfully unloaded model {model_id}")
+132 |                 except Exception as unload_e:
+    |                        ^^^^^^^^^
+133 |                     logger.warning(f"Failed to unload model {model_id}: {unload_e}")
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/inference.py:234:20
+    |
+232 |                 lmstudio.unload()
+233 |                 time.sleep(0.5)  # Brief pause after unload
+234 |             except Exception as e:
+    |                    ^^^^^^^^^
+235 |                 logger.warning(f"Failed to unload existing models: {e}")
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/inference.py:339:16
+    |
+337 |             )
+338 |
+339 |         except Exception as e:
+    |                ^^^^^^^^^
+340 |             error_str = str(e)
+341 |             is_oom_error = any(
+    |
+
+E722 Do not use bare `except`
+   --> src/lmstrix/core/inference.py:376:29
+    |
+374 | …                         llm.unload()
+375 | …                         logger.debug("Unloaded previous model instance")
+376 | …                     except:
+    |                       ^^^^^^
+377 | …                         pass
+    |
+
+S110 `try`-`except`-`pass` detected, consider logging the exception
+   --> src/lmstrix/core/inference.py:376:29
+    |
+374 |                                   llm.unload()
+375 |                                   logger.debug("Unloaded previous model instance")
+376 | /                             except:
+377 | |                                 pass
+    | |____________________________________^
+378 |
+379 |                           llm = self.client.load_model_by_id(model.id, context_len=working_context)
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/inference.py:401:28
+    |
+399 |                         )
+400 |
+401 |                     except Exception as retry_e:
+    |                            ^^^^^^^^^
+402 |                         logger.error(f"Even with reduced context, inference failed: {retry_e}")
+403 |                         error_str = str(retry_e)
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/inference.py:484:20
+    |
+482 |                 lmstudio.unload()
+483 |                 time.sleep(0.5)  # Brief pause after unload
+484 |             except Exception as e:
+    |                    ^^^^^^^^^
+485 |                 logger.warning(f"Failed to unload existing models: {e}")
+    |
+
+ERA001 Found commented-out code
+ --> src/lmstrix/core/inference_manager.py:7:1
+  |
+5 | """
+6 |
+7 | # this_file: src/lmstrix/core/inference_manager.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+8 |
+9 | import builtins
+  |
+help: Remove commented-out code
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/inference_manager.py:180:24
+    |
+178 |                             f"→ effective out_ctx={out_ctx}",
+179 |                         )
+180 |                 except Exception as e:
+    |                        ^^^^^^^^^
+181 |                     logger.debug(f"Could not derive context_out from model: {e}")
+    |
+
+TRY300 Consider moving this statement to an `else` block
+   --> src/lmstrix/core/inference_manager.py:202:13
+    |
+200 |               tokens_used = response.usage.get("total_tokens", 0)
+201 |
+202 | /             return {
+203 | |                 "model_id": model_id,
+204 | |                 "prompt": prompt,
+205 | |                 "response": response.content,
+206 | |                 "tokens_used": tokens_used,
+207 | |                 "inference_time": inference_time,
+208 | |                 "error": None,
+209 | |                 "succeeded": True,
+210 | |             }
+    | |_____________^
+211 |
+212 |           except Exception as e:
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/inference_manager.py:212:16
+    |
+210 |             }
+211 |
+212 |         except Exception as e:
+    |                ^^^^^^^^^
+213 |             error_str = str(e)
+214 |             logger.error(f"Inference failed for model {model_id}: {error_str}")
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/inference_manager.py:257:24
+    |
+255 |                         "succeeded": True,
+256 |                     }
+257 |                 except Exception as retry_e:
+    |                        ^^^^^^^^^
+258 |                     error_str = f"Even with reduced context: {retry_e}"
+    |
+
+TRY300 Consider moving this statement to an `else` block
+   --> src/lmstrix/core/inference_manager.py:316:13
+    |
+314 |             )
+315 |
+316 |             return success, combined_response
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+317 |
+318 |         except Exception as e:
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/inference_manager.py:318:16
+    |
+316 |             return success, combined_response
+317 |
+318 |         except Exception as e:
+    |                ^^^^^^^^^
+319 |             return False, str(e)
+320 |         finally:
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/inference_manager.py:325:24
+    |
+323 |                     llm.unload()
+324 |                     logger.debug(f"Successfully unloaded model {model.id}")
+325 |                 except Exception as e:
+    |                        ^^^^^^^^^
+326 |                     logger.warning(f"Failed to unload model {model.id}: {e}")
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/inference_manager.py:454:24
+    |
+452 |                             f"→ effective out_ctx={out_ctx}",
+453 |                         )
+454 |                 except Exception as e:
+    |                        ^^^^^^^^^
+455 |                     logger.debug(f"Could not derive context_out from model: {e}")
+    |
+
+ERA001 Found commented-out code
+ --> src/lmstrix/core/models.py:3:1
+  |
+1 | """Simplified model definitions and registry for LMStrix."""
+2 |
+3 | # this_file: src/lmstrix/core/models_simple.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+4 |
+5 | import json
+  |
+help: Remove commented-out code
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+   --> src/lmstrix/core/models.py:142:9
+    |
+140 |           # and they may not be directly accessible as filesystem paths
+141 |           # Only check path existence for obvious test paths
+142 | /         if str(model_path).startswith("/path/to/"):
+143 | |             # This is a test path, check if it exists
+144 | |             if not model_path.exists():
+    | |_______________________________________^
+145 |                   logger.warning(f"Test model path does not exist: {self.path}")
+146 |                   return False
+    |
+help: Combine `if` statements using `and`
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/models.py:220:24
+    |
+218 |                     model = Model(**model_info)
+219 |                     self._models[model_id] = model
+220 |                 except Exception as e:
+    |                        ^^^^^^^^^
+221 |                     logger.warning(f"Failed to load model {model_id}: {e}")
+222 |                     continue
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/models.py:226:16
+    |
+224 |         except json.JSONDecodeError as e:
+225 |             logger.error(f"Failed to parse models file: {e}")
+226 |         except Exception as e:
+    |                ^^^^^^^^^
+227 |             logger.error(f"Failed to load models: {e}")
+    |
+
+TRY300 Consider moving this statement to an `else` block
+   --> src/lmstrix/loaders/model_loader.py:106:9
+    |
+104 |             return False
+105 |
+106 |         return True
+    |         ^^^^^^^^^^^
+107 |
+108 |     except (KeyError, TypeError, ValueError) as e:
+    |
+
+TRY300 Consider moving this statement to an `else` block
+   --> src/lmstrix/loaders/model_loader.py:186:9
+    |
+184 |             return None
+185 |
+186 |         return new_model
+    |         ^^^^^^^^^^^^^^^^
+187 |
+188 |     except (KeyError, ValueError, TypeError, ModelRegistryError) as e:
+    |
+
+TRY300 Consider moving this statement to an `else` block
+   --> src/lmstrix/loaders/model_loader.py:361:9
+    |
+359 |         registry.update_model(str(model.path), model)
+360 |         logger.info(f"Successfully reset test data for {model.id}")
+361 |         return True
+    |         ^^^^^^^^^^^
+362 |
+363 |     except (ModelRegistryError, ValueError) as e:
+    |
+
+TRY300 Consider moving this statement to an `else` block
+  --> src/lmstrix/utils/context_parser.py:64:17
+   |
+62 |                 )
+63 |
+64 |                 return token_count
+   |                 ^^^^^^^^^^^^^^^^^^
+65 |
+66 |             except ValueError as e:
+   |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  --> src/lmstrix/utils/context_parser.py:73:13
+   |
+71 |               return int(out_ctx)
+72 |           except ValueError:
+73 | /             raise ValueError(
+74 | |                 f"Invalid out_ctx format '{out_ctx}'. Expected integer or percentage (e.g., '80%')",
+75 | |             )
+   | |_____________^
+76 |
+77 |       raise TypeError(f"out_ctx must be int or str, got {type(out_ctx).__name__}")
+   |
+
+ERA001 Found commented-out code
+ --> src/lmstrix/utils/state.py:3:1
+  |
+1 | """State management utilities for LMStrix."""
+2 |
+3 | # this_file: src/lmstrix/utils/state.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+4 |
+5 | import json
+  |
+help: Remove commented-out code
+
+BLE001 Do not catch blind exception: `Exception`
+  --> src/lmstrix/utils/state.py:26:20
+   |
+24 |                 with self.state_file.open() as f:
+25 |                     return json.load(f)
+26 |             except Exception as e:
+   |                    ^^^^^^^^^
+27 |                 logger.warning(f"Failed to load state: {e}")
+28 |         return {}
+   |
+
+BLE001 Do not catch blind exception: `Exception`
+  --> src/lmstrix/utils/state.py:35:16
+   |
+33 |             with self.state_file.open("w") as f:
+34 |                 json.dump(self._state, f, indent=2)
+35 |         except Exception as e:
+   |                ^^^^^^^^^
+36 |             logger.warning(f"Failed to save state: {e}")
+   |
+
+W293 Blank line contains whitespace
+ --> test_limit_threshold.py:6:1
+  |
+4 | def calculate_context_to_save(tested_context: int, limit: int = 100, threshold: int = 0) -> int:
+5 |     """Calculate the context value to save based on limit and threshold.
+6 |     
+  | ^^^^
+7 |     This mimics the logic in ConcreteConfigManager.save_model_config
+8 |     """
+  |
+help: Remove whitespace from blank line
+
+W293 [*] Blank line contains whitespace
+  --> test_limit_threshold.py:20:1
+   |
+18 |         else:
+19 |             print(f"Using 100% of context: {tested_context}")
+20 |     
+   | ^^^^
+21 |     return context_to_save
+   |
+help: Remove whitespace from blank line
+
+W292 [*] No newline at end of file
+  --> test_limit_threshold.py:45:61
+   |
+44 | print("Test Case 6: Default behavior - limit=100, threshold=0")
+45 | print(f"Result: {calculate_context_to_save(65536, 100, 0)}")
+   |                                                             ^
+   |
+help: Add trailing newline
+
+ERA001 Found commented-out code
+ --> test_model_out_ctx.py:5:1
+  |
+3 | Test script to verify model-specific context_out values are being used.
+4 | """
+5 | # this_file: test_model_out_ctx.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+6 |
+7 | import sys
+  |
+help: Remove commented-out code
+
+BLE001 Do not catch blind exception: `Exception`
+  --> test_model_out_ctx.py:61:12
+   |
+59 |         print(f"\n💡 The test now uses context_out={model.context_out} instead of -1 (unlimited)")
+60 |
+61 |     except Exception as e:
+   |            ^^^^^^^^^
+62 |         print(f"\n❌ Test failed: {e}")
+63 |         import traceback
+   |
+
+PLC0415 `import` should be at the top-level of a file
+  --> test_model_out_ctx.py:63:9
+   |
+61 |     except Exception as e:
+62 |         print(f"\n❌ Test failed: {e}")
+63 |         import traceback
+   |         ^^^^^^^^^^^^^^^^
+64 |
+65 |         traceback.print_exc()
+   |
+
+BLE001 Do not catch blind exception: `Exception`
+  --> test_model_out_ctx.py:87:12
+   |
+85 |         print(f"  Response length: {len(result1.response)} chars")
+86 |         print(f"  Response: '{result1.response[:100]}...'")
+87 |     except Exception as e:
+   |            ^^^^^^^^^
+88 |         print(f"  Failed: {e}")
+   |
+
+BLE001 Do not catch blind exception: `Exception`
+  --> test_model_out_ctx.py:98:16
+   |
+96 |             print(f"  Response length: {len(result2.response)} chars")
+97 |             print(f"  Response: '{result2.response[:100]}...'")
+98 |         except Exception as e:
+   |                ^^^^^^^^^
+99 |             print(f"  Failed: {e}")
+   |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> test_model_out_ctx.py:107:12
+    |
+105 |         print(f"  Response length: {len(result3.response)} chars")
+106 |         print(f"  Response: '{result3.response}'")
+107 |     except Exception as e:
+    |            ^^^^^^^^^
+108 |         print(f"  Failed: {e}")
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+  --> test_streaming.py:47:12
+   |
+45 |         print("\n=== End of Stream ===")
+46 |
+47 |     except Exception as e:
+   |            ^^^^^^^^^
+48 |         print(f"Error during streaming: {e}")
+   |
+
+Found 130 errors.
+[*] 32 fixable with the `--fix` option (7 hidden fixes can be enabled with the `--unsafe-fixes` option).
