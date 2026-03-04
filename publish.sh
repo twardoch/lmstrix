@@ -7,6 +7,6 @@ fd -e py -x uvx ruff check --output-format=github --fix --unsafe-fixes {} &>>cle
 fd -e py -x uvx ruff format --respect-gitignore --target-version py312 {} &>>cleanup.txt
 llms . "llms.txt"
 uvx hatch clean
-gitnextvers .
+gitnextver .
 uvx hatch build
 uv publish
