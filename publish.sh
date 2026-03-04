@@ -9,4 +9,4 @@ llms . "llms.txt"
 uvx hatch clean
 gitnextvers .
 uvx hatch build
-uvx publish
+uv publish
