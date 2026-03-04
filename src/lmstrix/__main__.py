@@ -150,11 +150,11 @@ class LMStrixCLI:
         self.service.check_health(verbose=verbose)
 
     def save(
-        self, 
+        self,
         flash: bool = False,
         limit: str | int = "100%",
         threshold: int = 0,
-        verbose: bool = False
+        verbose: bool = False,
     ) -> None:
         """Save tested context limits to LM Studio concrete config files.
 

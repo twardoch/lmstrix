@@ -1177,14 +1177,14 @@ class LMStrixService:
             logger.debug("No backup files found")
 
     def save_configs(
-        self, 
-        flash: bool = False, 
+        self,
+        flash: bool = False,
         limit: str | int = "100%",
         threshold: int = 0,
-        verbose: bool = False
+        verbose: bool = False,
     ) -> None:
         """Save tested context limits to LM Studio concrete config files.
-        
+
         Args:
             flash: Enable flash attention for GGUF models
             limit: Context limit - either percentage (e.g. "50%") or absolute value (e.g. 4096)
@@ -1196,7 +1196,7 @@ class LMStrixService:
         # Parse the limit parameter
         is_percentage = False
         limit_value = 100  # default
-        
+
         if isinstance(limit, str):
             if limit.endswith("%"):
                 # It's a percentage
@@ -1215,7 +1215,9 @@ class LMStrixService:
                     limit_value = int(limit)
                     is_percentage = False
                 except ValueError:
-                    logger.error(f"Invalid limit value: {limit}. Must be an integer or percentage (e.g., '50%').")
+                    logger.error(
+                        f"Invalid limit value: {limit}. Must be an integer or percentage (e.g., '50%')."
+                    )
                     return
         else:
             # It's already an integer
@@ -1275,7 +1277,7 @@ class LMStrixService:
                 logger.debug(
                     f"[blue]Flash attention enabled for {gguf_count} GGUF models[/blue]",
                 )
-        
+
         # Report the limit mode used
         if is_percentage:
             if threshold > 0:
@@ -1347,7 +1349,9 @@ class LMStrixService:
             "  [green]save[/green]            Save tested contexts to LM Studio configs",
         )
         console.print("    --flash           Enable flash attention for GGUF models")
-        console.print("    --limit NUM|%     Context limit - percentage (e.g. '50%') or absolute (e.g. 4096)")
+        console.print(
+            "    --limit NUM|%     Context limit - percentage (e.g. '50%') or absolute (e.g. 4096)"
+        )
         console.print("                      With %: applies to contexts > threshold")
         console.print("                      Without %: sets min(tested_context, limit) for all")
         console.print("    --threshold NUM   With % limit: apply percentage if context > threshold")

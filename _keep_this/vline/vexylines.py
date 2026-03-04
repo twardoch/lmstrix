@@ -26,7 +26,7 @@ from lmstrix.loaders.model_loader import load_model_registry
 class VexyLines:
     """A tool for benchmarking prompts against LM-Studio models."""
 
-    def __init__(self, verbose: bool = False):
+    def __init__(self, verbose: bool = False) -> None:
         """Initialize VexyLines.
 
         Args:
@@ -41,9 +41,9 @@ class VexyLines:
             client=self.client, registry=self.registry, verbose=verbose
         )
 
-    def _write_bench_record(self, record: dict, bench_file: Path):
+    def _write_bench_record(self, record: dict, bench_file: Path) -> None:
         """Write a record to the benchmark JSONL file.
-        
+
         Args:
             record: Dictionary containing benchmark data.
             bench_file: Path to the benchmark JSONL file.
@@ -52,7 +52,9 @@ class VexyLines:
             f.write(json.dumps(record) + "\n")
             f.flush()  # Ensure immediate write
 
-    def run(self, prompt_path: str, dry_run: bool = False, bench: str = ".", out: str = "out"):
+    def run(
+        self, prompt_path: str, dry_run: bool = False, bench: str = ".", out: str = "out"
+    ) -> None:
         """Run the benchmarking tool.
 
         Args:
@@ -64,12 +66,12 @@ class VexyLines:
         # Create directories if they don't exist
         bench_dir = Path(bench)
         bench_dir.mkdir(exist_ok=True)
-        
+
         output_dir = Path(out)
         output_dir.mkdir(exist_ok=True)
-        
+
         bench_file = bench_dir / "bench.jsonl"
-        
+
         try:
             prompt = Path(prompt_path).read_text(encoding="utf-8")
         except FileNotFoundError:
@@ -77,10 +79,10 @@ class VexyLines:
             sys.exit(1)
 
         models = self.registry.list_models()
-        
+
         # Sort models by size (assuming size is stored in bytes)
-        models.sort(key=lambda m: m.size if hasattr(m, 'size') else 0)
-        
+        models.sort(key=lambda m: m.size if hasattr(m, "size") else 0)
+
         if dry_run:
             models = models[:2]  # Only test 2 smallest models
             self.console.print(f"[Dry Run] Testing {len(models)} smallest models.", style="yellow")
@@ -93,19 +95,19 @@ class VexyLines:
             if output_path.exists():
                 self.console.print(f"Skipping {model.id}: output already exists", style="dim")
                 continue
-            
+
             self.console.print(f"Benchmarking model: {model.id}", style="cyan")
-            
+
             # Record before starting inference
             start_record = {
                 "model_id": model.id,
-                "model_size": getattr(model, 'size', None),
+                "model_size": getattr(model, "size", None),
                 "event": "start",
                 "timestamp": datetime.now().isoformat(),
-                "unix_time": time.time()
+                "unix_time": time.time(),
             }
             self._write_bench_record(start_record, bench_file)
-            
+
             start_time = time.time()
 
             result = self.inference_manager.infer(
@@ -120,14 +122,14 @@ class VexyLines:
             # Record after inference completes
             end_record = {
                 "model_id": model.id,
-                "model_size": getattr(model, 'size', None),
+                "model_size": getattr(model, "size", None),
                 "event": "end",
                 "timestamp": datetime.now().isoformat(),
                 "unix_time": end_time,
                 "duration_seconds": duration,
-                "succeeded": result["succeeded"]
+                "succeeded": result["succeeded"],
             }
-            
+
             if result["succeeded"]:
                 output_path.write_text(result["response"], encoding="utf-8")
                 self.console.print(f"  Success! Output saved to {output_path}", style="green")
@@ -136,7 +138,7 @@ class VexyLines:
             else:
                 self.console.print(f"  Failed: {result['error']}", style="red")
                 end_record["error"] = result.get("error", "Unknown error")
-            
+
             self._write_bench_record(end_record, bench_file)
 
 

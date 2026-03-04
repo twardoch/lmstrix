@@ -15,9 +15,8 @@ and model identifiers so it can operate across slightly different logs.
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
-from typing import Any, Iterable, Tuple
+from typing import TYPE_CHECKING, Any
 
 try:
     import orjson as json
@@ -28,6 +27,8 @@ import fire
 from rich.console import Console
 from rich.table import Table
 
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 console = Console()
 
@@ -68,7 +69,7 @@ def coerce_float(value: Any) -> float | None:
         return None
 
 
-def extract_kv(obj: dict[str, Any]) -> Tuple[float | None, str | None]:
+def extract_kv(obj: dict[str, Any]) -> tuple[float | None, str | None]:
     dur = None
     for k in DURATION_KEYS:
         if k in obj:
@@ -98,20 +99,20 @@ def read_jsonl(path: Path) -> Iterable[dict[str, Any]]:
 
 def main(bench: str = ".", out: str | None = None) -> int:
     """Process benchmark data from JSONL file and generate timing report.
-    
+
     Args:
         bench: Benchmark directory containing bench.jsonl (creates if doesn't exist)
         out: Output directory for benchtimes.txt (defaults to bench directory if not provided)
     """
     bench_dir = Path(bench)
     bench_dir.mkdir(exist_ok=True)
-    
+
     if out is None:
         out_dir = bench_dir
     else:
         out_dir = Path(out)
         out_dir.mkdir(exist_ok=True)
-    
+
     bench_path = bench_dir / "bench.jsonl"
     out_path = out_dir / "benchtimes.txt"
 
@@ -143,13 +144,11 @@ def main(bench: str = ".", out: str | None = None) -> int:
 
     console.print(table)
     console.print(
-        f"[green]Wrote {len(rows)} rows to {out_path}[/green]" + (
-            f"; skipped {missing} incomplete lines" if missing else ""
-        )
+        f"[green]Wrote {len(rows)} rows to {out_path}[/green]"
+        + (f"; skipped {missing} incomplete lines" if missing else "")
     )
     return 0
 
 
 if __name__ == "__main__":
     fire.Fire(main)
-

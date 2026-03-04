@@ -68,12 +68,12 @@ class ConcreteConfigManager:
         fields.append({"key": key, "value": value})
 
     def save_model_config(
-        self, 
-        model: Model, 
+        self,
+        model: Model,
         enable_flash: bool = False,
         limit_value: int = 100,
         is_percentage: bool = True,
-        threshold: int = 0
+        threshold: int = 0,
     ) -> bool:
         """Save a model's tested context limit to its concrete config.
 
@@ -113,7 +113,7 @@ class ConcreteConfigManager:
 
         # Calculate the context value to save based on limit mode
         tested_context = model.tested_max_context
-        
+
         if is_percentage:
             # Percentage mode: apply percentage with threshold
             if tested_context > threshold and limit_value < 100:
@@ -136,7 +136,7 @@ class ConcreteConfigManager:
                 logger.debug(
                     f"Using absolute limit for {model.id}: {tested_context} -> {context_to_save}"
                 )
-        
+
         # Update context length
         self._update_field(
             config["load"]["fields"],
@@ -165,12 +165,12 @@ class ConcreteConfigManager:
             return False
 
     def save_all_configs(
-        self, 
-        models: list[Model], 
+        self,
+        models: list[Model],
         enable_flash: bool = False,
         limit_value: int = 100,
         is_percentage: bool = True,
-        threshold: int = 0
+        threshold: int = 0,
     ) -> tuple[int, int]:
         """Save concrete configs for all models with tested contexts.
 
@@ -189,7 +189,9 @@ class ConcreteConfigManager:
 
         for model in models:
             if model.tested_max_context:
-                if self.save_model_config(model, enable_flash, limit_value, is_percentage, threshold):
+                if self.save_model_config(
+                    model, enable_flash, limit_value, is_percentage, threshold
+                ):
                     successful += 1
                 else:
                     failed += 1
