@@ -37,6 +37,10 @@ class Model:
         tested_max_context: int | None = None,
         context_test_status: str = "untested",
         context_test_date: str | None = None,
+        ttft_seconds: float | None = None,
+        tps: float | None = None,
+        description: str | None = None,
+        keywords: list[str] | None = None,
         **kwargs: Any,  # Ignore extra fields
     ) -> None:
         """Initialize a model with essential fields only."""
@@ -58,6 +62,10 @@ class Model:
             self.context_test_date = context_test_date
         else:
             self.context_test_date = None
+        self.ttft_seconds = ttft_seconds
+        self.tps = tps
+        self.description = description
+        self.keywords = keywords or []
 
         # Compatibility attributes for existing code
         self.last_known_good_context = kwargs.get("last_known_good_context")
@@ -79,6 +87,8 @@ class Model:
                 "context_test_log",
                 "failed",
                 "error_msg",
+                "description",
+                "keywords",
             ]
         }
 
@@ -101,6 +111,10 @@ class Model:
             "context_test_date": (
                 self.context_test_date.isoformat() if self.context_test_date else None
             ),
+            "ttft_seconds": self.ttft_seconds,
+            "tps": self.tps,
+            "description": self.description,
+            "keywords": self.keywords if self.keywords else [],
             "last_known_good_context": self.last_known_good_context,
             "last_known_bad_context": self.last_known_bad_context,
             "loadable_max_context": self.loadable_max_context,
@@ -124,6 +138,8 @@ class Model:
         self.context_test_status = ContextTestStatus.UNTESTED
         self.context_test_log = None
         self.context_test_date = None
+        self.ttft_seconds = None
+        self.tps = None
         self.failed = False
         self.error_msg = ""
 

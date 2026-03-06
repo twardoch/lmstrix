@@ -167,13 +167,14 @@ def _add_new_model(model_data: dict) -> Model | None:
         logger.info(f"Discovered new model: {model_path}")
         short_id = model_path.stem if model_path.name else model_data["id"]
 
+        ctx_in = model_data.get("context_length", 8192)
         new_model = Model(
             model_id=model_data["id"],
             short_id=short_id,
             path=str(model_path),
             size_bytes=model_data.get("size_bytes", 0),
-            ctx_in=model_data.get("context_length", 8192),
-            ctx_out=4096,
+            ctx_in=ctx_in,
+            ctx_out=min(4096, ctx_in),
             has_tools=model_data.get("has_tools", False),
             has_vision=model_data.get("has_vision", False),
         )

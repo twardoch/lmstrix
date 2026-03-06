@@ -13,6 +13,14 @@ from rich.table import Table
 from lmstrix.api.exceptions import APIConnectionError, ModelRegistryError
 from lmstrix.core.concrete_config import ConcreteConfigManager
 from lmstrix.core.context_tester import ContextTester
+from lmstrix.core.describer import (
+    describe_models as run_describe_models,
+)
+from lmstrix.core.describer import (
+    filter_models_by_keywords,
+    format_models_markdown,
+    sort_models_by_keywords,
+)
 from lmstrix.core.inference_manager import InferenceManager
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 from lmstrix.loaders.model_loader import (
@@ -124,6 +132,8 @@ def _sort_models(models: list[Model], sort_by: str) -> list[Model]:
         "ctx": "tested_max_context",
         "dtx": "context_limit",
         "size": "size",
+        "ttft": "ttft_seconds",
+        "tps": "tps",
     }
     sort_attr = key_map.get(sort_key.rstrip("d"))
 
@@ -207,16 +217,22 @@ def _test_single_model(
             logger.info(f"Response preview: ||{response_preview}||")
         else:
             # Update the table with success
+            ttft_str = f"{result.ttft_seconds:.2f}s" if result.ttft_seconds is not None else "-"
+            tps_str = f"{result.tps:.1f}" if result.tps is not None else "-"
             table = Table(show_header=False, header_style="bold cyan", box=None, expand=False)
             table.add_column("Model", style="cyan", no_wrap=True)
             table.add_column("Context", justify="right", style="yellow")
             table.add_column("Status", style="green")
+            table.add_column("TTFT", justify="right", style="blue")
+            table.add_column("TPS", justify="right", style="blue")
             table.add_column("Response", style="white")
 
             table.add_row(
                 model.id[:40] + "..." if len(model.id) > 40 else model.id,
                 f"{ctx:,}",
                 "[green]✓ Success[/green]",
+                ttft_str,
+                tps_str,
                 f"||{response_preview}||",
             )
             live.update(table)
@@ -225,6 +241,10 @@ def _test_single_model(
         if not model.tested_max_context or ctx > model.tested_max_context:
             model.tested_max_context = ctx
         model.context_test_status = ContextTestStatus.COMPLETED
+        if result.ttft_seconds is not None:
+            model.ttft_seconds = result.ttft_seconds
+        if result.tps is not None:
+            model.tps = result.tps
     else:
         error_type = "load" if not result.load_success else "inference"
         if verbose:
@@ -287,6 +307,8 @@ def _test_all_models_at_ctx(
             table.add_column("Model", style="cyan", no_wrap=True)
             table.add_column("Context", justify="right", style="yellow")
             table.add_column("Status", style="blue")
+            table.add_column("TTFT", justify="right", style="blue")
+            table.add_column("TPS", justify="right", style="blue")
             table.add_column("Response", style="white")
             table.add_column("Progress", justify="right", style="magenta")
 
@@ -298,10 +320,20 @@ def _test_all_models_at_ctx(
                     else "[red]✗ Failed[/red]"
                 )
                 response_preview = getattr(prev_model, "_test_response_preview", "❌")
+                prev_ttft = (
+                    f"{prev_model.ttft_seconds:.2f}s"
+                    if getattr(prev_model, "ttft_seconds", None) is not None
+                    else "-"
+                )
+                prev_tps = (
+                    f"{prev_model.tps:.1f}" if getattr(prev_model, "tps", None) is not None else "-"
+                )
                 table.add_row(
                     prev_model.id[:40] + "..." if len(prev_model.id) > 40 else prev_model.id,
                     f"{ctx:,}",
                     status,
+                    prev_ttft,
+                    prev_tps,
                     f"||{response_preview}||" if response_preview else "❌",
                     f"{j + 1}/{len(models_to_test)}",
                 )
@@ -311,6 +343,8 @@ def _test_all_models_at_ctx(
                 model.id[:40] + "..." if len(model.id) > 40 else model.id,
                 f"{ctx:,}",
                 "[blue]Testing...[/blue]",
+                "-",
+                "-",
                 "",
                 f"{i}/{len(models_to_test)}",
             )
@@ -341,6 +375,10 @@ def _test_all_models_at_ctx(
             model.last_known_good_context = ctx
             if not model.tested_max_context or ctx > model.tested_max_context:
                 model.tested_max_context = ctx
+            if result.ttft_seconds is not None:
+                model.ttft_seconds = result.ttft_seconds
+            if result.tps is not None:
+                model.tps = result.tps
             model.context_test_status = ContextTestStatus.TESTING
             # Store response preview temporarily for display
             model._test_response_preview = response_preview if response_preview else "❌"
@@ -362,6 +400,8 @@ def _test_all_models_at_ctx(
         table.add_column("Model", style="cyan", no_wrap=True)
         table.add_column("Context", justify="right", style="yellow")
         table.add_column("Status", style="blue")
+        table.add_column("TTFT", justify="right", style="blue")
+        table.add_column("TPS", justify="right", style="blue")
         table.add_column("Response", style="white")
         table.add_column("Progress", justify="right", style="magenta")
 
@@ -372,10 +412,18 @@ def _test_all_models_at_ctx(
                 else "[red]✗ Failed[/red]"
             )
             response_preview = getattr(model, "_test_response_preview", "❌")
+            final_ttft = (
+                f"{model.ttft_seconds:.2f}s"
+                if getattr(model, "ttft_seconds", None) is not None
+                else "-"
+            )
+            final_tps = f"{model.tps:.1f}" if getattr(model, "tps", None) is not None else "-"
             table.add_row(
                 model.id[:40] + "..." if len(model.id) > 40 else model.id,
                 f"{ctx:,}",
                 status,
+                final_ttft,
+                final_tps,
                 f"||{response_preview}||" if response_preview else "❌",
                 f"{j + 1}/{len(models_to_test)}",
             )
@@ -417,6 +465,8 @@ def _print_final_results(updated_models: list[Model]) -> None:
     table.add_column("Optimal Context", justify="right")
     table.add_column("Declared Limit", justify="right")
     table.add_column("Efficiency", justify="right")
+    table.add_column("TTFT", justify="right", style="blue")
+    table.add_column("TPS", justify="right", style="blue")
 
     for model in updated_models:
         status = "✓ Completed" if model.context_test_status.value == "completed" else "✗ Failed"
@@ -427,6 +477,12 @@ def _print_final_results(updated_models: list[Model]) -> None:
             if model.tested_max_context
             else "N/A"
         )
+        final_ttft = (
+            f"{model.ttft_seconds:.2f}s"
+            if getattr(model, "ttft_seconds", None) is not None
+            else "-"
+        )
+        final_tps = f"{model.tps:.1f}" if getattr(model, "tps", None) is not None else "-"
 
         table.add_row(
             model.id,
@@ -434,6 +490,8 @@ def _print_final_results(updated_models: list[Model]) -> None:
             optimal,
             declared,
             efficiency,
+            final_ttft,
+            final_tps,
         )
 
     logger.debug(table)
@@ -481,19 +539,35 @@ class LMStrixService:
                 logger.debug(f"Error details: {e}")
             return
 
-        # After scanning, list the models
-        self.list_models(verbose=verbose)
+        self.list_models(verbose=verbose, _registry=registry)
 
     def list_models(
         self,
         sort: str = "id",
         show: str | None = None,
+        key: str | None = None,
         verbose: bool = False,
+        _registry: "ModelRegistry | None" = None,
     ) -> None:
-        """List all models from the registry with their test status."""
+        """List all models from the registry with their test status.
+
+        Always performs a fresh scan so the list matches what LM Studio
+        currently has downloaded.  Stale entries are removed automatically.
+
+        Args:
+            _registry: Pre-scanned registry (internal use by scan_models to
+                avoid a redundant rescan).
+        """
         setup_logging(verbose=verbose)
 
-        registry = load_model_registry(verbose=verbose)
+        if _registry is not None:
+            registry = _registry
+        else:
+            try:
+                registry = scan_and_update_registry(verbose=verbose)
+            except Exception:
+                # Fall back to cached registry when LM Studio is unreachable
+                registry = load_model_registry(verbose=verbose)
         models = registry.list_models()
 
         if not models:
@@ -502,11 +576,29 @@ class LMStrixService:
             )
             return
 
+        if key:
+            keywords = [k.strip() for k in key.split(",") if k.strip()]
+            models = filter_models_by_keywords(models, keywords)
+            if not models:
+                Console().print(f"[yellow]No models match keywords: {', '.join(keywords)}[/yellow]")
+                return
+
         # Sort models based on the sort parameter
         sort_key = sort.lower()
         reverse = sort_key.endswith("d") and len(sort_key) > 1
 
-        if sort_key in ("id", "idd"):
+        if sort_key in (
+            "arch",
+            "archd",
+            "inp",
+            "inpd",
+            "outp",
+            "outpd",
+            "proc",
+            "procd",
+        ):
+            sorted_models = sort_models_by_keywords(models, sort_key)
+        elif sort_key in ("id", "idd"):
             sorted_models = sorted(models, key=lambda m: m.id, reverse=reverse)
         elif sort_key in ("ctx", "ctxd"):
             sorted_models = sorted(
@@ -523,11 +615,27 @@ class LMStrixService:
         elif sort_key in ("size", "sized"):
             sorted_models = sorted(models, key=lambda m: m.size, reverse=reverse)
         elif sort_key in ("smart", "smartd"):
-            # Use the same smart sorting as 'test --all': size + context_limit * 100,000
-            # This prioritizes smaller models first, then lower context within similar sizes
+            # Composite score: tps*2000 + tested + declared + size_in_mb*500
             sorted_models = sorted(
                 models,
-                key=lambda m: m.size + (m.context_limit * 100_000),
+                key=lambda m: (
+                    (m.tps or 0) * 2000
+                    + (m.tested_max_context or 0)
+                    + m.context_limit
+                    + (m.size / (1024 * 1024)) * 500
+                ),
+                reverse=reverse,
+            )
+        elif sort_key in ("ttft", "ttftd"):
+            sorted_models = sorted(
+                models,
+                key=lambda m: m.ttft_seconds or 0,
+                reverse=reverse,
+            )
+        elif sort_key in ("tps", "tpsd"):
+            sorted_models = sorted(
+                models,
+                key=lambda m: m.tps or 0,
                 reverse=reverse,
             )
         else:
@@ -549,11 +657,13 @@ class LMStrixService:
                 # JSON array of models (matching registry format)
                 models_dict = []
                 for model in sorted_models:
-                    model_data = model.model_dump(by_alias=True, mode="json")
+                    model_data = model.to_dict()
                     models_dict.append(model_data)
                 print(json.dumps(models_dict, indent=2))
+            elif show == "md":
+                print(format_models_markdown(sorted_models))
             else:
-                logger.debug(f"Invalid show option: {show}. Options: id, path, json.")
+                logger.debug(f"Invalid show option: {show}. Options: id, path, json, md.")
                 return
             return
 
@@ -564,6 +674,8 @@ class LMStrixService:
         table.add_column("Tested", style="green")
         table.add_column("Good", style="green")
         table.add_column("Bad", style="red")
+        table.add_column("TTFT", justify="right", style="blue")
+        table.add_column("TPS", justify="right", style="blue")
         table.add_column("Status", style="blue")
 
         for model in sorted_models:
@@ -572,6 +684,8 @@ class LMStrixService:
                 f"{model.last_known_good_context:,}" if model.last_known_good_context else "-"
             )
             last_bad = f"{model.last_known_bad_context:,}" if model.last_known_bad_context else "-"
+            ttft_str = f"{model.ttft_seconds:.2f}s" if model.ttft_seconds is not None else "-"
+            tps_str = f"{model.tps:.1f}" if model.tps is not None else "-"
 
             status_map = {
                 "untested": "Untested",
@@ -588,9 +702,43 @@ class LMStrixService:
                 tested_ctx,
                 last_good,
                 last_bad,
+                ttft_str,
+                tps_str,
                 status,
             )
         console.print(table)
+
+    def describe_models(
+        self,
+        model_id: str | None = None,
+        desc_all: bool = False,
+        describer_model_id: str | None = None,
+        reset: bool = False,
+        verbose: bool = False,
+    ) -> None:
+        """Use an LLM or droid exec to generate descriptions and keyword tags for models."""
+        setup_logging(verbose=verbose)
+        console = Console()
+        registry = load_model_registry(verbose=verbose)
+        if not registry.list_models():
+            console.print("[red]No registry found. Run 'scan' first.[/red]")
+            return
+
+        if not model_id and not desc_all:
+            console.print("[yellow]Specify a model ID or --all to describe models.[/yellow]")
+            return
+
+        method = describer_model_id or "droid exec"
+        console.print(f"[bold]Using [cyan]{method}[/cyan] for descriptions.[/bold]")
+
+        count = run_describe_models(
+            registry=registry,
+            describer_model_id=describer_model_id,
+            model_id=model_id,
+            reset=reset,
+            verbose=verbose,
+        )
+        console.print(f"\n[green]Described {count} model(s).[/green]")
 
     def test_models(
         self,
@@ -605,6 +753,7 @@ class LMStrixService:
         force: bool = False,
         prompt: str | None = None,
         file_prompt: str | None = None,
+        key: str | None = None,
     ) -> None:
         """Test the context limits for models."""
         setup_logging(verbose=verbose)
@@ -625,6 +774,15 @@ class LMStrixService:
         if not models_to_test:
             return
 
+        # Apply keyword filtering if specified
+        if key:
+            keywords = [k.strip() for k in key.split(",") if k.strip()]
+            if keywords:
+                models_to_test = filter_models_by_keywords(models_to_test, keywords)
+                if not models_to_test:
+                    logger.error(f"No models match all keywords: {', '.join(keywords)}")
+                    return
+
         # If reset flag is used, clear test results for all models being tested
         if reset:
             logger.debug("Resetting test results for selected models...")
@@ -636,6 +794,8 @@ class LMStrixService:
                 model.loadable_max_context = None
                 model.context_test_date = None
                 model.context_test_log = None
+                model.ttft_seconds = None
+                model.tps = None
                 registry.update_model_by_id(model)
             registry.save()
             logger.success(f"Reset {len(models_to_test)} models for re-testing")
@@ -757,18 +917,32 @@ class LMStrixService:
                         logger.info(f"Response preview: ||{response_preview}||")
                 else:
                     # Update the table with success
+                    ttft_str = (
+                        f"{updated_model.ttft_seconds:.2f}s"
+                        if getattr(updated_model, "ttft_seconds", None) is not None
+                        else "-"
+                    )
+                    tps_str = (
+                        f"{updated_model.tps:.1f}"
+                        if getattr(updated_model, "tps", None) is not None
+                        else "-"
+                    )
                     table = Table(
                         show_header=False, header_style="bold cyan", box=None, expand=False
                     )
                     table.add_column("Model", style="cyan", no_wrap=True)
                     table.add_column("Context", justify="right", style="yellow")
                     table.add_column("Status", style="green")
+                    table.add_column("TTFT", justify="right", style="blue")
+                    table.add_column("TPS", justify="right", style="blue")
                     table.add_column("Response", style="white")
 
                     table.add_row(
                         model.id[:40] + "..." if len(model.id) > 40 else model.id,
                         f"{updated_model.tested_max_context:,}",
                         "[green]✓ Success[/green]",
+                        ttft_str,
+                        tps_str,
                         f"||{response_preview}||" if response_preview else "❌",
                     )
                     live.update(table)
@@ -1310,7 +1484,20 @@ class LMStrixService:
         console.print(
             "    --sort id|ctx|dtx|size|smart  Sort by: id, tested context, declared context, size, smart",
         )
-        console.print("    --show id|path|json     Output format")
+        console.print(
+            "    --sort arch|inp|outp|proc     Sort by keyword category (add 'd' for descending)",
+        )
+        console.print("    --show id|path|json|md  Output format (md = Markdown report)")
+        console.print("    --key kw1,kw2         Filter models matching all specified keywords")
+        console.print("    --verbose         Enable verbose output")
+        console.print("")
+        console.print(
+            "  [green]desc[/green]            Generate model descriptions and keywords",
+        )
+        console.print("    MODEL_ID          Describe specific model")
+        console.print("    --all             Describe all undescribed models")
+        console.print("    --model MODEL_ID  LLM to use (default: droid exec)")
+        console.print("    --reset           Re-describe already described models")
         console.print("    --verbose         Enable verbose output")
         console.print("")
         console.print("  [green]test[/green]            Test model context limits")
@@ -1324,6 +1511,7 @@ class LMStrixService:
         console.print(
             "    --fast            Skip semantic verification (only test if inference completes)",
         )
+        console.print("    --key kw1,kw2         Filter models matching all specified keywords")
         console.print("    --prompt TEXT     Custom prompt to use for testing")
         console.print("    --file_prompt PATH Load prompt from file for testing")
         console.print("    --verbose         Enable verbose output")
@@ -1360,7 +1548,13 @@ class LMStrixService:
         console.print("Examples:")
         console.print("  lmstrix scan --verbose")
         console.print("  lmstrix list --sort ctx")
+        console.print("  lmstrix list --show md --key outp-code,proc-thinking")
+        console.print("  lmstrix list --sort arch --show md")
+        console.print("  lmstrix desc --all                    # uses droid exec")
+        console.print("  lmstrix desc --all --model my-llm      # uses LM Studio model")
+        console.print("  lmstrix desc my-model --reset")
         console.print("  lmstrix test --all")
+        console.print("  lmstrix test --all --key arch-gguf")
         console.print("  lmstrix test my-model --ctx 8192")
         console.print('  lmstrix test my-model --prompt "What is 2+2?"')
         console.print("  lmstrix test my-model --file_prompt test_prompt.txt")

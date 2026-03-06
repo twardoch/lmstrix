@@ -291,3 +291,34 @@ When I say "/plan [requirement]", you must:
 - `/report` - Update documentation and clean up completed tasks
 - `/work` - Enter continuous work mode to implement plans
 - You may use these commands autonomously when appropriate
+
+<!-- This section is maintained by the coding agent via lore (https://github.com/BYK/opencode-lore) -->
+## Long-term Knowledge
+
+### Architecture
+
+<!-- lore:019cc377-a380-7b5f-b1fa-7b64a6466191 -->
+* **LMStrix desc command: dual-mode model description (LLM or droid exec fallback)**: The \`lmstrix desc\` command in \`core/describer.py\` has two execution paths: (1) when \`--model MODEL\_ID\` is provided, uses \`InferenceManager\` to call that LLM directly, (2) when omitted, falls back to \`subprocess.run(\['droid', 'exec', prompt])\` — requiring \`droid\` CLI on PATH. Both paths use the same structured JSON prompt requesting \`{id, description, keywords}\` and the same \`\_parse\_response()\` parser that strips markdown fences and validates keywords against \`ALL\_KEYWORDS\`. The keyword vocabulary (24 keywords in 4 categories: arch/inp/outp/proc) is defined in \`KEYWORD\_VOCAB\` dict. \`describe\_models()\` orchestrates the batch, saving after each model via \`registry.update\_model\_by\_id()\`.
+
+<!-- lore:019cbb47-f079-7e7f-8fe9-e3201275fa63 -->
+* **LMStrix Model class is plain Python (not Pydantic) with kwargs passthrough**: The \`Model\` class in \`core/models.py\` is a plain Python class (NOT Pydantic), using \`\*\*kwargs: Any\` in \`\_\_init\_\_\` to absorb unknown fields into \`self.extra\` dict. \`to\_dict()\` merges \`self.extra\` back, enabling forward-compatible JSON persistence. When adding new fields: (1) add param with default to \`\_\_init\_\_\`, (2) add to \`to\_dict()\` return dict, (3) add field name to the \`extra\` exclusion list in \`\_\_init\_\_\`, (4) add to \`reset\_test\_data()\` if test-related. Fields added so far beyond basics: \`ttft\_seconds\`, \`tps\`, \`description\` (str|None), \`keywords\` (list\[str]). The \`ModelRegistry\` uses model path as dict key, with \`update\_model\_by\_id()\` doing path/ID matching. Auto-saves on every \`add\_model\`/\`update\_model\`/\`remove\_model\` call.
+
+<!-- lore:019cbb47-f078-739c-886f-90f771188081 -->
+* **LMStrix timing data flow: SDK → CompletionResponse → ContextTestResult → Model → JSON**: TTFT and TPS flow through a 5-layer chain: (1) LM Studio SDK \`response.stats\` has \`time\_to\_first\_token\_sec\` and \`tokens\_per\_second\` attrs, accessed via \`hasattr\` guards. (2) \`CompletionResponse\` (Pydantic, client.py) stores \`ttft\_seconds\`/\`tps\` as \`float | None\`. (3) \`InferenceEngine.\_test\_inference\_capability()\` returns 4-tuple \`(success, response, ttft, tps)\` — uses test 2 timing (warm model). (4) \`ContextTestResult\` carries timing through \`\_test\_at\_context()\`. (5) \`Model\` class persists via \`to\_dict()\` → JSON. Timing only propagated on successful tests. \`reset\_test\_data()\` clears both fields. All display tables in \`api/main.py\` show TTFT/TPS columns.
+
+### Gotcha
+
+<!-- lore:019cbb47-f079-7e7f-8fe9-e323275b7cfb -->
+* **LMStrix has 23+ pre-existing test failures from mock/path issues**: The test suite has ~23 pre-existing failures unrelated to new features: (1) \`test\_completion\_\*\` tests expect old config params (temp 0.7 vs 0.8, missing topK/topP). (2) \`test\_test\_all\_models\` calls with removed \`passes\` kwarg. (3) \`test\_paths\` have mock issues (\`exists\_side\_effect\` missing self). (4) Various scanner/loader tests have path/mock issues. Core model creation, registry save/load, and response tests all pass. When verifying new changes, check only relevant tests — don't be alarmed by existing failures.
+
+<!-- lore:019cbb47-f079-7e7f-8fe9-e32223be68ba -->
+* **LMStrix SDK stats attributes use hasattr guards — not always present**: The \`lmstudio\` Python SDK's \`response.stats\` object may or may not have timing attributes (\`time\_to\_first\_token\_sec\`, \`tokens\_per\_second\`, \`predicted\_tokens\_count\`, etc.) depending on the model and server version. Always use \`hasattr()\` checks before accessing. The \`client.py\` completion method already logs these when present but they were not being captured/returned until the TTFT/TPS feature was added. The \`complete\_stream()\` method has \`on\_first\_token\` callback for TTFT in streaming mode, but the non-streaming \`complete()\` path relies on \`response.stats\`.
+
+### Pattern
+
+<!-- lore:019cc377-a381-77ae-b26a-3d4365b4dcf1 -->
+* **LMStrix keyword filtering and sorting system in list/test commands**: \`list\_models()\` and \`test\_models()\` in \`api/main.py\` accept \`--key keyword1,keyword2\` which calls \`filter\_models\_by\_keywords()\` requiring ALL keywords match (set subset check on \`model.keywords\`). Keyword-based sorting via \`--sort arch|archd|inp|inpd|outp|outpd|proc|procd\` dispatches to \`sort\_models\_by\_keywords()\` which counts matching keywords per category, with smart sort (size + tested ctx) as tiebreaker. The \`--show md\` option calls \`format\_models\_markdown()\` for a full Markdown report with descriptions, keywords, and stats. All three functions live in \`core/describer.py\`.
+
+<!-- lore:019cbb47-f079-7e7f-8fe9-e32127263c7b -->
+* **LMStrix test command flow: CLI → api/main.py service → ContextTester → InferenceEngine → client**: Test command has 3 paths in \`api/main.py\`: (1) \`\_test\_single\_model\` for single model+ctx, (2) \`\_test\_all\_models\_at\_ctx\` for batch at specific ctx, (3) \`\_test\_all\_models\_optimized\` → \`ContextTester.test\_all\_models()\` for threshold-based batch. All paths call \`tester.\_test\_at\_context()\` which delegates to \`InferenceEngine.\_test\_inference\_capability()\`. That method runs dual prompts ("96" digits + "2+3=5") — success if ANY passes. Uses Rich \`Live\` tables for compact real-time progress display. 3-second delay between batch models for resource cleanup.
+<!-- End lore-managed section -->

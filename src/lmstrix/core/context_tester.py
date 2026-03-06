@@ -23,6 +23,8 @@ class ContextTestResult:
         prompt: str = "",
         response: str = "",
         error: str = "",
+        ttft_seconds: float | None = None,
+        tps: float | None = None,
     ) -> None:
         """Initialize test result."""
         self.timestamp = datetime.now()
@@ -32,6 +34,8 @@ class ContextTestResult:
         self.prompt = prompt
         self.response = response
         self.error = error
+        self.ttft_seconds = ttft_seconds
+        self.tps = tps
 
     def to_dict(self) -> dict:
         """Convert to dictionary for logging."""
@@ -43,6 +47,8 @@ class ContextTestResult:
             "prompt": self.prompt,
             "response": self.response,
             "error": self.error,
+            "ttft_seconds": self.ttft_seconds,
+            "tps": self.tps,
         }
 
     def is_valid_response(self) -> bool:
@@ -124,7 +130,7 @@ class ContextTester:
         """
         # Use the proven InferenceEngine test method
         try:
-            success, response = self.inference_engine._test_inference_capability(
+            success, response, ttft, tps = self.inference_engine._test_inference_capability(
                 model_id,
                 context_size,
             )
@@ -140,6 +146,8 @@ class ContextTester:
                 ),
                 response=response,
                 error=None if success else response,
+                ttft_seconds=ttft,
+                tps=tps,
             )
         except Exception as e:
             return ContextTestResult(
@@ -217,6 +225,10 @@ class ContextTester:
             if result.load_success and result.inference_success:
                 model.tested_max_context = threshold
                 model.context_test_status = ContextTestStatus.COMPLETED
+                if result.ttft_seconds is not None:
+                    model.ttft_seconds = result.ttft_seconds
+                if result.tps is not None:
+                    model.tps = result.tps
             else:
                 model.context_test_status = ContextTestStatus.FAILED
 
@@ -304,6 +316,11 @@ class ContextTester:
             model.last_known_good_context = max_context
             # Store response preview temporarily for display
             model._test_response_preview = result.response[:12] if result.response else ""
+            # Persist TTFT and TPS from successful test
+            if result.ttft_seconds is not None:
+                model.ttft_seconds = result.ttft_seconds
+            if result.tps is not None:
+                model.tps = result.tps
         else:
             model.context_test_status = ContextTestStatus.FAILED
             model.last_known_bad_context = max_context

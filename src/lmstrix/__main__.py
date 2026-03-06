@@ -24,15 +24,22 @@ class LMStrixCLI:
         """
         self.service.scan_models(failed=failed, reset=reset, verbose=verbose)
 
-    def list(self, sort: str = "id", show: str | None = None, verbose: bool = False) -> None:
+    def list(
+        self,
+        sort: str = "id",
+        show: str | None = None,
+        key: str | None = None,
+        verbose: bool = False,
+    ) -> None:
         """List all models from the registry with their test status.
 
         Args:
-            sort: Sort order. Options: id, idd, ctx, ctxd, dtx, dtxd, size, sized, smart, smartd (d = descending).
-            show: Output format. Options: id (plain IDs), path (relative paths), json (JSON array).
+            sort: Sort order. Options: id, idd, ctx, ctxd, dtx, dtxd, size, sized, smart, smartd, ttft, ttftd, tps, tpsd, arch, archd, inp, inpd, outp, outpd, proc, procd (d = descending).
+            show: Output format. Options: id (plain IDs), path (relative paths), json (JSON array), md (Markdown report).
+            key: Filter by keywords (comma-separated). Only show models matching ALL keywords.
             verbose: Enable verbose output.
         """
-        self.service.list_models(sort=sort, show=show, verbose=verbose)
+        self.service.list_models(sort=sort, show=show, key=key, verbose=verbose)
 
     def test(
         self,
@@ -47,6 +54,7 @@ class LMStrixCLI:
         force: bool = False,
         prompt: str | None = None,
         file_prompt: str | None = None,
+        key: str | None = None,
     ) -> None:
         """Test the context limits for models.
 
@@ -55,7 +63,6 @@ class LMStrixCLI:
             all: Test all untested or previously failed models.
             reset: Re-test all models, including those already tested.
             threshold: Maximum context size for initial testing (default: 31744).
-                      Prevents system crashes from very large contexts.
             ctx: Test only this specific context value (skips if > declared context).
             sort: Sort order (only used for single model tests). --all always sorts by size.
             fast: Skip semantic verification - only test if inference completes technically.
@@ -63,6 +70,7 @@ class LMStrixCLI:
             force: Override safety limits and test at contexts marked as bad.
             prompt: Custom prompt string to use for testing instead of built-in prompts.
             file_prompt: Path to file containing the prompt to use for testing.
+            key: Filter by keywords (comma-separated). Only test models matching ALL keywords.
         """
         self.service.test_models(
             model_id=model_id,
@@ -76,6 +84,7 @@ class LMStrixCLI:
             force=force,
             prompt=prompt,
             file_prompt=file_prompt,
+            key=key,
         )
 
     def infer(
@@ -148,6 +157,33 @@ class LMStrixCLI:
             verbose: Enable verbose output.
         """
         self.service.check_health(verbose=verbose)
+
+    def desc(
+        self,
+        model_id: str | None = None,
+        all: bool = False,
+        model: str | None = None,
+        reset: bool = False,
+        verbose: bool = False,
+    ) -> None:
+        """Generate descriptions and keyword tags for models.
+
+        Uses --model LLM if specified, otherwise falls back to 'droid exec'.
+
+        Args:
+            model_id: Describe only this specific model.
+            all: Describe all models (skip already-described unless --reset).
+            model: LLM model for descriptions (optional, falls back to droid exec).
+            reset: Re-describe models that already have descriptions.
+            verbose: Enable verbose output.
+        """
+        self.service.describe_models(
+            model_id=model_id,
+            desc_all=all,
+            describer_model_id=model,
+            reset=reset,
+            verbose=verbose,
+        )
 
     def save(
         self,

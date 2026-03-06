@@ -1,0 +1,145 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1772740752636,
+  "projectRoot": "/Users/adam/Developer/vcs3/github.twardoch/pub/lmstrix",
+  "techStack": {
+    "languages": [
+      {
+        "name": "Python",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "pyproject.toml"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "pytest",
+        "version": null,
+        "category": "testing"
+      }
+    ],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": "pytest",
+    "lintCommand": "ruff check",
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs",
+      "examples",
+      "src",
+      "tests"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "_keep_this": {
+      "path": "_keep_this",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1772740752631,
+      "keyFiles": []
+    },
+    "dist": {
+      "path": "dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 2,
+      "lastAccessed": 1772740752632,
+      "keyFiles": [
+        "lmstrix-1.0.76-py3-none-any.whl",
+        "lmstrix-1.0.76.tar.gz"
+      ]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 7,
+      "lastAccessed": 1772740752632,
+      "keyFiles": [
+        "_config.yml",
+        "api.md",
+        "how-it-works.md",
+        "index.md",
+        "installation.md"
+      ]
+    },
+    "examples": {
+      "path": "examples",
+      "purpose": "Example code",
+      "fileCount": 3,
+      "lastAccessed": 1772740752632,
+      "keyFiles": [
+        "README.md",
+        "prompts.toml",
+        "run_all_examples.sh"
+      ]
+    },
+    "issues": {
+      "path": "issues",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1772740752633,
+      "keyFiles": [
+        "102.txt"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 0,
+      "lastAccessed": 1772740752633,
+      "keyFiles": []
+    },
+    "src_docs": {
+      "path": "src_docs",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1772740752633,
+      "keyFiles": [
+        "mkdocs.yml"
+      ]
+    },
+    "tests": {
+      "path": "tests",
+      "purpose": "Test files",
+      "fileCount": 3,
+      "lastAccessed": 1772740752634,
+      "keyFiles": [
+        "__init__.py",
+        "conftest.py",
+        "run_tests.py"
+      ]
+    },
+    "examples/data": {
+      "path": "examples/data",
+      "purpose": "Data files",
+      "fileCount": 2,
+      "lastAccessed": 1772740752634,
+      "keyFiles": [
+        "sample_context.txt",
+        "test_questions.json"
+      ]
+    }
+  },
+  "hotPaths": [],
+  "userDirectives": []
+}

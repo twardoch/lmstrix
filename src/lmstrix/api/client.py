@@ -19,6 +19,8 @@ class CompletionResponse(BaseModel):
     model: str = Field(..., description="Model used for generation")
     usage: dict[str, int] = Field(default_factory=dict, description="Token usage statistics")
     finish_reason: str | None = Field(None, description="Reason for completion termination")
+    ttft_seconds: float | None = Field(None, description="Time to first token in seconds")
+    tps: float | None = Field(None, description="Tokens per second during generation")
 
 
 class LMStudioClient:
@@ -259,6 +261,8 @@ class LMStudioClient:
         logger.info("═" * 60)
 
         start_time = time.time()
+        captured_ttft: float | None = None
+        captured_tps: float | None = None
 
         try:
             # Direct synchronous call - no threading or async
@@ -279,7 +283,8 @@ class LMStudioClient:
 
                 # Time to first token
                 if hasattr(stats, "time_to_first_token_sec"):
-                    logger.info(f"⚡ Time to first token: {stats.time_to_first_token_sec:.2f}s")
+                    captured_ttft = stats.time_to_first_token_sec
+                    logger.info(f"⚡ Time to first token: {captured_ttft:.2f}s")
 
                 # Total inference time
                 logger.info(f"⏱️  Total inference time: {total_inference_time:.2f}s")
@@ -296,7 +301,8 @@ class LMStudioClient:
 
                 # Tokens per second
                 if hasattr(stats, "tokens_per_second"):
-                    logger.info(f"🚀 Tokens/second: {stats.tokens_per_second:.2f}")
+                    captured_tps = stats.tokens_per_second
+                    logger.info(f"🚀 Tokens/second: {captured_tps:.2f}")
 
                 # Stop reason
                 if hasattr(stats, "stop_reason"):
@@ -371,6 +377,8 @@ class LMStudioClient:
             model=response_model,
             usage=usage,
             finish_reason="stop",
+            ttft_seconds=captured_ttft,
+            tps=captured_tps,
         )
 
     def stream_completion(

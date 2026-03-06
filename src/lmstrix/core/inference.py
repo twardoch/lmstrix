@@ -50,7 +50,9 @@ class InferenceEngine:
         else:
             logger.disable("lmstrix")
 
-    def _test_inference_capability(self, model_id: str, context_len: int) -> tuple[bool, str]:
+    def _test_inference_capability(
+        self, model_id: str, context_len: int
+    ) -> tuple[bool, str, float | None, float | None]:
         """Test if model can do basic inference at given context length.
 
         Args:
@@ -58,7 +60,7 @@ class InferenceEngine:
             context_len: Context length to test
 
         Returns:
-            Tuple of (success, response_or_error)
+            Tuple of (success, response_or_error, ttft_seconds, tps)
         """
         llm = None
         try:
@@ -69,6 +71,10 @@ class InferenceEngine:
             )  # Default to 4096 if model not found
 
             llm = self.client.load_model_by_id(model_id, context_len=context_len)
+
+            # Track best timing across tests (use values from last successful completion)
+            best_ttft: float | None = None
+            best_tps: float | None = None
 
             if self.custom_prompt:
                 # Use custom prompt for testing
@@ -83,6 +89,8 @@ class InferenceEngine:
                 # For custom prompts, we consider any non-empty response as success
                 success = bool(response.content.strip())
                 combined_response = response.content.strip()
+                best_ttft = response.ttft_seconds
+                best_tps = response.tps
             else:
                 # Use default dual-test prompts
                 # Test 1: Number words to digits
@@ -119,10 +127,14 @@ class InferenceEngine:
                     f"Test2: '{response_2.content.strip()}' ({test2_status})"
                 )
 
-            return success, combined_response
+                # Use timing from the last response (test 2) as it's on a warm model
+                best_ttft = response_2.ttft_seconds
+                best_tps = response_2.tps
+
+            return success, combined_response, best_ttft, best_tps
 
         except Exception as e:
-            return False, str(e)
+            return False, str(e), None, None
         finally:
             # Always unload model regardless of success/failure
             if llm:
