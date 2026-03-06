@@ -11,128 +11,35 @@ ERA001 Found commented-out code
   |
 help: Remove commented-out code
 
-F401 [*] `sys` imported but unused
-  --> _keep_this/vline/benchread.py:18:8
-   |
-16 | from __future__ import annotations
-17 |
-18 | import sys
-   |        ^^^
-19 | from pathlib import Path
-20 | from typing import Any, Iterable, Tuple
-   |
-help: Remove unused import: `sys`
-
-UP035 [*] Import from `collections.abc` instead: `Iterable`
-  --> _keep_this/vline/benchread.py:20:1
-   |
-18 | import sys
-19 | from pathlib import Path
-20 | from typing import Any, Iterable, Tuple
-   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-21 |
-22 | try:
-   |
-help: Import from `collections.abc`
-
-UP035 `typing.Tuple` is deprecated, use `tuple` instead
-  --> _keep_this/vline/benchread.py:20:1
-   |
-18 | import sys
-19 | from pathlib import Path
-20 | from typing import Any, Iterable, Tuple
-   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-21 |
-22 | try:
-   |
-
 BLE001 Do not catch blind exception: `Exception`
-  --> _keep_this/vline/benchread.py:24:8
+  --> _keep_this/vline/benchread.py:23:8
    |
-22 | try:
-23 |     import orjson as json
-24 | except Exception:  # pragma: no cover - tiny fallback
+21 | try:
+22 |     import orjson as json
+23 | except Exception:  # pragma: no cover - tiny fallback
    |        ^^^^^^^^^
-25 |     import json  # type: ignore[misc]
+24 |     import json  # type: ignore[misc]
    |
-
-I001 [*] Import block is un-sorted or un-formatted
-  --> _keep_this/vline/benchread.py:27:1
-   |
-25 |       import json  # type: ignore[misc]
-26 |
-27 | / import fire
-28 | | from rich.console import Console
-29 | | from rich.table import Table
-   | |____________________________^
-   |
-help: Organize imports
 
 BLE001 Do not catch blind exception: `Exception`
-  --> _keep_this/vline/benchread.py:67:12
+  --> _keep_this/vline/benchread.py:68:12
    |
-65 |             return float(s[:-1].strip())
-66 |         return float(s)
-67 |     except Exception:
+66 |             return float(s[:-1].strip())
+67 |         return float(s)
+68 |     except Exception:
    |            ^^^^^^^^^
-68 |         return None
+69 |         return None
    |
-
-UP006 [*] Use `tuple` instead of `Tuple` for type annotation
-  --> _keep_this/vline/benchread.py:71:40
-   |
-71 | def extract_kv(obj: dict[str, Any]) -> Tuple[float | None, str | None]:
-   |                                        ^^^^^
-72 |     dur = None
-73 |     for k in DURATION_KEYS:
-   |
-help: Replace with `tuple`
 
 BLE001 Do not catch blind exception: `Exception`
-  --> _keep_this/vline/benchread.py:95:20
+  --> _keep_this/vline/benchread.py:96:20
    |
-93 |             try:
-94 |                 yield json.loads(line)
-95 |             except Exception as e:  # pragma: no cover
+94 |             try:
+95 |                 yield json.loads(line)
+96 |             except Exception as e:  # pragma: no cover
    |                    ^^^^^^^^^
-96 |                 console.print(f"[yellow]Skipping invalid JSON on line {i}: {e}")
+97 |                 console.print(f"[yellow]Skipping invalid JSON on line {i}: {e}")
    |
-
-W293 Blank line contains whitespace
-   --> _keep_this/vline/benchread.py:101:1
-    |
- 99 | def main(bench: str = ".", out: str | None = None) -> int:
-100 |     """Process benchmark data from JSONL file and generate timing report.
-101 |     
-    | ^^^^
-102 |     Args:
-103 |         bench: Benchmark directory containing bench.jsonl (creates if doesn't exist)
-    |
-help: Remove whitespace from blank line
-
-W293 [*] Blank line contains whitespace
-   --> _keep_this/vline/benchread.py:108:1
-    |
-106 |     bench_dir = Path(bench)
-107 |     bench_dir.mkdir(exist_ok=True)
-108 |     
-    | ^^^^
-109 |     if out is None:
-110 |         out_dir = bench_dir
-    |
-help: Remove whitespace from blank line
-
-W293 [*] Blank line contains whitespace
-   --> _keep_this/vline/benchread.py:114:1
-    |
-112 |         out_dir = Path(out)
-113 |         out_dir.mkdir(exist_ok=True)
-114 |     
-    | ^^^^
-115 |     bench_path = bench_dir / "bench.jsonl"
-116 |     out_path = out_dir / "benchtimes.txt"
-    |
-help: Remove whitespace from blank line
 
 ERA001 Found commented-out code
  --> _keep_this/vline/vexylines.py:7:1
@@ -145,199 +52,6 @@ ERA001 Found commented-out code
 9 | import json
   |
 help: Remove commented-out code
-
-ANN204 Missing return type annotation for special method `__init__`
-  --> _keep_this/vline/vexylines.py:29:9
-   |
-27 |     """A tool for benchmarking prompts against LM-Studio models."""
-28 |
-29 |     def __init__(self, verbose: bool = False):
-   |         ^^^^^^^^
-30 |         """Initialize VexyLines.
-   |
-help: Add return type annotation: `None`
-
-ANN202 Missing return type annotation for private function `_write_bench_record`
-  --> _keep_this/vline/vexylines.py:44:9
-   |
-42 |         )
-43 |
-44 |     def _write_bench_record(self, record: dict, bench_file: Path):
-   |         ^^^^^^^^^^^^^^^^^^^
-45 |         """Write a record to the benchmark JSONL file.
-   |
-help: Add return type annotation: `None`
-
-W293 Blank line contains whitespace
-  --> _keep_this/vline/vexylines.py:46:1
-   |
-44 |     def _write_bench_record(self, record: dict, bench_file: Path):
-45 |         """Write a record to the benchmark JSONL file.
-46 |         
-   | ^^^^^^^^
-47 |         Args:
-48 |             record: Dictionary containing benchmark data.
-   |
-help: Remove whitespace from blank line
-
-ANN201 Missing return type annotation for public function `run`
-  --> _keep_this/vline/vexylines.py:55:9
-   |
-53 |             f.flush()  # Ensure immediate write
-54 |
-55 |     def run(self, prompt_path: str, dry_run: bool = False, bench: str = ".", out: str = "out"):
-   |         ^^^
-56 |         """Run the benchmarking tool.
-   |
-help: Add return type annotation: `None`
-
-W293 [*] Blank line contains whitespace
-  --> _keep_this/vline/vexylines.py:67:1
-   |
-65 |         bench_dir = Path(bench)
-66 |         bench_dir.mkdir(exist_ok=True)
-67 |         
-   | ^^^^^^^^
-68 |         output_dir = Path(out)
-69 |         output_dir.mkdir(exist_ok=True)
-   |
-help: Remove whitespace from blank line
-
-W293 [*] Blank line contains whitespace
-  --> _keep_this/vline/vexylines.py:70:1
-   |
-68 |         output_dir = Path(out)
-69 |         output_dir.mkdir(exist_ok=True)
-70 |         
-   | ^^^^^^^^
-71 |         bench_file = bench_dir / "bench.jsonl"
-   |
-help: Remove whitespace from blank line
-
-W293 [*] Blank line contains whitespace
-  --> _keep_this/vline/vexylines.py:72:1
-   |
-71 |         bench_file = bench_dir / "bench.jsonl"
-72 |         
-   | ^^^^^^^^
-73 |         try:
-74 |             prompt = Path(prompt_path).read_text(encoding="utf-8")
-   |
-help: Remove whitespace from blank line
-
-W293 [*] Blank line contains whitespace
-  --> _keep_this/vline/vexylines.py:80:1
-   |
-79 |         models = self.registry.list_models()
-80 |         
-   | ^^^^^^^^
-81 |         # Sort models by size (assuming size is stored in bytes)
-82 |         models.sort(key=lambda m: m.size if hasattr(m, 'size') else 0)
-   |
-help: Remove whitespace from blank line
-
-Q000 [*] Single quotes found but double quotes preferred
-  --> _keep_this/vline/vexylines.py:82:56
-   |
-81 |         # Sort models by size (assuming size is stored in bytes)
-82 |         models.sort(key=lambda m: m.size if hasattr(m, 'size') else 0)
-   |                                                        ^^^^^^
-83 |         
-84 |         if dry_run:
-   |
-help: Replace single quotes with double quotes
-
-W293 [*] Blank line contains whitespace
-  --> _keep_this/vline/vexylines.py:83:1
-   |
-81 |         # Sort models by size (assuming size is stored in bytes)
-82 |         models.sort(key=lambda m: m.size if hasattr(m, 'size') else 0)
-83 |         
-   | ^^^^^^^^
-84 |         if dry_run:
-85 |             models = models[:2]  # Only test 2 smallest models
-   |
-help: Remove whitespace from blank line
-
-W293 [*] Blank line contains whitespace
-  --> _keep_this/vline/vexylines.py:96:1
-   |
-94 |                 self.console.print(f"Skipping {model.id}: output already exists", style="dim")
-95 |                 continue
-96 |             
-   | ^^^^^^^^^^^^
-97 |             self.console.print(f"Benchmarking model: {model.id}", style="cyan")
-   |
-help: Remove whitespace from blank line
-
-W293 [*] Blank line contains whitespace
-   --> _keep_this/vline/vexylines.py:98:1
-    |
- 97 |             self.console.print(f"Benchmarking model: {model.id}", style="cyan")
- 98 |             
-    | ^^^^^^^^^^^^
- 99 |             # Record before starting inference
-100 |             start_record = {
-    |
-help: Remove whitespace from blank line
-
-Q000 [*] Single quotes found but double quotes preferred
-   --> _keep_this/vline/vexylines.py:102:46
-    |
-100 |             start_record = {
-101 |                 "model_id": model.id,
-102 |                 "model_size": getattr(model, 'size', None),
-    |                                              ^^^^^^
-103 |                 "event": "start",
-104 |                 "timestamp": datetime.now().isoformat(),
-    |
-help: Replace single quotes with double quotes
-
-W293 [*] Blank line contains whitespace
-   --> _keep_this/vline/vexylines.py:108:1
-    |
-106 |             }
-107 |             self._write_bench_record(start_record, bench_file)
-108 |             
-    | ^^^^^^^^^^^^
-109 |             start_time = time.time()
-    |
-help: Remove whitespace from blank line
-
-Q000 [*] Single quotes found but double quotes preferred
-   --> _keep_this/vline/vexylines.py:123:46
-    |
-121 |             end_record = {
-122 |                 "model_id": model.id,
-123 |                 "model_size": getattr(model, 'size', None),
-    |                                              ^^^^^^
-124 |                 "event": "end",
-125 |                 "timestamp": datetime.now().isoformat(),
-    |
-help: Replace single quotes with double quotes
-
-W293 [*] Blank line contains whitespace
-   --> _keep_this/vline/vexylines.py:130:1
-    |
-128 |                 "succeeded": result["succeeded"]
-129 |             }
-130 |             
-    | ^^^^^^^^^^^^
-131 |             if result["succeeded"]:
-132 |                 output_path.write_text(result["response"], encoding="utf-8")
-    |
-help: Remove whitespace from blank line
-
-W293 [*] Blank line contains whitespace
-   --> _keep_this/vline/vexylines.py:139:1
-    |
-137 |                 self.console.print(f"  Failed: {result['error']}", style="red")
-138 |                 end_record["error"] = result.get("error", "Unknown error")
-139 |             
-    | ^^^^^^^^^^^^
-140 |             self._write_bench_record(end_record, bench_file)
-    |
-help: Remove whitespace from blank line
 
 ERA001 Found commented-out code
  --> debug_inference.py:6:1
@@ -657,247 +371,286 @@ ERA001 Found commented-out code
   |
 help: Remove commented-out code
 
-W291 [*] Trailing whitespace
-   --> src/lmstrix/__main__.py:153:14
-    |
-152 |     def save(
-153 |         self, 
-    |              ^
-154 |         flash: bool = False,
-155 |         limit: str | int = "100%",
-    |
-help: Remove trailing whitespace
+ERA001 Found commented-out code
+ --> issues/lmsmodsearch.py:5:1
+  |
+3 | # dependencies = []
+4 | # ///
+5 | # this_file: lmsmodsearch.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+6 | """Read lmstrix.json, use droid exec to describe each model, output lmstrix-desc.json."""
+  |
+help: Remove commented-out code
+
+S603 `subprocess` call: check for execution of untrusted input
+  --> issues/lmsmodsearch.py:40:18
+   |
+39 |     try:
+40 |         result = subprocess.run(
+   |                  ^^^^^^^^^^^^^^
+41 |             ["droid", "exec", prompt],
+42 |             capture_output=True,
+   |
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> issues/lmsmodsearch.py:40:18
+   |
+39 |     try:
+40 |         result = subprocess.run(
+   |                  ^^^^^^^^^^^^^^
+41 |             ["droid", "exec", prompt],
+42 |             capture_output=True,
+   |
+help: Add explicit `check=False`
+
+S607 Starting a process with a partial executable path
+  --> issues/lmsmodsearch.py:41:13
+   |
+39 |     try:
+40 |         result = subprocess.run(
+41 |             ["droid", "exec", prompt],
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^
+42 |             capture_output=True,
+43 |             text=True,
+   |
+
+TRY300 Consider moving this statement to an `else` block
+  --> issues/lmsmodsearch.py:49:9
+   |
+47 |         if not desc and result.stderr.strip():
+48 |             return model_key, f"[error] {result.stderr.strip()[:300]}"
+49 |         return model_key, desc or "[no description returned]"
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+50 |     except subprocess.TimeoutExpired:
+51 |         return model_key, "[error] droid timed out"
+   |
 
 BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/api/client.py:127:20
+  --> issues/lmsmodsearch.py:55:12
+   |
+53 |         print("Error: 'droid' not found on PATH. Install it first.", file=sys.stderr)
+54 |         sys.exit(1)
+55 |     except Exception as e:
+   |            ^^^^^^^^^
+56 |         return model_key, f"[error] {e}"
+   |
+
+PTH123 `open()` should be replaced by `Path.open()`
+  --> issues/lmsmodsearch.py:62:14
+   |
+60 |     """Load existing output JSON if present."""
+61 |     if output_path.exists():
+62 |         with open(output_path) as f:
+   |              ^^^^
+63 |             return json.load(f)
+64 |     return {}
+   |
+help: Replace with `Path.open()`
+
+PTH123 `open()` should be replaced by `Path.open()`
+  --> issues/lmsmodsearch.py:83:10
+   |
+81 |         extended_llms[key] = entry
+82 |     extended["llms"] = extended_llms
+83 |     with open(output_path, "w") as f:
+   |          ^^^^
+84 |         json.dump(extended, f, indent=2, ensure_ascii=False)
+   |
+help: Replace with `Path.open()`
+
+PTH123 `open()` should be replaced by `Path.open()`
+  --> issues/lmsmodsearch.py:95:10
+   |
+93 |         sys.exit(1)
+94 |
+95 |     with open(input_path) as f:
+   |          ^^^^
+96 |         data = json.load(f)
+   |
+help: Replace with `Path.open()`
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/api/client.py:129:20
     |
-125 |                     f"Failed to load model '{model_id}'. Available models: {available_models[:5]}"
-126 |                 )
-127 |             except Exception:
+127 |                     f"Failed to load model '{model_id}'. Available models: {available_models[:5]}"
+128 |                 )
+129 |             except Exception:
     |                    ^^^^^^^^^
-128 |                 error_msg = f"Failed to load model '{model_id}': {e}"
-129 |             raise ModelLoadError(model_id, error_msg) from e
+130 |                 error_msg = f"Failed to load model '{model_id}': {e}"
+131 |             raise ModelLoadError(model_id, error_msg) from e
     |
 
 TRY300 Consider moving this statement to an `else` block
-   --> src/lmstrix/api/client.py:155:13
+   --> src/lmstrix/api/client.py:157:13
     |
-153 |                 except (AttributeError, TypeError) as e:
-154 |                     logger.warning(f"Failed to extract info from loaded model: {e}")
-155 |             return models_info
+155 |                 except (AttributeError, TypeError) as e:
+156 |                     logger.warning(f"Failed to extract info from loaded model: {e}")
+157 |             return models_info
     |             ^^^^^^^^^^^^^^^^^^
-156 |         except (ImportError, RuntimeError) as e:
-157 |             logger.warning(f"Failed to list loaded models: {e}")
+158 |         except (ImportError, RuntimeError) as e:
+159 |             logger.warning(f"Failed to list loaded models: {e}")
     |
 
 ARG002 Unused method argument: `kwargs`
-   --> src/lmstrix/api/client.py:198:11
+   --> src/lmstrix/api/client.py:200:11
     |
-196 |         repeat_penalty: float = 1.1,  # repeatPenalty - penalty for repeated tokens
-197 |         min_p: float = 0.05,  # minPSampling - minimum token probability threshold
-198 |         **kwargs: Any,  # Accept additional parameters
+198 |         repeat_penalty: float = 1.1,  # repeatPenalty - penalty for repeated tokens
+199 |         min_p: float = 0.05,  # minPSampling - minimum token probability threshold
+200 |         **kwargs: Any,  # Accept additional parameters
     |           ^^^^^^
-199 |     ) -> CompletionResponse:
-200 |         """Make a completion request to a loaded LM Studio model."""
+201 |     ) -> CompletionResponse:
+202 |         """Make a completion request to a loaded LM Studio model."""
     |
 
 ARG002 Unused method argument: `model_context_length`
-   --> src/lmstrix/api/client.py:383:9
+   --> src/lmstrix/api/client.py:391:9
     |
-381 |         temperature: float = 0.8,  # Temperature for generation (LM Studio default)
-382 |         model_id: str | None = None,  # Pass model_id separately
-383 |         model_context_length: (
+389 |         temperature: float = 0.8,  # Temperature for generation (LM Studio default)
+390 |         model_id: str | None = None,  # Pass model_id separately
+391 |         model_context_length: (
     |         ^^^^^^^^^^^^^^^^^^^^
-384 |             int | None
-385 |         ) = None,  # Model's total context length for percentage calculation
+392 |             int | None
+393 |         ) = None,  # Model's total context length for percentage calculation
     |
 
 ARG002 Unused method argument: `kwargs`
-   --> src/lmstrix/api/client.py:392:11
+   --> src/lmstrix/api/client.py:400:11
     |
-390 |         on_token: Callable[[str], None] | None = None,  # Callback for each token
-391 |         stream_timeout: int = 120,  # Timeout in seconds for no progress
-392 |         **kwargs: Any,  # Accept additional parameters
+398 |         on_token: Callable[[str], None] | None = None,  # Callback for each token
+399 |         stream_timeout: int = 120,  # Timeout in seconds for no progress
+400 |         **kwargs: Any,  # Accept additional parameters
     |           ^^^^^^
-393 |     ) -> Iterator[str]:
-394 |         """Stream a completion request to a loaded LM Studio model."""
+401 |     ) -> Iterator[str]:
+402 |         """Stream a completion request to a loaded LM Studio model."""
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/api/main.py:568:20
+    |
+566 |             try:
+567 |                 registry = scan_and_update_registry(verbose=verbose)
+568 |             except Exception:
+    |                    ^^^^^^^^^
+569 |                 # Fall back to cached registry when LM Studio is unreachable
+570 |                 registry = load_model_registry(verbose=verbose)
     |
 
 ARG002 Unused method argument: `sort`
-   --> src/lmstrix/api/main.py:602:9
+   --> src/lmstrix/api/main.py:750:9
     |
-600 |         threshold: int = 31744,
-601 |         ctx: int | None = None,
-602 |         sort: str = "id",
+748 |         threshold: int = 31744,
+749 |         ctx: int | None = None,
+750 |         sort: str = "id",
     |         ^^^^
-603 |         fast: bool = False,
-604 |         verbose: bool = False,
+751 |         fast: bool = False,
+752 |         verbose: bool = False,
     |
 
 BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/api/main.py:670:20
+   --> src/lmstrix/api/main.py:830:20
     |
-668 |                         else f"Prompt: {custom_prompt}"
-669 |                     )
-670 |             except Exception as e:
+828 |                         else f"Prompt: {custom_prompt}"
+829 |                     )
+830 |             except Exception as e:
     |                    ^^^^^^^^^
-671 |                 logger.error(f"Error reading prompt file: {e}")
-672 |                 return
+831 |                 logger.error(f"Error reading prompt file: {e}")
+832 |                 return
     |
 
 BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/api/main.py:834:24
-    |
-832 |                         return
-833 |                     text_content = text_path.read_text(encoding="utf-8")
-834 |                 except Exception as e:
-    |                        ^^^^^^^^^
-835 |                     logger.debug(f"Error reading text file: {e}")
-836 |                     return
-    |
+    --> src/lmstrix/api/main.py:1008:24
+     |
+1006 |                         return
+1007 |                     text_content = text_path.read_text(encoding="utf-8")
+1008 |                 except Exception as e:
+     |                        ^^^^^^^^^
+1009 |                     logger.debug(f"Error reading text file: {e}")
+1010 |                     return
+     |
 
 SIM108 Use ternary operator `pairs = dict_params.split(",") if "," in dict_params else dict_params.split(",")` instead of `if`-`else`-block
-   --> src/lmstrix/api/main.py:848:17
-    |
-846 |               if dict_params:
-847 |                   # Support both comma-separated and space-separated formats
-848 | /                 if "," in dict_params:
-849 | |                     # Format: "key1=value1,key2=value2"
-850 | |                     pairs = dict_params.split(",")
-851 | |                 else:
-852 | |                     # Format: "key1=value1 key2=value2" (fire might split this)
-853 | |                     # For now, assume comma-separated
-854 | |                     pairs = dict_params.split(",")
-    | |__________________________________________________^
-855 |
-856 |                   for pair in pairs:
-    |
+    --> src/lmstrix/api/main.py:1022:17
+     |
+1020 |               if dict_params:
+1021 |                   # Support both comma-separated and space-separated formats
+1022 | /                 if "," in dict_params:
+1023 | |                     # Format: "key1=value1,key2=value2"
+1024 | |                     pairs = dict_params.split(",")
+1025 | |                 else:
+1026 | |                     # Format: "key1=value1 key2=value2" (fire might split this)
+1027 | |                     # For now, assume comma-separated
+1028 | |                     pairs = dict_params.split(",")
+     | |__________________________________________________^
+1029 |
+1030 |                   for pair in pairs:
+     |
 help: Replace `if`-`else`-block with `pairs = dict_params.split(",") if "," in dict_params else dict_params.split(",")`
 
 ERA001 Found commented-out code
-   --> src/lmstrix/api/main.py:849:21
-    |
-847 |                 # Support both comma-separated and space-separated formats
-848 |                 if "," in dict_params:
-849 |                     # Format: "key1=value1,key2=value2"
-    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-850 |                     pairs = dict_params.split(",")
-851 |                 else:
-    |
+    --> src/lmstrix/api/main.py:1023:21
+     |
+1021 |                 # Support both comma-separated and space-separated formats
+1022 |                 if "," in dict_params:
+1023 |                     # Format: "key1=value1,key2=value2"
+     |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1024 |                     pairs = dict_params.split(",")
+1025 |                 else:
+     |
 help: Remove commented-out code
 
 PLW2901 `for` loop variable `pair` overwritten by assignment target
-   --> src/lmstrix/api/main.py:857:21
-    |
-856 |                 for pair in pairs:
-857 |                     pair = pair.strip()
-    |                     ^^^^
-858 |                     if "=" in pair:
-859 |                         key, value = pair.split("=", 1)
-    |
-
-BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/api/main.py:874:24
-    |
-872 |                         return
-873 |                     prompt_params["text"] = text_path.read_text(encoding="utf-8")
-874 |                 except Exception as e:
-    |                        ^^^^^^^^^
-875 |                     logger.debug(f"Error reading text file: {e}")
-876 |                     return
-    |
-
-BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/api/main.py:957:20
-    |
-955 |                             )
-956 |
-957 |             except Exception as e:
-    |                    ^^^^^^^^^
-958 |                 logger.debug(f"Error loading prompt from file: {e}")
-959 |                 return
-    |
-
-BLE001 Do not catch blind exception: `Exception`
-    --> src/lmstrix/api/main.py:1060:20
+    --> src/lmstrix/api/main.py:1031:21
      |
-1058 |                 print("", file=sys.stdout)
-1059 |
-1060 |             except Exception as e:
+1030 |                 for pair in pairs:
+1031 |                     pair = pair.strip()
+     |                     ^^^^
+1032 |                     if "=" in pair:
+1033 |                         key, value = pair.split("=", 1)
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> src/lmstrix/api/main.py:1048:24
+     |
+1046 |                         return
+1047 |                     prompt_params["text"] = text_path.read_text(encoding="utf-8")
+1048 |                 except Exception as e:
+     |                        ^^^^^^^^^
+1049 |                     logger.debug(f"Error reading text file: {e}")
+1050 |                     return
+     |
+
+BLE001 Do not catch blind exception: `Exception`
+    --> src/lmstrix/api/main.py:1131:20
+     |
+1129 |                             )
+1130 |
+1131 |             except Exception as e:
      |                    ^^^^^^^^^
-1061 |                 # Use stderr for error messages
-1062 |                 print(f"\nStreaming inference failed: {e}", file=sys.stderr)
+1132 |                 logger.debug(f"Error loading prompt from file: {e}")
+1133 |                 return
      |
-
-W291 [*] Trailing whitespace
-    --> src/lmstrix/api/main.py:1180:14
-     |
-1179 |     def save_configs(
-1180 |         self, 
-     |              ^
-1181 |         flash: bool = False, 
-1182 |         limit: str | int = "100%",
-     |
-help: Remove trailing whitespace
-
-W291 [*] Trailing whitespace
-    --> src/lmstrix/api/main.py:1181:29
-     |
-1179 |     def save_configs(
-1180 |         self, 
-1181 |         flash: bool = False, 
-     |                             ^
-1182 |         limit: str | int = "100%",
-1183 |         threshold: int = 0,
-     |
-help: Remove trailing whitespace
-
-W293 Blank line contains whitespace
-    --> src/lmstrix/api/main.py:1187:1
-     |
-1185 |     ) -> None:
-1186 |         """Save tested context limits to LM Studio concrete config files.
-1187 |         
-     | ^^^^^^^^
-1188 |         Args:
-1189 |             flash: Enable flash attention for GGUF models
-     |
-help: Remove whitespace from blank line
-
-W293 [*] Blank line contains whitespace
-    --> src/lmstrix/api/main.py:1199:1
-     |
-1197 |         is_percentage = False
-1198 |         limit_value = 100  # default
-1199 |         
-     | ^^^^^^^^
-1200 |         if isinstance(limit, str):
-1201 |             if limit.endswith("%"):
-     |
-help: Remove whitespace from blank line
 
 BLE001 Do not catch blind exception: `Exception`
-    --> src/lmstrix/api/main.py:1244:16
+    --> src/lmstrix/api/main.py:1234:20
      |
-1242 |         try:
-1243 |             lms_path = get_lmstudio_path()
-1244 |         except Exception as e:
-     |                ^^^^^^^^^
-1245 |             logger.debug(f"Failed to find LM Studio installation: {e}")
-1246 |             return
+1232 |                 print("", file=sys.stdout)
+1233 |
+1234 |             except Exception as e:
+     |                    ^^^^^^^^^
+1235 |                 # Use stderr for error messages
+1236 |                 print(f"\nStreaming inference failed: {e}", file=sys.stderr)
      |
 
-W293 [*] Blank line contains whitespace
-    --> src/lmstrix/api/main.py:1278:1
+BLE001 Do not catch blind exception: `Exception`
+    --> src/lmstrix/api/main.py:1420:16
      |
-1276 |                     f"[blue]Flash attention enabled for {gguf_count} GGUF models[/blue]",
-1277 |                 )
-1278 |         
-     | ^^^^^^^^
-1279 |         # Report the limit mode used
-1280 |         if is_percentage:
+1418 |         try:
+1419 |             lms_path = get_lmstudio_path()
+1420 |         except Exception as e:
+     |                ^^^^^^^^^
+1421 |             logger.debug(f"Failed to find LM Studio installation: {e}")
+1422 |             return
      |
-help: Remove whitespace from blank line
 
 ERA001 Found commented-out code
  --> src/lmstrix/core/concrete_config.py:3:1
@@ -911,53 +664,6 @@ ERA001 Found commented-out code
   |
 help: Remove commented-out code
 
-W291 [*] Trailing whitespace
-  --> src/lmstrix/core/concrete_config.py:71:14
-   |
-70 |     def save_model_config(
-71 |         self, 
-   |              ^
-72 |         model: Model, 
-73 |         enable_flash: bool = False,
-   |
-help: Remove trailing whitespace
-
-W291 [*] Trailing whitespace
-  --> src/lmstrix/core/concrete_config.py:72:22
-   |
-70 |     def save_model_config(
-71 |         self, 
-72 |         model: Model, 
-   |                      ^
-73 |         enable_flash: bool = False,
-74 |         limit_value: int = 100,
-   |
-help: Remove trailing whitespace
-
-W293 [*] Blank line contains whitespace
-   --> src/lmstrix/core/concrete_config.py:116:1
-    |
-114 |         # Calculate the context value to save based on limit mode
-115 |         tested_context = model.tested_max_context
-116 |         
-    | ^^^^^^^^
-117 |         if is_percentage:
-118 |             # Percentage mode: apply percentage with threshold
-    |
-help: Remove whitespace from blank line
-
-W293 [*] Blank line contains whitespace
-   --> src/lmstrix/core/concrete_config.py:139:1
-    |
-137 |                     f"Using absolute limit for {model.id}: {tested_context} -> {context_to_save}"
-138 |                 )
-139 |         
-    | ^^^^^^^^
-140 |         # Update context length
-141 |         self._update_field(
-    |
-help: Remove whitespace from blank line
-
 TRY300 Consider moving this statement to an `else` block
    --> src/lmstrix/core/concrete_config.py:162:13
     |
@@ -969,144 +675,173 @@ TRY300 Consider moving this statement to an `else` block
 164 |             logger.error(f"Failed to save concrete config {config_path}: {e}")
     |
 
-W291 [*] Trailing whitespace
-   --> src/lmstrix/core/concrete_config.py:168:14
-    |
-167 |     def save_all_configs(
-168 |         self, 
-    |              ^
-169 |         models: list[Model], 
-170 |         enable_flash: bool = False,
-    |
-help: Remove trailing whitespace
-
-W291 [*] Trailing whitespace
-   --> src/lmstrix/core/concrete_config.py:169:29
-    |
-167 |     def save_all_configs(
-168 |         self, 
-169 |         models: list[Model], 
-    |                             ^
-170 |         enable_flash: bool = False,
-171 |         limit_value: int = 100,
-    |
-help: Remove trailing whitespace
-
 BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/core/context_tester.py:144:16
+   --> src/lmstrix/core/context_tester.py:152:16
     |
-142 |                 error=None if success else response,
-143 |             )
-144 |         except Exception as e:
+150 |                 tps=tps,
+151 |             )
+152 |         except Exception as e:
     |                ^^^^^^^^^
-145 |             return ContextTestResult(
-146 |                 context_size=context_size,
+153 |             return ContextTestResult(
+154 |                 context_size=context_size,
     |
 
 ANN001 Missing type annotation for function argument `model`
-   --> src/lmstrix/core/context_tester.py:158:35
+   --> src/lmstrix/core/context_tester.py:166:35
     |
-156 |             )
-157 |
-158 |     def _is_embedding_model(self, model) -> bool:
+164 |             )
+165 |
+166 |     def _is_embedding_model(self, model) -> bool:
     |                                   ^^^^^
-159 |         """Check if a model is an embedding model.
+167 |         """Check if a model is an embedding model.
+    |
+
+ERA001 Found commented-out code
+ --> src/lmstrix/core/describer.py:1:1
+  |
+1 | # this_file: src/lmstrix/core/describer.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2 | """Model describer: uses LLM to generate model descriptions and keyword tags."""
+  |
+help: Remove commented-out code
+
+S603 `subprocess` call: check for execution of untrusted input
+   --> src/lmstrix/core/describer.py:173:18
+    |
+172 |     try:
+173 |         result = subprocess.run(
+    |                  ^^^^^^^^^^^^^^
+174 |             ["droid", "exec", prompt],
+175 |             capture_output=True,
+    |
+
+PLW1510 `subprocess.run` without explicit `check` argument
+   --> src/lmstrix/core/describer.py:173:18
+    |
+172 |     try:
+173 |         result = subprocess.run(
+    |                  ^^^^^^^^^^^^^^
+174 |             ["droid", "exec", prompt],
+175 |             capture_output=True,
+    |
+help: Add explicit `check=False`
+
+S607 Starting a process with a partial executable path
+   --> src/lmstrix/core/describer.py:174:13
+    |
+172 |     try:
+173 |         result = subprocess.run(
+174 |             ["droid", "exec", prompt],
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^
+175 |             capture_output=True,
+176 |             text=True,
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/describer.py:192:12
+    |
+190 |         logger.error("'droid' CLI not found on PATH. Install it or use --model MODEL_ID.")
+191 |         return None
+192 |     except Exception as e:
+    |            ^^^^^^^^^
+193 |         logger.error(f"droid exec failed for {model.id}: {e}")
+194 |         return None
     |
 
 TRY300 Consider moving this statement to an `else` block
-   --> src/lmstrix/core/inference.py:122:13
+   --> src/lmstrix/core/inference.py:134:13
     |
-120 |                 )
-121 |
-122 |             return success, combined_response
-    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-123 |
-124 |         except Exception as e:
+132 |                 best_tps = response_2.tps
+133 |
+134 |             return success, combined_response, best_ttft, best_tps
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+135 |
+136 |         except Exception as e:
     |
 
 BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/core/inference.py:124:16
+   --> src/lmstrix/core/inference.py:136:16
     |
-122 |             return success, combined_response
-123 |
-124 |         except Exception as e:
+134 |             return success, combined_response, best_ttft, best_tps
+135 |
+136 |         except Exception as e:
     |                ^^^^^^^^^
-125 |             return False, str(e)
-126 |         finally:
+137 |             return False, str(e), None, None
+138 |         finally:
     |
 
 BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/core/inference.py:132:24
+   --> src/lmstrix/core/inference.py:144:24
     |
-130 |                     llm.unload()
-131 |                     logger.debug(f"Successfully unloaded model {model_id}")
-132 |                 except Exception as unload_e:
+142 |                     llm.unload()
+143 |                     logger.debug(f"Successfully unloaded model {model_id}")
+144 |                 except Exception as unload_e:
     |                        ^^^^^^^^^
-133 |                     logger.warning(f"Failed to unload model {model_id}: {unload_e}")
+145 |                     logger.warning(f"Failed to unload model {model_id}: {unload_e}")
     |
 
 BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/core/inference.py:234:20
+   --> src/lmstrix/core/inference.py:246:20
     |
-232 |                 lmstudio.unload()
-233 |                 time.sleep(0.5)  # Brief pause after unload
-234 |             except Exception as e:
+244 |                 lmstudio.unload()
+245 |                 time.sleep(0.5)  # Brief pause after unload
+246 |             except Exception as e:
     |                    ^^^^^^^^^
-235 |                 logger.warning(f"Failed to unload existing models: {e}")
+247 |                 logger.warning(f"Failed to unload existing models: {e}")
     |
 
 BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/core/inference.py:339:16
+   --> src/lmstrix/core/inference.py:351:16
     |
-337 |             )
-338 |
-339 |         except Exception as e:
+349 |             )
+350 |
+351 |         except Exception as e:
     |                ^^^^^^^^^
-340 |             error_str = str(e)
-341 |             is_oom_error = any(
+352 |             error_str = str(e)
+353 |             is_oom_error = any(
     |
 
 E722 Do not use bare `except`
-   --> src/lmstrix/core/inference.py:376:29
+   --> src/lmstrix/core/inference.py:388:29
     |
-374 | …                         llm.unload()
-375 | …                         logger.debug("Unloaded previous model instance")
-376 | …                     except:
+386 | …                         llm.unload()
+387 | …                         logger.debug("Unloaded previous model instance")
+388 | …                     except:
     |                       ^^^^^^
-377 | …                         pass
+389 | …                         pass
     |
 
 S110 `try`-`except`-`pass` detected, consider logging the exception
-   --> src/lmstrix/core/inference.py:376:29
+   --> src/lmstrix/core/inference.py:388:29
     |
-374 |                                   llm.unload()
-375 |                                   logger.debug("Unloaded previous model instance")
-376 | /                             except:
-377 | |                                 pass
+386 |                                   llm.unload()
+387 |                                   logger.debug("Unloaded previous model instance")
+388 | /                             except:
+389 | |                                 pass
     | |____________________________________^
-378 |
-379 |                           llm = self.client.load_model_by_id(model.id, context_len=working_context)
+390 |
+391 |                           llm = self.client.load_model_by_id(model.id, context_len=working_context)
     |
 
 BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/core/inference.py:401:28
+   --> src/lmstrix/core/inference.py:413:28
     |
-399 |                         )
-400 |
-401 |                     except Exception as retry_e:
+411 |                         )
+412 |
+413 |                     except Exception as retry_e:
     |                            ^^^^^^^^^
-402 |                         logger.error(f"Even with reduced context, inference failed: {retry_e}")
-403 |                         error_str = str(retry_e)
+414 |                         logger.error(f"Even with reduced context, inference failed: {retry_e}")
+415 |                         error_str = str(retry_e)
     |
 
 BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/core/inference.py:484:20
+   --> src/lmstrix/core/inference.py:496:20
     |
-482 |                 lmstudio.unload()
-483 |                 time.sleep(0.5)  # Brief pause after unload
-484 |             except Exception as e:
+494 |                 lmstudio.unload()
+495 |                 time.sleep(0.5)  # Brief pause after unload
+496 |             except Exception as e:
     |                    ^^^^^^^^^
-485 |                 logger.warning(f"Failed to unload existing models: {e}")
+497 |                 logger.warning(f"Failed to unload existing models: {e}")
     |
 
 ERA001 Found commented-out code
@@ -1226,38 +961,38 @@ ERA001 Found commented-out code
 help: Remove commented-out code
 
 SIM102 Use a single `if` statement instead of nested `if` statements
-   --> src/lmstrix/core/models.py:142:9
+   --> src/lmstrix/core/models.py:158:9
     |
-140 |           # and they may not be directly accessible as filesystem paths
-141 |           # Only check path existence for obvious test paths
-142 | /         if str(model_path).startswith("/path/to/"):
-143 | |             # This is a test path, check if it exists
-144 | |             if not model_path.exists():
+156 |           # and they may not be directly accessible as filesystem paths
+157 |           # Only check path existence for obvious test paths
+158 | /         if str(model_path).startswith("/path/to/"):
+159 | |             # This is a test path, check if it exists
+160 | |             if not model_path.exists():
     | |_______________________________________^
-145 |                   logger.warning(f"Test model path does not exist: {self.path}")
-146 |                   return False
+161 |                   logger.warning(f"Test model path does not exist: {self.path}")
+162 |                   return False
     |
 help: Combine `if` statements using `and`
 
 BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/core/models.py:220:24
+   --> src/lmstrix/core/models.py:236:24
     |
-218 |                     model = Model(**model_info)
-219 |                     self._models[model_id] = model
-220 |                 except Exception as e:
+234 |                     model = Model(**model_info)
+235 |                     self._models[model_id] = model
+236 |                 except Exception as e:
     |                        ^^^^^^^^^
-221 |                     logger.warning(f"Failed to load model {model_id}: {e}")
-222 |                     continue
+237 |                     logger.warning(f"Failed to load model {model_id}: {e}")
+238 |                     continue
     |
 
 BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/core/models.py:226:16
+   --> src/lmstrix/core/models.py:242:16
     |
-224 |         except json.JSONDecodeError as e:
-225 |             logger.error(f"Failed to parse models file: {e}")
-226 |         except Exception as e:
+240 |         except json.JSONDecodeError as e:
+241 |             logger.error(f"Failed to parse models file: {e}")
+242 |         except Exception as e:
     |                ^^^^^^^^^
-227 |             logger.error(f"Failed to load models: {e}")
+243 |             logger.error(f"Failed to load models: {e}")
     |
 
 TRY300 Consider moving this statement to an `else` block
@@ -1272,25 +1007,25 @@ TRY300 Consider moving this statement to an `else` block
     |
 
 TRY300 Consider moving this statement to an `else` block
-   --> src/lmstrix/loaders/model_loader.py:186:9
+   --> src/lmstrix/loaders/model_loader.py:187:9
     |
-184 |             return None
-185 |
-186 |         return new_model
+185 |             return None
+186 |
+187 |         return new_model
     |         ^^^^^^^^^^^^^^^^
-187 |
-188 |     except (KeyError, ValueError, TypeError, ModelRegistryError) as e:
+188 |
+189 |     except (KeyError, ValueError, TypeError, ModelRegistryError) as e:
     |
 
 TRY300 Consider moving this statement to an `else` block
-   --> src/lmstrix/loaders/model_loader.py:361:9
+   --> src/lmstrix/loaders/model_loader.py:362:9
     |
-359 |         registry.update_model(str(model.path), model)
-360 |         logger.info(f"Successfully reset test data for {model.id}")
-361 |         return True
+360 |         registry.update_model(str(model.path), model)
+361 |         logger.info(f"Successfully reset test data for {model.id}")
+362 |         return True
     |         ^^^^^^^^^^^
-362 |
-363 |     except (ModelRegistryError, ValueError) as e:
+363 |
+364 |     except (ModelRegistryError, ValueError) as e:
     |
 
 TRY300 Consider moving this statement to an `else` block
@@ -1349,38 +1084,6 @@ BLE001 Do not catch blind exception: `Exception`
    |                ^^^^^^^^^
 36 |             logger.warning(f"Failed to save state: {e}")
    |
-
-W293 Blank line contains whitespace
- --> test_limit_threshold.py:6:1
-  |
-4 | def calculate_context_to_save(tested_context: int, limit: int = 100, threshold: int = 0) -> int:
-5 |     """Calculate the context value to save based on limit and threshold.
-6 |     
-  | ^^^^
-7 |     This mimics the logic in ConcreteConfigManager.save_model_config
-8 |     """
-  |
-help: Remove whitespace from blank line
-
-W293 [*] Blank line contains whitespace
-  --> test_limit_threshold.py:20:1
-   |
-18 |         else:
-19 |             print(f"Using 100% of context: {tested_context}")
-20 |     
-   | ^^^^
-21 |     return context_to_save
-   |
-help: Remove whitespace from blank line
-
-W292 [*] No newline at end of file
-  --> test_limit_threshold.py:45:61
-   |
-44 | print("Test Case 6: Default behavior - limit=100, threshold=0")
-45 | print(f"Result: {calculate_context_to_save(65536, 100, 0)}")
-   |                                                             ^
-   |
-help: Add trailing newline
 
 ERA001 Found commented-out code
  --> test_model_out_ctx.py:5:1
@@ -1456,5 +1159,4 @@ BLE001 Do not catch blind exception: `Exception`
 48 |         print(f"Error during streaming: {e}")
    |
 
-Found 130 errors.
-[*] 32 fixable with the `--fix` option (7 hidden fixes can be enabled with the `--unsafe-fixes` option).
+Found 105 errors.
