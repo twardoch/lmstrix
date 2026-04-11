@@ -1,7 +1,5 @@
 """Main API service layer. Hooks up the CLI commands to the underlying core logic."""
 
-import json
-import sys
 import time
 from datetime import datetime
 from pathlib import Path
@@ -19,7 +17,7 @@ from lmstrix.api.helptext import show_help_command
 from lmstrix.api.infer import run_inference_command
 from lmstrix.api.listing import list_models_command
 from lmstrix.core.context_tester import ContextTester
-from lmstrix.core.describer import KEYWORD_VOCAB, filter_models_by_keywords
+from lmstrix.core.describer import filter_models_by_keywords
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 from lmstrix.loaders.model_loader import (
     load_model_registry,
@@ -27,7 +25,6 @@ from lmstrix.loaders.model_loader import (
 )
 from lmstrix.utils import get_context_test_log_path, setup_logging
 from lmstrix.utils.logging import logger
-from lmstrix.utils.paths import get_default_models_file
 
 console = Console()
 
@@ -557,6 +554,7 @@ class LMStrixService:
         model_id: str | None = None,
         desc_all: bool = False,
         describer_model_id: str | None = None,
+        search: int = 0,
         reset: bool = False,
         verbose: bool = False,
     ) -> None:
@@ -564,6 +562,7 @@ class LMStrixService:
             model_id=model_id,
             desc_all=desc_all,
             describer_model_id=describer_model_id,
+            search=search,
             reset=reset,
             verbose=verbose,
         )

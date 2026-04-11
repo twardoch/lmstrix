@@ -42,8 +42,10 @@ classifiers = [
   "Typing :: Typed",
 ]
 dependencies = [
+  "beautifulsoup4>=4.12",
   "fire>=0.7.0",
   "httpx>=0.24",
+  "openai>=1.0",
   "lmstudio>=1.4.1",
   "loguru>=0.7",
   "pydantic>=2.0",

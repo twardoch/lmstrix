@@ -100,11 +100,17 @@ Respond with ONLY a valid JSON object (no markdown, no explanation):
 {{"id": "...", "description": "...", "keywords": [...]}}
 """
 
+WEB_CONTEXT_ADDENDUM = """
 
-def _build_prompt(model: Model) -> str:
-    """Build the description prompt from model metadata."""
+ADDITIONAL WEB RESEARCH about this model (use this to write a more accurate and detailed description):
+{web_content}
+"""
+
+
+def _build_prompt(model: Model, web_content: str | None = None) -> str:
+    """Build the description prompt from model metadata, optionally with web research."""
     size_gb = model.size / (1024**3) if model.size else 0.0
-    return DESCRIBE_PROMPT_TEMPLATE.format(
+    prompt = DESCRIBE_PROMPT_TEMPLATE.format(
         model_path=model.path,
         model_id=model.id,
         size_gb=size_gb,
@@ -112,6 +118,9 @@ def _build_prompt(model: Model) -> str:
         has_tools=model.has_tools,
         ctx_in=model.context_limit,
     )
+    if web_content:
+        prompt += WEB_CONTEXT_ADDENDUM.format(web_content=web_content)
+    return prompt
 
 
 def _parse_response(response_text: str) -> dict | None:
@@ -156,9 +165,19 @@ def _has_description(model: Model) -> bool:
     return not desc.strip().startswith("[")
 
 
+def _get_web_content(model: Model, search: int) -> str | None:
+    """Fetch web research content for a model if search is enabled."""
+    if not search:
+        return None
+    from lmstrix.core.web_search import search_model_info
+
+    return search_model_info(model.id, search)
+
+
 def describe_single_model_droid(
     model: Model,
     *,
+    search: int = 0,
     verbose: bool = False,
 ) -> dict | None:
     """Use droid exec (subprocess) to generate description and keywords for a model.
@@ -166,7 +185,8 @@ def describe_single_model_droid(
     Fallback method when no LLM model ID is specified. Requires 'droid' CLI on PATH.
     Returns dict with id, description, keywords on success, None on failure.
     """
-    prompt = _build_prompt(model)
+    web_content = _get_web_content(model, search)
+    prompt = _build_prompt(model, web_content=web_content)
     logger.debug(f"Describing model {model.id} via droid exec")
 
     try:
@@ -212,13 +232,15 @@ def describe_single_model(
     inference_mgr: InferenceManager,
     describer_model_id: str,
     *,
+    search: int = 0,
     verbose: bool = False,
 ) -> dict | None:
     """Use LLM via InferenceManager to generate description and keywords for a model.
 
     Returns dict with id, description, keywords on success, None on failure.
     """
-    prompt = _build_prompt(model)
+    web_content = _get_web_content(model, search)
+    prompt = _build_prompt(model, web_content=web_content)
     logger.debug(f"Describing model {model.id} using {describer_model_id}")
 
     result = inference_mgr.infer(
@@ -252,6 +274,7 @@ def describe_models(
     describer_model_id: str | None = None,
     *,
     model_id: str | None = None,
+    search: int = 0,
     reset: bool = False,
     verbose: bool = False,
 ) -> int:
@@ -259,6 +282,7 @@ def describe_models(
 
     When describer_model_id is provided, uses InferenceManager to call that LLM.
     When describer_model_id is None, falls back to 'droid exec' subprocess.
+    search: 0=disabled, 1=web-search, 2=ddg-search via Poe API.
     """
     console = Console()
     use_droid = describer_model_id is None
@@ -302,7 +326,7 @@ def describe_models(
             progress.update(task, description=f"Describing {model.id}...")
 
             if use_droid:
-                result = describe_single_model_droid(model, verbose=verbose)
+                result = describe_single_model_droid(model, search=search, verbose=verbose)
             else:
                 assert inference_mgr is not None
                 assert describer_model_id is not None
@@ -310,6 +334,7 @@ def describe_models(
                     model,
                     inference_mgr,
                     describer_model_id,
+                    search=search,
                     verbose=verbose,
                 )
 

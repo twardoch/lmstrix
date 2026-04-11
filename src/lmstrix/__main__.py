@@ -173,6 +173,7 @@ class LMStrixCLI:
         model_id: str | None = None,
         all: bool = False,
         model: str | None = None,
+        search: int = 0,
         reset: bool = False,
         verbose: bool = False,
     ) -> None:
@@ -184,6 +185,9 @@ class LMStrixCLI:
             model_id: Describe only this specific model.
             all: Describe all models (skip already-described unless --reset).
             model: LLM model for descriptions (optional, falls back to droid exec).
+            search: Web search for model info before describing.
+                0 = disabled (default), 1 = web-search, 2 = ddg-search.
+                Requires POE_API_KEY env var.
             reset: Re-describe models that already have descriptions.
             verbose: Enable verbose output.
         """
@@ -191,6 +195,7 @@ class LMStrixCLI:
             model_id=model_id,
             desc_all=all,
             describer_model_id=model,
+            search=search,
             reset=reset,
             verbose=verbose,
         )

@@ -13,6 +13,7 @@ def describe_models_command(
     model_id: str | None = None,
     desc_all: bool = False,
     describer_model_id: str | None = None,
+    search: int = 0,
     reset: bool = False,
     verbose: bool = False,
 ) -> None:
@@ -28,11 +29,15 @@ def describe_models_command(
 
     method = describer_model_id or "droid exec"
     console.print(f"[bold]Using [cyan]{method}[/cyan] for descriptions.[/bold]")
+    if search:
+        search_label = {1: "web-search", 2: "ddg-search"}.get(search, f"search-{search}")
+        console.print(f"[bold]Web search enabled: [cyan]{search_label}[/cyan][/bold]")
 
     count = run_describe_models(
         registry=registry,
         describer_model_id=describer_model_id,
         model_id=model_id,
+        search=search,
         reset=reset,
         verbose=verbose,
     )
