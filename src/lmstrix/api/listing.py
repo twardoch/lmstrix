@@ -78,10 +78,7 @@ def list_models_command(
         sorted_models = sorted(models, key=lambda m: m.id)
 
     if show:
-        if show == "id":
-            for model in sorted_models:
-                print(model.id)
-        elif show == "path":
+        if show in {"id", "path"}:
             for model in sorted_models:
                 print(model.id)
         elif show == "json":

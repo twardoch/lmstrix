@@ -1,1 +1,4 @@
+Creating environment: lint
+Checking dependencies
+Syncing dependencies
 cmd [1] | ruff check .

@@ -1,59 +1,5 @@
 Running linter and formatter...
 ERA001 Found commented-out code
- --> _keep_this/vline/benchread.py:5:1
-  |
-3 | # dependencies = ["orjson", "rich", "fire"]
-4 | # ///
-5 | # this_file: benchread.py
-  | ^^^^^^^^^^^^^^^^^^^^^^^^^
-6 |
-7 | """
-  |
-help: Remove commented-out code
-
-BLE001 Do not catch blind exception: `Exception`
-  --> _keep_this/vline/benchread.py:23:8
-   |
-21 | try:
-22 |     import orjson as json
-23 | except Exception:  # pragma: no cover - tiny fallback
-   |        ^^^^^^^^^
-24 |     import json  # type: ignore[misc]
-   |
-
-BLE001 Do not catch blind exception: `Exception`
-  --> _keep_this/vline/benchread.py:68:12
-   |
-66 |             return float(s[:-1].strip())
-67 |         return float(s)
-68 |     except Exception:
-   |            ^^^^^^^^^
-69 |         return None
-   |
-
-BLE001 Do not catch blind exception: `Exception`
-  --> _keep_this/vline/benchread.py:96:20
-   |
-94 |             try:
-95 |                 yield json.loads(line)
-96 |             except Exception as e:  # pragma: no cover
-   |                    ^^^^^^^^^
-97 |                 console.print(f"[yellow]Skipping invalid JSON on line {i}: {e}")
-   |
-
-ERA001 Found commented-out code
- --> _keep_this/vline/vexylines.py:7:1
-  |
-5 | """Vexy Lines: A tool for benchmarking prompts against LM-Studio models."""
-6 |
-7 | # this_file: vexylines.py
-  | ^^^^^^^^^^^^^^^^^^^^^^^^^
-8 |
-9 | import json
-  |
-help: Remove commented-out code
-
-ERA001 Found commented-out code
  --> debug_inference.py:6:1
   |
 4 | Focuses on slim-extract-qwen-0.5b model to identify inference issues.
@@ -469,6 +415,16 @@ PTH123 `open()` should be replaced by `Path.open()`
    |
 help: Replace with `Path.open()`
 
+ERA001 Found commented-out code
+ --> src/lmstrix/api/about.py:1:1
+  |
+1 | # this_file: src/lmstrix/api/about.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2 |
+3 | from rich.console import Console
+  |
+help: Remove commented-out code
+
 BLE001 Do not catch blind exception: `Exception`
    --> src/lmstrix/api/client.py:129:20
     |
@@ -524,133 +480,194 @@ ARG002 Unused method argument: `kwargs`
 402 |         """Stream a completion request to a loaded LM Studio model."""
     |
 
-BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/api/main.py:568:20
-    |
-566 |             try:
-567 |                 registry = scan_and_update_registry(verbose=verbose)
-568 |             except Exception:
-    |                    ^^^^^^^^^
-569 |                 # Fall back to cached registry when LM Studio is unreachable
-570 |                 registry = load_model_registry(verbose=verbose)
-    |
-
-ARG002 Unused method argument: `sort`
-   --> src/lmstrix/api/main.py:750:9
-    |
-748 |         threshold: int = 31744,
-749 |         ctx: int | None = None,
-750 |         sort: str = "id",
-    |         ^^^^
-751 |         fast: bool = False,
-752 |         verbose: bool = False,
-    |
-
-BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/api/main.py:830:20
-    |
-828 |                         else f"Prompt: {custom_prompt}"
-829 |                     )
-830 |             except Exception as e:
-    |                    ^^^^^^^^^
-831 |                 logger.error(f"Error reading prompt file: {e}")
-832 |                 return
-    |
-
-BLE001 Do not catch blind exception: `Exception`
-    --> src/lmstrix/api/main.py:1008:24
-     |
-1006 |                         return
-1007 |                     text_content = text_path.read_text(encoding="utf-8")
-1008 |                 except Exception as e:
-     |                        ^^^^^^^^^
-1009 |                     logger.debug(f"Error reading text file: {e}")
-1010 |                     return
-     |
-
-SIM108 Use ternary operator `pairs = dict_params.split(",") if "," in dict_params else dict_params.split(",")` instead of `if`-`else`-block
-    --> src/lmstrix/api/main.py:1022:17
-     |
-1020 |               if dict_params:
-1021 |                   # Support both comma-separated and space-separated formats
-1022 | /                 if "," in dict_params:
-1023 | |                     # Format: "key1=value1,key2=value2"
-1024 | |                     pairs = dict_params.split(",")
-1025 | |                 else:
-1026 | |                     # Format: "key1=value1 key2=value2" (fire might split this)
-1027 | |                     # For now, assume comma-separated
-1028 | |                     pairs = dict_params.split(",")
-     | |__________________________________________________^
-1029 |
-1030 |                   for pair in pairs:
-     |
-help: Replace `if`-`else`-block with `pairs = dict_params.split(",") if "," in dict_params else dict_params.split(",")`
-
 ERA001 Found commented-out code
-    --> src/lmstrix/api/main.py:1023:21
-     |
-1021 |                 # Support both comma-separated and space-separated formats
-1022 |                 if "," in dict_params:
-1023 |                     # Format: "key1=value1,key2=value2"
-     |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-1024 |                     pairs = dict_params.split(",")
-1025 |                 else:
-     |
+ --> src/lmstrix/api/configs.py:1:1
+  |
+1 | # this_file: src/lmstrix/api/configs.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2 |
+3 | from rich.console import Console
+  |
 help: Remove commented-out code
 
+BLE001 Do not catch blind exception: `Exception`
+  --> src/lmstrix/api/configs.py:59:12
+   |
+57 |     try:
+58 |         lms_path = get_lmstudio_path()
+59 |     except Exception as e:
+   |            ^^^^^^^^^
+60 |         logger.debug(f"Failed to find LM Studio installation: {e}")
+61 |         return
+   |
+
+ERA001 Found commented-out code
+ --> src/lmstrix/api/describe.py:1:1
+  |
+1 | # this_file: src/lmstrix/api/describe.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2 |
+3 | from rich.console import Console
+  |
+help: Remove commented-out code
+
+ERA001 Found commented-out code
+ --> src/lmstrix/api/health.py:1:1
+  |
+1 | # this_file: src/lmstrix/api/health.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2 |
+3 | import json
+  |
+help: Remove commented-out code
+
+ERA001 Found commented-out code
+ --> src/lmstrix/api/helptext.py:1:1
+  |
+1 | # this_file: src/lmstrix/api/helptext.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2 |
+3 | from rich.console import Console
+  |
+help: Remove commented-out code
+
+ERA001 Found commented-out code
+ --> src/lmstrix/api/infer.py:1:1
+  |
+1 | # this_file: src/lmstrix/api/infer.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2 |
+3 | import sys
+  |
+help: Remove commented-out code
+
+BLE001 Do not catch blind exception: `Exception`
+  --> src/lmstrix/api/infer.py:51:20
+   |
+49 |                     return
+50 |                 text_content = text_path.read_text(encoding="utf-8")
+51 |             except Exception as e:
+   |                    ^^^^^^^^^
+52 |                 logger.debug(f"Error reading text file: {e}")
+53 |                 return
+   |
+
+SIM108 Use ternary operator `pairs = dict_params.split(",") if "," in dict_params else dict_params.split(",")` instead of `if`-`else`-block
+  --> src/lmstrix/api/infer.py:61:13
+   |
+59 |           prompt_params = {}
+60 |           if dict_params:
+61 | /             if "," in dict_params:
+62 | |                 pairs = dict_params.split(",")
+63 | |             else:
+64 | |                 pairs = dict_params.split(",")
+   | |______________________________________________^
+65 |
+66 |               for pair in pairs:
+   |
+help: Replace `if`-`else`-block with `pairs = dict_params.split(",") if "," in dict_params else dict_params.split(",")`
+
 PLW2901 `for` loop variable `pair` overwritten by assignment target
-    --> src/lmstrix/api/main.py:1031:21
-     |
-1030 |                 for pair in pairs:
-1031 |                     pair = pair.strip()
-     |                     ^^^^
-1032 |                     if "=" in pair:
-1033 |                         key, value = pair.split("=", 1)
-     |
+  --> src/lmstrix/api/infer.py:67:17
+   |
+66 |             for pair in pairs:
+67 |                 pair = pair.strip()
+   |                 ^^^^
+68 |                 if "=" in pair:
+69 |                     key, value = pair.split("=", 1)
+   |
 
 BLE001 Do not catch blind exception: `Exception`
-    --> src/lmstrix/api/main.py:1048:24
-     |
-1046 |                         return
-1047 |                     prompt_params["text"] = text_path.read_text(encoding="utf-8")
-1048 |                 except Exception as e:
-     |                        ^^^^^^^^^
-1049 |                     logger.debug(f"Error reading text file: {e}")
-1050 |                     return
-     |
+  --> src/lmstrix/api/infer.py:83:20
+   |
+81 |                     return
+82 |                 prompt_params["text"] = text_path.read_text(encoding="utf-8")
+83 |             except Exception as e:
+   |                    ^^^^^^^^^
+84 |                 logger.debug(f"Error reading text file: {e}")
+85 |                 return
+   |
 
 BLE001 Do not catch blind exception: `Exception`
-    --> src/lmstrix/api/main.py:1131:20
-     |
-1129 |                             )
-1130 |
-1131 |             except Exception as e:
-     |                    ^^^^^^^^^
-1132 |                 logger.debug(f"Error loading prompt from file: {e}")
-1133 |                 return
-     |
+   --> src/lmstrix/api/infer.py:157:16
+    |
+155 |                         )
+156 |
+157 |         except Exception as e:
+    |                ^^^^^^^^^
+158 |             logger.debug(f"Error loading prompt from file: {e}")
+159 |             return
+    |
 
 BLE001 Do not catch blind exception: `Exception`
-    --> src/lmstrix/api/main.py:1234:20
-     |
-1232 |                 print("", file=sys.stdout)
-1233 |
-1234 |             except Exception as e:
-     |                    ^^^^^^^^^
-1235 |                 # Use stderr for error messages
-1236 |                 print(f"\nStreaming inference failed: {e}", file=sys.stderr)
-     |
+   --> src/lmstrix/api/infer.py:241:16
+    |
+239 |             print("", file=sys.stdout)
+240 |
+241 |         except Exception as e:
+    |                ^^^^^^^^^
+242 |             print(f"\nStreaming inference failed: {e}", file=sys.stderr)
+243 |     else:
+    |
+
+ERA001 Found commented-out code
+ --> src/lmstrix/api/listing.py:1:1
+  |
+1 | # this_file: src/lmstrix/api/listing.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2 |
+3 | import json
+  |
+help: Remove commented-out code
 
 BLE001 Do not catch blind exception: `Exception`
-    --> src/lmstrix/api/main.py:1420:16
-     |
-1418 |         try:
-1419 |             lms_path = get_lmstudio_path()
-1420 |         except Exception as e:
-     |                ^^^^^^^^^
-1421 |             logger.debug(f"Failed to find LM Studio installation: {e}")
-1422 |             return
-     |
+  --> src/lmstrix/api/listing.py:33:16
+   |
+31 |         try:
+32 |             registry = scan_and_update_registry(verbose=verbose)
+33 |         except Exception:
+   |                ^^^^^^^^^
+34 |             registry = load_model_registry(verbose=verbose)
+35 |     models = registry.list_models()
+   |
+
+SIM114 [*] Combine `if` branches using logical `or` operator
+  --> src/lmstrix/api/listing.py:81:9
+   |
+80 |       if show:
+81 | /         if show == "id":
+82 | |             for model in sorted_models:
+83 | |                 print(model.id)
+84 | |         elif show == "path":
+85 | |             for model in sorted_models:
+86 | |                 print(model.id)
+   | |_______________________________^
+87 |           elif show == "json":
+88 |               print(json.dumps([model.to_dict() for model in sorted_models], indent=2))
+   |
+help: Combine `if` branches
+
+ARG002 Unused method argument: `sort`
+   --> src/lmstrix/api/main.py:577:9
+    |
+575 |         threshold: int = 31744,
+576 |         ctx: int | None = None,
+577 |         sort: str = "id",
+    |         ^^^^
+578 |         fast: bool = False,
+579 |         verbose: bool = False,
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/api/main.py:657:20
+    |
+655 |                         else f"Prompt: {custom_prompt}"
+656 |                     )
+657 |             except Exception as e:
+    |                    ^^^^^^^^^
+658 |                 logger.error(f"Error reading prompt file: {e}")
+659 |                 return
+    |
 
 ERA001 Found commented-out code
  --> src/lmstrix/core/concrete_config.py:3:1
@@ -676,24 +693,24 @@ TRY300 Consider moving this statement to an `else` block
     |
 
 BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/core/context_tester.py:152:16
+   --> src/lmstrix/core/context_tester.py:163:16
     |
-150 |                 tps=tps,
-151 |             )
-152 |         except Exception as e:
+161 |                 tps=tps,
+162 |             )
+163 |         except Exception as e:
     |                ^^^^^^^^^
-153 |             return ContextTestResult(
-154 |                 context_size=context_size,
+164 |             return ContextTestResult(
+165 |                 context_size=context_size,
     |
 
 ANN001 Missing type annotation for function argument `model`
-   --> src/lmstrix/core/context_tester.py:166:35
+   --> src/lmstrix/core/context_tester.py:177:35
     |
-164 |             )
-165 |
-166 |     def _is_embedding_model(self, model) -> bool:
+175 |             )
+176 |
+177 |     def _is_embedding_model(self, model) -> bool:
     |                                   ^^^^^
-167 |         """Check if a model is an embedding model.
+178 |         """Check if a model is an embedding model.
     |
 
 ERA001 Found commented-out code
@@ -705,47 +722,58 @@ ERA001 Found commented-out code
   |
 help: Remove commented-out code
 
-S603 `subprocess` call: check for execution of untrusted input
-   --> src/lmstrix/core/describer.py:173:18
+PLC0415 `import` should be at the top-level of a file
+   --> src/lmstrix/core/describer.py:172:5
     |
-172 |     try:
-173 |         result = subprocess.run(
+170 |     if not search:
+171 |         return None
+172 |     from lmstrix.core.web_search import search_model_info
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+173 |
+174 |     return search_model_info(model.id, search)
+    |
+
+S603 `subprocess` call: check for execution of untrusted input
+   --> src/lmstrix/core/describer.py:193:18
+    |
+192 |     try:
+193 |         result = subprocess.run(
     |                  ^^^^^^^^^^^^^^
-174 |             ["droid", "exec", prompt],
-175 |             capture_output=True,
+194 |             ["droid", "exec", prompt],
+195 |             capture_output=True,
     |
 
 PLW1510 `subprocess.run` without explicit `check` argument
-   --> src/lmstrix/core/describer.py:173:18
+   --> src/lmstrix/core/describer.py:193:18
     |
-172 |     try:
-173 |         result = subprocess.run(
+192 |     try:
+193 |         result = subprocess.run(
     |                  ^^^^^^^^^^^^^^
-174 |             ["droid", "exec", prompt],
-175 |             capture_output=True,
+194 |             ["droid", "exec", prompt],
+195 |             capture_output=True,
     |
 help: Add explicit `check=False`
 
 S607 Starting a process with a partial executable path
-   --> src/lmstrix/core/describer.py:174:13
+   --> src/lmstrix/core/describer.py:194:13
     |
-172 |     try:
-173 |         result = subprocess.run(
-174 |             ["droid", "exec", prompt],
+192 |     try:
+193 |         result = subprocess.run(
+194 |             ["droid", "exec", prompt],
     |             ^^^^^^^^^^^^^^^^^^^^^^^^^
-175 |             capture_output=True,
-176 |             text=True,
+195 |             capture_output=True,
+196 |             text=True,
     |
 
 BLE001 Do not catch blind exception: `Exception`
-   --> src/lmstrix/core/describer.py:192:12
+   --> src/lmstrix/core/describer.py:212:12
     |
-190 |         logger.error("'droid' CLI not found on PATH. Install it or use --model MODEL_ID.")
-191 |         return None
-192 |     except Exception as e:
+210 |         logger.error("'droid' CLI not found on PATH. Install it or use --model MODEL_ID.")
+211 |         return None
+212 |     except Exception as e:
     |            ^^^^^^^^^
-193 |         logger.error(f"droid exec failed for {model.id}: {e}")
-194 |         return None
+213 |         logger.error(f"droid exec failed for {model.id}: {e}")
+214 |         return None
     |
 
 TRY300 Consider moving this statement to an `else` block
@@ -995,6 +1023,148 @@ BLE001 Do not catch blind exception: `Exception`
 243 |             logger.error(f"Failed to load models: {e}")
     |
 
+ERA001 Found commented-out code
+ --> src/lmstrix/core/web_search.py:1:1
+  |
+1 | # this_file: src/lmstrix/core/web_search.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2 | """Web search via Poe API: search for model info and fetch page content."""
+  |
+help: Remove commented-out code
+
+PLC0415 `import` should be at the top-level of a file
+  --> src/lmstrix/core/web_search.py:52:9
+   |
+50 |     """Convert HTML to plain text using stdlib parser."""
+51 |     try:
+52 |         from bs4 import BeautifulSoup
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+53 |
+54 |         soup = BeautifulSoup(html, "html.parser")
+   |
+
+BLE001 Do not catch blind exception: `Exception`
+  --> src/lmstrix/core/web_search.py:58:12
+   |
+56 |             tag.decompose()
+57 |         text = soup.get_text(separator=" ", strip=True)
+58 |     except Exception:
+   |            ^^^^^^^^^
+59 |         parser = _HTMLTextExtractor()
+60 |         try:
+   |
+
+BLE001 Do not catch blind exception: `Exception`
+  --> src/lmstrix/core/web_search.py:63:16
+   |
+61 |             parser.feed(html)
+62 |             text = parser.get_text()
+63 |         except Exception:
+   |                ^^^^^^^^^
+64 |             text = re.sub(r"<[^>]+>", " ", html)
+65 |     # Collapse whitespace
+   |
+
+PLC0415 `import` should be at the top-level of a file
+  --> src/lmstrix/core/web_search.py:85:9
+   |
+84 |     try:
+85 |         import openai
+   |         ^^^^^^^^^^^^^
+86 |
+87 |         client = openai.OpenAI(
+   |
+
+TRY300 Consider moving this statement to an `else` block
+  --> src/lmstrix/core/web_search.py:97:9
+   |
+95 |         content = response.choices[0].message.content
+96 |         logger.debug(f"Search returned {len(content or '')} chars")
+97 |         return content
+   |         ^^^^^^^^^^^^^^
+98 |     except Exception as e:
+99 |         logger.error(f"Poe search failed: {e}")
+   |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/web_search.py:98:12
+    |
+ 96 |         logger.debug(f"Search returned {len(content or '')} chars")
+ 97 |         return content
+ 98 |     except Exception as e:
+    |            ^^^^^^^^^
+ 99 |         logger.error(f"Poe search failed: {e}")
+100 |         return None
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> src/lmstrix/core/web_search.py:143:12
+    |
+141 |                 text = text[:MAX_PAGE_CHARS] + "..."
+142 |             return text
+143 |     except Exception as e:
+    |            ^^^^^^^^^
+144 |         logger.debug(f"Failed to fetch {url}: {e}")
+145 |         return None
+    |
+
+S602 `subprocess` call with `shell=True` identified, security issue
+  --> src/lmstrix/data/jinja2_templates/hy-mt1.5-test.py:52:14
+   |
+50 | def load_model(model_id: str = MODEL_ID) -> None:
+51 |     command = f"lms unload -a; lms load {model_id}"
+52 |     result = subprocess.run(command, shell=True, text=True, capture_output=True)
+   |              ^^^^^^^^^^^^^^
+53 |     if result.stdout:
+54 |         console.print(Panel(result.stdout.strip(), title="lms stdout", border_style="blue"))
+   |
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> src/lmstrix/data/jinja2_templates/hy-mt1.5-test.py:52:14
+   |
+50 | def load_model(model_id: str = MODEL_ID) -> None:
+51 |     command = f"lms unload -a; lms load {model_id}"
+52 |     result = subprocess.run(command, shell=True, text=True, capture_output=True)
+   |              ^^^^^^^^^^^^^^
+53 |     if result.stdout:
+54 |         console.print(Panel(result.stdout.strip(), title="lms stdout", border_style="blue"))
+   |
+help: Add explicit `check=False`
+
+ERA001 Found commented-out code
+ --> src/lmstrix/data/jinja2_templates/translategemma_test.py:5:1
+  |
+3 | # dependencies = ["httpx", "rich", "fire"]
+4 | # ///
+5 | # this_file: src/lmstrix/data/jinja2_templates/translategemma_test.py
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+6 | """End-to-end test tool for the TranslateGemma LM Studio chat template."""
+  |
+help: Remove commented-out code
+
+S602 `subprocess` call with `shell=True` identified, security issue
+  --> src/lmstrix/data/jinja2_templates/translategemma_test.py:52:14
+   |
+50 | def load_model(model_id: str = MODEL_ID) -> None:
+51 |     command = f"lms unload -a; lms load {model_id}"
+52 |     result = subprocess.run(command, shell=True, text=True, capture_output=True)
+   |              ^^^^^^^^^^^^^^
+53 |     if result.stdout:
+54 |         console.print(Panel(result.stdout.strip(), title="lms stdout", border_style="blue"))
+   |
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> src/lmstrix/data/jinja2_templates/translategemma_test.py:52:14
+   |
+50 | def load_model(model_id: str = MODEL_ID) -> None:
+51 |     command = f"lms unload -a; lms load {model_id}"
+52 |     result = subprocess.run(command, shell=True, text=True, capture_output=True)
+   |              ^^^^^^^^^^^^^^
+53 |     if result.stdout:
+54 |         console.print(Panel(result.stdout.strip(), title="lms stdout", border_style="blue"))
+   |
+help: Add explicit `check=False`
+
 TRY300 Consider moving this statement to an `else` block
    --> src/lmstrix/loaders/model_loader.py:106:9
     |
@@ -1159,4 +1329,5 @@ BLE001 Do not catch blind exception: `Exception`
 48 |         print(f"Error during streaming: {e}")
    |
 
-Found 105 errors.
+Found 121 errors.
+[*] 1 fixable with the `--fix` option (1 hidden fix can be enabled with the `--unsafe-fixes` option).

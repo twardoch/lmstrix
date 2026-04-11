@@ -28,7 +28,9 @@ def show_help_command() -> None:
     console.print("    MODEL_ID          Describe specific model")
     console.print("    --all             Describe all undescribed models")
     console.print("    --model MODEL_ID  LLM to use (default: droid exec)")
-    console.print("    --search 0|1|2    Web search before describing (0=off, 1=web-search, 2=ddg-search)")
+    console.print(
+        "    --search 0|1|2    Web search before describing (0=off, 1=web-search, 2=ddg-search)"
+    )
     console.print("    --reset           Re-describe already described models")
     console.print("    --verbose         Enable verbose output")
     console.print("")

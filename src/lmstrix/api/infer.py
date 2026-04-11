@@ -58,10 +58,7 @@ def run_inference_command(
     elif file_prompt:
         prompt_params = {}
         if dict_params:
-            if "," in dict_params:
-                pairs = dict_params.split(",")
-            else:
-                pairs = dict_params.split(",")
+            pairs = dict_params.split(",") if "," in dict_params else dict_params.split(",")
 
             for pair in pairs:
                 pair = pair.strip()

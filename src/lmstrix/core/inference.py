@@ -20,8 +20,13 @@ class InferenceResult(BaseModel):
     prompt: str = Field(..., description="The input prompt")
     response: str = Field(..., description="The text returned by the model")
     tokens_used: int = Field(0, description="Combined prompt + generation token count")
-    inference_time: float = Field(0.0, description="Total wall-clock time from sending the request to receiving the final token")
-    error: str | None = Field(None, description="What went wrong (e.g., out of memory, model crashed)")
+    inference_time: float = Field(
+        0.0,
+        description="Total wall-clock time from sending the request to receiving the final token",
+    )
+    error: str | None = Field(
+        None, description="What went wrong (e.g., out of memory, model crashed)"
+    )
 
     @property
     def succeeded(self) -> bool:

@@ -15,10 +15,16 @@ class OptimizationResult(BaseModel):
     """The final outcome of a context discovery test."""
 
     model_id: str = Field(..., description="ID of the model")
-    declared_limit: int = Field(..., description="The theoretical maximum context the model claims it supports")
-    optimal_context: int = Field(..., description="The highest context size we actually got to load without crashing")
+    declared_limit: int = Field(
+        ..., description="The theoretical maximum context the model claims it supports"
+    )
+    optimal_context: int = Field(
+        ..., description="The highest context size we actually got to load without crashing"
+    )
     attempts: int = Field(0, description="How many binary search iterations we ran")
-    error: str | None = Field(None, description="What went wrong (e.g., out of memory, server crash)")
+    error: str | None = Field(
+        None, description="What went wrong (e.g., out of memory, server crash)"
+    )
 
     @property
     def succeeded(self) -> bool:
