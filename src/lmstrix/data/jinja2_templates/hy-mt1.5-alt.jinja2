@@ -1,0 +1,90 @@
+{#- HY-MT1.5 Translation Chat Template -#}
+{#- Structured content: {"input": "en", "output": "pl", "text": "...", "vocab": {...}, "context": "..."} -#}
+{#- Plain string content is passed through as-is for backward compatibility -#}
+{%- set lang_zh = {
+    "zh": "中文",
+    "zh-Hant": "繁体中文",
+    "yue": "粤语",
+    "en": "英语",
+    "fr": "法语",
+    "pt": "葡萄牙语",
+    "es": "西班牙语",
+    "ja": "日语",
+    "tr": "土耳其语",
+    "ru": "俄语",
+    "ar": "阿拉伯语",
+    "ko": "韩语",
+    "th": "泰语",
+    "it": "意大利语",
+    "de": "德语",
+    "vi": "越南语",
+    "ms": "马来语",
+    "id": "印尼语",
+    "tl": "菲律宾语",
+    "hi": "印地语",
+    "pl": "波兰语",
+    "cs": "捷克语",
+    "nl": "荷兰语",
+    "km": "高棉语",
+    "my": "缅甸语",
+    "fa": "波斯语",
+    "gu": "古吉拉特语",
+    "ur": "乌尔都语",
+    "te": "泰卢固语",
+    "mr": "马拉地语",
+    "he": "希伯来语",
+    "bn": "孟加拉语",
+    "ta": "泰米尔语",
+    "uk": "乌克兰语",
+    "bo": "藏语",
+    "kk": "哈萨克语",
+    "mn": "蒙古语",
+    "ug": "维吾尔语",
+} -%}
+{%- if messages[0]['role'] == 'system' -%}
+    {%- set loop_messages = messages[1:] -%}
+    {%- set system_message = messages[0]['content'] -%}
+<｜hy_begin▁of▁sentence｜>{{ system_message }}<｜hy_place▁holder▁no▁3｜>
+{%- else -%}
+    {%- set loop_messages = messages -%}
+<｜hy_begin▁of▁sentence｜>
+{%- endif -%}
+{%- for message in loop_messages -%}
+    {%- if message['role'] == 'user' -%}
+        {%- set content = message['content'] -%}
+        {%- if content is string -%}
+<｜hy_User｜>{{ content }}
+        {%- else -%}
+            {%- if content is mapping -%}
+                {%- set p = content -%}
+            {%- else -%}
+                {%- set p = content[0] -%}
+            {%- endif -%}
+            {%- set src = p['input'] | replace("_", "-") -%}
+            {%- set tgt = p['output'] | replace("_", "-") -%}
+            {%- set text = p['text'] | trim -%}
+            {%- set tgt_zh = lang_zh[tgt] if tgt in lang_zh else tgt -%}
+            {%- set has_vocab = 'vocab' in p and p['vocab'] -%}
+            {%- set has_context = 'context' in p and p['context'] -%}
+<｜hy_User｜>
+            {%- if has_context -%}
+                {{- p['context'] | trim + '\n参考上面的信息，把下面的文本翻译成' + tgt_zh + '，注意不需要翻译上文，也不要额外解释：\n' + text -}}
+            {%- elif has_vocab -%}
+                {{- '参考下面的翻译：' -}}
+                {%- for s, t in p['vocab'].items() -%}
+                    {{- '\n' + s + ' 翻译成 ' + t -}}
+                {%- endfor -%}
+                {{- '\n\n将以下文本翻译为' + tgt_zh + '，注意只需要输出翻译后的结果，不要额外解释：\n' + text -}}
+            {%- else -%}
+                {{- '将以下文本翻译为' + tgt_zh + '，注意只需要输出翻译后的结果，不要额外解释：\n\n' + text -}}
+            {%- endif -%}
+        {%- endif -%}
+    {%- elif message['role'] == 'assistant' -%}
+<｜hy_Assistant｜>{{ message['content'] }}<｜hy_place▁holder▁no▁2｜>
+    {%- endif -%}
+{%- endfor -%}
+{%- if add_generation_prompt -%}
+<｜hy_Assistant｜>
+{%- else -%}
+<｜hy_place▁holder▁no▁8｜>
+{%- endif -%}

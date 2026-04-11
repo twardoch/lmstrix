@@ -1,4 +1,4 @@
-"""Adaptive context optimizer for finding optimal context window sizes."""
+"""The core logic for finding a model\'s true context limit using binary search."""
 
 import json
 from pathlib import Path
@@ -12,22 +12,27 @@ from lmstrix.utils.logging import logger
 
 
 class OptimizationResult(BaseModel):
-    """Result from context optimization."""
+    """The final outcome of a context discovery test."""
 
     model_id: str = Field(..., description="ID of the model")
-    declared_limit: int = Field(..., description="Model's declared context limit")
-    optimal_context: int = Field(..., description="Optimal context size found")
-    attempts: int = Field(0, description="Number of attempts made")
-    error: str | None = Field(None, description="Error message if optimization failed")
+    declared_limit: int = Field(..., description="The theoretical maximum context the model claims it supports")
+    optimal_context: int = Field(..., description="The highest context size we actually got to load without crashing")
+    attempts: int = Field(0, description="How many binary search iterations we ran")
+    error: str | None = Field(None, description="What went wrong (e.g., out of memory, server crash)")
 
     @property
     def succeeded(self) -> bool:
-        """Check if optimization was successful."""
+        """Did we successfully find a working context limit?"""
         return self.error is None and self.optimal_context > 0
 
 
 class ContextOptimizer:
-    """Finds the maximum effective context window for models."""
+    """Pushes models to their limits to find how much context your hardware can actually handle.
+
+    Hardware varies. A model might claim an 8k context, but if your GPU only has 8GB of VRAM,
+    you might only be able to run it at 4k. This class uses a binary search to find that
+    exact breaking point.
+    """
 
     def __init__(
         self,

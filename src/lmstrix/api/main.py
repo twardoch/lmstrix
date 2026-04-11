@@ -1,4 +1,4 @@
-"""Main API service layer for LMStrix CLI operations."""
+"""Main API service layer. Hooks up the CLI commands to the underlying core logic."""
 
 import json
 import sys
@@ -10,29 +10,24 @@ from rich.console import Console
 from rich.live import Live
 from rich.table import Table
 
+from lmstrix.api.about import about_command
+from lmstrix.api.configs import save_configs_command
+from lmstrix.api.describe import describe_models_command
 from lmstrix.api.exceptions import APIConnectionError, ModelRegistryError
-from lmstrix.core.concrete_config import ConcreteConfigManager
+from lmstrix.api.health import check_health_command
+from lmstrix.api.helptext import show_help_command
+from lmstrix.api.infer import run_inference_command
+from lmstrix.api.listing import list_models_command
 from lmstrix.core.context_tester import ContextTester
-from lmstrix.core.describer import (
-    describe_models as run_describe_models,
-)
-from lmstrix.core.describer import (
-    filter_models_by_keywords,
-    format_models_markdown,
-    sort_models_by_keywords,
-)
-from lmstrix.core.inference_manager import InferenceManager
+from lmstrix.core.describer import KEYWORD_VOCAB, filter_models_by_keywords
 from lmstrix.core.models import ContextTestStatus, Model, ModelRegistry
 from lmstrix.loaders.model_loader import (
     load_model_registry,
     scan_and_update_registry,
 )
-from lmstrix.loaders.prompt_loader import load_single_prompt
 from lmstrix.utils import get_context_test_log_path, setup_logging
-from lmstrix.utils.context_parser import get_model_max_context, parse_out_ctx
 from lmstrix.utils.logging import logger
-from lmstrix.utils.paths import get_default_models_file, get_lmstudio_path
-from lmstrix.utils.state import StateManager
+from lmstrix.utils.paths import get_default_models_file
 
 console = Console()
 
@@ -549,164 +544,13 @@ class LMStrixService:
         verbose: bool = False,
         _registry: "ModelRegistry | None" = None,
     ) -> None:
-        """List all models from the registry with their test status.
-
-        Always performs a fresh scan so the list matches what LM Studio
-        currently has downloaded.  Stale entries are removed automatically.
-
-        Args:
-            _registry: Pre-scanned registry (internal use by scan_models to
-                avoid a redundant rescan).
-        """
-        setup_logging(verbose=verbose)
-
-        if _registry is not None:
-            registry = _registry
-        else:
-            try:
-                registry = scan_and_update_registry(verbose=verbose)
-            except Exception:
-                # Fall back to cached registry when LM Studio is unreachable
-                registry = load_model_registry(verbose=verbose)
-        models = registry.list_models()
-
-        if not models:
-            logger.debug(
-                "No models found. Run 'lmstrix scan' to discover models.",
-            )
-            return
-
-        if key:
-            keywords = [k.strip() for k in key.split(",") if k.strip()]
-            models = filter_models_by_keywords(models, keywords)
-            if not models:
-                Console().print(f"[yellow]No models match keywords: {', '.join(keywords)}[/yellow]")
-                return
-
-        # Sort models based on the sort parameter
-        sort_key = sort.lower()
-        reverse = sort_key.endswith("d") and len(sort_key) > 1
-
-        if sort_key in (
-            "arch",
-            "archd",
-            "inp",
-            "inpd",
-            "outp",
-            "outpd",
-            "proc",
-            "procd",
-        ):
-            sorted_models = sort_models_by_keywords(models, sort_key)
-        elif sort_key in ("id", "idd"):
-            sorted_models = sorted(models, key=lambda m: m.id, reverse=reverse)
-        elif sort_key in ("ctx", "ctxd"):
-            sorted_models = sorted(
-                models,
-                key=lambda m: m.tested_max_context or 0,
-                reverse=reverse,
-            )
-        elif sort_key in ("dtx", "dtxd"):
-            sorted_models = sorted(
-                models,
-                key=lambda m: m.context_limit,
-                reverse=reverse,
-            )
-        elif sort_key in ("size", "sized"):
-            sorted_models = sorted(models, key=lambda m: m.size, reverse=reverse)
-        elif sort_key in ("smart", "smartd"):
-            # Composite score: tps*2000 + tested + declared + size_in_mb*500
-            sorted_models = sorted(
-                models,
-                key=lambda m: (
-                    (m.tps or 0) * 2000
-                    + (m.tested_max_context or 0)
-                    + m.context_limit
-                    + (m.size / (1024 * 1024)) * 500
-                ),
-                reverse=reverse,
-            )
-        elif sort_key in ("ttft", "ttftd"):
-            sorted_models = sorted(
-                models,
-                key=lambda m: m.ttft_seconds or 0,
-                reverse=reverse,
-            )
-        elif sort_key in ("tps", "tpsd"):
-            sorted_models = sorted(
-                models,
-                key=lambda m: m.tps or 0,
-                reverse=reverse,
-            )
-        else:
-            logger.debug(f"Invalid sort option: {sort}. Using default (id).")
-            sorted_models = sorted(models, key=lambda m: m.id)
-
-        # Handle different show formats
-        if show:
-            if show == "id":
-                # Plain newline-delimited list of model IDs
-                for model in sorted_models:
-                    print(model.id)
-            elif show == "path":
-                # Newline-delimited list of relative paths
-                for model in sorted_models:
-                    # Model.id is already the relative path
-                    print(model.id)
-            elif show == "json":
-                # JSON array of models (matching registry format)
-                models_dict = []
-                for model in sorted_models:
-                    model_data = model.to_dict()
-                    models_dict.append(model_data)
-                print(json.dumps(models_dict, indent=2))
-            elif show == "md":
-                print(format_models_markdown(sorted_models))
-            else:
-                logger.debug(f"Invalid show option: {show}. Options: id, path, json, md.")
-                return
-            return
-
-        table = Table(show_lines=False, box=None, expand=False)
-        table.add_column("Model ID", style="cyan", no_wrap=False)
-        table.add_column("Size(GB)", style="magenta")
-        table.add_column("Declared", style="yellow")
-        table.add_column("Tested", style="green")
-        table.add_column("Good", style="green")
-        table.add_column("Bad", style="red")
-        table.add_column("TTFT", justify="right", style="blue")
-        table.add_column("TPS", justify="right", style="blue")
-        table.add_column("Status", style="blue")
-
-        for model in sorted_models:
-            tested_ctx = f"{model.tested_max_context:,}" if model.tested_max_context else "-"
-            last_good = (
-                f"{model.last_known_good_context:,}" if model.last_known_good_context else "-"
-            )
-            last_bad = f"{model.last_known_bad_context:,}" if model.last_known_bad_context else "-"
-            ttft_str = f"{model.ttft_seconds:.2f}s" if model.ttft_seconds is not None else "-"
-            tps_str = f"{model.tps:.1f}" if model.tps is not None else "-"
-
-            status_map = {
-                "untested": "Untested",
-                "testing": "Testing...",
-                "completed": "[green]✓ Tested[/green]",
-                "failed": "✗ Failed",
-            }
-            status = status_map.get(model.context_test_status.value, "Unknown")
-
-            table.add_row(
-                model.id,
-                f"{model.size / (1024**3):.2f}" if model.size else "N/A",
-                f"{model.context_limit:,}",
-                tested_ctx,
-                last_good,
-                last_bad,
-                ttft_str,
-                tps_str,
-                status,
-            )
-        console.print(table)
+        list_models_command(
+            sort=sort,
+            show=show,
+            key=key,
+            verbose=verbose,
+            registry=_registry,
+        )
 
     def describe_models(
         self,
@@ -716,29 +560,13 @@ class LMStrixService:
         reset: bool = False,
         verbose: bool = False,
     ) -> None:
-        """Use an LLM or droid exec to generate descriptions and keyword tags for models."""
-        setup_logging(verbose=verbose)
-        console = Console()
-        registry = load_model_registry(verbose=verbose)
-        if not registry.list_models():
-            console.print("[red]No registry found. Run 'scan' first.[/red]")
-            return
-
-        if not model_id and not desc_all:
-            console.print("[yellow]Specify a model ID or --all to describe models.[/yellow]")
-            return
-
-        method = describer_model_id or "droid exec"
-        console.print(f"[bold]Using [cyan]{method}[/cyan] for descriptions.[/bold]")
-
-        count = run_describe_models(
-            registry=registry,
-            describer_model_id=describer_model_id,
+        describe_models_command(
             model_id=model_id,
+            desc_all=desc_all,
+            describer_model_id=describer_model_id,
             reset=reset,
             verbose=verbose,
         )
-        console.print(f"\n[green]Described {count} model(s).[/green]")
 
     def test_models(
         self,
@@ -990,365 +818,28 @@ class LMStrixService:
         stream_timeout: int = 120,
         verbose: bool = False,
     ) -> None:
-        """Run inference on a specified model."""
-        setup_logging(verbose=verbose)
-
-        if not out_ctx:
-            out_ctx = -1  # Default to unlimited
-
-        # Handle --text and --text_file for simple prompts without file_prompt
-        if not file_prompt and (text or text_file):
-            if text_file:
-                try:
-                    text_path = Path(text_file).expanduser()
-                    if not text_path.exists():
-                        logger.error(f"Text file not found: {text_file}")
-                        return
-                    text_content = text_path.read_text(encoding="utf-8")
-                except Exception as e:
-                    logger.debug(f"Error reading text file: {e}")
-                    return
-            else:
-                text_content = text
-
-            # Replace {{text}} placeholder in the prompt
-            actual_prompt = prompt.replace("{{text}}", text_content)
-        # Handle prompt file loading if specified
-        elif file_prompt:
-            # Parse dictionary parameters
-            prompt_params = {}
-            if dict_params:
-                # Support both comma-separated and space-separated formats
-                if "," in dict_params:
-                    # Format: "key1=value1,key2=value2"
-                    pairs = dict_params.split(",")
-                else:
-                    # Format: "key1=value1 key2=value2" (fire might split this)
-                    # For now, assume comma-separated
-                    pairs = dict_params.split(",")
-
-                for pair in pairs:
-                    pair = pair.strip()
-                    if "=" in pair:
-                        key, value = pair.split("=", 1)
-                        prompt_params[key.strip()] = value.strip()
-                    else:
-                        logger.debug(
-                            f"Warning: Invalid parameter format '{pair}'. Expected 'key=value'.",
-                        )
-
-            # Handle --text and --text_file
-            if text_file:
-                try:
-                    text_path = Path(text_file).expanduser()
-                    if not text_path.exists():
-                        logger.error(f"Text file not found: {text_file}")
-                        return
-                    prompt_params["text"] = text_path.read_text(encoding="utf-8")
-                except Exception as e:
-                    logger.debug(f"Error reading text file: {e}")
-                    return
-            elif text:
-                prompt_params["text"] = text
-
-            # Load and resolve prompt from TOML file
-            try:
-                prompt_path = Path(file_prompt).expanduser()
-                if not prompt_path.exists():
-                    logger.error(f"Prompt file not found: {file_prompt}")
-                    return
-
-                # Check if prompt contains commas (multiple templates)
-                if "," in prompt:
-                    # Split by comma and load each template
-                    prompt_names = [name.strip() for name in prompt.split(",") if name.strip()]
-                    concatenated_prompts = []
-                    all_placeholders_resolved = []
-                    all_placeholders_unresolved = []
-
-                    if verbose:
-                        logger.debug(
-                            f"Loading multiple prompts: {', '.join(prompt_names)}",
-                        )
-
-                    for prompt_name in prompt_names:
-                        resolved_prompt = load_single_prompt(
-                            toml_path=prompt_path,
-                            prompt_name=prompt_name,
-                            verbose=verbose,
-                            **prompt_params,
-                        )
-                        concatenated_prompts.append(resolved_prompt.resolved)
-                        all_placeholders_resolved.extend(
-                            resolved_prompt.placeholders_resolved,
-                        )
-                        all_placeholders_unresolved.extend(
-                            resolved_prompt.placeholders_unresolved,
-                        )
-
-                        if verbose:
-                            logger.debug(
-                                f"Loaded prompt '{prompt_name}' from {file_prompt}",
-                            )
-
-                    # Concatenate all prompts with double newline separator
-                    actual_prompt = "\n\n".join(concatenated_prompts)
-
-                    if verbose:
-                        logger.debug(f"Concatenated {len(prompt_names)} prompts")
-                        if all_placeholders_resolved:
-                            unique_resolved = list(set(all_placeholders_resolved))
-                            logger.debug(
-                                f"Resolved placeholders: {', '.join(unique_resolved)}",
-                            )
-                        if all_placeholders_unresolved:
-                            unique_unresolved = list(set(all_placeholders_unresolved))
-                            logger.debug(
-                                f"Warning: Unresolved placeholders: {', '.join(unique_unresolved)}",
-                            )
-                else:
-                    # Single prompt - existing behavior
-                    resolved_prompt = load_single_prompt(
-                        toml_path=prompt_path,
-                        prompt_name=prompt,  # Now refers to prompt name in TOML
-                        verbose=verbose,
-                        **prompt_params,
-                    )
-
-                    actual_prompt = resolved_prompt.resolved
-
-                    if verbose:
-                        logger.debug(f"Loaded prompt '{prompt}' from {file_prompt}")
-                        if resolved_prompt.placeholders_resolved:
-                            logger.debug(
-                                f"Resolved placeholders: {', '.join(resolved_prompt.placeholders_resolved)}",
-                            )
-                        if resolved_prompt.placeholders_unresolved:
-                            logger.debug(
-                                f"Warning: Unresolved placeholders: {', '.join(resolved_prompt.placeholders_unresolved)}",
-                            )
-
-            except Exception as e:
-                logger.debug(f"Error loading prompt from file: {e}")
-                return
-        else:
-            # No file_prompt, just use the prompt as-is
-            actual_prompt = prompt
-
-        # Initialize state manager
-        state_manager = StateManager()
-
-        # Handle model_id
-        if not model_id:
-            # Try to use the last used model
-            model_id = state_manager.get_last_used_model()
-            if not model_id:
-                logger.error("No model specified and no last-used model found.")
-                logger.debug("Please specify a model with -m or --model_id")
-                return
-            if verbose:
-                logger.debug(f"Using last-used model: {model_id}")
-
-        registry = load_model_registry(verbose=verbose)
-        model = registry.find_model(model_id)
-        if not model:
-            logger.error(f"Model '{model_id}' not found in registry.")
-            return
-
-        # Update last-used model
-        state_manager.set_last_used_model(model_id)
-
-        # Handle reload by setting in_ctx to optimal if not specified
-        if reload and in_ctx is None:
-            # Force reload with optimal context
-            in_ctx = model.tested_max_context or model.context_limit
-            logger.debug(
-                f"Force reload requested, loading with context {in_ctx:,}",
-            )
-
-        # Parse out_ctx if it's a percentage
-        if isinstance(out_ctx, str) and out_ctx != "-1":
-            try:
-                max_context = get_model_max_context(model, use_tested=True)
-                if not max_context:
-                    max_context = model.context_limit
-                parsed_out_ctx = parse_out_ctx(out_ctx, max_context)
-                if verbose:
-                    logger.debug(
-                        f"Parsed out_ctx '{out_ctx}' as {parsed_out_ctx} tokens",
-                    )
-                out_ctx = parsed_out_ctx
-            except ValueError as e:
-                logger.error(f"{e}")
-                return
-
-        # Parse in_ctx if it's a percentage
-        if isinstance(in_ctx, str):
-            try:
-                max_context = get_model_max_context(model, use_tested=True)
-                if not max_context:
-                    max_context = model.context_limit
-                parsed_in_ctx = parse_out_ctx(in_ctx, max_context)
-                if verbose:
-                    logger.debug(
-                        f"Parsed in_ctx '{in_ctx}' as {parsed_in_ctx} tokens",
-                    )
-                in_ctx = parsed_in_ctx
-            except ValueError as e:
-                logger.error(f"{e}")
-                return
-
-        manager = InferenceManager(registry=registry, verbose=verbose)
-
-        # Handle streaming vs regular inference
-        if stream:
-            try:
-                # Show status only in verbose mode
-                if verbose:
-                    print(f"\nStreaming inference on {model.id}...", file=sys.stderr)
-
-                # Callback to print tokens to stdout as they arrive
-                def print_token(token: str) -> None:
-                    print(token, end="", flush=True, file=sys.stdout)
-
-                # Stream the response
-                for _token in manager.stream_infer(
-                    model_id=model.id,  # Use the full ID for inference
-                    prompt=actual_prompt,  # Use the resolved prompt
-                    in_ctx=in_ctx,
-                    out_ctx=out_ctx,
-                    temperature=param_temp,
-                    top_k=param_top_k,
-                    top_p=param_top_p,
-                    repeat_penalty=param_repeat,
-                    min_p=param_min_p,
-                    on_token=print_token,
-                    stream_timeout=stream_timeout,
-                ):
-                    # Tokens are already printed by callback, just iterate
-                    pass
-
-                # Add newline after streaming completes
-                print("", file=sys.stdout)
-
-            except Exception as e:
-                # Use stderr for error messages
-                print(f"\nStreaming inference failed: {e}", file=sys.stderr)
-        else:
-            # Regular non-streaming inference
-            # Show status only in verbose mode
-            if verbose:
-                with console.status(f"Running inference on {model.id}..."):
-                    result = manager.infer(
-                        model_id=model.id,  # Use the full ID for inference
-                        prompt=actual_prompt,  # Use the resolved prompt
-                        in_ctx=in_ctx,
-                        out_ctx=out_ctx,
-                        temperature=param_temp,
-                        top_k=param_top_k,
-                        top_p=param_top_p,
-                        repeat_penalty=param_repeat,
-                        min_p=param_min_p,
-                    )
-            else:
-                result = manager.infer(
-                    model_id=model.id,  # Use the full ID for inference
-                    prompt=actual_prompt,  # Use the resolved prompt
-                    in_ctx=in_ctx,
-                    out_ctx=out_ctx,
-                    temperature=param_temp,
-                    top_k=param_top_k,
-                    top_p=param_top_p,
-                    repeat_penalty=param_repeat,
-                    min_p=param_min_p,
-                )
-
-            if result["succeeded"]:
-                if verbose:
-                    # Use stderr for debug info to avoid parsing issues
-                    print("\nModel Response:", file=sys.stderr)
-                # Always output the actual response to stdout
-                print(result["response"], file=sys.stdout)
-            else:
-                # Use stderr for error messages
-                print(f"Inference failed: {result['error']}", file=sys.stderr)
+        run_inference_command(
+            prompt=prompt,
+            model_id=model_id,
+            out_ctx=out_ctx,
+            in_ctx=in_ctx,
+            reload=reload,
+            file_prompt=file_prompt,
+            dict_params=dict_params,
+            text=text,
+            text_file=text_file,
+            param_temp=param_temp,
+            param_top_k=param_top_k,
+            param_top_p=param_top_p,
+            param_repeat=param_repeat,
+            param_min_p=param_min_p,
+            stream=stream,
+            stream_timeout=stream_timeout,
+            verbose=verbose,
+        )
 
     def check_health(self, verbose: bool = False) -> None:
-        """Check database health and backup status."""
-        setup_logging(verbose=verbose)
-
-        models_file = get_default_models_file()
-        logger.debug("[blue]Database Health Check[/blue]")
-        logger.info(f"Registry file: {models_file}")
-
-        # Check if registry exists
-        if not models_file.exists():
-            logger.debug("✗ Registry file not found")
-            return
-
-        logger.success("✓ Registry file exist")
-
-        # Check if registry is valid JSON
-        try:
-            with models_file.open() as f:
-                json.load(f)
-            logger.success("✓ Registry file is valid JSON")
-        except json.JSONDecodeError as e:
-            logger.debug(f"✗ Registry file is corrupted: {e}")
-
-        # Load with validation
-        try:
-            registry = load_model_registry(verbose=verbose)
-            model_count = len(registry)
-            logger.success(f"✓ Successfully loaded {model_count} model")
-
-            # Check for validation issues
-            invalid_models = []
-            for model_path, model in registry._models.items():
-                if not model.validate_integrity():
-                    invalid_models.append(model_path)
-
-            if invalid_models:
-                logger.debug(
-                    f"⚠ Found {len(invalid_models)} models with integrity issues",
-                )
-                if verbose:
-                    for model_path in invalid_models:
-                        logger.debug(f"  - {model_path}")
-            else:
-                logger.success("✓ All models pass integrity check")
-
-        except (ModelRegistryError, OSError, json.JSONDecodeError) as e:
-            logger.debug(f"✗ Failed to load registry: {e}")
-
-        # Check backup files
-        backup_pattern = f"{models_file.stem}.backup_*"
-        backup_files = list(models_file.parent.glob(backup_pattern))
-
-        if backup_files:
-            backup_files.sort(key=lambda p: p.stat().st_mtime, reverse=True)
-            logger.debug(f"[blue]Found {len(backup_files)} backup files:[/blue]")
-
-            for _i, backup_file in enumerate(backup_files[:5]):  # Show latest 5
-                mtime = datetime.fromtimestamp(backup_file.stat().st_mtime)
-                size_kb = backup_file.stat().st_size // 1024
-
-                # Test if backup is valid
-                try:
-                    with backup_file.open() as f:
-                        json.load(f)
-                    status = "[green]✓[/green]"
-                except json.JSONDecodeError:
-                    status = "✗"
-
-                logger.debug(
-                    f"  {status} {backup_file.name} ({size_kb}KB, {mtime.strftime('%Y-%m-%d %H:%M')})",
-                )
-
-            if len(backup_files) > 5:
-                logger.debug(f"  ... and {len(backup_files) - 5} more")
-        else:
-            logger.debug("No backup files found")
+        check_health_command(verbose=verbose)
 
     def save_configs(
         self,
@@ -1357,207 +848,15 @@ class LMStrixService:
         threshold: int = 0,
         verbose: bool = False,
     ) -> None:
-        """Save tested context limits to LM Studio concrete config files.
-
-        Args:
-            flash: Enable flash attention for GGUF models
-            limit: Context limit - either percentage (e.g. "50%") or absolute value (e.g. 4096)
-            threshold: Only used with percentage limit - apply percentage if context > threshold
-            verbose: Enable verbose output
-        """
-        setup_logging(verbose=verbose)
-
-        # Parse the limit parameter
-        is_percentage = False
-        limit_value = 100  # default
-
-        if isinstance(limit, str):
-            if limit.endswith("%"):
-                # It's a percentage
-                is_percentage = True
-                try:
-                    limit_value = int(limit.rstrip("%"))
-                    if limit_value < 1 or limit_value > 100:
-                        logger.error(f"Invalid percentage: {limit}. Must be between 1% and 100%.")
-                        return
-                except ValueError:
-                    logger.error(f"Invalid percentage format: {limit}")
-                    return
-            else:
-                # It's a string representing an integer
-                try:
-                    limit_value = int(limit)
-                    is_percentage = False
-                except ValueError:
-                    logger.error(
-                        f"Invalid limit value: {limit}. Must be an integer or percentage (e.g., '50%')."
-                    )
-                    return
-        else:
-            # It's already an integer
-            limit_value = limit
-            is_percentage = False
-
-        # Load the model registry
-        registry = load_model_registry(verbose=verbose)
-        models = registry.list_models()
-
-        # Filter models with tested context
-        models_with_context = [m for m in models if m.tested_max_context]
-
-        if not models_with_context:
-            logger.debug("No models with tested context limits found.")
-            logger.debug("Run 'lmstrix test' to test model context limits first.")
-            return
-
-        logger.debug(
-            f"[blue]Found {len(models_with_context)} models with tested context limits[/blue]",
+        save_configs_command(
+            flash=flash,
+            limit=limit,
+            threshold=threshold,
+            verbose=verbose,
         )
 
-        # Get LM Studio path
-        try:
-            lms_path = get_lmstudio_path()
-        except Exception as e:
-            logger.debug(f"Failed to find LM Studio installation: {e}")
-            return
-
-        # Create concrete config manager
-        config_manager = ConcreteConfigManager(lms_path)
-
-        # Save configurations with parsed limit and threshold
-        with console.status("Saving concrete configurations..."):
-            successful, failed = config_manager.save_all_configs(
-                models_with_context,
-                enable_flash=flash,
-                limit_value=limit_value,
-                is_percentage=is_percentage,
-                threshold=threshold,
-            )
-
-        # Report results
-        if successful > 0:
-            logger.debug(
-                f"[green]✓ Successfully saved {successful} model configurations[/green]",
-            )
-
-        if failed > 0:
-            logger.debug(
-                f"✗ Failed to save {failed} model configurations",
-            )
-
-        if flash:
-            gguf_count = sum(1 for m in models_with_context if str(m.path).endswith(".gguf"))
-            if gguf_count > 0:
-                logger.debug(
-                    f"[blue]Flash attention enabled for {gguf_count} GGUF models[/blue]",
-                )
-
-        # Report the limit mode used
-        if is_percentage:
-            if threshold > 0:
-                logger.debug(
-                    f"[blue]Applied limit: {limit_value}% for contexts > {threshold:,} tokens[/blue]",
-                )
-            else:
-                logger.debug(
-                    f"[blue]Applied limit: {limit_value}% to all models[/blue]",
-                )
-        else:
-            logger.debug(
-                f"[blue]Applied absolute limit: {limit_value:,} tokens (or tested max if lower)[/blue]",
-            )
+    def about(self, verbose: bool = False) -> None:
+        about_command(verbose=verbose)
 
     def show_help(self) -> None:
-        """Show comprehensive help text."""
-        console.print("[bold cyan]LMStrix - LM Studio Model Testing Toolkit[/bold cyan]")
-        console.print("\n[cyan]Available commands:[/cyan]")
-        console.print(
-            "  [green]scan[/green]            Scan for LM Studio models and update registry",
-        )
-        console.print("    --failed          Re-scan only previously failed models")
-        console.print("    --reset           Re-scan all models (clear test data)")
-        console.print("    --verbose         Enable verbose output")
-        console.print("")
-        console.print(
-            "  [green]list[/green]            List all models with their test status",
-        )
-        console.print(
-            "    --sort id|ctx|dtx|size|smart  Sort by: id, tested context, declared context, size, smart",
-        )
-        console.print(
-            "    --sort arch|inp|outp|proc     Sort by keyword category (add 'd' for descending)",
-        )
-        console.print("    --show id|path|json|md  Output format (md = Markdown report)")
-        console.print("    --key kw1,kw2         Filter models matching all specified keywords")
-        console.print("    --verbose         Enable verbose output")
-        console.print("")
-        console.print(
-            "  [green]desc[/green]            Generate model descriptions and keywords",
-        )
-        console.print("    MODEL_ID          Describe specific model")
-        console.print("    --all             Describe all undescribed models")
-        console.print("    --model MODEL_ID  LLM to use (default: droid exec)")
-        console.print("    --reset           Re-describe already described models")
-        console.print("    --verbose         Enable verbose output")
-        console.print("")
-        console.print("  [green]test[/green]            Test model context limits")
-        console.print("    MODEL_ID          Test specific model")
-        console.print("    --all             Test all untested models")
-        console.print("    --reset           Re-test all models")
-        console.print("    --ctx SIZE        Test specific context size")
-        console.print(
-            "    --threshold SIZE  Max context for initial testing (default: 31744)",
-        )
-        console.print(
-            "    --fast            Skip semantic verification (only test if inference completes)",
-        )
-        console.print("    --key kw1,kw2         Filter models matching all specified keywords")
-        console.print("    --prompt TEXT     Custom prompt to use for testing")
-        console.print("    --file_prompt PATH Load prompt from file for testing")
-        console.print("    --verbose         Enable verbose output")
-        console.print("")
-        console.print("  [green]infer[/green]           Run inference on a model")
-        console.print("    PROMPT MODEL_ID   Required prompt and model")
-        console.print(
-            "    --out_ctx NUM|%   Maximum tokens to generate (e.g., 500 or '80%')",
-        )
-        console.print("    --in_ctx NUM      Context size for loading model")
-        console.print("    --file_prompt PATH Load prompt from TOML file")
-        console.print("    --dict PARAMS     Parameters as key=value pairs")
-        console.print("    --temperature NUM Temperature for generation")
-        console.print("    --reload          Force reload model")
-        console.print("    --verbose         Enable verbose output")
-        console.print("")
-        console.print(
-            "  [green]health[/green]          Check database health and backups",
-        )
-        console.print("    --verbose         Show detailed health information")
-        console.print("")
-        console.print(
-            "  [green]save[/green]            Save tested contexts to LM Studio configs",
-        )
-        console.print("    --flash           Enable flash attention for GGUF models")
-        console.print(
-            "    --limit NUM|%     Context limit - percentage (e.g. '50%') or absolute (e.g. 4096)"
-        )
-        console.print("                      With %: applies to contexts > threshold")
-        console.print("                      Without %: sets min(tested_context, limit) for all")
-        console.print("    --threshold NUM   With % limit: apply percentage if context > threshold")
-        console.print("    --verbose         Enable verbose output")
-        console.print("")
-        console.print("Examples:")
-        console.print("  lmstrix scan --verbose")
-        console.print("  lmstrix list --sort ctx")
-        console.print("  lmstrix list --show md --key outp-code,proc-thinking")
-        console.print("  lmstrix list --sort arch --show md")
-        console.print("  lmstrix desc --all                    # uses droid exec")
-        console.print("  lmstrix desc --all --model my-llm      # uses LM Studio model")
-        console.print("  lmstrix desc my-model --reset")
-        console.print("  lmstrix test --all")
-        console.print("  lmstrix test --all --key arch-gguf")
-        console.print("  lmstrix test my-model --ctx 8192")
-        console.print('  lmstrix test my-model --prompt "What is 2+2?"')
-        console.print("  lmstrix test my-model --file_prompt test_prompt.txt")
-        console.print('  lmstrix infer "Hello world" my-model')
-        console.print("  lmstrix save --flash")
-        console.print("  lmstrix save --limit 75 --threshold 20000")
+        show_help_command()

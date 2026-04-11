@@ -1,4 +1,4 @@
-"""Context testing functionality for discovering true model limits."""
+"""The binary search runner that pushes models until they break to find their true context limits."""
 
 from datetime import datetime
 from typing import TYPE_CHECKING, ClassVar
@@ -13,7 +13,7 @@ from lmstrix.core.models import ContextTestStatus
 
 
 class ContextTestResult:
-    """Result of a context test attempt."""
+    """A record of what happened when we tried to load and run a model at a specific context size."""
 
     def __init__(
         self,
@@ -26,7 +26,18 @@ class ContextTestResult:
         ttft_seconds: float | None = None,
         tps: float | None = None,
     ) -> None:
-        """Initialize test result."""
+        """Initialize a test record.
+
+        Args:
+            context_size: The size we tried to load.
+            load_success: Did LM Studio successfully allocate the memory?
+            inference_success: Did the model actually output text without crashing?
+            prompt: The text we sent.
+            response: The text we got back.
+            error: What went wrong if it failed.
+            ttft_seconds: Time to first token.
+            tps: Tokens per second.
+        """
         self.timestamp = datetime.now()
         self.context_size = context_size
         self.load_success = load_success

@@ -1,4 +1,4 @@
-"""Path utilities for LMStrix."""
+"""File system utilities. Handles finding LM Studio, the model registry, and log files."""
 
 from pathlib import Path
 
@@ -7,13 +7,15 @@ from lmstrix.utils.logging import logger
 
 
 def get_lmstudio_path() -> Path:
-    """Get the LM Studio installation path.
+    """Locate the LM Studio installation directory on the user\'s machine.
+
+    First checks the `.lmstudio-home-pointer` file, then falls back to OS-specific defaults.
 
     Returns:
-        Path to LM Studio directory.
+        The absolute Path to the LM Studio directory.
 
     Raises:
-        LMStudioInstallationNotFoundError: If LM Studio path cannot be determined.
+        LMStudioInstallationNotFoundError: If LM Studio isn\'t installed or the folder is missing.
     """
     # Check for .lmstudio-home-pointer file
     home_pointer = Path.home() / ".lmstudio-home-pointer"

@@ -1,4 +1,4 @@
-"""Inference engine for running models."""
+"""High-level inference engine. Connects the API client, model registry, and context management into one cohesive pipeline."""
 
 import time
 from collections.abc import Callable, Iterator
@@ -14,18 +14,18 @@ from lmstrix.utils.logging import logger
 
 
 class InferenceResult(BaseModel):
-    """Result from an inference run."""
+    """A snapshot of a completed text generation request, including performance stats."""
 
     model_id: str = Field(..., description="ID of the model used")
     prompt: str = Field(..., description="The input prompt")
-    response: str = Field(..., description="The generated response")
-    tokens_used: int = Field(0, description="Total tokens used")
-    inference_time: float = Field(0.0, description="Time taken for inference in seconds")
-    error: str | None = Field(None, description="Error message if inference failed")
+    response: str = Field(..., description="The text returned by the model")
+    tokens_used: int = Field(0, description="Combined prompt + generation token count")
+    inference_time: float = Field(0.0, description="Total wall-clock time from sending the request to receiving the final token")
+    error: str | None = Field(None, description="What went wrong (e.g., out of memory, model crashed)")
 
     @property
     def succeeded(self) -> bool:
-        """Check if the inference was successful."""
+        """Did the model successfully return text without crashing?"""
         return self.error is None and bool(self.response)
 
 

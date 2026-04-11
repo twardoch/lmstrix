@@ -1,0 +1,130 @@
+{#- HY-MT1.5 Chat Template with translate: record-string translation support -#}
+{#- Accepts plain string content or a structured mapping/list. String content starting with `translate:` is parsed into translation prompt fields. -#}
+{%- macro render_vocab_lines(vocab_lines) -%}
+{%- for vocab_line in vocab_lines -%}
+{%- set cleaned = vocab_line | trim -%}
+{%- if ',' in cleaned -%}
+{%- set source = cleaned.split(',', 1)[0] | trim -%}
+{%- set target = cleaned.split(',', 1)[1] | trim -%}
+{{- '\n' + source + ' 翻译成 ' + target -}}
+{%- endif -%}
+{%- endfor -%}
+{%- endmacro -%}
+{%- macro build_translation_prompt(src, tgt, text, vocab_lines, context, lang_zh, lang_en, zh_codes) -%}
+{%- set normalized_src = (src if src else '') | replace('_', '-') -%}
+{%- set normalized_tgt = tgt | replace('_', '-') -%}
+{%- set normalized_text = text | trim -%}
+{%- set normalized_context = context | trim -%}
+{%- set has_vocab = vocab_lines and (vocab_lines | length > 0) -%}
+{%- set has_context = normalized_context != '' -%}
+{%- set tgt_zh = lang_zh[normalized_tgt] if normalized_tgt in lang_zh else normalized_tgt -%}
+{%- set tgt_en = lang_en[normalized_tgt] if normalized_tgt in lang_en else normalized_tgt -%}
+{%- if has_vocab and has_context -%}
+{{- normalized_context + '\n参考下面的翻译：' + render_vocab_lines(vocab_lines) + '\n\n将以下文本翻译为' + tgt_zh + '，注意只需要输出翻译后的结果，不要额外解释：\n\n' + normalized_text -}}
+{%- elif has_context -%}
+{{- normalized_context + '\n参考上面的信息，把下面的文本翻译成' + tgt_zh + '，注意不需要翻译上文，也不要额外解释：\n' + normalized_text -}}
+{%- elif has_vocab -%}
+{{- '参考下面的翻译：' + render_vocab_lines(vocab_lines) + '\n\n将以下文本翻译为' + tgt_zh + '，注意只需要输出翻译后的结果，不要额外解释：\n\n' + normalized_text -}}
+{%- elif normalized_src in zh_codes or normalized_tgt in zh_codes -%}
+{{- '将以下文本翻译为' + tgt_zh + '，注意只需要输出翻译后的结果，不要额外解释：\n\n' + normalized_text -}}
+{%- else -%}
+{{- 'Translate the following segment into ' + tgt_en + ', without additional explanation.\n\n' + normalized_text -}}
+{%- endif -%}
+{%- endmacro -%}
+{%- macro render_translate_record_prompt(raw, lang_zh, lang_en, zh_codes) -%}
+{%- set normalized = raw | replace('\r\n', '\n') | replace('\r', '\n') -%}
+{%- set segments = normalized.split(';') -%}
+{%- set parts = namespace(lines=[]) -%}
+{%- for segment in segments -%}
+{%- set parts.lines = parts.lines + (segment.split('\n')) -%}
+{%- endfor -%}
+{%- set lines = parts.lines -%}
+{%- set known_keys = ['translate', 'input', 'output', 'vocab', 'context', 'text'] -%}
+{%- set ns = namespace(seen_translate=false, current_key='', current_value='', src='', tgt='', text='', context='', vocab_lines=[]) -%}
+{%- for line in lines -%}
+{%- set trimmed = line | trim -%}
+{%- if trimmed -%}
+{%- set starts_record = false -%}
+{%- if ':' in trimmed -%}
+{%- set maybe_key = trimmed.split(':', 1)[0] | trim -%}
+{%- if maybe_key in known_keys -%}
+{%- set starts_record = true -%}
+{%- endif -%}
+{%- endif -%}
+{%- if starts_record -%}
+{%- if ns.current_key == 'translate' -%}
+{%- set ns.seen_translate = true -%}
+{%- elif ns.current_key == 'input' -%}
+{%- set ns.src = ns.current_value | trim -%}
+{%- elif ns.current_key == 'output' -%}
+{%- set ns.tgt = ns.current_value | trim -%}
+{%- elif ns.current_key == 'text' -%}
+{%- set ns.text = ns.current_value | trim -%}
+{%- elif ns.current_key == 'context' -%}
+{%- set ns.context = ns.current_value | trim -%}
+{%- elif ns.current_key == 'vocab' -%}
+{%- if ns.current_value | trim -%}
+{%- set ns.vocab_lines = ns.vocab_lines + [ns.current_value | trim] -%}
+{%- endif -%}
+{%- endif -%}
+{%- set ns.current_key = trimmed.split(':', 1)[0] | trim -%}
+{%- set ns.current_value = trimmed.split(':', 1)[1] | trim -%}
+{%- elif ns.current_key -%}
+{%- set ns.current_value = ns.current_value + '\n' + trimmed -%}
+{%- endif -%}
+{%- endif -%}
+{%- endfor -%}
+{%- if ns.current_key == 'translate' -%}
+{%- set ns.seen_translate = true -%}
+{%- elif ns.current_key == 'input' -%}
+{%- set ns.src = ns.current_value | trim -%}
+{%- elif ns.current_key == 'output' -%}
+{%- set ns.tgt = ns.current_value | trim -%}
+{%- elif ns.current_key == 'text' -%}
+{%- set ns.text = ns.current_value | trim -%}
+{%- elif ns.current_key == 'context' -%}
+{%- set ns.context = ns.current_value | trim -%}
+{%- elif ns.current_key == 'vocab' -%}
+{%- if ns.current_value | trim -%}
+{%- set ns.vocab_lines = ns.vocab_lines + [ns.current_value | trim] -%}
+{%- endif -%}
+{%- endif -%}
+{%- if ns.tgt and ns.text -%}
+{{- build_translation_prompt(ns.src, ns.tgt, ns.text, ns.vocab_lines, ns.context, lang_zh, lang_en, zh_codes) -}}
+{%- else -%}
+{{- raw -}}
+{%- endif -%}
+{%- endmacro -%}
+{%- set lang_zh = {"zh": "中文", "zh-Hant": "繁体中文", "yue": "粤语", "en": "英语", "fr": "法语", "pt": "葡萄牙语", "es": "西班牙语", "ja": "日语", "tr": "土耳其语", "ru": "俄语", "ar": "阿拉伯语", "ko": "韩语", "th": "泰语", "it": "意大利语", "de": "德语", "vi": "越南语", "ms": "马来语", "id": "印尼语", "tl": "菲律宾语", "hi": "印地语", "pl": "波兰语", "cs": "捷克语", "nl": "荷兰语", "km": "高棉语", "my": "缅甸语", "fa": "波斯语", "gu": "古吉拉特语", "ur": "乌尔都语", "te": "泰卢固语", "mr": "马拉地语", "he": "希伯来语", "bn": "孟加拉语", "ta": "泰米尔语", "uk": "乌克兰语", "bo": "藏语", "kk": "哈萨克语", "mn": "蒙古语", "ug": "维吾尔语"} -%}
+{%- set lang_en = {"zh": "Chinese", "zh-Hant": "Traditional Chinese", "yue": "Cantonese", "en": "English", "fr": "French", "pt": "Portuguese", "es": "Spanish", "ja": "Japanese", "tr": "Turkish", "ru": "Russian", "ar": "Arabic", "ko": "Korean", "th": "Thai", "it": "Italian", "de": "German", "vi": "Vietnamese", "ms": "Malay", "id": "Indonesian", "tl": "Filipino", "hi": "Hindi", "pl": "Polish", "cs": "Czech", "nl": "Dutch", "km": "Khmer", "my": "Burmese", "fa": "Persian", "gu": "Gujarati", "ur": "Urdu", "te": "Telugu", "mr": "Marathi", "he": "Hebrew", "bn": "Bengali", "ta": "Tamil", "uk": "Ukrainian", "bo": "Tibetan", "kk": "Kazakh", "mn": "Mongolian", "ug": "Uyghur"} -%}
+{%- set zh_codes = ["zh", "zh-Hant", "yue"] -%}
+{%- set ns = namespace(has_head=true) -%}
+{%- set loop_messages = messages -%}
+{%- for message in loop_messages -%}
+{%- set content = message['content'] -%}
+{%- if loop.index0 == 0 -%}
+{%- if content == '' -%}
+{%- set ns.has_head = false -%}
+{%- elif message['role'] == 'system' -%}
+{%- set content = '<|startoftext|>' + content + '<|extra_4|>' -%}
+{%- endif -%}
+{%- endif -%}
+{%- if message['role'] == 'user' -%}
+{%- if content is mapping -%}
+{%- set content = build_translation_prompt(content['input'] if 'input' in content else '', content['output'], content['text'], content['vocab'] if 'vocab' in content else [], content['context'] if 'context' in content else '', lang_zh, lang_en, zh_codes) -%}
+{%- elif content is not string -%}
+{%- set payload = content[0] -%}
+{%- set content = build_translation_prompt(payload['input'] if 'input' in payload else '', payload['output'], payload['text'], payload['vocab'] if 'vocab' in payload else [], payload['context'] if 'context' in payload else '', lang_zh, lang_en, zh_codes) -%}
+{%- elif content | trim and (content | trim).startswith('translate:') -%}
+{%- set content = render_translate_record_prompt(content | trim, lang_zh, lang_en, zh_codes) -%}
+{%- endif -%}
+{%- if loop.index0 == 1 and ns.has_head -%}
+{%- set content = content + '<|extra_0|>' -%}
+{%- else -%}
+{%- set content = '<|startoftext|>' + content + '<|extra_0|>' -%}
+{%- endif -%}
+{%- elif message['role'] == 'assistant' -%}
+{%- set content = content + '<|eos|>' -%}
+{%- endif -%}
+{{- content -}}
+{%- endfor -%}

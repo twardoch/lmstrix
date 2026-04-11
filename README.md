@@ -1,256 +1,98 @@
-# LMStrix
+# lmstrix
 
-LMStrix is a professional Python toolkit designed to supercharge your interaction with [LM Studio](https://lmstudio.ai/). It provides a powerful command-line interface (CLI) and Python API for managing, testing, and running local language models, with a standout feature: **Adaptive Context Optimization**.
+Manage, test, and run local language models through [LM Studio](https://lmstudio.ai/) from the command line. Its centrepiece is a binary-search algorithm that finds the true maximum context window of any model — so you stop guessing and stop crashing.
 
-## Key Features
+## Background: what a context window is
 
-- **🔍 Automatic Context Discovery**: Binary search algorithm to find the true operational context limit of any model
-- **📊 Beautiful Verbose Logging**: Enhanced stats display with emojis showing inference metrics, timing, and token usage
-- **🚀 Smart Model Management**: Models persist between calls to reduce loading overhead
-- **🎯 Flexible Inference Engine**: Run inference with powerful prompt templating and percentage-based output control
-- **📋 Comprehensive Model Registry**: Track models, their context limits, and test results with JSON persistence
-- **🛡️ Safety Controls**: Configurable thresholds and fail-safes to prevent system crashes
-- **💻 Rich CLI Interface**: Beautiful terminal output with progress indicators and formatted tables
-- **📈 Compact Test Output**: Live-updating tables show test progress without verbose logging clutter
+A language model can only "see" a fixed number of tokens at once. This is its context window. Feed it more tokens than it can handle and it either crashes, silently truncates your input, or runs out of GPU memory mid-inference.
 
-## Installation
+Every model has a theoretical maximum stated in its documentation. That number is often optimistic. The real limit depends on your hardware, quantisation level, and the LM Studio version. The only way to know for certain is to test it.
+
+## What lmstrix does
+
+- **Scans** your LM Studio models directory and builds a registry of available models
+- **Tests** models using binary search to find their actual maximum context window
+- **Persists** the results to a JSON registry so you never re-test a model you already know
+- **Runs inference** via LM Studio's local API with configurable prompts and context sizes
+- **Reports** test results and model metadata in formatted terminal tables
+
+## Install
 
 ```bash
-# Using pip
 pip install lmstrix
-
-# Using uv (recommended)
+# or
 uv pip install lmstrix
 ```
 
-## Quick Start
+Requires LM Studio installed and running on `localhost:1234` (the default).
 
-### Command-Line Interface
+## Quick start
 
 ```bash
-# Scan for available models in LM Studio
+# Discover all models in your LM Studio directory
 lmstrix scan
 
-# List all models with their context limits and test status
+# List discovered models and their tested context limits
 lmstrix list
 
-# Test context limit for a specific model
-lmstrix test llama-3.2-3b-instruct
+# Find the true context limit for a specific model
+lmstrix test "llama-3.2-3b-instruct"
 
-# Test all untested models with safety threshold
-lmstrix test --all --threshold 102400
-
-# Run inference with enhanced verbose logging
-lmstrix infer "What is the capital of Poland?" -m llama-3.2-3b-instruct --verbose
-
-# Run inference with percentage-based output tokens
-lmstrix infer "Explain quantum computing" -m llama-3.2-3b-instruct --out_ctx "25%"
-
-# Use file-based prompts with templates
-lmstrix infer summary -m llama-3.2-3b-instruct --file_prompt adam.toml --text_file document.txt
-
-# Direct text input for prompts
-lmstrix infer "Summarize: {{text}}" -m llama-3.2-3b-instruct --text "Your content here"
+# Run inference at a specific context size
+lmstrix infer "llama-3.2-3b-instruct" --prompt "Explain quantum entanglement" --context 8192
 ```
 
-### Enhanced Verbose Output
+## How the context test works
 
-When using `--verbose`, LMStrix provides comprehensive statistics:
+Testing all possible context sizes would take hours. Binary search cuts that down to logarithmic time.
+
+1. Start with the model's stated maximum (e.g. 131072 tokens).
+2. Try loading the model at that size and running two simple inference checks: "Write 'ninety-six' as a number" and "2+3=".
+3. If it succeeds, record that size as the working maximum.
+4. If it fails (OOM, crash, timeout, zero tokens returned), halve the search space.
+5. Repeat until the boundary is found within a small tolerance.
+
+The test uses dual prompts because a single "say hello" prompt can succeed even when the model is misconfigured — it is too short to stress the context allocation. The two prompts require the model to produce specific, verifiable output.
+
+Results include time-to-first-token (TTFT) and tokens-per-second (TPS) from the successful test run.
+
+## The model registry
+
+Scan results and test results are persisted to a JSON file (default: `~/.local/share/lmstrix/models.json` on Linux, similar paths on macOS/Windows). Subsequent `scan` runs update the registry without discarding test results. `list` reads from the registry without touching LM Studio.
+
+## CLI reference
 
 ```
-════════════════════════════════════════════════════════════
-🤖 MODEL: llama-3.2-3b-instruct
-🔧 CONFIG: maxTokens=26214, temperature=0.7
-📝 PROMPT (1 lines, 18 chars): Capital of Poland?
-════════════════════════════════════════════════════════════
-⠸ Running inference...
-════════════════════════════════════════════════════════════
-📊 INFERENCE STATS
-⚡ Time to first token: 0.82s
-⏱️  Total inference time: 11.66s
-🔢 Predicted tokens: 338
-📝 Prompt tokens: 5
-🎯 Total tokens: 343
-🚀 Tokens/second: 32.04
-🛑 Stop reason: eosFound
-════════════════════════════════════════════════════════════
+lmstrix scan              Scan LM Studio models directory and update registry
+lmstrix list              List all models with context limits and test status
+lmstrix test <model-id>   Binary-search for true maximum context window
+lmstrix infer <model-id>  Run inference; options: --prompt, --context, --max-tokens
 ```
 
-### Python API
+## Python API
 
 ```python
-from lmstrix.loaders.model_loader import load_model_registry
-from lmstrix.core.inference_manager import InferenceManager
+from lmstrix.api import LMStudioClient
+from lmstrix.core.context_tester import ContextTester
+from lmstrix.core.scanner import ModelScanner
 
-# Load model registry
-registry = load_model_registry()
+client = LMStudioClient()
+scanner = ModelScanner()
+registry = scanner.scan()
 
-# List available models
-models = registry.list_models()
-print(f"Available models: {len(models)}")
+tester = ContextTester(client=client, verbose=True)
+model = registry.get_model("llama-3.2-3b-instruct")
+updated_model = tester.test_model(model, max_context=32768, registry=registry)
 
-# Run inference
-manager = InferenceManager(verbose=True)
-result = manager.infer(
-    model_id="llama-3.2-3b-instruct",
-    prompt="What is the meaning of life?",
-    out_ctx=100,
-    temperature=0.7
-)
-
-if result["succeeded"]:
-    print(f"Response: {result['response']}")
-    print(f"Tokens used: {result['tokens_used']}")
-    print(f"Time: {result['inference_time']:.2f}s")
+print(f"Max working context: {updated_model.tested_max_context}")
+print(f"TTFT: {updated_model.ttft_seconds:.2f}s")
+print(f"TPS: {updated_model.tps:.1f}")
 ```
 
-## Context Testing & Optimization
+## LM Studio setup
 
-LMStrix uses a sophisticated binary search algorithm to discover true model context limits:
-
-### Safety Features
-- **Threshold Protection**: Configurable maximum context size to prevent system crashes
-- **Progressive Testing**: Starts with small contexts and increases safely
-- **Persistent Results**: Saves test results to avoid re-testing
-
-### Testing Commands
-```bash
-# Test specific model
-lmstrix test llama-3.2-3b-instruct
-
-# Test all models with custom threshold
-lmstrix test --all --threshold 65536
-
-# Test at specific context size
-lmstrix test --all --ctx 32768
-
-# Reset and re-test a model
-lmstrix test llama-3.2-3b-instruct --reset
-
-# Test with custom prompt
-lmstrix test llama-3.2-3b-instruct --prompt "What is 2+2?"
-
-# Test with file-based prompt
-lmstrix test llama-3.2-3b-instruct --file_prompt test_prompt.txt
-```
-
-### Compact Output (Default)
-When running without `--verbose`, tests display a clean, live-updating table:
-```
-Model                                   Context      Status
-llama-3.2-3b-instruct                   32,768      Testing...
-→
-Model                                   Context      Status  
-llama-3.2-3b-instruct                   32,768      ✓ Success
-```
-
-For batch testing with `--all`, a progress column is added to track multiple models.
-
-## Model Management
-
-### Registry Commands
-```bash
-# Scan for new models
-lmstrix scan --verbose
-
-# List models with different sorting
-lmstrix list --sort size        # Sort by size
-lmstrix list --sort ctx         # Sort by tested context
-lmstrix list --show json        # Export as JSON
-
-# Check system health
-lmstrix health --verbose
-```
-
-### Model Persistence
-Models stay loaded between inference calls for improved performance:
-- When no explicit context is specified, models remain loaded
-- Last-used model is remembered for subsequent calls
-- Explicit context changes trigger model reloading
-
-## Prompt Templating
-
-LMStrix supports flexible prompt templating with TOML files:
-
-```toml
-# adam.toml
-[aps]
-prompt = """
-You are an AI assistant skilled in Abstractive Proposition Segmentation.
-Convert the following text: {{text}}
-"""
-
-[summary] 
-prompt = "Create a comprehensive summary: {{text}}"
-```
-
-Use with CLI:
-```bash
-lmstrix infer aps --file_prompt adam.toml --text "Your text here"
-lmstrix infer summary --file_prompt adam.toml --text_file document.txt
-```
-
-## Development
-
-```bash
-# Clone repository
-git clone https://github.com/twardoch/lmstrix.git
-cd lmstrix
-
-# Install for development
-pip install -e ".[dev]"
-
-# Run tests
-pytest
-
-# Run linting
-hatch run lint:all
-```
-
-## Project Structure
-
-```
-src/lmstrix/
-├── cli/main.py              # CLI interface
-├── core/
-│   ├── inference_manager.py # Unified inference engine
-│   ├── models.py            # Model registry
-│   └── context_tester.py    # Context limit testing
-├── api/client.py            # LM Studio API client
-├── loaders/                 # Data loading utilities
-└── utils/                   # Helper utilities
-```
-
-## Features in Detail
-
-### Adaptive Context Optimizer
-- Binary search algorithm for efficient context limit discovery
-- Safety thresholds to prevent system crashes
-- Automatic persistence of test results
-- Resume capability for interrupted tests
-
-### Enhanced Logging
-- Beautiful emoji-rich output in verbose mode
-- Comprehensive inference statistics
-- Progress indicators for long operations
-- Clear error messages with context
-
-### Smart Model Management
-- Automatic model discovery from LM Studio
-- Persistent registry with JSON storage
-- Model state tracking (loaded/unloaded)
-- Batch operations for multiple models
-
-## Requirements
-
-- Python 3.11+
-- LM Studio installed and configured
-- Models downloaded in LM Studio
+LM Studio must be running with its local API server enabled (Settings → Local Server → Start Server). The default address is `http://localhost:1234`. Set `LMSTUDIO_BASE_URL` to override.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## Contributing
-
-Contributions welcome! Please read our contributing guidelines and submit pull requests for any improvements.
+MIT

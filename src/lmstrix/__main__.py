@@ -158,6 +158,16 @@ class LMStrixCLI:
         """
         self.service.check_health(verbose=verbose)
 
+    def about(self, verbose: bool = False) -> None:
+        """Show general information about LMStrix and the model registry.
+
+        Displays statistics, unique keywords in the registry, and architecture distribution.
+
+        Args:
+            verbose: Enable verbose output.
+        """
+        self.service.about(verbose=verbose)
+
     def desc(
         self,
         model_id: str | None = None,

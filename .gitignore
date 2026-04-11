@@ -1,7 +1,8 @@
 __marimo__/
 __pycache__/
 __pypackages__/
-_keep_this/adam
+_keep_this/ 
+_version.py
 ._*
 .abstra/
 .AppleDouble
@@ -72,7 +73,6 @@ eggs/
 ehthumbs.db
 env.bak/
 env/
-ENV/
 htmlcov/
 instance/
 ipython_config.py
@@ -90,8 +90,6 @@ pip-log.txt
 profile_default/
 sdist/
 share/python-wheels/
-src/lmstrix/_version.py
-src/lmstrix/_version.py
 target/
 Thumbs.db
 uv.lock
@@ -99,3 +97,4 @@ var/
 venv.bak/
 venv/
 wheels/
+.DS_Store

@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1772740752636,
+  "lastScanned": 1775940708552,
   "projectRoot": "/Users/adam/Developer/vcs3/github.twardoch/pub/lmstrix",
   "techStack": {
     "languages": [
@@ -56,24 +56,24 @@
       "path": "_keep_this",
       "purpose": null,
       "fileCount": 0,
-      "lastAccessed": 1772740752631,
+      "lastAccessed": 1775940708546,
       "keyFiles": []
     },
     "dist": {
       "path": "dist",
       "purpose": "Distribution/build output",
       "fileCount": 2,
-      "lastAccessed": 1772740752632,
+      "lastAccessed": 1775940708546,
       "keyFiles": [
-        "lmstrix-1.0.76-py3-none-any.whl",
-        "lmstrix-1.0.76.tar.gz"
+        "lmstrix-1.0.78-py3-none-any.whl",
+        "lmstrix-1.0.78.tar.gz"
       ]
     },
     "docs": {
       "path": "docs",
       "purpose": "Documentation",
       "fileCount": 7,
-      "lastAccessed": 1772740752632,
+      "lastAccessed": 1775940708548,
       "keyFiles": [
         "_config.yml",
         "api.md",
@@ -86,7 +86,7 @@
       "path": "examples",
       "purpose": "Example code",
       "fileCount": 3,
-      "lastAccessed": 1772740752632,
+      "lastAccessed": 1775940708548,
       "keyFiles": [
         "README.md",
         "prompts.toml",
@@ -96,24 +96,26 @@
     "issues": {
       "path": "issues",
       "purpose": null,
-      "fileCount": 1,
-      "lastAccessed": 1772740752633,
+      "fileCount": 3,
+      "lastAccessed": 1775940708549,
       "keyFiles": [
-        "102.txt"
+        "102.txt",
+        "103.md",
+        "lmsmodsearch.py"
       ]
     },
     "src": {
       "path": "src",
       "purpose": "Source code",
       "fileCount": 0,
-      "lastAccessed": 1772740752633,
+      "lastAccessed": 1775940708549,
       "keyFiles": []
     },
     "src_docs": {
       "path": "src_docs",
       "purpose": null,
       "fileCount": 1,
-      "lastAccessed": 1772740752633,
+      "lastAccessed": 1775940708549,
       "keyFiles": [
         "mkdocs.yml"
       ]
@@ -122,7 +124,7 @@
       "path": "tests",
       "purpose": "Test files",
       "fileCount": 3,
-      "lastAccessed": 1772740752634,
+      "lastAccessed": 1775940708550,
       "keyFiles": [
         "__init__.py",
         "conftest.py",
@@ -133,7 +135,7 @@
       "path": "examples/data",
       "purpose": "Data files",
       "fileCount": 2,
-      "lastAccessed": 1772740752634,
+      "lastAccessed": 1775940708551,
       "keyFiles": [
         "sample_context.txt",
         "test_questions.json"
