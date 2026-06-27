@@ -134,10 +134,38 @@ def _update_existing_model(
         existing_model.context_limit = new_context
 
     # Update capabilities
+    if "capabilities" in model_data:
+        existing_model.capabilities = Model._normalize_capabilities(
+            model_data.get("capabilities"),
+            model_data.get("has_tools", existing_model.has_tools),
+            model_data.get("has_vision", existing_model.has_vision),
+        )
     if "has_tools" in model_data:
-        existing_model.supports_tools = model_data["has_tools"]
+        existing_model.has_tools = model_data["has_tools"] is True
+    else:
+        existing_model.has_tools = (
+            existing_model.capabilities.get("trained_for_tool_use", False) is True
+        )
     if "has_vision" in model_data:
-        existing_model.supports_vision = model_data["has_vision"]
+        existing_model.has_vision = model_data["has_vision"] is True
+    else:
+        existing_model.has_vision = existing_model.capabilities.get("vision", False) is True
+    existing_model.capabilities = Model._normalize_capabilities(
+        existing_model.capabilities,
+        existing_model.has_tools,
+        existing_model.has_vision,
+    )
+    existing_model.supports_tools = existing_model.has_tools
+    existing_model.supports_vision = existing_model.has_vision
+    reasoning = existing_model.capabilities.get("reasoning")
+    existing_model.has_reasoning = isinstance(reasoning, dict)
+    existing_model.supports_reasoning = existing_model.has_reasoning
+    existing_model.reasoning_options = (
+        list(reasoning.get("allowed_options", [])) if isinstance(reasoning, dict) else []
+    )
+    existing_model.default_reasoning = (
+        reasoning.get("default") if isinstance(reasoning, dict) else None
+    )
 
     if rescan_all:
         logger.info(f"Clearing test data for {existing_model.path} (--all flag)")
@@ -177,6 +205,7 @@ def _add_new_model(model_data: dict) -> Model | None:
             ctx_out=min(4096, ctx_in),
             has_tools=model_data.get("has_tools", False),
             has_vision=model_data.get("has_vision", False),
+            capabilities=model_data.get("capabilities"),
         )
 
         # Validate the new model

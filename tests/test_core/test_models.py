@@ -58,6 +58,37 @@ class TestModel:
         assert model.supports_tools is True
         assert model.supports_vision is True
 
+    def test_model_creation_with_structured_capabilities(self: "TestModel") -> None:
+        """Test structured capabilities are persisted with legacy boolean aliases."""
+        model = Model(
+            model_id="capability-test",
+            path="/path/to/model.gguf",
+            size_bytes=2000000,
+            ctx_in=8192,
+            capabilities={
+                "vision": True,
+                "trained_for_tool_use": True,
+                "reasoning": {
+                    "allowed_options": ["off", "low", "high"],
+                    "default": "low",
+                },
+            },
+        )
+
+        assert model.has_vision is True
+        assert model.has_tools is True
+        assert model.supports_vision is True
+        assert model.supports_tools is True
+        assert model.capabilities["reasoning"]["default"] == "low"
+        assert model.supports_reasoning is True
+        assert model.reasoning_options == ["off", "low", "high"]
+        assert model.default_reasoning == "low"
+
+        registry_dict = model.to_registry_dict()
+        assert registry_dict["has_vision"] is True
+        assert registry_dict["has_tools"] is True
+        assert registry_dict["capabilities"] == model.capabilities
+
     def test_model_with_context_testing(
         self: "TestModel",
         sample_model_data: dict[str, Any],

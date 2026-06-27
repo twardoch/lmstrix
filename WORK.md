@@ -1,5 +1,21 @@
 # Current Work Progress
 
+## 0. 2026-06-10 - Model Capability Reporting
+
+### 0.1. What was done
+1. Researched LM Studio's native `GET /api/v1/models` schema and confirmed it exposes `capabilities.vision`, `capabilities.trained_for_tool_use`, and optional `capabilities.reasoning`.
+2. Updated `LMStudioClient.list_models()` to build an SDK metadata map keyed by `modelKey`, then merge REST capability metadata with the same keys, using `LM_API_TOKEN` when present.
+3. Added structured `Model.capabilities` persistence while preserving legacy `has_vision` and `has_tools` JSON fields.
+4. Fixed rescan updates so existing registry entries persist changed capability flags.
+5. Added capability reporting to default `lmstrix list`, Markdown reports, and `lmstrix about`.
+6. Documented capability retrieval in `README.md` and release notes in `CHANGELOG.md`.
+
+### 0.2. Verification
+- `python -m pytest tests/test_api/test_client.py::TestLMStudioClient::test_sdk_model_info_by_key_uses_model_key tests/test_api/test_client.py::TestLMStudioClient::test_list_models_success tests/test_api/test_client.py::TestLMStudioClient::test_list_models_merges_rest_capabilities tests/test_api/test_client.py::TestLMStudioClient::test_list_models_uses_sdk_capability_fallback tests/test_core/test_models.py::TestModel::test_model_creation_with_structured_capabilities tests/test_loaders/test_model_loader.py::TestModelLoader::test_scan_updates_existing_model_capabilities tests/test_api/test_listing.py::test_list_models_command_reports_capabilities -q` passed.
+- `python -c 'import lmstudio, json; infos=[d.info.to_dict() for d in lmstudio.list_downloaded_models()]; print(json.dumps({i["modelKey"]: i for i in infos}))' | jq '{count: length, first_keys: (keys[:5]), first_value: .[keys[0]]}'` returned 236 keyed records.
+- Live smoke check against `http://localhost:1234/api/v1/models` through `LMStudioClient.list_models()` returned 236 models, 68 vision-capable models, 126 tool-trained models, and 12 reasoning-capable models.
+- Wider related suite still has pre-existing stale failures unrelated to capability reporting: old completion config assertions, direct `id` constructor tests, scanner `id` vs `model_id` expectations, custom registry save path behavior, and old CLI patch targets.
+
 ## 1. Recently Completed Work
 
 ### 1.1. Issue #307 - Streaming Inference Support ✅

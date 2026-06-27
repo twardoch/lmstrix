@@ -34,6 +34,7 @@ class Model:
         ctx_out: int = 4096,
         has_tools: bool = False,
         has_vision: bool = False,
+        capabilities: dict[str, Any] | None = None,
         tested_max_context: int | None = None,
         context_test_status: str = "untested",
         context_test_date: str | None = None,
@@ -49,11 +50,21 @@ class Model:
         self.size = size_bytes
         self.context_limit = ctx_in
         self.context_out = ctx_out
+        self.capabilities = self._normalize_capabilities(capabilities, has_tools, has_vision)
+        has_tools = self.capabilities.get("trained_for_tool_use", has_tools) is True
+        has_vision = self.capabilities.get("vision", has_vision) is True
         self.has_tools = has_tools
         self.has_vision = has_vision
         self.short_id = kwargs.get("short_id")  # Compatibility
         self.supports_tools = has_tools  # Alias for compatibility
         self.supports_vision = has_vision  # Alias for compatibility
+        reasoning = self.capabilities.get("reasoning")
+        self.has_reasoning = isinstance(reasoning, dict)
+        self.supports_reasoning = self.has_reasoning
+        self.reasoning_options = (
+            list(reasoning.get("allowed_options", [])) if isinstance(reasoning, dict) else []
+        )
+        self.default_reasoning = reasoning.get("default") if isinstance(reasoning, dict) else None
         self.tested_max_context = tested_max_context
         self.context_test_status = ContextTestStatus(context_test_status)
         if isinstance(context_test_date, str):
@@ -89,8 +100,35 @@ class Model:
                 "error_msg",
                 "description",
                 "keywords",
+                "capabilities",
+                "has_reasoning",
             ]
         }
+
+    @staticmethod
+    def _normalize_capabilities(
+        capabilities: dict[str, Any] | None,
+        has_tools: bool,
+        has_vision: bool,
+    ) -> dict[str, Any]:
+        """Normalize LM Studio capability metadata for registry persistence."""
+        normalized: dict[str, Any] = {}
+        if isinstance(capabilities, dict):
+            normalized.update(capabilities)
+
+        if "trainedForToolUse" in normalized and "trained_for_tool_use" not in normalized:
+            normalized["trained_for_tool_use"] = normalized.pop("trainedForToolUse")
+
+        normalized["vision"] = normalized.get("vision") is True or has_vision is True
+        normalized["trained_for_tool_use"] = (
+            normalized.get("trained_for_tool_use") is True or has_tools is True
+        )
+
+        reasoning = normalized.get("reasoning")
+        if reasoning is not None and not isinstance(reasoning, dict):
+            normalized.pop("reasoning", None)
+
+        return normalized
 
     def to_dict(self) -> dict[str, Any]:
         """Convert model to dictionary for JSON storage."""
@@ -102,6 +140,7 @@ class Model:
             "ctx_out": self.context_out,
             "has_tools": self.has_tools,
             "has_vision": self.has_vision,
+            "capabilities": self.capabilities,
             "tested_max_context": self.tested_max_context,
             "context_test_status": (
                 self.context_test_status.value

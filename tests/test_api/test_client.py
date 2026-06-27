@@ -1,10 +1,11 @@
 """Tests for LMStudioClient."""
 
+from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 import pytest
 
-from lmstrix.api.client import CompletionResponse, LMStudioClient
+from lmstrix.api.client import CompletionResponse, LMStudioClient, _sdk_model_info_by_key
 from lmstrix.api.exceptions import APIConnectionError, InferenceError, ModelLoadError
 
 
@@ -50,9 +51,15 @@ class TestLMStudioClient:
             LMStudioClient(verbose=False)
             mock_logger.disable.assert_called_with("lmstrix")
 
+    @patch("lmstrix.api.client.httpx.get")
     @patch("lmstrix.api.client.lmstudio")
-    def test_list_models_success(self: "TestLMStudioClient", mock_lmstudio: Mock) -> None:
+    def test_list_models_success(
+        self: "TestLMStudioClient",
+        mock_lmstudio: Mock,
+        mock_http_get: Mock,
+    ) -> None:
         """Test successful list_models call."""
+        mock_http_get.side_effect = Exception("REST API unavailable")
         mock_model_info1 = Mock(
             model_key="model1",
             path="/path/to/model1",
@@ -72,7 +79,7 @@ class TestLMStudioClient:
             display_name="Model Two",
             architecture="mistral",
             trainedForToolUse=True,
-            vision=False,
+            vision=True,
             type="llm",
         )
         mock_model1 = Mock(info=mock_model_info1)
@@ -92,6 +99,10 @@ class TestLMStudioClient:
                 "architecture": "llama",
                 "has_tools": False,
                 "has_vision": False,
+                "capabilities": {
+                    "vision": False,
+                    "trained_for_tool_use": False,
+                },
                 "model_type": "llm",
             },
             {
@@ -103,11 +114,100 @@ class TestLMStudioClient:
                 "architecture": "mistral",
                 "has_tools": True,
                 "has_vision": True,
+                "capabilities": {
+                    "vision": True,
+                    "trained_for_tool_use": True,
+                },
                 "model_type": "llm",
             },
         ]
         assert result == expected_result
         mock_lmstudio.list_downloaded_models.assert_called_once()
+
+    @patch("lmstrix.api.client.httpx.get")
+    @patch("lmstrix.api.client.lmstudio")
+    def test_list_models_merges_rest_capabilities(
+        self: "TestLMStudioClient",
+        mock_lmstudio: Mock,
+        mock_http_get: Mock,
+    ) -> None:
+        """Test REST model capabilities override SDK fallback metadata."""
+        mock_model_info = SimpleNamespace(
+            model_key="google/gemma-4-26b-a4b",
+            path="/path/to/gemma",
+            size_bytes=17990911801,
+            max_context_length=262144,
+            display_name="Gemma 4 26B A4B",
+            architecture="gemma4",
+            trained_for_tool_use=False,
+            vision=False,
+            type="llm",
+        )
+        mock_lmstudio.list_downloaded_models.return_value = [Mock(info=mock_model_info)]
+
+        mock_response = Mock()
+        mock_response.raise_for_status.return_value = None
+        mock_response.json.return_value = {
+            "models": [
+                {
+                    "key": "google/gemma-4-26b-a4b",
+                    "type": "llm",
+                    "capabilities": {
+                        "vision": True,
+                        "trained_for_tool_use": True,
+                        "reasoning": {
+                            "allowed_options": ["off", "on"],
+                            "default": "on",
+                        },
+                    },
+                },
+            ],
+        }
+        mock_http_get.return_value = mock_response
+
+        result = LMStudioClient().list_models()
+
+        assert result[0]["has_vision"] is True
+        assert result[0]["has_tools"] is True
+        assert result[0]["capabilities"] == {
+            "vision": True,
+            "trained_for_tool_use": True,
+            "reasoning": {
+                "allowed_options": ["off", "on"],
+                "default": "on",
+            },
+        }
+
+    @patch("lmstrix.api.client.httpx.get")
+    @patch("lmstrix.api.client.lmstudio")
+    def test_list_models_uses_sdk_capability_fallback(
+        self: "TestLMStudioClient",
+        mock_lmstudio: Mock,
+        mock_http_get: Mock,
+    ) -> None:
+        """Test SDK snake_case capability fields are used when REST is unavailable."""
+        mock_http_get.side_effect = Exception("server unavailable")
+        mock_model_info = SimpleNamespace(
+            model_key="tool-model",
+            path="/path/to/tool-model",
+            size_bytes=2000,
+            max_context_length=8192,
+            display_name="Tool Model",
+            architecture="llama",
+            trained_for_tool_use=True,
+            vision=True,
+            type="llm",
+        )
+        mock_lmstudio.list_downloaded_models.return_value = [Mock(info=mock_model_info)]
+
+        result = LMStudioClient().list_models()
+
+        assert result[0]["has_tools"] is True
+        assert result[0]["has_vision"] is True
+        assert result[0]["capabilities"] == {
+            "vision": True,
+            "trained_for_tool_use": True,
+        }
 
     @patch("lmstrix.api.client.lmstudio")
     def test_list_models_failure(self: "TestLMStudioClient", mock_lmstudio: Mock) -> None:
@@ -120,6 +220,27 @@ class TestLMStudioClient:
 
         assert "Failed to list models" in str(exc_info.value)
         assert "Connection failed" in str(exc_info.value)
+
+    def test_sdk_model_info_by_key_uses_model_key(self: "TestLMStudioClient") -> None:
+        """Test SDK model info is normalized to a dict keyed by modelKey."""
+        info = Mock()
+        info.to_dict.return_value = {
+            "modelKey": "model-one",
+            "displayName": "Model One",
+            "trainedForToolUse": True,
+            "vision": False,
+        }
+
+        result = _sdk_model_info_by_key([Mock(info=info)])
+
+        assert result == {
+            "model-one": {
+                "modelKey": "model-one",
+                "displayName": "Model One",
+                "trainedForToolUse": True,
+                "vision": False,
+            },
+        }
 
     @patch("lmstrix.api.client.lmstudio")
     def test_load_model_success(self: "TestLMStudioClient", mock_lmstudio: Mock) -> None:

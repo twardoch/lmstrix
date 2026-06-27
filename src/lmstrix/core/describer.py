@@ -123,6 +123,22 @@ def _build_prompt(model: Model, web_content: str | None = None) -> str:
     return prompt
 
 
+def _format_capabilities(model: Model) -> str:
+    """Format structured model capabilities for reports."""
+    capabilities = []
+    if model.has_vision:
+        capabilities.append("vision")
+    if model.has_tools:
+        capabilities.append("tool calling")
+    if getattr(model, "has_reasoning", False):
+        default = getattr(model, "default_reasoning", None)
+        if default:
+            capabilities.append(f"reasoning (default: {default})")
+        else:
+            capabilities.append("reasoning")
+    return ", ".join(capabilities) if capabilities else "none recorded"
+
+
 def _parse_response(response_text: str) -> dict | None:
     """Parse LLM JSON response, extracting from markdown code blocks if needed."""
     text = response_text.strip()
@@ -410,10 +426,10 @@ def format_models_markdown(models: list[Model]) -> str:
         lines.append(f"- **Path**: `{model.path}`")
         lines.append(f"- **Size**: {size_gb:.2f} GB")
         lines.append(f"- **Context**: {model.context_limit}")
-        if model.has_vision:
-            lines.append("- **Vision**: Yes")
-        if model.has_tools:
-            lines.append("- **Tool calling**: Yes")
+        lines.append(f"- **Capabilities**: {_format_capabilities(model)}")
+        if getattr(model, "reasoning_options", None):
+            options = ", ".join(f"`{option}`" for option in model.reasoning_options)
+            lines.append(f"- **Reasoning options**: {options}")
         if model.tested_max_context:
             lines.append(f"- **Tested context**: {model.tested_max_context}")
         if model.ttft_seconds is not None:

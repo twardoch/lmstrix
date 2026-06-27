@@ -13,6 +13,7 @@ Every model has a theoretical maximum stated in its documentation. That number i
 - **Scans** your LM Studio models directory and builds a registry of available models
 - **Tests** models using binary search to find their actual maximum context window
 - **Persists** the results to a JSON registry so you never re-test a model you already know
+- **Records capabilities** such as vision input, native tool-use training, and public reasoning options
 - **Runs inference** via LM Studio's local API with configurable prompts and context sizes
 - **Reports** test results and model metadata in formatted terminal tables
 
@@ -34,6 +35,9 @@ lmstrix scan
 
 # List discovered models and their tested context limits
 lmstrix list
+
+# Retrieve full model metadata, including capabilities, as JSON
+lmstrix list --show json
 
 # Find the true context limit for a specific model
 lmstrix test "llama-3.2-3b-instruct"
@@ -60,11 +64,30 @@ Results include time-to-first-token (TTFT) and tokens-per-second (TPS) from the 
 
 Scan results and test results are persisted to a JSON file (default: `~/.local/share/lmstrix/models.json` on Linux, similar paths on macOS/Windows). Subsequent `scan` runs update the registry without discarding test results. `list` reads from the registry without touching LM Studio.
 
+Each model record includes compatibility booleans (`has_vision`, `has_tools`) and a structured `capabilities` object when LM Studio exposes it:
+
+```json
+{
+  "has_vision": true,
+  "has_tools": true,
+  "capabilities": {
+    "vision": true,
+    "trained_for_tool_use": true,
+    "reasoning": {
+      "allowed_options": ["off", "on"],
+      "default": "on"
+    }
+  }
+}
+```
+
+`lmstrix scan` reads these details from LM Studio's native `GET /api/v1/models` endpoint when the local server is reachable, using `LM_API_TOKEN` if your LM Studio server requires authentication. It falls back to the Python SDK's downloaded-model metadata for vision and tool-use flags.
+
 ## CLI reference
 
 ```
 lmstrix scan              Scan LM Studio models directory and update registry
-lmstrix list              List all models with context limits and test status
+lmstrix list              List all models with context limits, capabilities, and test status
 lmstrix test <model-id>   Binary-search for true maximum context window
 lmstrix infer <model-id>  Run inference; options: --prompt, --context, --max-tokens
 ```
@@ -87,11 +110,12 @@ updated_model = tester.test_model(model, max_context=32768, registry=registry)
 print(f"Max working context: {updated_model.tested_max_context}")
 print(f"TTFT: {updated_model.ttft_seconds:.2f}s")
 print(f"TPS: {updated_model.tps:.1f}")
+print(f"Capabilities: {updated_model.capabilities}")
 ```
 
 ## LM Studio setup
 
-LM Studio must be running with its local API server enabled (Settings → Local Server → Start Server). The default address is `http://localhost:1234`. Set `LMSTUDIO_BASE_URL` to override.
+LM Studio must be running with its local API server enabled (Settings → Local Server → Start Server). The default address is `http://localhost:1234`. Set `LMSTUDIO_BASE_URL` to override. If you enabled LM Studio API authentication, set `LM_API_TOKEN` so `lmstrix scan` can read `/api/v1/models`.
 
 ## License
 

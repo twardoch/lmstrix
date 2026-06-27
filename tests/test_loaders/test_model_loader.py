@@ -171,6 +171,71 @@ class TestModelLoader:
 
     @patch("lmstrix.loaders.model_loader.LMStudioClient")
     @patch("lmstrix.loaders.model_loader.load_model_registry")
+    @patch("lmstrix.loaders.model_loader.save_model_registry")
+    def test_scan_updates_existing_model_capabilities(
+        self: "TestModelLoader",
+        mock_save_registry: Mock,
+        mock_load_registry: Mock,
+        mock_client_class: Mock,
+        tmp_path: Path,
+    ) -> None:
+        """Test rescans persist changed capability metadata on existing models."""
+        model_path = "/path/to/existing-model.gguf"
+        registry = ModelRegistry(models_file=tmp_path / "models.json")
+        registry.update_model(
+            model_path,
+            Model(
+                model_id="existing-model",
+                path=model_path,
+                size_bytes=1000,
+                ctx_in=4096,
+                has_tools=False,
+                has_vision=False,
+            ),
+        )
+        mock_load_registry.return_value = registry
+
+        mock_client = Mock()
+        mock_client.list_models.return_value = [
+            {
+                "id": "existing-model",
+                "path": model_path,
+                "size_bytes": 1000,
+                "context_length": 4096,
+                "has_tools": True,
+                "has_vision": True,
+                "capabilities": {
+                    "vision": True,
+                    "trained_for_tool_use": True,
+                    "reasoning": {
+                        "allowed_options": ["off", "on"],
+                        "default": "on",
+                    },
+                },
+            },
+        ]
+        mock_client_class.return_value = mock_client
+
+        updated_registry = scan_and_update_registry()
+        updated_model = updated_registry.get_model(model_path)
+
+        assert updated_model is not None
+        assert updated_model.has_tools is True
+        assert updated_model.has_vision is True
+        assert updated_model.capabilities == {
+            "vision": True,
+            "trained_for_tool_use": True,
+            "reasoning": {
+                "allowed_options": ["off", "on"],
+                "default": "on",
+            },
+        }
+        assert updated_model.to_dict()["has_tools"] is True
+        assert updated_model.to_dict()["has_vision"] is True
+        mock_save_registry.assert_called_once_with(updated_registry)
+
+    @patch("lmstrix.loaders.model_loader.LMStudioClient")
+    @patch("lmstrix.loaders.model_loader.load_model_registry")
     def test_scan_and_update_models_default_client(
         self: "TestModelLoader",
         mock_load_registry: Mock,

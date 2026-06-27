@@ -89,6 +89,7 @@ class ModelScanner:
         elif "1m" in path_str or "1048k" in path_str:
             ctx_in = 1024 * 1024
 
+        has_vision = "vision" in path_str or "vl" in path_str
         return {
             "model_id": model_id,
             "path": str(model_path),
@@ -96,7 +97,11 @@ class ModelScanner:
             "ctx_in": ctx_in,
             "ctx_out": 4096,  # Default
             "has_tools": False,  # Would need to load model to determine
-            "has_vision": "vision" in path_str or "vl" in path_str,  # Heuristic
+            "has_vision": has_vision,  # Heuristic
+            "capabilities": {
+                "vision": has_vision,
+                "trained_for_tool_use": False,
+            },
         }
 
     def scan_models(self) -> dict[str, dict]:

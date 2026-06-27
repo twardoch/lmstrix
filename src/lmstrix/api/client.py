@@ -1,15 +1,20 @@
 """LM Studio API client. Connects to your local LM Studio server to list models, load them, and run inference."""
 
+import os
 import time
 from collections.abc import Callable, Iterator
 from typing import Any
 
+import httpx
 import lmstudio
 from lmstudio import LMStudioServerError
 from pydantic import BaseModel, Field
 
 from lmstrix.api.exceptions import APIConnectionError, InferenceError, ModelLoadError
 from lmstrix.utils.logging import logger
+
+DEFAULT_LMSTUDIO_BASE_URL = "http://localhost:1234"
+MODELS_ENDPOINT_TIMEOUT_SECONDS = 5.0
 
 
 class CompletionResponse(BaseModel):
@@ -29,6 +34,88 @@ class CompletionResponse(BaseModel):
     tps: float | None = Field(None, description="Generation speed in tokens per second (TPS)")
 
 
+def _get_attr(obj: Any, *names: str, default: Any = None) -> Any:
+    """Return the first real attribute value from an SDK object."""
+    for name in names:
+        if not hasattr(obj, name):
+            continue
+        value = getattr(obj, name)
+        if type(value).__module__ == "unittest.mock":
+            continue
+        return value
+    return default
+
+
+def _as_bool(value: Any) -> bool:
+    """Convert known capability values to bool without trusting arbitrary objects."""
+    return value is True
+
+
+def _normalise_capabilities(raw: Any) -> dict[str, Any]:
+    """Return a stable capabilities dict from LM Studio REST or SDK fields."""
+    if not isinstance(raw, dict):
+        return {}
+
+    capabilities: dict[str, Any] = {}
+    if "vision" in raw:
+        capabilities["vision"] = _as_bool(raw.get("vision"))
+    if "trained_for_tool_use" in raw:
+        capabilities["trained_for_tool_use"] = _as_bool(raw.get("trained_for_tool_use"))
+    elif "trainedForToolUse" in raw:
+        capabilities["trained_for_tool_use"] = _as_bool(raw.get("trainedForToolUse"))
+
+    reasoning = raw.get("reasoning")
+    if isinstance(reasoning, dict):
+        capabilities["reasoning"] = reasoning
+
+    return capabilities
+
+
+def _model_info_to_dict(info: Any) -> dict[str, Any]:
+    """Return SDK model info as a plain dict, preferring the SDK wire schema."""
+    to_dict = getattr(info, "to_dict", None)
+    if callable(to_dict):
+        try:
+            data = to_dict()
+        except Exception:
+            data = None
+        if isinstance(data, dict):
+            return data
+
+    return {
+        "modelKey": _get_attr(info, "model_key", "modelKey"),
+        "path": _get_attr(info, "path", default=""),
+        "sizeBytes": _get_attr(info, "size_bytes", "sizeBytes", default=0),
+        "maxContextLength": _get_attr(
+            info,
+            "max_context_length",
+            "maxContextLength",
+            default=8192,
+        ),
+        "displayName": _get_attr(info, "display_name", "displayName", default=""),
+        "architecture": _get_attr(info, "architecture"),
+        "trainedForToolUse": _get_attr(
+            info,
+            "trained_for_tool_use",
+            "trainedForToolUse",
+            default=False,
+        ),
+        "vision": _get_attr(info, "vision", default=False),
+        "type": _get_attr(info, "type", default="llm"),
+    }
+
+
+def _sdk_model_info_by_key(models: Any) -> dict[str, dict[str, Any]]:
+    """Return downloaded SDK model info records keyed by modelKey."""
+    keyed_models: dict[str, dict[str, Any]] = {}
+    for model in models:
+        info_dict = _model_info_to_dict(model.info)
+        model_key = info_dict.get("modelKey") or info_dict.get("model_key")
+        if isinstance(model_key, str):
+            keyed_models[model_key] = info_dict
+    return keyed_models
+
+
 class LMStudioClient:
     """Talks to your local LM Studio server. Manages models and runs inference."""
 
@@ -39,6 +126,42 @@ class LMStudioClient:
         else:
             logger.disable("lmstrix")
 
+    def _list_rest_model_capabilities(self) -> dict[str, dict[str, Any]]:
+        """Fetch current model capabilities from LM Studio's OpenAI-compatible REST API."""
+        base_url = os.environ.get("LMSTUDIO_BASE_URL", DEFAULT_LMSTUDIO_BASE_URL).rstrip("/")
+        headers = {}
+        if token := os.environ.get("LM_API_TOKEN"):
+            headers["Authorization"] = f"Bearer {token}"
+
+        try:
+            response = httpx.get(
+                f"{base_url}/api/v1/models",
+                headers=headers,
+                timeout=MODELS_ENDPOINT_TIMEOUT_SECONDS,
+            )
+            response.raise_for_status()
+            payload = response.json()
+        except Exception as e:
+            logger.debug(f"Could not read REST model capabilities: {e}")
+            return {}
+
+        models = payload.get("models") if isinstance(payload, dict) else None
+        if not isinstance(models, list):
+            return {}
+
+        capabilities_by_key: dict[str, dict[str, Any]] = {}
+        for model in models:
+            if not isinstance(model, dict):
+                continue
+            model_key = model.get("key") or model.get("id")
+            if not isinstance(model_key, str):
+                continue
+            capabilities = _normalise_capabilities(model.get("capabilities"))
+            if capabilities:
+                capabilities_by_key[model_key] = capabilities
+
+        return capabilities_by_key
+
     def list_models(self) -> list[dict[str, Any]]:
         """List all downloaded models."""
         try:
@@ -46,27 +169,31 @@ class LMStudioClient:
         except Exception as e:
             raise APIConnectionError("local", f"Failed to list models: {e}") from e
 
-        # Convert DownloadedModel objects to dicts
+        rest_capabilities = self._list_rest_model_capabilities()
+
+        sdk_models_by_key = _sdk_model_info_by_key(models)
+
+        # Convert DownloadedModel records to lmstrix's registry input format.
         result = []
-        for model in models:
-            # Access the info property which contains all model metadata
-            info = model.info
+        for model_key, info in sdk_models_by_key.items():
+            sdk_capabilities = _normalise_capabilities(info)
+            capabilities = rest_capabilities.get(model_key, sdk_capabilities)
 
             # Handle different attribute names for LLMs vs Embeddings
             model_dict = {
-                "id": getattr(info, "model_key", getattr(info, "modelKey", None)),
-                "path": info.path,
-                "size_bytes": getattr(info, "size_bytes", getattr(info, "sizeBytes", 0)),
-                "context_length": getattr(
-                    info,
-                    "max_context_length",
-                    getattr(info, "maxContextLength", 8192),
+                "id": model_key,
+                "path": info.get("path", ""),
+                "size_bytes": info.get("sizeBytes", info.get("size_bytes", 0)),
+                "context_length": info.get(
+                    "maxContextLength",
+                    info.get("max_context_length", 8192),
                 ),
-                "display_name": getattr(info, "display_name", getattr(info, "displayName", "")),
-                "architecture": info.architecture,
-                "has_tools": getattr(info, "trainedForToolUse", False),
-                "has_vision": getattr(info, "vision", False),
-                "model_type": getattr(info, "type", "llm"),  # 'llm' or 'embedding'
+                "display_name": info.get("displayName", info.get("display_name", "")),
+                "architecture": info.get("architecture"),
+                "has_tools": capabilities.get("trained_for_tool_use", False),
+                "has_vision": capabilities.get("vision", False),
+                "capabilities": capabilities,
+                "model_type": info.get("type", "llm"),  # 'llm' or 'embedding'
             }
             result.append(model_dict)
         return result

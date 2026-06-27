@@ -15,7 +15,19 @@ from lmstrix.loaders.model_loader import load_model_registry, scan_and_update_re
 from lmstrix.utils import setup_logging
 from lmstrix.utils.logging import logger
 
-console = Console()
+console = Console(width=160)
+
+
+def _format_capabilities(model) -> str:
+    """Format model capabilities for terminal output."""
+    labels = []
+    if model.has_vision:
+        labels.append("vision")
+    if model.has_tools:
+        labels.append("tools")
+    if getattr(model, "has_reasoning", False):
+        labels.append("reasoning")
+    return ", ".join(labels) if labels else "-"
 
 
 def list_models_command(
@@ -89,7 +101,7 @@ def list_models_command(
             logger.debug(f"Invalid show option: {show}. Options: id, path, json, md.")
         return
 
-    table = Table(show_lines=False, box=None, expand=False)
+    table = Table(show_lines=False, box=None, expand=True)
     table.add_column("Model ID", style="cyan", no_wrap=False)
     table.add_column("Size(GB)", style="magenta")
     table.add_column("Declared", style="yellow")
@@ -98,6 +110,7 @@ def list_models_command(
     table.add_column("Bad", style="red")
     table.add_column("TTFT", justify="right", style="blue")
     table.add_column("TPS", justify="right", style="blue")
+    table.add_column("Capabilities", style="cyan", no_wrap=False)
     table.add_column("Status", style="blue")
 
     for model in sorted_models:
@@ -124,6 +137,7 @@ def list_models_command(
             last_bad,
             ttft_str,
             tps_str,
+            _format_capabilities(model),
             status,
         )
     console.print(table)

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Model capability discovery during `lmstrix scan` via LM Studio's native `/api/v1/models` endpoint, with SDK fallback for downloaded-model metadata.
+- Structured `capabilities` persistence for each registry model, including `vision`, `trained_for_tool_use`, and optional `reasoning` options.
+- Capability reporting in `lmstrix list`, `lmstrix list --show json`, Markdown reports, and `lmstrix about`.
+
+### Fixed
+- Rescans now update canonical `has_tools` and `has_vision` fields, not only compatibility aliases, so changed capability flags persist to JSON.
+
 ## [1.0.66] - 2025-08-05
 
 ### Fixed
