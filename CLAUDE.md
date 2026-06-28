@@ -57,6 +57,33 @@ LMStrix is a Python toolkit for managing and testing LM Studio models with autom
 -   **Model Registry**: Persists discovered models and their tested limits to JSON.
 -   **Two-Phase Prompts**: Separates prompt template structure from runtime context.
 -   **Binary Search**: Efficiently finds maximum context window through targeted testing.
+-   **Dual-Prompt Verification**: Context testing uses two independent prompts (word-to-digit + arithmetic) with OR logic to reduce false negatives near the KV-cache limit. See `context_tester.py` and `inference.py` for the detailed rationale comments.
+-   **Two-Tier Context Detection**: `scanner.py` uses filename heuristics during fast scan (Tier 2); the LM Studio SDK exposes exact limits but requires loading the model (Tier 1, used by `lmstrix test`).
+-   **tiktoken Approximation**: Token counting uses `cl100k_base` as a universal proxy (±5–15% vs model-specific tokenisers). See `prompts.py` and `context_loader.py`.
+
+### 2.3. CLI Commands
+
+| Command | Description |
+|---|---|
+| `lmstrix scan` | Discover models and update registry |
+| `lmstrix list` | Show registry; `--show json/md/id/path` |
+| `lmstrix test [--model-id ID] [--all] [--dry-run]` | Find max context via binary search |
+| `lmstrix infer PROMPT` | Run inference on a model |
+| `lmstrix desc` | Generate descriptions and keyword tags |
+| `lmstrix save` | Write tested limits to LM Studio config files |
+| `lmstrix doctor` | Check registry health |
+| `lmstrix about` | Show registry statistics |
+
+The `--dry-run` flag on `lmstrix test` prints which models would be tested without connecting to LM Studio.
+
+### 2.4. Integration Tests
+
+Tests under `tests/test_integration/` split into two groups:
+
+- **Mock-based** (always run): use `unittest.mock.patch` to avoid LM Studio dependency.
+- **Live-server** (skipped in CI): marked `@pytest.mark.integration`, gated by the `lmstudio_server` fixture that calls `pytest.skip()` when `http://localhost:1234` is unreachable.
+
+Run only mock-based tests: `pytest -m "not integration"`
 
 ### 2.3. Dependencies
 

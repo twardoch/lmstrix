@@ -30,7 +30,7 @@ class _HTMLTextExtractor(HTMLParser):
         self._pieces: list[str] = []
         self._skip = False
 
-    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:  # noqa: ARG002
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         if tag in ("script", "style", "noscript"):
             self._skip = True
 

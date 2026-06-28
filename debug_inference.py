@@ -3,6 +3,7 @@
 Debug script to compare lmstrix infer vs direct lmstudio calls.
 Focuses on slim-extract-qwen-0.5b model to identify inference issues.
 """
+
 # this_file: debug_inference.py
 
 import sys

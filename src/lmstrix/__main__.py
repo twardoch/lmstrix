@@ -55,6 +55,7 @@ class LMStrixCLI:
         prompt: str | None = None,
         file_prompt: str | None = None,
         key: str | None = None,
+        dry_run: bool = False,
     ) -> None:
         """Test the context limits for models.
 
@@ -71,6 +72,7 @@ class LMStrixCLI:
             prompt: Custom prompt string to use for testing instead of built-in prompts.
             file_prompt: Path to file containing the prompt to use for testing.
             key: Filter by keywords (comma-separated). Only test models matching ALL keywords.
+            dry_run: Print models that would be tested without connecting to LM Studio.
         """
         self.service.test_models(
             model_id=model_id,
@@ -85,6 +87,7 @@ class LMStrixCLI:
             prompt=prompt,
             file_prompt=file_prompt,
             key=key,
+            dry_run=dry_run,
         )
 
     def infer(

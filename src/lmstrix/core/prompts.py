@@ -43,6 +43,13 @@ class PromptResolver:
             verbose: Enable verbose logging.
         """
         self.verbose = verbose
+        # NOTE: cl100k_base is the GPT-4 / text-embedding-ada-002 tokenizer.
+        # It is used here as a *cross-model approximation* because there is no
+        # universal tokenizer that works for every model family. For non-OpenAI
+        # models (Llama, Mistral, Gemma, Phi, …) token counts may differ by
+        # ±5-15 % compared to the model's own tokenizer. This is acceptable for
+        # context-budget estimation and prompt truncation — we are sizing the
+        # prompt, not billing by the token.
         self.encoder = tiktoken.get_encoding("cl100k_base")
 
         if verbose:
@@ -93,11 +100,17 @@ class PromptResolver:
         def repl(match: re.Match[str]) -> str:
             path = match.group(1).strip()
             value = self._get_by_path(root, path)
-            if value is not None:
+            # A placeholder may reference another prompt defined as a table with
+            # a "template" key; resolve to that template so cross-prompt
+            # references (e.g. {{base}}) expand to the referenced text.
+            if isinstance(value, Mapping) and isinstance(value.get("template"), str):
+                value = value["template"]
+            if value is not None and not isinstance(value, Mapping):
                 resolved.append(path)
-                # Escape any braces in the resolved value to prevent format string issues
-                value_str = str(value)
-                return value_str.replace("{", "{{").replace("}", "}}")
+                # Return the value verbatim. Remaining {{...}} fragments inside
+                # the value are resolved in subsequent passes (internal refs) or
+                # left untouched (genuine literals / unknown placeholders).
+                return str(value)
             return match.group(0)
 
         new_text = self.PLACEHOLDER_RE.sub(repl, text)
@@ -200,13 +213,25 @@ class PromptResolver:
         # Count tokens
         token_count = len(self.encoder.encode(current_text))
 
+        # A placeholder counts as resolved if it appeared in the original
+        # template and is no longer present after resolution. This keeps the
+        # report scoped to the template's own placeholders (e.g. a {{base}}
+        # reference is "resolved" even though expanding it pulled in nested
+        # placeholders that were handled internally).
+        resolved_set = set(resolved_placeholders)
+        placeholders_resolved = [
+            p
+            for p in dict.fromkeys(all_placeholders)
+            if p not in remaining or p in resolved_set
+        ]
+
         return ResolvedPrompt(
             name=prompt_name,
             template=template,
             resolved=current_text,
             tokens=token_count,
             placeholders_found=all_placeholders,
-            placeholders_resolved=list(set(resolved_placeholders)),
+            placeholders_resolved=placeholders_resolved,
             placeholders_unresolved=remaining,
         )
 
@@ -239,11 +264,15 @@ class PromptResolver:
                     # Check if this dict has a 'template' key - if so, treat it as a prompt definition
                     if "template" in value and isinstance(value["template"], str):
                         try:
-                            results[full_key] = self.resolve_prompt(
+                            resolved = self.resolve_prompt(
                                 f"{full_key}.template",
                                 prompts_data,
                                 **params,
                             )
+                            # Report the prompt under its public name, not the
+                            # internal ".template" path used for lookup.
+                            resolved.name = full_key
+                            results[full_key] = resolved
                         except ConfigurationError as e:
                             logger.error(f"Failed to resolve prompt '{full_key}': {e}")
                     else:

@@ -219,6 +219,9 @@ class LMStudioClient:
             raise ModelLoadError(model_path, f"LM Studio server error during load: {e}") from e
         except (TypeError, ValueError) as e:
             raise ModelLoadError(model_path, f"Failed to load model: {e}") from e
+        except Exception as e:
+            # Any other failure (network, SDK, etc.) is surfaced as a load error.
+            raise ModelLoadError(model_path, f"Failed to load model: {e}") from e
 
     def load_model_by_id(self, model_id: str, context_len: int) -> Any:
         """Load a model with a specific context length using model ID."""
@@ -333,6 +336,11 @@ class LMStudioClient:
         **kwargs: Any,  # Accept additional parameters
     ) -> CompletionResponse:
         """Make a completion request to a loaded LM Studio model."""
+        # Fall back to the loaded model's own id when no explicit id was passed,
+        # so error messages and logs identify the model under test.
+        if model_id is None:
+            model_id = getattr(llm, "model_id", None)
+
         # LM Studio's complete() method accepts a config dict
         # Pass maxTokens (camelCase) to prevent models from generating indefinitely
 
@@ -471,6 +479,9 @@ class LMStudioClient:
                     model_id or "unknown",
                     "Model was unloaded during inference - likely due to timeout or crash",
                 ) from e
+            raise InferenceError(model_id or "unknown", f"Inference failed: {e}") from e
+        except Exception as e:
+            # Any other failure during generation is surfaced as an inference error.
             raise InferenceError(model_id or "unknown", f"Inference failed: {e}") from e
 
         # Parse the response - could be PredictionResult, dict, or string

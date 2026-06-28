@@ -1,6 +1,6 @@
 """Logging configuration for LMStrix."""
 
-# this_file: src/lmstrix/utils/logging.py  # noqa: ERA001
+# this_file: src/lmstrix/utils/logging.py
 
 import sys
 from typing import Any

@@ -97,8 +97,17 @@ class InferenceEngine:
                 best_ttft = response.ttft_seconds
                 best_tps = response.tps
             else:
-                # Use default dual-test prompts
-                # Test 1: Number words to digits
+                # Dual-test strategy: two independent prompts, OR logic.
+                #
+                # Near the KV-cache limit, attention patterns degrade
+                # gradually — the model may garble one style of response
+                # while still completing another. Running two semantically
+                # distinct prompts and treating success as EITHER passing
+                # avoids discarding a working context size due to a single
+                # bad draw at temperature=1.0.
+                #
+                # Test 1: lexical reasoning — word-to-digit conversion.
+                # Checks that the model can look up / recall "ninety-six" → 96.
                 test_prompt_1 = "Write 'ninety-six' as a number using only digits"
                 response_1 = self.client.completion(
                     llm=llm,
@@ -110,7 +119,8 @@ class InferenceEngine:
 
                 test_1_pass = "96" in response_1.content
 
-                # Test 2: Simple arithmetic
+                # Test 2: trivial arithmetic — acts as a minimal fallback.
+                # Even a heavily degraded model usually echoes "5" for "2+3=".
                 test_prompt_2 = "2+3="
                 response_2 = self.client.completion(
                     llm=llm,
@@ -122,7 +132,8 @@ class InferenceEngine:
 
                 test_2_pass = "5" in response_2.content
 
-                # Success if ANY test passes
+                # OR: at least one correct answer = the model is functional
+                # at this context size; binary search continues upward.
                 success = test_1_pass or test_2_pass
 
                 test1_status = "✓" if test_1_pass else "✗"
@@ -390,8 +401,10 @@ class InferenceEngine:
                             try:
                                 llm.unload()
                                 logger.debug("Unloaded previous model instance")
-                            except:
-                                pass
+                            except Exception as unload_err:
+                                logger.debug(
+                                    f"Could not unload previous model instance: {unload_err}"
+                                )
 
                         llm = self.client.load_model_by_id(model.id, context_len=working_context)
                         response = self.client.completion(

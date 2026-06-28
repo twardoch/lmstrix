@@ -69,10 +69,10 @@ def parse_out_ctx(
         # Try to parse as integer
         try:
             return int(out_ctx)
-        except ValueError:
+        except ValueError as e:
             raise ValueError(
                 f"Invalid out_ctx format '{out_ctx}'. Expected integer or percentage (e.g., '80%')",
-            )
+            ) from e
 
     raise TypeError(f"out_ctx must be int or str, got {type(out_ctx).__name__}")
 

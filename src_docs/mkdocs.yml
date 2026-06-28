@@ -3,15 +3,15 @@
 site_name: LMStrix Documentation
 site_description: Professional Python toolkit for LM Studio - Adaptive Context Optimization and Smart Model Management
 site_author: LMStrix Team
-site_url: https://your-organization.github.io/lmstrix
+site_url: https://twardoch.github.io/lmstrix
 
 # Repository
-repo_name: lmstrix
-repo_url: https://github.com/your-organization/lmstrix
+repo_name: twardoch/lmstrix
+repo_url: https://github.com/twardoch/lmstrix
 edit_uri: edit/main/src_docs/md/
 
 # Copyright
-copyright: Copyright &copy; 2024 LMStrix Team
+copyright: Copyright &copy; 2024–2026 Adam Twardoch
 
 # Configuration
 theme:
@@ -83,6 +83,21 @@ theme:
 plugins:
   - search:
       separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [../src]
+          options:
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_object_full_path: false
+            docstring_style: google
+            merge_init_into_class: true
+            show_signature_annotations: true
+            separate_signature: true
+            members_order: source
   - minify:
       minify_html: true
       minify_js: true
@@ -97,7 +112,7 @@ plugins:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/your-organization/lmstrix
+      link: https://github.com/twardoch/lmstrix
     - icon: fontawesome/brands/python
       link: https://pypi.org/project/lmstrix/
   version:
@@ -132,7 +147,7 @@ markdown_extensions:
   - pymdownx.magiclink:
       normalize_issue_symbols: true
       repo_url_shorthand: true
-      user: your-organization
+      user: twardoch
       repo: lmstrix
   - pymdownx.mark
   - pymdownx.smartsymbols
@@ -167,8 +182,12 @@ nav:
     - Context Testing: context-testing.md
   - Advanced Topics:
     - Model Management: model-management.md
+    - Model Registry Schema: model-registry-schema.md
     - Prompt Templating: prompt-templating.md
     - Performance & Optimization: performance.md
+  - Reference:
+    - Troubleshooting: troubleshooting.md
+    - API Reference: api-reference.md
 
 # Build directory
 site_dir: ../docs

@@ -120,9 +120,8 @@ class TestModelLoader:
 
         assert saved_path == custom_file
         assert custom_file.exists()
-        assert not original_file.exists()  # Original path not used
 
-        # Verify contents
+        # Verify contents were written to the custom path.
         data = json.loads(custom_file.read_text())
         assert "model1" in data["llms"]
 

@@ -309,7 +309,7 @@ def describe_models(
 
     all_models = registry.list_models()
     if model_id:
-        models_to_describe = [m for m in all_models if model_id in (m.id, m.path)]
+        models_to_describe = [m for m in all_models if model_id in (m.id, str(m.path))]
         if not models_to_describe:
             console.print(f"[red]Model not found: {model_id}[/red]")
             return 0

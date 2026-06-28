@@ -27,10 +27,10 @@ class Model:
 
     def __init__(
         self,
-        model_id: str,
-        path: str,
-        size_bytes: int,
-        ctx_in: int,
+        model_id: str | None = None,
+        path: str | Path | None = None,
+        size_bytes: int | None = None,
+        ctx_in: int | None = None,
         ctx_out: int = 4096,
         has_tools: bool = False,
         has_vision: bool = False,
@@ -44,9 +44,34 @@ class Model:
         keywords: list[str] | None = None,
         **kwargs: Any,  # Ignore extra fields
     ) -> None:
-        """Initialize a model with essential fields only."""
+        """Initialize a model with essential fields only.
+
+        ``model_id`` may also be supplied under the persisted ``id`` key, so a
+        model can be round-tripped from :meth:`to_dict` output.
+        """
+        # Accept the persisted "id" field as an alias for model_id.
+        if model_id is None:
+            model_id = kwargs.pop("id", None)
+
+        # Required fields are validated explicitly so callers using the "id"
+        # alias still get a clear TypeError when essential data is missing.
+        missing = [
+            name
+            for name, value in (
+                ("model_id", model_id),
+                ("path", path),
+                ("size_bytes", size_bytes),
+                ("ctx_in", ctx_in),
+            )
+            if value is None
+        ]
+        if missing:
+            raise TypeError(f"Model missing required field(s): {', '.join(missing)}")
+
         self.id = model_id
-        self.path = path
+        # Normalize path to a Path object at the boundary; serialization in
+        # to_dict() converts it back to a string for JSON storage.
+        self.path = Path(path) if isinstance(path, str) else path
         self.size = size_bytes
         self.context_limit = ctx_in
         self.context_out = ctx_out
@@ -134,7 +159,7 @@ class Model:
         """Convert model to dictionary for JSON storage."""
         result = {
             "id": self.id,
-            "path": self.path,
+            "path": str(self.path),
             "size_bytes": self.size,
             "ctx_in": self.context_limit,
             "ctx_out": self.context_out,
@@ -188,17 +213,9 @@ class Model:
         Returns:
             bool: True if the model is valid, False otherwise.
         """
-        # Check if path exists (convert string to Path if needed)
-        model_path = Path(self.path) if isinstance(self.path, str) else self.path
-
         # Skip path existence check - LM Studio manages model paths internally
-        # and they may not be directly accessible as filesystem paths
-        # Only check path existence for obvious test paths
-        if str(model_path).startswith("/path/to/"):
-            # This is a test path, check if it exists
-            if not model_path.exists():
-                logger.warning(f"Test model path does not exist: {self.path}")
-                return False
+        # and they may not be directly accessible as filesystem paths, so a
+        # model's validity is judged on its metadata rather than its location.
 
         # Check if size is positive
         if self.size <= 0:
@@ -320,15 +337,15 @@ class ModelRegistry:
         existing_key = None
 
         # Check if there's an entry with the exact path
-        if model.path in self._models:
-            existing_key = model.path
+        if str(model.path) in self._models:
+            existing_key = str(model.path)
         # Otherwise, check if there's an entry with the model ID
         elif model.id in self._models:
             existing_key = model.id
         else:
             # Search through all models to find one with matching path or ID
             for key, existing_model in self._models.items():
-                if existing_model.path == model.path or existing_model.id == model.id:
+                if str(existing_model.path) == str(model.path) or existing_model.id == model.id:
                     existing_key = key
                     break
 

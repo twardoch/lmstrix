@@ -108,7 +108,22 @@ class ContextTester:
         self.inference_engine = InferenceEngine(
             client=self.client, verbose=verbose, custom_prompt=custom_prompt
         )
-        # Enhanced dual testing prompts
+        # Two independent verification prompts used in sequence during context testing.
+        # Using two prompts rather than one dramatically reduces false negatives:
+        #
+        #   test_prompt_1 — word-to-digit conversion ("ninety-six" → "96")
+        #     Tests lexical reasoning / vocabulary recall. Some models that are
+        #     overloaded at high context sizes may still answer a numeric prompt
+        #     while failing a purely linguistic one.
+        #
+        #   test_prompt_2 — trivial arithmetic ("2+3=")
+        #     Tests basic token completion. Acts as a fallback: if the model is too
+        #     confused by the first prompt it may still echo "5" for the second.
+        #
+        # Inference is declared successful if EITHER prompt produces the expected
+        # answer (OR logic). This avoids discarding a working context size because
+        # one prompt happened to get a garbled response (common near the KV-cache
+        # limit where attention patterns degrade before failing completely).
         self.test_prompt_1 = "Write 'ninety-six' as a number using only digits"
         self.test_prompt_2 = "2+3="
         # Keep legacy for backward compatibility

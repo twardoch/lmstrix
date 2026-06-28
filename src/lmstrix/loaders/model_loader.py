@@ -58,6 +58,11 @@ def save_model_registry(
     """
     save_path = json_path or registry.models_file
 
+    # When an explicit path is given, repoint the registry so it actually
+    # persists there rather than to its original file.
+    if json_path is not None:
+        registry.models_file = json_path
+
     try:
         registry.save()
     except ModelRegistryError as e:

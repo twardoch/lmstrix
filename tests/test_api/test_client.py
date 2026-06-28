@@ -292,7 +292,14 @@ class TestLMStudioClient:
 
         mock_llm.complete.assert_called_once_with(
             "2+2=",
-            config={"maxTokens": 100, "temperature": 0.7},
+            config={
+                "maxTokens": 100,
+                "temperature": 0.8,
+                "topKSampling": 40,
+                "topPSampling": 0.95,
+                "repeatPenalty": 1.1,
+                "minPSampling": 0.05,
+            },
         )
 
     def test_completion_failure(
@@ -326,5 +333,12 @@ class TestLMStudioClient:
 
         mock_llm.complete.assert_called_once_with(
             "Hello",
-            config={"maxTokens": 100},
+            config={
+                "maxTokens": None,
+                "temperature": 0.8,
+                "topKSampling": 40,
+                "topPSampling": 0.95,
+                "repeatPenalty": 1.1,
+                "minPSampling": 0.05,
+            },
         )

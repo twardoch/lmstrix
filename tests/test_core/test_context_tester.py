@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 
 from lmstrix.api.exceptions import ModelLoadError
 from lmstrix.core.context_tester import ContextTester, ContextTestResult
-from lmstrix.core.models import Model
+from lmstrix.core.models import ContextTestStatus, Model
 
 
 class TestContextTestResult:
@@ -85,30 +85,36 @@ class TestContextTester:
             # The actual test_model method returns the model, not the result
 
     def test_test_all_models(self, mock_lmstudio_client: Mock) -> None:
-        """Test batch testing of models."""
+        """Test batch testing of models returns updated models."""
         tester = ContextTester(mock_lmstudio_client)
 
-        models = {
-            "model1": Model(
+        models = [
+            Model(
                 model_id="model1",
                 path="/path/to/model1",
                 size_bytes=1000000,
                 ctx_in=4096,
             ),
-            "model2": Model(
+            Model(
                 model_id="model2",
                 path="/path/to/model2",
                 size_bytes=2000000,
                 ctx_in=8192,
             ),
-        }
+        ]
 
-        # Mock successful tests
-        with patch.object(tester, "test_model") as mock_test:
-            mock_test.return_value = models["model1"]
+        # Mock the per-context probe so no real LM Studio call is made.
+        with patch.object(tester, "_test_at_context") as mock_test:
+            mock_test.return_value = ContextTestResult(
+                context_size=4096,
+                load_success=True,
+                inference_success=True,
+            )
 
-            active, updated = tester.test_all_models(models, passes=1)
+            updated = tester.test_all_models(models, threshold=4096)
 
-            # Should attempt to test both models
-            assert len(active) <= 2
-            assert len(updated) >= 0
+            # Both models should have been tested and marked completed.
+            assert len(updated) == 2
+            assert all(
+                m.context_test_status == ContextTestStatus.COMPLETED for m in updated
+            )

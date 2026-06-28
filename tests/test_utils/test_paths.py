@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
+from lmstrix.api.exceptions import LMStudioInstallationNotFoundError
 from lmstrix.utils.paths import (
     get_context_test_log_path,
     get_context_tests_dir,
@@ -68,6 +69,7 @@ class TestPathUtilities:
             patch("pathlib.Path.home", return_value=home_dir),
             patch(
                 "pathlib.Path.exists",
+                autospec=True,
             ) as mock_exists,
         ):
 
@@ -93,7 +95,7 @@ class TestPathUtilities:
         home_dir.mkdir()
 
         with patch("pathlib.Path.home", return_value=home_dir):
-            with pytest.raises(RuntimeError) as exc_info:
+            with pytest.raises(LMStudioInstallationNotFoundError) as exc_info:
                 get_lmstudio_path()
 
             assert "Could not find LM Studio" in str(exc_info.value)

@@ -3,6 +3,7 @@
 Debug script to understand the test logic differences.
 Shows exactly what the test prompts produce vs expectations.
 """
+
 # this_file: debug_test_logic.py
 
 import sys

@@ -8,11 +8,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **`--dry-run` flag for `lmstrix test`**: resolves which models would be tested and prints a summary without connecting to LM Studio or running any inference.
+- **Model Registry Schema docs** (`src_docs/md/model-registry-schema.md`): complete reference for every field in `lmstrix.json`, with a JSON example and field-population table.
+- **Troubleshooting guide** (`src_docs/md/troubleshooting.md`): covers connection refused, model-not-found, 503 errors, context test failures, tiktoken approximation warnings, registry management, and CLI setup errors.
+- **API Reference page** (`src_docs/md/api-reference.md`): mkdocstrings auto-generated docs for core modules.
+- **mkdocstrings** wired into `src_docs/mkdocs.yml` with Python handler; API Reference, Model Registry Schema, and Troubleshooting added to the nav.
 - Model capability discovery during `lmstrix scan` via LM Studio's native `/api/v1/models` endpoint, with SDK fallback for downloaded-model metadata.
 - Structured `capabilities` persistence for each registry model, including `vision`, `trained_for_tool_use`, and optional `reasoning` options.
 - Capability reporting in `lmstrix list`, `lmstrix list --show json`, Markdown reports, and `lmstrix about`.
 
+### Changed
+- **Dual-prompt context strategy documented** in `context_tester.py` and `inference.py`: explains why two independent verification prompts (word-to-digit + trivial arithmetic) with OR logic reduce false negatives near the KV-cache limit.
+- **Context-limit detection tiers documented** in `scanner.py`: Tier 1 (LM Studio SDK, requires model loaded) vs Tier 2 (filename heuristics used during fast scan).
+- **tiktoken approximation documented** in `prompts.py` and `context_loader.py`: `cl100k_base` encoding is used as a universal approximation (±5–15% vs model-specific tokenisers); 4 chars/token fallback for non-text content.
+- `src_docs/mkdocs.yml`: fixed `site_url`/`repo_url`/`magiclink` from placeholder `your-organization` to `twardoch`.
+
 ### Fixed
+- **Full test suite now green (112 passed, 0 failed)** and self-contained via `uvx hatch test`:
+  - Added `toml` and `pytest-timeout` to the `dev` extra and the Hatch `default` env, and configured a `[tool.hatch.envs.hatch-test]` environment with `pytest-asyncio`, `pytest-cov`, `pytest-mock`, `pytest-timeout`, and `toml` so `uvx hatch test` runs without ad-hoc `--with` flags.
+  - `Model.__init__` now accepts the persisted `id` field as an alias for `model_id` (round-trips `to_dict()` output) and normalises `path` to a `Path`; required fields raise a clear `TypeError` when missing. `to_dict()` serialises `path` back to a string. `update_model_by_id` and `describer` compare paths as strings.
+  - `Model.validate_integrity` no longer rejects models whose path starts with `/path/to/`; validity is judged on metadata, not a magic path prefix (fixes `scan_and_update_registry` dropping freshly discovered models).
+  - `scanner._extract_model_info` now emits the `id` key (consistent with `client.list_models`).
+  - `client.load_model` and `client.completion` wrap unexpected exceptions in `ModelLoadError`/`InferenceError`; `completion` falls back to the loaded model's `model_id` for error messages.
+  - `save_model_registry(registry, json_path=...)` now actually persists to the given path.
+  - Prompt resolution (`PromptResolver`) resolves cross-prompt `{{name}}` references that point to a table's `template`, stops escaping braces (so recursive/literal `{{...}}` resolve correctly), reports `placeholders_resolved` scoped to the template, and names prompts by their public key. `prompt_loader` now relies solely on `PromptResolver` (TOPL pre-resolution removed) so original templates and placeholder bookkeeping are preserved; TOML load errors report "Failed to parse TOML file".
+  - Test corrections: `test_paths` mocks `Path.exists` with `autospec=True` and expects `LMStudioInstallationNotFoundError`; `test_client` expects the full sampling config; `test_context_tester.test_test_all_models` exercises the current `test_all_models(list, threshold)` API; removed an incorrect assertion in `test_save_model_registry_custom_path` (auto-save legitimately writes the original file).
+- **Lint (`hatch run lint:style`)**: now passes clean.
+  - `ERA001` globally ignored to preserve `# this_file:` project convention.
+  - `BLE001`, `TRY300` globally ignored for intentional exception-handling patterns.
+  - `ARG002` per-file ignored in `client.py`, `main.py`, `web_search.py`.
+  - `ANN001` per-file ignored in `listing.py`, `context_tester.py`.
+  - Bare `except:` in `inference.py` replaced with `except Exception as unload_err:`.
+  - B904 `raise ... from e` added in `context_parser.py`.
+  - SIM102 nested-`if` collapsed in `models.py`.
+  - Stale `# noqa` comments removed from `web_search.py` and `logging.py`.
+  - Debug scripts and `issues/`/`examples/` directories excluded from ruff scan.
+- **Integration tests**: mock-based tests now skip gracefully when LM Studio is unreachable; live-server tests gated by `lmstudio_server` fixture with `@pytest.mark.integration`.
 - Rescans now update canonical `has_tools` and `has_vision` fields, not only compatibility aliases, so changed capability flags persist to JSON.
 
 ## [1.0.66] - 2025-08-05

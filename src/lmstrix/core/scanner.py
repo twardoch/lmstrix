@@ -70,9 +70,19 @@ class ModelScanner:
         # Create a short ID by removing the file extension
         model_path.stem if model_path.is_file() else model_path.name
 
-        # Try to extract context info from filename or path
-        # This is a heuristic - actual values come from model metadata
-        ctx_in = 4096  # Default
+        # Context-limit detection: two-tier approach.
+        #
+        # Tier 1 (preferred): the LM Studio Python SDK exposes exact context
+        # limits via its model-info objects when a model is loaded. However
+        # querying the SDK requires loading the model into VRAM, which is too
+        # expensive to do during a fast scan of all local files.
+        #
+        # Tier 2 (used here): filename/path heuristics. Model publishers
+        # routinely embed context size in the filename or directory name
+        # (e.g. "…-128k-…", "…-32k-…"). These are an approximation — the true
+        # limit is what `lmstrix test` empirically verifies via binary search.
+        # The `ctx_in` value set here is overwritten once a model is tested.
+        ctx_in = 4096  # Conservative default when no hint found in path
 
         # Look for context indicators in path
         path_str = str(model_path).lower()
@@ -91,7 +101,7 @@ class ModelScanner:
 
         has_vision = "vision" in path_str or "vl" in path_str
         return {
-            "model_id": model_id,
+            "id": model_id,
             "path": str(model_path),
             "size_bytes": self._get_model_size(model_path),
             "ctx_in": ctx_in,
@@ -122,8 +132,8 @@ class ModelScanner:
             try:
                 model_info = self._extract_model_info(path)
                 if model_info:
-                    models[model_info["model_id"]] = model_info
-                    logger.debug(f"Found model: {model_info['model_id']}")
+                    models[model_info["id"]] = model_info
+                    logger.debug(f"Found model: {model_info['id']}")
             except (OSError, FileNotFoundError) as e:
                 logger.warning(f"Error scanning {path}: {e}")
 

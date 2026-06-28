@@ -115,9 +115,17 @@ def estimate_tokens(
 ) -> int:
     """Estimate the number of tokens in a text.
 
+    Uses tiktoken with the GPT-4 tokenizer (``cl100k_base``) as a
+    cross-model approximation. Counts for non-OpenAI models (Llama,
+    Mistral, Gemma, Phi, …) may differ by ±5-15 % from the model's
+    own tokenizer. This is acceptable for context-budget estimation
+    and file truncation — we are sizing content, not counting billable
+    tokens. Falls back to ``len(text) // 4`` if tiktoken fails.
+
     Args:
         text: Text to estimate tokens for.
-        model_encoding: Tiktoken encoding to use.
+        model_encoding: Tiktoken encoding to use. Defaults to
+            ``cl100k_base`` (GPT-4 / text-embedding-ada-002 vocab).
 
     Returns:
         Estimated number of tokens.
@@ -128,7 +136,7 @@ def estimate_tokens(
         return len(tokens)
     except (ValueError, KeyError) as e:
         logger.warning(f"Failed to estimate tokens with tiktoken: {e}")
-        # Fallback: rough estimate of 1 token per 4 characters
+        # Rough fallback: English prose averages ~4 chars/token
         return len(text) // 4
 
 

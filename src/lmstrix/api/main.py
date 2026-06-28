@@ -581,8 +581,14 @@ class LMStrixService:
         prompt: str | None = None,
         file_prompt: str | None = None,
         key: str | None = None,
+        dry_run: bool = False,
     ) -> None:
-        """Test the context limits for models."""
+        """Test the context limits for models.
+
+        When ``dry_run=True`` the method resolves and prints the list of
+        models that *would* be tested, then returns without connecting to
+        LM Studio. Useful for verifying filters and keyword matching in CI.
+        """
         setup_logging(verbose=verbose)
         registry = load_model_registry(verbose=verbose)
 
@@ -609,6 +615,19 @@ class LMStrixService:
                 if not models_to_test:
                     logger.error(f"No models match all keywords: {', '.join(keywords)}")
                     return
+
+        # Dry-run: print what would be tested and exit without touching LM Studio
+        if dry_run:
+            console.print(
+                f"[bold cyan]Dry run — {len(models_to_test)} model(s) would be tested:[/bold cyan]"
+            )
+            for m in models_to_test:
+                console.print(
+                    f"  [yellow]{m.id}[/yellow]  "
+                    f"ctx_in={m.context_limit:,}  "
+                    f"threshold={min(threshold, m.context_limit):,}"
+                )
+            return
 
         # If reset flag is used, clear test results for all models being tested
         if reset:
